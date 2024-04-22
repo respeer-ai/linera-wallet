@@ -1,0 +1,69 @@
+{
+  "name": "linera-checko-wallet",
+  "version": "0.0.1",
+  "description": "Another wallet client for Linera blockchain",
+  "productName": "CheCko Wallet",
+  "author": "respeer.ai <kikakkz@hotmail.com>",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --fix --ext .js,.ts,.vue ./",
+    "format": "prettier --write \"**/*.{js,ts,vue,,html,md,json}\" --ignore-path .gitignore",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "start": "quasar dev"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.9.11",
+    "@napi-rs/ed25519": "^1.1.1",
+    "@quasar/extras": "^1.16.11",
+    "@types/uuid": "^9.0.7",
+    "@vue/apollo-components": "^4.0.0-beta.5",
+    "@vue/apollo-composable": "^4.0.0-beta.8",
+    "axios": "^1.2.1",
+    "core-js": "^3.6.5",
+    "css-loader": "^6.8.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "graphql": "^16.8.1",
+    "graphql-ws": "^5.16.0",
+    "multiformats": "^12.0.1",
+    "pinia": "^2.0.11",
+    "quasar": "^2.6.0",
+    "uuid": "^9.0.1",
+    "vue": "^3.0.0",
+    "vue-demi": "^0.14.5",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.0.0"
+  },
+  "devDependencies": {
+    "@quasar/app-webpack": "^3.12.5",
+    "@quasar/quasar-app-extension-apollo": "^2.0.0-beta.5",
+    "@types/node": "^12.20.21",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "prettier": "^2.5.1"
+  },
+  "browserslist": [
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 12.22.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
