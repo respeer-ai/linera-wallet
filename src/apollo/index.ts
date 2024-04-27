@@ -4,20 +4,24 @@ import { createHttpLink, InMemoryCache, split } from '@apollo/client/core'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
-import { Cookies } from 'quasar'
 
-export /* async */ function getClientOptions (/* {app, router, ...}, options?: Partial<BootFileParams<unknown>> */) {
-  const port = Cookies.get('service-port') || '8080'
-  const host = Cookies.get('service-host') || 'localhost'
+export /* async */ function getClientOptions (schema?: string, host?: string, port?: number) {
+  const schema1 = schema || 'https'
+  const port1 = port?.toString() || '8080'
+  const host1 = host || 'localhost'
+
+  const httpBaseUrl = schema1 + '://' + host1 + ':' + port1
+  const wsBaseUrl = schema1 + '://' + host1 + ':' + port1 + '/ws'
+
   const wsLink = new GraphQLWsLink(
     createClient({
-      url: 'ws://' + host + ':' + port + '/ws'
+      url: wsBaseUrl
     })
   )
 
   const httpLink = createHttpLink({
     uri: () => {
-      return 'http://' + host + ':' + port
+      return httpBaseUrl
     }
   })
 
