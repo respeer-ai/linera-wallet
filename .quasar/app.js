@@ -29,6 +29,8 @@ export default async function (createAppFn, quasarUserOptions) {
   const app = createAppFn(RootComponent)
 
   
+  app.config.performance = true
+  
 
   app.use(Quasar, quasarUserOptions)
 
