@@ -6,7 +6,7 @@
 
 <script setup lang='ts'>
 import { onMounted } from 'vue'
-import { Berith, Ed25519SigningKey } from '@hazae41/berith'
+import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
@@ -78,18 +78,17 @@ const initMicrochainChainStore = async (publicKey: string, chainId: string, mess
   })
 }
 
-const generateEd25519SigningKey = (done?: (publicKey: string) => void) => {
+const generateEd25519SigningKey = (done?: (keyPair: Ed25519SigningKey) => void) => {
   Berith.initBundledOnce()
     .then(() => {
-      const keyPair = new Ed25519SigningKey()
-      done?.(toHex(keyPair.public().to_bytes().bytes))
+      done?.(new Ed25519SigningKey())
     })
     .catch((reason) => {
       console.log('Rejected:', reason)
     })
 }
 
-const getPendingRawBlock = (chainId: string, done?: () => void) => {
+const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => void) => {
   const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
   const apolloClient = new ApolloClient(options)
 
@@ -97,9 +96,20 @@ const getPendingRawBlock = (chainId: string, done?: () => void) => {
     query getPendingRawBlock($chainId: String!) {
       peekCandidateBlockAndRound(chainId: $chainId) {
         block {
+          chainId
+          epoch
+          incomingMessages {
+            origin
+            event
+            action
+          }
+          operations
+          height
+          timestamp
           authenticatedSigner
           previousBlockHash
         }
+        round
       }
     }
   `, {
@@ -109,26 +119,33 @@ const getPendingRawBlock = (chainId: string, done?: () => void) => {
   }))
 
   onResult((res) => {
-    console.log(res)
-    done?.()
+    console.log(graphqlResult.data(res, 'peekCandidateBlockAndRound'))
+    done?.(graphqlResult.data(res, 'peekCandidateBlockAndRound'))
   })
 
   onError((error) => {
-    console.log(error)
+    console.log(error, (blockAndRound: unknown) => {
+      console.log(blockAndRound)
+    })
   })
 }
 
-const listenNewBlock = (chainId: string) => {
-  getPendingRawBlock(chainId)
+const listenNewBlock = (chainId: string, keyPair: Ed25519SigningKey) => {
+  getPendingRawBlock(chainId, (blockAndRound: unknown) => {
+    // TODO: here should be wrond
+    const bytes = new TextEncoder().encode(JSON.stringify(blockAndRound))
+    console.log(toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes))
+  })
 }
 
 const initWallet = () => {
-  generateEd25519SigningKey((publicKey: string) => {
+  generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
+    const publicKey = toHex(keyPair.public().to_bytes().bytes)
     console.log('Opening chain for ', publicKey)
     void openChain(publicKey, (chainId: string, messageId: string) => {
       void initMicrochainChainStore(publicKey, chainId, messageId, () => {
         setInterval(() => {
-          listenNewBlock(chainId)
+          listenNewBlock(chainId, keyPair)
         }, 5000)
       })
     })
