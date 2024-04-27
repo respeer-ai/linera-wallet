@@ -130,11 +130,36 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
   })
 }
 
+const submitBlockSignature = async (chainId: string, height: number, signature: string, done?: () => void) => {
+  const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
+  const apolloClient = new ApolloClient(options)
+
+  const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
+    mutation submitBlockSignature ($chainId: String!, $height: Int!, $signature: String!) {
+      submitBlockSignature(chainId: $chainId, height: $height, signature: $signature)
+    }`))
+  onDone((res) => {
+    console.log('Success submit block signature for', chainId, res)
+    done?.()
+  })
+  onError((error) => {
+    console.log('Fail submit block signature for', chainId, error)
+  })
+  await mutate({
+    chainId,
+    height,
+    signature
+  })
+}
+
 const listenNewBlock = (chainId: string, keyPair: Ed25519SigningKey) => {
   getPendingRawBlock(chainId, (blockAndRound: unknown) => {
     // TODO: here should be wrond
     const bytes = new TextEncoder().encode(JSON.stringify(blockAndRound))
-    console.log(toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes))
+    const signature = toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+    const height = graphqlResult.keyValue(graphqlResult.keyValue(blockAndRound, 'block'), 'height') as number
+    console.log('Signature', chainId, height, signature)
+    void submitBlockSignature(chainId, height, signature)
   })
 }
 
