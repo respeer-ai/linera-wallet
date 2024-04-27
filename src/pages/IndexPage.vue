@@ -11,6 +11,7 @@ import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
+import { BSON } from 'bson'
 
 // const faucetSchema = 'https'
 // const faucetHost = 'faucet.devnet.linera.net'
@@ -155,7 +156,7 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
 const listenNewBlock = (chainId: string, keyPair: Ed25519SigningKey) => {
   getPendingRawBlock(chainId, (blockAndRound: unknown) => {
     // TODO: here should be wrond
-    const bytes = new TextEncoder().encode(JSON.stringify(blockAndRound))
+    const bytes = BSON.serialize(blockAndRound as BSON.Document)
     const signature = toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
     const height = graphqlResult.keyValue(graphqlResult.keyValue(blockAndRound, 'block'), 'height') as number
     console.log('Signature', chainId, height, signature)
