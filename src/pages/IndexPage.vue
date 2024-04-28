@@ -11,7 +11,6 @@ import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
-import { BSON } from 'bson'
 
 // const faucetSchema = 'https'
 // const faucetHost = 'faucet.devnet.linera.net'
@@ -96,21 +95,8 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query getPendingRawBlock($chainId: String!) {
       peekCandidateBlockAndRound(chainId: $chainId) {
-        block {
-          chainId
-          epoch
-          incomingMessages {
-            origin
-            event
-            action
-          }
-          operations
-          height
-          timestamp
-          authenticatedSigner
-          previousBlockHash
-        }
-        round
+        height
+        blockBytes
       }
     }
   `, {
@@ -120,7 +106,6 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
   }))
 
   onResult((res) => {
-    console.log(graphqlResult.data(res, 'peekCandidateBlockAndRound'))
     done?.(graphqlResult.data(res, 'peekCandidateBlockAndRound'))
   })
 
@@ -154,12 +139,12 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
 }
 
 const listenNewBlock = (chainId: string, keyPair: Ed25519SigningKey) => {
-  getPendingRawBlock(chainId, (blockAndRound: unknown) => {
-    // TODO: here should be wrond
-    const bytes = BSON.serialize(blockAndRound as BSON.Document)
-    const signature = toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
-    const height = graphqlResult.keyValue(graphqlResult.keyValue(blockAndRound, 'block'), 'height') as number
-    console.log('Signature', chainId, height, signature)
+  getPendingRawBlock(chainId, (rawBlockAndRound: unknown) => {
+    // TODO: here should be wrong
+    const blockBytes = graphqlResult.keyValue(rawBlockAndRound, 'blockBytes')
+    const signature = toHex(keyPair.sign(new Memory(blockBytes as Uint8Array)).to_bytes().bytes)
+    const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
+    console.log('Signature', chainId, height, signature, blockBytes)
     void submitBlockSignature(chainId, height, signature)
   })
 }
@@ -170,9 +155,7 @@ const initWallet = () => {
     console.log('Opening chain for ', publicKey)
     void openChain(publicKey, (chainId: string, messageId: string) => {
       void initMicrochainChainStore(publicKey, chainId, messageId, () => {
-        setInterval(() => {
-          listenNewBlock(chainId, keyPair)
-        }, 5000)
+        listenNewBlock(chainId, keyPair)
       })
     })
   })
