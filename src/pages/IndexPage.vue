@@ -9,7 +9,7 @@ import { onMounted } from 'vue'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
-import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
+import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 
 // const faucetSchema = 'https'
@@ -124,8 +124,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
     mutation submitBlockSignature ($chainId: String!, $height: Int!, $signature: String!) {
       submitBlockSignature(chainId: $chainId, height: $height, signature: $signature)
     }`))
-  onDone((res) => {
-    console.log('Success submit block signature for', chainId, res)
+  onDone(() => {
+    console.log('Success submit block signature for', chainId)
     done?.()
   })
   onError((error) => {
@@ -138,13 +138,40 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-const listenNewBlock = (chainId: string, keyPair: Ed25519SigningKey) => {
+const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void) => {
+  const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
+  const apolloClient = new ApolloClient(options)
+
+  const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
+    subscription notifications($chainId: String!) {
+      notifications(chainId: $chainId)
+    }
+  `, {
+    chainId
+  }))
+
+  onResult((res) => {
+    const notifications = graphqlResult.data(res, 'notifications')
+    const reason = graphqlResult.keyValue(notifications, 'reason')
+    const newRawBlock = graphqlResult.keyValue(reason, 'NewRawBlock')
+    console.log('New notification', notifications)
+    if (newRawBlock) {
+      onNewRawBlock?.(graphqlResult.keyValue(newRawBlock, 'height') as number)
+    }
+  })
+}
+
+const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey) => {
   getPendingRawBlock(chainId, (rawBlockAndRound: unknown) => {
     // TODO: here should be wrong
     const blockBytes = graphqlResult.keyValue(rawBlockAndRound, 'blockBytes')
     const signature = toHex(keyPair.sign(new Memory(blockBytes as Uint8Array)).to_bytes().bytes)
     const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
-    console.log('Signature', chainId, height, signature, blockBytes)
+    if (height !== notifiedHeight) {
+      console.log('Mismatch block height', height, notifiedHeight)
+      return
+    }
+    console.log('Signature', chainId, height, signature, toHex(blockBytes as Uint8Array))
     void submitBlockSignature(chainId, height, signature)
   })
 }
@@ -155,7 +182,10 @@ const initWallet = () => {
     console.log('Opening chain for ', publicKey)
     void openChain(publicKey, (chainId: string, messageId: string) => {
       void initMicrochainChainStore(publicKey, chainId, messageId, () => {
-        listenNewBlock(chainId, keyPair)
+        signNewBlock(chainId, 0, keyPair)
+        void subscribe(chainId, (height: number) => {
+          signNewBlock(chainId, height, keyPair)
+        })
       })
     })
   })
