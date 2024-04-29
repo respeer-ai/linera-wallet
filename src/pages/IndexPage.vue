@@ -29,10 +29,7 @@ const rpcHost = '172.16.31.73'
 const rpcPort = 9080
 
 const _wallet = wallet.useWalletStore()
-const accounts = computed(() => _wallet.accounts)
-watch(accounts, () => {
-  console.log(accounts.value)
-})
+const addresses = computed(() => _wallet.accounts.keys())
 
 const toHex = (bytes: Uint8Array) => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
 
