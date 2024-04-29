@@ -1,17 +1,19 @@
 <template>
   <div class='text-center'>
-    Hello world
+    <AccountList />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { onMounted, computed, watch } from 'vue'
+import { onMounted } from 'vue'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { wallet } from 'src/localstores'
+
+import AccountList from 'src/components/AccountList.vue'
 
 // const faucetSchema = 'https'
 // const faucetHost = 'faucet.devnet.linera.net'
@@ -29,7 +31,6 @@ const rpcHost = '172.16.31.73'
 const rpcPort = 9080
 
 const _wallet = wallet.useWalletStore()
-const addresses = computed(() => _wallet.accounts.keys())
 
 const toHex = (bytes: Uint8Array) => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
 
