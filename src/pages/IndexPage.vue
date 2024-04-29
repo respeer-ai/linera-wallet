@@ -5,30 +5,39 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
+import { wallet } from 'src/localstores'
 
 // const faucetSchema = 'https'
 // const faucetHost = 'faucet.devnet.linera.net'
 // const faucetPort = 443
 
+const faucetWsSchema = 'ws'
 const faucetSchema = 'http'
 const faucetHost = '172.16.31.73'
 const faucetPort = 8080
 const faucetUrl = faucetSchema + '://' + faucetHost + ':' + faucetPort.toString()
 
+const rpcWsSchema = 'ws'
 const rpcSchema = 'http'
 const rpcHost = '172.16.31.73'
 const rpcPort = 9080
 
+const _wallet = wallet.useWalletStore()
+const accounts = computed(() => _wallet.accounts)
+watch(accounts, () => {
+  console.log(accounts.value)
+})
+
 const toHex = (bytes: Uint8Array) => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string) => void) => {
-  const options = getClientOptions(faucetSchema, faucetHost, faucetPort)
+  const options = getClientOptions(faucetSchema, faucetWsSchema, faucetHost, faucetPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -55,7 +64,7 @@ const openChain = async (publicKey: string, done?: (chainId: string, messageId: 
 }
 
 const initMicrochainChainStore = async (publicKey: string, chainId: string, messageId: string, done?: () => void) => {
-  const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
+  const options = getClientOptions(rpcSchema, rpcWsSchema, rpcHost, rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -89,7 +98,7 @@ const generateEd25519SigningKey = (done?: (keyPair: Ed25519SigningKey) => void) 
 }
 
 const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => void) => {
-  const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
+  const options = getClientOptions(rpcSchema, rpcWsSchema, rpcHost, rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
@@ -106,18 +115,18 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
   }))
 
   onResult((res) => {
-    done?.(graphqlResult.data(res, 'peekCandidateBlockAndRound'))
+    const rawBlock = graphqlResult.data(res, 'peekCandidateBlockAndRound')
+    if (!rawBlock) return
+    done?.(rawBlock)
   })
 
   onError((error) => {
-    console.log(error, (blockAndRound: unknown) => {
-      console.log(blockAndRound)
-    })
+    console.log(error)
   })
 }
 
 const submitBlockSignature = async (chainId: string, height: number, signature: string, done?: () => void) => {
-  const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
+  const options = getClientOptions(rpcSchema, rpcWsSchema, rpcHost, rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -139,7 +148,7 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
 }
 
 const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void) => {
-  const options = getClientOptions(rpcSchema, rpcHost, rpcPort)
+  const options = getClientOptions(rpcSchema, rpcWsSchema, rpcHost, rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
@@ -179,7 +188,9 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
 const initWallet = () => {
   generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
     const publicKey = toHex(keyPair.public().to_bytes().bytes)
-    console.log('Opening chain for ', publicKey)
+    const privateKey = toHex(keyPair.to_bytes().bytes)
+    void _wallet.addAccount(publicKey, privateKey)
+    console.log('Opening chain for ', publicKey, privateKey)
     void openChain(publicKey, (chainId: string, messageId: string) => {
       void initMicrochainChainStore(publicKey, chainId, messageId, () => {
         signNewBlock(chainId, 0, keyPair)

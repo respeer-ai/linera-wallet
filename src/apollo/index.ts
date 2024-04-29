@@ -5,13 +5,14 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
 
-export /* async */ function getClientOptions (schema?: string, host?: string, port?: number) {
+export /* async */ function getClientOptions (schema?: string, waSchema?: string, host?: string, port?: number) {
   const schema1 = schema || 'https'
   const port1 = port?.toString() || '8080'
   const host1 = host || 'localhost'
+  const waSchema1 = waSchema || 'ws'
 
   const httpBaseUrl = schema1 + '://' + host1 + ':' + port1
-  const wsBaseUrl = schema1 + '://' + host1 + ':' + port1 + '/ws'
+  const wsBaseUrl = waSchema1 + '://' + host1 + ':' + port1 + '/ws'
 
   const wsLink = new GraphQLWsLink(
     createClient({
