@@ -6,7 +6,8 @@ export const useWalletStore = defineStore('checko-wallet', {
   state: () => ({
     accounts: new Map<string, Account>(),
     currentAddress: undefined as unknown as string,
-    chains: new Map<string, Array<string>>(),
+    chains: new Map<string, Map<string, number>>(),
+    chainBalances: new Map<string, number>(),
     walletStorage: localforage.createInstance({
       name: 'checko-wallet'
     }),
@@ -19,15 +20,24 @@ export const useWalletStore = defineStore('checko-wallet', {
     currentAccount (): Account | undefined {
       return this.accounts.get(this.currentAddress)
     },
-    accountChains (): (publicKey: string) => Array<string> {
+    currentChains (): Map<string, number> {
+      return this.chains.get(this.currentAddress) || new Map<string, number>()
+    },
+    accountChains (): (publicKey: string) => Map<string, number> {
       return (publicKey: string) => {
-        return this.chains.get(publicKey) || []
+        return this.chains.get(publicKey) || new Map<string, number>()
       }
     },
     account (): (publicKey: string) => Account | undefined {
       return (publicKey: string) => {
         return this.accounts.get(publicKey)
       }
+    },
+    _chains (): Map<string, Map<string, number>> {
+      return this.chains
+    },
+    _chainBalances (): Map<string, number> {
+      return this.chainBalances
     }
   },
   actions: {
@@ -36,7 +46,7 @@ export const useWalletStore = defineStore('checko-wallet', {
       void this.walletStorage.setItem('chains', '{}')
       void this.walletStorage.setItem('current-address', undefined)
     },
-    load () {
+    load (listener?: () => void) {
       this.walletStorage.getItem('accounts')
         .then((accounts) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
@@ -47,6 +57,7 @@ export const useWalletStore = defineStore('checko-wallet', {
             this.accounts.set(k, _accounts[k] as Account)
           })
           this.loaded = true
+          listener?.()
         })
         .catch((e) => {
           console.log('Load accounts', e)
@@ -57,8 +68,13 @@ export const useWalletStore = defineStore('checko-wallet', {
           const _chains = JSON.parse(chains as string)
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           Object.keys(_chains).forEach((k: string) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            this.chains.set(k, _chains[k] as string[])
+            const kChains = new Map<string, number>()
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+            Object.keys(_chains[k]).forEach((k, v) => {
+              kChains.set(k, v)
+            })
+            this.chains.set(k, kChains)
+            listener?.()
           })
         })
         .catch((e) => {
@@ -110,7 +126,11 @@ export const useWalletStore = defineStore('checko-wallet', {
     },
     saveChains () {
       this.storeReady(() => {
-        this.walletStorage.setItem('chains', JSON.stringify(Object.fromEntries(this.chains)))
+        const obj = {} as Record<string, unknown>
+        this.chains.forEach((v, k) => {
+          obj[k] = Object.fromEntries(v)
+        })
+        this.walletStorage.setItem('chains', JSON.stringify(obj))
           .catch((e) => {
             console.log(e)
           })
@@ -118,11 +138,27 @@ export const useWalletStore = defineStore('checko-wallet', {
     },
     addChain (publicKey: string, chainId: string) {
       let chains = this.chains.get(publicKey)
-      if (!chains) chains = []
-      if (chains?.includes(chainId)) return
-      chains.push(chainId)
+      if (!chains) chains = new Map<string, number>()
+      if (chains?.has(chainId)) return
+      chains.set(chainId, 0)
       this.chains.set(publicKey, chains)
       this.saveChains()
+    },
+    setAccountBalance (publicKey: string, chainId: string, balance: number) {
+      const chains = this.chains.get(publicKey)
+      if (!chains) {
+        throw Error('Invalid public key')
+      }
+      const _balance = chains?.get(chainId)
+      if (_balance === undefined) {
+        throw Error('Invalid account chain')
+      }
+      chains.set(chainId, balance)
+      this.chains.set(publicKey, chains)
+      this.saveChains()
+    },
+    setChainBalance (chainId: string, balance: number) {
+      this.chainBalances.set(chainId, balance)
     }
   }
 })

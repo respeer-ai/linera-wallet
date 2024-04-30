@@ -28,6 +28,7 @@ const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
 const currentAddress = computed(() => _wallet.currentAddress)
 const address = ref(_wallet.currentAddress || addresses.value[0])
+const chains = computed(() => _wallet.currentChains)
 const subscriptions = ref(new Map<string, Array<string>>())
 
 const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
@@ -110,10 +111,28 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-watch(addresses, () => {
-  if (!address.value) {
-    address.value = addresses.value[0]
-  }
+const getAccountBalance = (chainId: string, publicKey?: string, done?: (balance: number) => void) => {
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
+    query getAccountBalance($chainId: String!, $publicKey: String) {
+      balance(chainId: $chainId, publicKey: $publicKey)
+    }
+  `, {
+    chainId,
+    publicKey
+  }, {
+    fetchPolicy: 'network-only'
+  }))
+
+  onResult((res) => {
+    done?.(graphqlResult.data(res, 'balance') as number)
+  })
+
+  onError((error) => {
+    console.log('Get pending block', error)
+  })
+}
+
+const processChains = () => {
   addresses.value.forEach((addr) => {
     const chains = _wallet.accountChains(addr)
     const account = _wallet.account(addr)
@@ -121,13 +140,29 @@ watch(addresses, () => {
       return
     }
     const subscribedChains = subscriptions.value.get(addr)
-    chains.forEach((chainId) => {
+    chains.forEach((balance, chainId) => {
       if (subscribedChains?.includes(chainId)) return
       subscribe(chainId, (height: number) => {
         signNewBlock(chainId, height, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey))))
       })
+      getAccountBalance(chainId, addr, (balance: number) => {
+        _wallet.setAccountBalance(addr, chainId, balance)
+      })
+      getAccountBalance(chainId, undefined, (balance: number) => {
+        _wallet.setChainBalance(chainId, balance)
+      })
     })
   })
+}
+
+watch(addresses, () => {
+  if (!address.value) {
+    address.value = addresses.value[0]
+  }
+})
+
+watch(chains, () => {
+  processChains()
 })
 
 watch(address, () => {
@@ -139,7 +174,9 @@ watch(currentAddress, () => {
 })
 
 onMounted(() => {
-  _wallet.load()
+  _wallet.load(() => {
+    processChains()
+  })
 })
 
 </script>

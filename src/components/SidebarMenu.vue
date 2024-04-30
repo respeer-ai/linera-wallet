@@ -26,17 +26,12 @@
         </q-list>
       </q-scroll-area>
       <div :style='{margin: "16px"}'>
+        <div :style='{margin: "6px 0 0 0"}'>
+          <OpenChain />
+        </div>
         <div :style='{margin: "16px 0"}'>
           <CreateAccount />
         </div>
-        <q-btn
-          outline
-          rounded
-          label='Clear Accounts'
-          @click='onClearAccountsClick'
-          class='text-brown-10'
-          :style='{margin: "6px 0 0 0"}'
-        />
         <q-btn
           outline
           rounded
@@ -51,6 +46,14 @@
           class='text-brown-10'
           :style='{margin: "6px 0 0 0"}'
         />
+        <q-btn
+          outline
+          rounded
+          label='Clear Accounts'
+          @click='onClearAccountsClick'
+          class='text-grey-6 bg-grey-3'
+          :style='{margin: "24px 0 0 0"}'
+        />
       </div>
     </q-drawer>
   </div>
@@ -62,6 +65,7 @@ import { useRouter } from 'vue-router'
 import { wallet } from 'src/localstores'
 
 import CreateAccount from './CreateAccount.vue'
+import OpenChain from './OpenChain.vue'
 
 const minimal = ref(false)
 const selectedMenu = ref('Transfer')
@@ -81,6 +85,10 @@ const menus = ref([
     icon: 'account_tree',
     label: 'Accounts',
     target: '/accounts'
+  }, {
+    icon: 'link',
+    label: 'Microchains',
+    target: '/microchains'
   }, {
     icon: 'monetization_on',
     label: 'Assets'
