@@ -12,7 +12,9 @@
 
 
 
+import {Notify,Cookies} from 'quasar'
 
 
-export default { config: {} }
+
+export default { config: {},plugins: {Notify,Cookies} }
 

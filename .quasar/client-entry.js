@@ -53,7 +53,7 @@ const publicPath = `/`
 async function start ({
   app,
   router
-  , store
+  
 }, bootFiles) {
   
 
@@ -91,7 +91,7 @@ async function start ({
       await bootFiles[i]({
         app,
         router,
-        store,
+        
         ssrContext: null,
         redirect,
         urlPath,
@@ -153,11 +153,15 @@ createQuasarApp(createApp, quasarUserOptions)
 
     return Promise[ method ]([
       
+      import(/* webpackMode: "eager" */ 'boot/pinia'),
+      
       import(/* webpackMode: "eager" */ 'boot/i18n'),
       
       import(/* webpackMode: "eager" */ 'boot/axios'),
       
-      import(/* webpackMode: "eager" */ 'boot/apollo')
+      import(/* webpackMode: "eager" */ 'boot/apollo'),
+      
+      import(/* webpackMode: "eager" */ 'boot/notify-defaults')
       
     ]).then(bootFiles => {
       const boot = mapFn(bootFiles).filter(entry => typeof entry === 'function')
