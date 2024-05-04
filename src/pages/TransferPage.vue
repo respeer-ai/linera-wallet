@@ -96,6 +96,7 @@
       <q-select
         dense
         v-model='targetAddress'
+        :options='targetAddresses'
         :style='{
           height: "48px",
           width: "640px"
@@ -149,7 +150,7 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { wallet } from 'src/localstores'
+import { wallet, notify } from 'src/localstores'
 import { useRoute } from 'vue-router'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
@@ -162,6 +163,8 @@ const fromChainBalance = ref(false)
 const fromAddress = computed(() => _wallet.currentAddress)
 const fromChains = computed(() => Array.from(_wallet.currentChains.keys()))
 
+const notification = notify.useNotificationStore()
+
 interface Query {
   chainId: string
 }
@@ -171,6 +174,7 @@ const fromChainId = ref(queryChainId.value)
 const amount = ref(0)
 
 const toChainBalance = ref(false)
+const targetAddresses = computed(() => Array.from(_wallet.accounts.keys()))
 const targetAddress = ref(undefined as unknown as string)
 const targetChains = computed(() => Array.from(_wallet.accountChains(targetAddress.value).keys()))
 const targetChainId = ref('')
@@ -211,7 +215,16 @@ const onTransferClick = () => {
     fromChainId.value,
     toChainBalance.value ? undefined : targetAddress.value,
     targetChainId.value,
-    amount.value
+    amount.value,
+    undefined,
+    () => {
+      notification.pushNotification({
+        Title: 'Transfer',
+        Message: `Success transfer ${amount.value} TLINERA to ${targetAddress.value} on ${targetChainId.value}.`,
+        Popup: true,
+        Type: notify.NotifyType.Info
+      })
+    }
   )
 }
 
