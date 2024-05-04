@@ -3,7 +3,7 @@
     <q-drawer
       v-model='minimal'
       show-if-above
-      :width='220'
+      :width='260'
       :breakpoint='500'
     >
       <q-scroll-area :style='{height: "400px"}'>
@@ -60,8 +60,8 @@
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { wallet } from 'src/localstores'
 
 import CreateAccount from './CreateAccount.vue'
@@ -69,6 +69,9 @@ import OpenChain from './OpenChain.vue'
 
 const minimal = ref(false)
 const selectedMenu = ref('Transfer')
+
+const route = useRoute()
+const path = ref(route.path)
 
 interface MenuItem {
   icon: string
@@ -115,6 +118,15 @@ const _wallet = wallet.useWalletStore()
 const onClearAccountsClick = () => {
   _wallet.reset()
 }
+
+onMounted(() => {
+  for (let i = 0; i < menus.value.length; i++) {
+    if (menus.value[i].target === path.value) {
+      selectedMenu.value = menus.value[i].label
+      break
+    }
+  }
+})
 
 </script>
 

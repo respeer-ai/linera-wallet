@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
-import { Account } from './types'
+import { Account, Microchain } from './types'
 import localforage from 'localforage'
 
 export const useWalletStore = defineStore('checko-wallet', {
   state: () => ({
     accounts: new Map<string, Account>(),
     currentAddress: undefined as unknown as string,
-    chains: new Map<string, Map<string, number>>(),
-    chainBalances: new Map<string, number>(),
+    // chains: new Map<string, Map<string, number>>(),
+    // chainBalances: new Map<string, number>(),
     walletStorage: localforage.createInstance({
       name: 'checko-wallet'
     }),
@@ -20,12 +20,12 @@ export const useWalletStore = defineStore('checko-wallet', {
     currentAccount (): Account | undefined {
       return this.accounts.get(this.currentAddress)
     },
-    currentChains (): Map<string, number> {
-      return this.chains.get(this.currentAddress) || new Map<string, number>()
+    currentChains (): Map<string, Microchain> {
+      return this.accountChains(this.currentAddress)
     },
-    accountChains (): (publicKey: string) => Map<string, number> {
+    accountChains (): (publicKey: string) => Map<string, Microchain> {
       return (publicKey: string) => {
-        return this.chains.get(publicKey) || new Map<string, number>()
+        return this.accounts.get(publicKey)?.microchains || new Map<string, Microchain>()
       }
     },
     account (): (publicKey: string) => Account | undefined {
@@ -33,18 +33,27 @@ export const useWalletStore = defineStore('checko-wallet', {
         return this.accounts.get(publicKey)
       }
     },
-    _chains (): Map<string, Map<string, number>> {
-      return this.chains
+    chainBalance (): (publicKey: string | undefined, chainId: string) => number {
+      return (publicKey: string | undefined, chainId: string) => {
+        return this.accounts.get(publicKey || this.currentAddress)?.microchains.get(chainId)?.chain_balance || 0
+      }
     },
-    _chainBalances (): Map<string, number> {
-      return this.chainBalances
+    accountBalance (): (publicKey: string | undefined, chainId: string | undefined) => number {
+      return (publicKey: string | undefined, chainId: string | undefined) => {
+        if (chainId) {
+          return this.accounts.get(publicKey || this.currentAddress)?.microchains.get(chainId)?.account_balance || 0
+        }
+        let balance = 0
+        this.accounts.get(publicKey || this.currentAddress)?.microchains.forEach((microchain) => {
+          balance += microchain.account_balance + microchain.chain_balance
+        })
+        return balance
+      }
     }
   },
   actions: {
     reset () {
       void this.walletStorage.setItem('accounts', '{}')
-      void this.walletStorage.setItem('chains', '{}')
-      void this.walletStorage.setItem('current-address', undefined)
     },
     load (listener?: () => void) {
       this.walletStorage.getItem('accounts')
@@ -54,31 +63,26 @@ export const useWalletStore = defineStore('checko-wallet', {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           Object.keys(_accounts).forEach((k: string) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            this.accounts.set(k, _accounts[k] as Account)
+            const account = _accounts[k] as Record<string, unknown>
+            const _account = {
+              privateKey: account.privateKey,
+              microchains: new Map<string, Microchain>()
+            } as Account
+            const microchains = account.microchains as Record<string, unknown>
+            Object.keys(microchains).forEach((k1: string) => {
+              _account.microchains.set(k1, {
+                chain_balance: Number((microchains[k1] as Microchain).chain_balance),
+                account_balance: Number((microchains[k1] as Microchain).account_balance)
+              })
+            })
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            this.accounts.set(k, _account)
           })
           this.loaded = true
           listener?.()
         })
         .catch((e) => {
           console.log('Load accounts', e)
-        })
-      this.walletStorage.getItem('chains')
-        .then((chains) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
-          const _chains = JSON.parse(chains as string)
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          Object.keys(_chains).forEach((k: string) => {
-            const kChains = new Map<string, number>()
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-            Object.keys(_chains[k]).forEach((k, v) => {
-              kChains.set(k, v)
-            })
-            this.chains.set(k, kChains)
-            listener?.()
-          })
-        })
-        .catch((e) => {
-          console.log('Load chains', e)
         })
       this.walletStorage.getItem('current-address')
         .then((currentAddress) => {
@@ -99,7 +103,14 @@ export const useWalletStore = defineStore('checko-wallet', {
     },
     saveAccount () {
       this.storeReady(() => {
-        this.walletStorage.setItem('accounts', JSON.stringify(Object.fromEntries(this.accounts)))
+        const obj = {} as Record<string, unknown>
+        this.accounts.forEach((account, publicKey) => {
+          obj[publicKey] = {
+            microchains: Object.fromEntries(account.microchains),
+            privateKey: account.privateKey
+          }
+        })
+        this.walletStorage.setItem('accounts', JSON.stringify(obj))
           .catch((e) => {
             console.log(e)
           })
@@ -108,7 +119,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     addAccount (publicKey: string, privateKey: string) {
       this.accounts.set(publicKey, {
         privateKey,
-        balance: 0
+        microchains: new Map<string, Microchain>()
       })
       this.saveAccount()
     },
@@ -124,41 +135,46 @@ export const useWalletStore = defineStore('checko-wallet', {
       this.currentAddress = publicKey
       this.saveCurrentAddress()
     },
-    saveChains () {
-      this.storeReady(() => {
-        const obj = {} as Record<string, unknown>
-        this.chains.forEach((v, k) => {
-          obj[k] = Object.fromEntries(v)
-        })
-        this.walletStorage.setItem('chains', JSON.stringify(obj))
-          .catch((e) => {
-            console.log(e)
-          })
-      })
-    },
     addChain (publicKey: string, chainId: string) {
-      let chains = this.chains.get(publicKey)
-      if (!chains) chains = new Map<string, number>()
-      if (chains?.has(chainId)) return
-      chains.set(chainId, 0)
-      this.chains.set(publicKey, chains)
-      this.saveChains()
+      const account = this.accounts.get(publicKey)
+      if (!account) {
+        throw Error('Invalid account public key')
+      }
+      if (account.microchains.has(chainId)) return
+      account.microchains.set(chainId, {
+        chain_balance: 0,
+        account_balance: 0
+      })
+      this.accounts.set(publicKey, account)
+      this.saveAccount()
     },
     setAccountBalance (publicKey: string, chainId: string, balance: number) {
-      const chains = this.chains.get(publicKey)
-      if (!chains) {
-        throw Error('Invalid public key')
+      const account = this.accounts.get(publicKey)
+      if (!account) {
+        throw Error('Invalid account public key')
       }
-      const _balance = chains?.get(chainId)
-      if (_balance === undefined) {
-        throw Error('Invalid account chain')
+      const microchain = account.microchains.get(chainId)
+      if (!microchain) {
+        throw Error('Invalid microchain')
       }
-      chains.set(chainId, balance)
-      this.chains.set(publicKey, chains)
-      this.saveChains()
+      microchain.account_balance = Number(balance)
+      account.microchains.set(chainId, microchain)
+      this.accounts.set(publicKey, account)
+      this.saveAccount()
     },
-    setChainBalance (chainId: string, balance: number) {
-      this.chainBalances.set(chainId, balance)
+    setChainBalance (publicKey: string, chainId: string, balance: number) {
+      const account = this.accounts.get(publicKey)
+      if (!account) {
+        throw Error('Invalid account public key')
+      }
+      const microchain = account.microchains.get(chainId)
+      if (!microchain) {
+        throw Error('Invalid microchain')
+      }
+      microchain.chain_balance = Number(balance)
+      account.microchains.set(chainId, microchain)
+      this.accounts.set(publicKey, account)
+      this.saveAccount()
     }
   }
 })

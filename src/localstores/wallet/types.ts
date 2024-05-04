@@ -1,4 +1,9 @@
+export interface Microchain {
+  chain_balance: number
+  account_balance: number
+}
+
 export interface Account {
-  balance: number
+  microchains: Map<string, Microchain>
   privateKey: string
 }

@@ -153,7 +153,7 @@ const processChains = () => {
       return
     }
     const subscribedChains = subscriptions.value.get(addr)
-    chains.forEach((balance, chainId) => {
+    chains.forEach((microchain, chainId) => {
       if (subscribedChains?.includes(chainId)) return
       subscribe(chainId, (height: number) => {
         signNewBlock(chainId, height, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey))))
@@ -162,7 +162,7 @@ const processChains = () => {
         _wallet.setAccountBalance(addr, chainId, balance)
       })
       getAccountBalance(chainId, undefined, (balance: number) => {
-        _wallet.setChainBalance(chainId, balance)
+        _wallet.setChainBalance(addr, chainId, balance)
       })
     })
   })

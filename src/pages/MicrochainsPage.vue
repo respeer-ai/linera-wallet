@@ -43,7 +43,7 @@
     </div>
   </div>
   <div
-    v-for='chainId in chains.keys()'
+    v-for='chainId in microchains.keys()'
     :key='chainId'
     class='row'
     :style='{
@@ -80,7 +80,7 @@
         color: "#555555"
       }'
     >
-      {{ Number(chains.get(chainId))?.toFixed(6) }} <strong>LINERA</strong>
+      {{ _wallet.accountBalance(undefined, chainId).toFixed(6) }} <strong>LINERA</strong>
     </div>
     <div
       :style='{
@@ -88,7 +88,7 @@
         color: "#555555"
       }'
     >
-      {{ Number(chainBalances.get(chainId))?.toFixed(6) }} <strong>LINERA</strong>
+      {{ _wallet.chainBalance(undefined, chainId).toFixed(6) }} <strong>LINERA</strong>
     </div>
     <div
       :style='{
@@ -123,8 +123,7 @@ import { wallet, notify } from 'src/localstores'
 import { copyToClipboard } from 'quasar'
 
 const _wallet = wallet.useWalletStore()
-const chains = computed(() => _wallet.currentChains)
-const chainBalances = computed(() => _wallet._chainBalances)
+const microchains = computed(() => _wallet.currentChains)
 
 const notification = notify.useNotificationStore()
 
