@@ -8,13 +8,23 @@
         :options='addresses'
         :style='{ height: "24px" }'
       />
+      <q-icon
+        name='content_copy'
+        size='16px'
+        color='grey'
+        :style='{
+          margin: "16px 8px"
+        }'
+        class='cursor-pointer'
+        @click='onCopyAddressClick'
+      />
     </div>
   </div>
 </template>
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { wallet } from 'src/localstores'
+import { wallet, notify } from 'src/localstores'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
@@ -23,6 +33,7 @@ import * as constant from 'src/const'
 
 import lineraLogo from '../assets/LineraLogo.png'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { copyToClipboard } from 'quasar'
 
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
@@ -30,6 +41,8 @@ const currentAddress = computed(() => _wallet.currentAddress)
 const address = ref(_wallet.currentAddress || addresses.value[0])
 const chains = computed(() => _wallet.currentChains)
 const subscriptions = ref(new Map<string, Array<string>>())
+
+const notification = notify.useNotificationStore()
 
 const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
 const apolloClient = new ApolloClient(options)
@@ -178,5 +191,20 @@ onMounted(() => {
     processChains()
   })
 })
+
+const onCopyAddressClick = () => {
+  copyToClipboard(address.value)
+    .then(() => {
+      notification.pushNotification({
+        Title: 'Copy Address',
+        Message: `Success copy address ${address.value} to clipboard.`,
+        Popup: true,
+        Type: notify.NotifyType.Info
+      })
+    })
+    .catch((e) => {
+      console.log('Fail copy address', e)
+    })
+}
 
 </script>

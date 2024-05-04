@@ -63,7 +63,16 @@
       class='row'
     >
       <span>{{ chainId }}</span>
-      <q-icon name='copy' />
+      <q-icon
+        name='content_copy'
+        size='16px'
+        color='grey'
+        :style='{
+          margin: "10px 8px"
+        }'
+        class='cursor-pointer'
+        @click='onCopyChainIdClick(chainId)'
+      />
     </div>
     <div
       :style='{
@@ -110,11 +119,14 @@
 
 <script setup lang='ts'>
 import { computed } from 'vue'
-import { wallet } from 'src/localstores'
+import { wallet, notify } from 'src/localstores'
+import { copyToClipboard } from 'quasar'
 
 const _wallet = wallet.useWalletStore()
 const chains = computed(() => _wallet.currentChains)
 const chainBalances = computed(() => _wallet._chainBalances)
+
+const notification = notify.useNotificationStore()
 
 const onTransferClick = (chainId: string) => {
   console.log(chainId)
@@ -122,6 +134,21 @@ const onTransferClick = (chainId: string) => {
 
 const onCloseClick = (chainId: string) => {
   console.log(chainId)
+}
+
+const onCopyChainIdClick = (chainId: string) => {
+  copyToClipboard(chainId)
+    .then(() => {
+      notification.pushNotification({
+        Title: 'Copy Chain Id',
+        Message: `Success copy chain id ${chainId} to clipboard.`,
+        Popup: true,
+        Type: notify.NotifyType.Info
+      })
+    })
+    .catch((e) => {
+      console.log('Fail copy chain id', e)
+    })
 }
 
 </script>
