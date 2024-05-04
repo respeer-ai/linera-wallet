@@ -156,8 +156,6 @@ import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import * as constant from 'src/const'
 import { _hex } from 'src/utils'
-// eslint-disable-next-line camelcase
-import { sha3_256 } from 'js-sha3'
 
 const _wallet = wallet.useWalletStore()
 const fromChainBalance = ref(false)
@@ -181,37 +179,27 @@ const onMaxAmountClick = () => {
   amount.value = fromChainBalance.value ? _wallet.chainBalance(undefined, fromChainId.value) : _wallet.accountBalance(undefined, fromChainId.value)
 }
 
-const transfer = async (publicKey: string | undefined, chainId: string, targetPublicKey: string | undefined, targetChainId: string, amount: number, userData?: string, done?: () => void) => {
+const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number, userData?: string, done?: () => void) => {
   const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
   const apolloClient = new ApolloClient(options)
 
-  const fromOwner = publicKey ? 'User:' + sha3_256(_hex.toBytes(publicKey)) : undefined
-  const toOwner = targetPublicKey ? 'User:' + sha3_256(_hex.toBytes(targetPublicKey)) : undefined
-  // TODO: targetPublicKey, targetChainId -> recipient
-  const recipient = {
-    Account: {
-      chain_id: targetChainId,
-      owner: toOwner
-    }
-  }
-  // TODO: userData to bytes
   const userDataBytes = userData ? _hex.toBytes(userData) : undefined
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation transfer ($owner: String, $chainId: String!, $recipient: Account!, $amount: String!, $userData: String) {
-      transfer(owner: $owner, chainId: $chainId, recipient: $recipient, amount: $amount, userData: $userData)
+    mutation transfer ($fromPublicKey: String, $fromChainId: String!, $toPublicKey: String, $toChainId: String!, $amount: String!, $userData: String) {
+      transferWithoutBlockProposal(fromPublicKey: $fromPublicKey, fromChainId: $fromChainId, toPublicKey: $toPublicKey, toChainId: $toChainId, amount: $amount, userData: $userData)
     }`))
-  onDone((res) => {
-    console.log(res)
+  onDone(() => {
     done?.()
   })
   onError((error) => {
-    console.log('Fail open chain for ', publicKey, error)
+    console.log('Fail open chain for ', fromPublicKey, error)
   })
   await mutate({
-    owner: fromOwner,
-    chainId,
-    recipient,
+    fromPublicKey,
+    fromChainId,
+    toPublicKey,
+    toChainId,
     amount,
     userData: userDataBytes
   })

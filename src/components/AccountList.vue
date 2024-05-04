@@ -32,14 +32,14 @@ import { graphqlResult, _hex } from 'src/utils'
 import * as constant from 'src/const'
 
 import lineraLogo from '../assets/LineraLogo.png'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { copyToClipboard } from 'quasar'
 
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
 const currentAddress = computed(() => _wallet.currentAddress)
 const address = ref(_wallet.currentAddress || addresses.value[0])
-const chains = computed(() => _wallet.currentChains)
+const chains = computed(() => _wallet.chains)
 const subscriptions = ref(new Map<string, Array<string>>())
 
 const notification = notify.useNotificationStore()
@@ -67,16 +67,20 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void) =>
   })
 }
 
-const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey) => {
+const signNewBlock = (chainId: string, notifiedHeight: number | undefined, keyPair: Ed25519SigningKey, recursive?: boolean) => {
   getPendingRawBlock(chainId, (rawBlockAndRound: unknown) => {
-    // TODO: here should be wrong
+    if (!rawBlockAndRound) {
+      return
+    }
     const blockBytes = graphqlResult.keyValue(rawBlockAndRound, 'blockBytes')
     const signature = _hex.toHex(keyPair.sign(new Memory(blockBytes as Uint8Array)).to_bytes().bytes)
     const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
-    if (height !== notifiedHeight) {
+    if (notifiedHeight !== undefined && height !== notifiedHeight) {
       return
     }
-    void submitBlockSignature(chainId, height, signature)
+    void submitBlockSignature(chainId, height, signature, () => {
+      if (recursive) signNewBlock(chainId, undefined, keyPair, recursive)
+    })
   })
 }
 
@@ -96,7 +100,6 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
 
   onResult((res) => {
     const rawBlock = graphqlResult.data(res, 'peekCandidateBlockAndRound')
-    if (!rawBlock) return
     done?.(rawBlock)
   })
 
@@ -155,8 +158,10 @@ const processChains = () => {
     const subscribedChains = subscriptions.value.get(addr)
     chains.forEach((microchain, chainId) => {
       if (subscribedChains?.includes(chainId)) return
+      const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
+      signNewBlock(chainId, undefined, keyPair, true)
       subscribe(chainId, (height: number) => {
-        signNewBlock(chainId, height, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey))))
+        signNewBlock(chainId, height, keyPair, false)
       })
       getAccountBalance(chainId, addr, (balance: number) => {
         _wallet.setAccountBalance(addr, chainId, balance)
@@ -168,6 +173,16 @@ const processChains = () => {
   })
 }
 
+const _processChains = () => {
+  Berith.initBundledOnce()
+    .then(() => {
+      processChains()
+    })
+    .catch((reason) => {
+      console.log('Rejected:', reason)
+    })
+}
+
 watch(addresses, () => {
   if (!address.value) {
     address.value = addresses.value[0]
@@ -175,7 +190,9 @@ watch(addresses, () => {
 })
 
 watch(chains, () => {
-  processChains()
+  _wallet.load(() => {
+    _processChains()
+  })
 })
 
 watch(address, () => {
@@ -188,7 +205,7 @@ watch(currentAddress, () => {
 
 onMounted(() => {
   _wallet.load(() => {
-    processChains()
+    _processChains()
   })
 })
 

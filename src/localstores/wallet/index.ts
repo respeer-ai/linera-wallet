@@ -49,6 +49,15 @@ export const useWalletStore = defineStore('checko-wallet', {
         })
         return balance
       }
+    },
+    chains (): Map<string, Microchain> {
+      const chains = new Map<string, Microchain>()
+      this.accounts.forEach((account) => {
+        account.microchains.forEach((microchain, chainId) => {
+          chains.set(chainId, microchain)
+        })
+      })
+      return chains
     }
   },
   actions: {
@@ -56,6 +65,9 @@ export const useWalletStore = defineStore('checko-wallet', {
       void this.walletStorage.setItem('accounts', '{}')
     },
     load (listener?: () => void) {
+      if (this.loaded) {
+        return listener?.()
+      }
       this.walletStorage.getItem('accounts')
         .then((accounts) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
