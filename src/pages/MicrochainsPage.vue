@@ -121,14 +121,22 @@
 import { computed } from 'vue'
 import { wallet, notify } from 'src/localstores'
 import { copyToClipboard } from 'quasar'
+import { useRouter } from 'vue-router'
 
 const _wallet = wallet.useWalletStore()
 const microchains = computed(() => _wallet.currentChains)
 
 const notification = notify.useNotificationStore()
 
+const router = useRouter()
+
 const onTransferClick = (chainId: string) => {
-  console.log(chainId)
+  void router.push({
+    path: '/transfer',
+    query: {
+      chainId
+    }
+  })
 }
 
 const onCloseClick = (chainId: string) => {
