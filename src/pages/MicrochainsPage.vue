@@ -10,7 +10,7 @@
   >
     <div
       :style='{
-        width: "800px",
+        width: "640px",
         fontWeight: 600
       }'
     >
@@ -57,7 +57,7 @@
   >
     <div
       :style='{
-        width: "800px",
+        width: "640px",
         color: "#555555"
       }'
       class='row'
