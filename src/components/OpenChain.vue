@@ -15,14 +15,13 @@ import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
-import { graphqlResult, _hex } from 'src/utils'
-import * as constant from 'src/const'
+import { graphqlResult, _hex, endpoint } from 'src/utils'
 import { wallet } from 'src/localstores'
 
 const _wallet = wallet.useWalletStore()
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string) => void) => {
-  const options = getClientOptions(constant.faucetSchema, constant.faucetWsSchema, constant.faucetHost, constant.faucetPort)
+  const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetHost, endpoint.faucetPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -48,7 +47,7 @@ const openChain = async (publicKey: string, done?: (chainId: string, messageId: 
 }
 
 const initMicrochainChainStore = async (publicKey: string, chainId: string, messageId: string, done?: () => void) => {
-  const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
+  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -63,7 +62,7 @@ const initMicrochainChainStore = async (publicKey: string, chainId: string, mess
   })
   await mutate({
     publicKey,
-    faucetUrl: constant.faucetUrl,
+    faucetUrl: endpoint.faucetUrl,
     chainId,
     messageId,
     withOtherChains: []
@@ -71,7 +70,7 @@ const initMicrochainChainStore = async (publicKey: string, chainId: string, mess
 }
 
 const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => void) => {
-  const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
+  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
@@ -99,7 +98,7 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
 }
 
 const submitBlockSignature = async (chainId: string, height: number, signature: string, done?: () => void) => {
-  const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
+  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`

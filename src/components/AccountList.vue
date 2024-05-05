@@ -28,8 +28,7 @@ import { wallet, notify } from 'src/localstores'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
-import { graphqlResult, _hex } from 'src/utils'
-import * as constant from 'src/const'
+import { graphqlResult, _hex, endpoint } from 'src/utils'
 
 import lineraLogo from '../assets/LineraLogo.png'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
@@ -44,7 +43,7 @@ const subscriptions = ref(new Map<string, Array<string>>())
 
 const notification = notify.useNotificationStore()
 
-const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
+const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
 const apolloClient = new ApolloClient(options)
 
 const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void) => {

@@ -104,6 +104,10 @@ const menus = ref([
   }, {
     icon: 'token',
     label: 'NFT'
+  }, {
+    icon: 'settings',
+    label: 'Setting',
+    target: '/setting'
   }
 ] as Array<MenuItem>)
 

@@ -155,8 +155,7 @@ import { useRoute } from 'vue-router'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
-import * as constant from 'src/const'
-import { _hex } from 'src/utils'
+import { _hex, endpoint } from 'src/utils'
 
 const _wallet = wallet.useWalletStore()
 const fromChainBalance = ref(false)
@@ -184,7 +183,7 @@ const onMaxAmountClick = () => {
 }
 
 const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number, userData?: string, done?: () => void) => {
-  const options = getClientOptions(constant.rpcSchema, constant.rpcWsSchema, constant.rpcHost, constant.rpcPort)
+  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const userDataBytes = userData ? _hex.toBytes(userData) : undefined
