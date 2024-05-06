@@ -17,6 +17,13 @@ export const useWalletStore = defineStore('checko-wallet', {
     publicKeys (): Array<string> {
       return Array.from(this.accounts.keys())
     },
+    chainIds (): Array<string> {
+      const chainIds = [] as Array<string>
+      this.accounts.forEach((account) => {
+        chainIds.push(...Array.from(account.microchains.keys()))
+      })
+      return chainIds
+    },
     currentAccount (): Account | undefined {
       return this.accounts.get(this.currentAddress)
     },

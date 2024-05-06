@@ -46,7 +46,7 @@ const notification = notify.useNotificationStore()
 const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
 const apolloClient = new ApolloClient(options)
 
-const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void) => {
+const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: () => void) => {
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
@@ -62,7 +62,10 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void) =>
     if (newRawBlock) {
       onNewRawBlock?.(graphqlResult.keyValue(newRawBlock, 'height') as number)
     }
-    // TODO: if new block notified, get account balances
+    const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
+    if (newBlock) {
+      onNewBlock?.()
+    }
   })
 }
 
@@ -147,6 +150,35 @@ const getAccountBalance = (chainId: string, publicKey?: string, done?: (balance:
   })
 }
 
+interface ChainAccountBalances {
+  chainBalance: number
+  accountBalances: Record<string, number>
+}
+
+const getChainAccountBalances = (done: (balances: Record<string, ChainAccountBalances>) => void) => {
+  const chainIds = _wallet.chainIds
+  const publicKeys = _wallet.publicKeys
+
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
+    query getChainAccountBalances($chainIds: [String!]!, $publicKeys: [String!]!) {
+      balances(chainIds: $chainIds, publicKeys: $publicKeys)
+    }
+  `, {
+    chainIds,
+    publicKeys
+  }, {
+    fetchPolicy: 'network-only'
+  }))
+
+  onResult((res) => {
+    done?.(graphqlResult.data(res, 'balances') as Record<string, ChainAccountBalances>)
+  })
+
+  onError((error) => {
+    console.log('Get pending block', error)
+  })
+}
+
 const processChains = () => {
   addresses.value.forEach((addr) => {
     const chains = _wallet.accountChains(addr)
@@ -161,6 +193,21 @@ const processChains = () => {
       signNewBlock(chainId, undefined, keyPair, true)
       subscribe(chainId, (height: number) => {
         signNewBlock(chainId, height, keyPair, false)
+      }, () => {
+        getChainAccountBalances((balances: Record<string, ChainAccountBalances>) => {
+          Object.keys(balances).forEach((chainId: string) => {
+            const chainBalance = balances[chainId]
+            Object.keys(chainBalance?.accountBalances).forEach((publicKey: string) => {
+              const balance = chainBalance?.accountBalances[publicKey]
+              try {
+                _wallet.setChainBalance(publicKey, chainId, chainBalance.chainBalance)
+                _wallet.setAccountBalance(publicKey, chainId, balance)
+              } catch (e) {
+                console.log('Fail get chain account balances', e)
+              }
+            })
+          })
+        })
       })
       getAccountBalance(chainId, addr, (balance: number) => {
         _wallet.setAccountBalance(addr, chainId, balance)
