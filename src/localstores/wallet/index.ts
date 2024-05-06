@@ -147,6 +147,9 @@ export const useWalletStore = defineStore('checko-wallet', {
       this.currentAddress = publicKey
       this.saveCurrentAddress()
     },
+    deleteAddress (publicKey: string) {
+      this.accounts.delete(publicKey)
+    },
     addChain (publicKey: string, chainId: string) {
       const account = this.accounts.get(publicKey)
       if (!account) {

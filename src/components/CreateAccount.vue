@@ -6,6 +6,9 @@
       label='Create Account'
       @click='onCreateAccountClick'
       class='text-brown-10'
+      :style='{
+        width: "100%"
+      }'
     />
   </div>
 </template>

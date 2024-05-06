@@ -6,6 +6,9 @@
       label='Open Chain'
       @click='onOpenChainClick'
       class='text-brown-10'
+      :style='{
+        width: "100%"
+      }'
     />
   </div>
 </template>

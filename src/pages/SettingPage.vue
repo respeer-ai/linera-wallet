@@ -4,13 +4,14 @@
     <q-card
       :style='{
         padding: "48px",
-        borderRadius: "16px"
+        borderRadius: "16px",
+        maxWidth: "736px"
       }'
     >
       <div
         class='text-brown-10'
         :style='{
-          margin: "16px 0 16px 0",
+          margin: "0 0 16px 0",
           fontSize: "20px",
           opacity: 0.8,
           width: "100%"
@@ -71,9 +72,6 @@
         }'
       >
         RPC
-        <span :style='{fontSize: "13px", color: "black"}'>
-          {{ constant.toUrl(rpcSchema, rpcHost, rpcPort) }}
-        </span>
       </div>
       <div class='row'>
         <q-select
@@ -128,6 +126,19 @@
         }'
         @click='onSaveClick'
       />
+      <q-separator />
+      <div :style='{margin: "32px 0 0 0"}'>
+        <ClearAccounts />
+      </div>
+      <div :style='{margin: "32px 0 0 0"}'>
+        <OpenChain />
+      </div>
+      <div :style='{margin: "8px 0"}'>
+        <CreateAccount />
+      </div>
+      <div :style='{margin: "16px 0"}'>
+        <ExportAccounts />
+      </div>
     </q-card>
     <q-space />
   </div>
@@ -138,6 +149,11 @@ import { ref } from 'vue'
 import { setting, notify } from 'src/localstores'
 import { endpoint } from 'src/utils'
 import * as constant from 'src/const'
+
+import CreateAccount from '../components/CreateAccount.vue'
+import OpenChain from '../components/OpenChain.vue'
+import ClearAccounts from '../components/ClearAccounts.vue'
+import ExportAccounts from 'src/components/ExportAccounts.vue'
 
 const _setting = setting.useSettingStore()
 

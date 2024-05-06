@@ -1,5 +1,5 @@
 <template>
-  <div class='row'>
+  <div class='row' :style='{padding: "16px 0 8px 0"}'>
     <q-img
       src='~assets/CheCko.png'
       height='24px'
