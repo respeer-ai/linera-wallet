@@ -119,8 +119,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
     console.log('Success submit block signature for', chainId)
     done?.()
   })
-  onError((error) => {
-    console.log('Fail submit block signature for', chainId, error)
+  onError((/* error */) => {
+    // console.log('Fail submit block signature for', chainId, error)
   })
   await mutate({
     chainId,
@@ -151,8 +151,8 @@ const getAccountBalance = (chainId: string, publicKey?: string, done?: (balance:
 }
 
 interface ChainAccountBalances {
-  chainBalance: number
-  accountBalances: Record<string, number>
+  chain_balance: number
+  account_balances: Record<string, number>
 }
 
 const getChainAccountBalances = (done: (balances: Record<string, ChainAccountBalances>) => void) => {
@@ -197,13 +197,13 @@ const processChains = () => {
         getChainAccountBalances((balances: Record<string, ChainAccountBalances>) => {
           Object.keys(balances).forEach((chainId: string) => {
             const chainBalance = balances[chainId]
-            Object.keys(chainBalance?.accountBalances).forEach((publicKey: string) => {
-              const balance = chainBalance?.accountBalances[publicKey]
+            Object.keys(chainBalance?.account_balances).forEach((publicKey: string) => {
+              const balance = chainBalance?.account_balances[publicKey]
               try {
-                _wallet.setChainBalance(publicKey, chainId, chainBalance.chainBalance)
+                _wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
                 _wallet.setAccountBalance(publicKey, chainId, balance)
               } catch (e) {
-                console.log('Fail get chain account balances', e)
+                // console.log('Fail get chain account balances', e)
               }
             })
           })

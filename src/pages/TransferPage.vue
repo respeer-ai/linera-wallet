@@ -196,7 +196,12 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
     done?.()
   })
   onError((error) => {
-    console.log('Fail open chain for ', fromPublicKey, error)
+    notification.pushNotification({
+      Title: 'Transfer',
+      Message: `Fail transfer ${amount} TLINERA to ${toPublicKey as string} on ${toChainId}: ${error.message}.`,
+      Popup: true,
+      Type: notify.NotifyType.Error
+    })
   })
   await mutate({
     fromPublicKey,
