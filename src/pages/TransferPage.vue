@@ -198,7 +198,7 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
   onError((error) => {
     notification.pushNotification({
       Title: 'Transfer',
-      Message: `Fail transfer ${amount} TLINERA to ${toPublicKey as string} on ${toChainId}: ${error.message}.`,
+      Message: `Fail transfer ${amount} TNAT to ${toPublicKey as string} on ${toChainId}: ${error.message}.`,
       Popup: true,
       Type: notify.NotifyType.Error
     })
@@ -224,7 +224,7 @@ const onTransferClick = () => {
     () => {
       notification.pushNotification({
         Title: 'Transfer',
-        Message: `Success transfer ${amount.value} TLINERA to ${targetAddress.value} on ${targetChainId.value}.`,
+        Message: `Success transfer ${amount.value} TNAT to ${targetAddress.value} on ${targetChainId.value}.`,
         Popup: true,
         Type: notify.NotifyType.Info
       })

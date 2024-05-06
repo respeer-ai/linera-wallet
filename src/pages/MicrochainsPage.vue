@@ -83,7 +83,7 @@
             color: "#555555"
           }'
         >
-          {{ _wallet.accountBalance(undefined, chainId).toFixed(6) }} <strong>TLINERA</strong>
+          {{ _wallet.accountBalance(undefined, chainId).toFixed(6) }} <strong>TNAT</strong>
         </div>
         <div
           :style='{
@@ -91,7 +91,7 @@
             color: "#555555"
           }'
         >
-          {{ _wallet.chainBalance(undefined, chainId).toFixed(6) }} <strong>TLINERA</strong>
+          {{ _wallet.chainBalance(undefined, chainId).toFixed(6) }} <strong>TNAT</strong>
         </div>
         <div
           :style='{

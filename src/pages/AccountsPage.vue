@@ -75,7 +75,7 @@
             color: "#555555"
           }'
         >
-          {{ _wallet.accountBalance(address, undefined).toFixed(6) }} <strong>TLINERA</strong>
+          {{ _wallet.accountBalance(address, undefined).toFixed(6) }} <strong>TNAT</strong>
         </div>
         <div
           :style='{
