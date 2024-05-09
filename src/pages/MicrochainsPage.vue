@@ -83,7 +83,7 @@
             color: "#555555"
           }'
         >
-          {{ _wallet.accountBalance(undefined, chainId).toFixed(6) }} <strong>TNAT</strong>
+          {{ _wallet.accountBalance(undefined, chainId).toFixed(6) }} <strong>TLINERA</strong>
         </div>
         <div
           :style='{
@@ -91,7 +91,7 @@
             color: "#555555"
           }'
         >
-          {{ _wallet.chainBalance(undefined, chainId).toFixed(6) }} <strong>TNAT</strong>
+          {{ _wallet.chainBalance(undefined, chainId).toFixed(6) }} <strong>TLINERA</strong>
         </div>
         <div
           :style='{
@@ -114,7 +114,7 @@
             flat
             label='Close'
             @click='onCloseClick(chainId)'
-            class='text-blue-6'
+            class='text-grey-6'
           />
         </div>
       </div>

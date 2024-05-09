@@ -3,10 +3,10 @@
     <q-drawer
       v-model='minimal'
       show-if-above
-      :width='320'
-      :breakpoint='500'
+      :width='220'
+      :breakpoint='800'
     >
-      <q-scroll-area :style='{height: "400px"}'>
+      <q-scroll-area :style='{height: "100%"}'>
         <q-list padding class='menu-list'>
           <q-item
             v-for='menu in menus'
@@ -70,6 +70,9 @@ const menus = ref([
   }, {
     icon: 'token',
     label: 'NFT'
+  }, {
+    icon: 'apps',
+    label: 'Application Portal'
   }, {
     icon: 'settings',
     label: 'Setting',

@@ -75,7 +75,7 @@
             color: "#555555"
           }'
         >
-          {{ _wallet.accountBalance(address, undefined).toFixed(6) }} <strong>TNAT</strong>
+          {{ _wallet.accountBalance(address, undefined).toFixed(6) }} <strong>TLINERA</strong>
         </div>
         <div
           :style='{
@@ -106,7 +106,7 @@
             flat
             label='Delete'
             @click='onDeleteClick(address)'
-            class='text-blue-6'
+            class='text-grey-6'
           />
         </div>
       </div>
