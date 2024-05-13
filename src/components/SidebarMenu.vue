@@ -11,10 +11,11 @@
           <q-item
             v-for='menu in menus'
             :key='menu.label'
-            clickable
+            :clickable='!menu.disable'
             v-ripple
             @click='onMenuClick(menu)'
             :class='[ selectedMenu === menu.label ? "text-red-8 bg-red-1" : "" ]'
+            :disable='menu.disable'
           >
             <q-item-section avatar>
               <q-icon :name='menu.icon' />
@@ -43,40 +44,38 @@ interface MenuItem {
   icon: string
   label: string
   target: string
+  disable: boolean
 }
 
 const menus = ref([
   {
     icon: 'account_balance_wallet',
     label: 'Transfer',
-    target: '/transfer'
+    target: '/transfer',
+    disable: false
   }, {
     icon: 'account_tree',
     label: 'Accounts',
-    target: '/accounts'
+    target: '/accounts',
+    disable: false
   }, {
     icon: 'link',
     label: 'Microchains',
-    target: '/microchains'
-  }, {
-    icon: 'monetization_on',
-    label: 'Assets'
+    target: '/microchains',
+    disable: false
   }, {
     icon: 'contacts',
-    label: 'Contacts'
+    label: 'Contacts',
+    disable: true
   }, {
     icon: 'security',
-    label: 'Security'
-  }, {
-    icon: 'token',
-    label: 'NFT'
-  }, {
-    icon: 'apps',
-    label: 'Application Portal'
+    label: 'Security',
+    disable: true
   }, {
     icon: 'settings',
     label: 'Setting',
-    target: '/setting'
+    target: '/setting',
+    disable: false
   }
 ] as Array<MenuItem>)
 

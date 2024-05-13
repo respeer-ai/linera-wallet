@@ -74,8 +74,8 @@ const signNewBlock = (chainId: string, notifiedHeight: number | undefined, keyPa
     if (!rawBlockAndRound) {
       return
     }
-    const blockBytes = graphqlResult.keyValue(rawBlockAndRound, 'blockBytes')
-    const signature = _hex.toHex(keyPair.sign(new Memory(blockBytes as Uint8Array)).to_bytes().bytes)
+    const payloadBytes = graphqlResult.keyValue(rawBlockAndRound, 'payloadBytes')
+    const signature = _hex.toHex(keyPair.sign(new Memory(payloadBytes as Uint8Array)).to_bytes().bytes)
     const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
     if (notifiedHeight !== undefined && height !== notifiedHeight) {
       return
@@ -89,9 +89,9 @@ const signNewBlock = (chainId: string, notifiedHeight: number | undefined, keyPa
 const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => void) => {
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query getPendingRawBlock($chainId: String!) {
-      peekCandidateBlockAndRound(chainId: $chainId) {
+      peekCandidateRawBlockPayload(chainId: $chainId) {
         height
-        blockBytes
+        payloadBytes
       }
     }
   `, {
@@ -101,7 +101,7 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
   }))
 
   onResult((res) => {
-    const rawBlock = graphqlResult.data(res, 'peekCandidateBlockAndRound')
+    const rawBlock = graphqlResult.data(res, 'peekCandidateRawBlockPayload')
     done?.(rawBlock)
   })
 

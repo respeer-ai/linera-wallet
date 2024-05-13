@@ -128,9 +128,6 @@
       />
       <q-separator />
       <div :style='{margin: "32px 0 0 0"}'>
-        <ClearAccounts />
-      </div>
-      <div :style='{margin: "32px 0 0 0"}'>
         <OpenChain />
       </div>
       <div :style='{margin: "8px 0"}'>
@@ -139,6 +136,10 @@
       <div :style='{margin: "16px 0"}'>
         <ExportAccounts />
       </div>
+      <div :style='{margin: "32px 0 32px 0"}'>
+        <ClearAccounts />
+      </div>
+      <q-separator />
     </q-card>
     <q-space />
   </div>
@@ -150,9 +151,9 @@ import { setting, notify } from 'src/localstores'
 import { endpoint } from 'src/utils'
 import * as constant from 'src/const'
 
-import CreateAccount from '../components/CreateAccount.vue'
-import OpenChain from '../components/OpenChain.vue'
-import ClearAccounts from '../components/ClearAccounts.vue'
+import CreateAccount from 'src/components/CreateAccount.vue'
+import OpenChain from 'src/components/OpenChain.vue'
+import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
 
 const _setting = setting.useSettingStore()

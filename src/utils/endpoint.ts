@@ -40,5 +40,5 @@ export const rpcHost = (() => {
 
 export const rpcPort = (() => {
   const _setting = useSettingStore()
-  return _setting.setting?.rpcPort || 9080
+  return _setting.setting?.rpcPort || 30080
 })()
