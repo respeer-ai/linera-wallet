@@ -35,7 +35,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const minimal = ref(false)
-const selectedMenu = ref('Transfer')
+const selectedMenu = ref('Microchains')
 
 const route = useRoute()
 const path = computed(() => route.path)
@@ -62,6 +62,11 @@ const menus = ref([
     icon: 'link',
     label: 'Microchains',
     target: '/microchains',
+    disable: false
+  }, {
+    icon: 'library_books',
+    label: 'Activity',
+    target: '/activity',
     disable: false
   }, {
     icon: 'contacts',

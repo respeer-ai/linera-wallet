@@ -197,7 +197,7 @@ const _getChainAccountBalances = () => {
   })
 }
 
-const getBlockWithHash = (chainId: string, hash: string, done?: () => void) => {
+const getBlockWithHash = (chainId: string, hash: string, done?: (height: number, incomingMessages: Array<graphqlResult.IncomingMessage>) => void) => {
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query block($chainId: String!, $hash: String!) {
       block(chainId: $chainId, hash: $hash) {
@@ -246,8 +246,13 @@ const getBlockWithHash = (chainId: string, hash: string, done?: () => void) => {
   }))
 
   onResult((res) => {
-    console.log(res.data)
-    done?.()
+    const block = graphqlResult.data(res, 'block')
+    const value = graphqlResult.keyValue(block, 'value')
+    const executedBlock = graphqlResult.keyValue(value, 'executedBlock')
+    const _block = graphqlResult.keyValue(executedBlock, 'block')
+    const incomingMessages = graphqlResult.keyValue(_block, 'incomingMessages') as Array<graphqlResult.IncomingMessage>
+    const height = graphqlResult.keyValue(_block, 'height') as number
+    done?.(height, incomingMessages)
   })
 
   onError((error) => {
@@ -256,8 +261,27 @@ const getBlockWithHash = (chainId: string, hash: string, done?: () => void) => {
 }
 
 const _getBlockWithHash = (chainId: string, hash: string) => {
-  getBlockWithHash(chainId, hash, () => {
-    // TODO
+  getBlockWithHash(chainId, hash, (height: number, incomingMessages: Array<graphqlResult.IncomingMessage>) => {
+    try {
+      incomingMessages.forEach((incomingMessage: graphqlResult.IncomingMessage) => {
+        if (!incomingMessage.event?.message?.System?.Credit) return
+        _wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.source, (fromPublicKey: string | undefined) => {
+          _wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.target, (toPublicKey: string | undefined) => {
+            _wallet.addActivity(
+              incomingMessage.origin.sender,
+              fromPublicKey,
+              chainId,
+              toPublicKey,
+              incomingMessage.event?.message?.System?.Credit?.amount,
+              height,
+              incomingMessage.event?.timestamp
+            )
+          })
+        })
+      })
+    } catch (e) {
+      // TODO
+    }
   })
 }
 

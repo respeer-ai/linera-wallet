@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
-import { Account, Microchain } from './types'
+import { Account, Activity, Microchain } from './types'
 import localforage from 'localforage'
+import { sha3 } from 'hash-wasm'
+import { _hex } from 'src/utils'
 
 export const useWalletStore = defineStore('checko-wallet', {
   state: () => ({
     accounts: new Map<string, Account>(),
     currentAddress: undefined as unknown as string,
-    // chains: new Map<string, Map<string, number>>(),
-    // chainBalances: new Map<string, number>(),
+    activities: [] as Array<Activity>,
     walletStorage: localforage.createInstance({
       name: 'checko-wallet'
     }),
@@ -65,13 +66,36 @@ export const useWalletStore = defineStore('checko-wallet', {
         })
       })
       return chains
+    },
+    publicKeyFromOwner (): (owner: string | undefined, done: (publicKey: string | undefined) => void) => void {
+      return (owner: string | undefined, done: (publicKey: string | undefined) => void) => {
+        if (!owner) {
+          done(undefined)
+          return
+        }
+        this.accounts.forEach((_, publicKey) => {
+          const publicKeyBytes = _hex.toBytes(publicKey)
+          const typeNameBytes = new TextEncoder().encode('PublicKey::')
+          const bytes = new Uint8Array([...typeNameBytes, ...publicKeyBytes])
+          sha3(bytes, 256).then((hash) => {
+            if (hash === owner) {
+              done(publicKey)
+            }
+          }).catch(() => {
+            // TODO
+          })
+        })
+      }
     }
   },
   actions: {
     reset () {
       void this.walletStorage.setItem('accounts', '{}')
+      void this.walletStorage.setItem('activity', '[]')
+
       this.accounts.clear()
       this.currentAddress = undefined as unknown as string
+      this.activities = []
     },
     load (listener?: () => void) {
       if (this.loaded) {
@@ -111,6 +135,13 @@ export const useWalletStore = defineStore('checko-wallet', {
         })
         .catch((e) => {
           console.log('Load current address', e)
+        })
+      this.walletStorage.getItem('activities')
+        .then((activites) => {
+          this.activities = JSON.parse(activites as string) as Array<Activity> || []
+        })
+        .catch((e) => {
+          console.log('Load activities', e)
         })
     },
     storeReady (ready: () => void) {
@@ -199,6 +230,36 @@ export const useWalletStore = defineStore('checko-wallet', {
       account.microchains.set(chainId, microchain)
       this.accounts.set(publicKey, account)
       this.saveAccount()
+    },
+    saveActivities () {
+      this.storeReady(() => {
+        this.walletStorage.setItem('activities', JSON.stringify(this.activities))
+          .catch((e) => {
+            console.log(e)
+          })
+      })
+    },
+    addActivity (fromChainId: string, fromPublicKey: string | undefined, toChainId: string, toPublicKey: string | undefined, amount: string, blockHeight: number, timestamp: number) {
+      let account = undefined as unknown as Account | undefined
+      if (fromPublicKey) {
+        account = this.accounts.get(fromPublicKey)
+      }
+      if (!account && toPublicKey) {
+        account = this.accounts.get(toPublicKey)
+      }
+      if (!account) {
+        throw Error('Invalid account')
+      }
+      this.activities.push({
+        sourceChain: fromChainId,
+        sourceAddress: fromPublicKey,
+        targetChain: toChainId,
+        targetAddress: toPublicKey,
+        amount,
+        blockHeight,
+        timestamp
+      })
+      this.saveActivities()
     }
   }
 })
