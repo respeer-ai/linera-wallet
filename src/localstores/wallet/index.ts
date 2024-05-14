@@ -70,6 +70,8 @@ export const useWalletStore = defineStore('checko-wallet', {
   actions: {
     reset () {
       void this.walletStorage.setItem('accounts', '{}')
+      this.accounts.clear()
+      this.currentAddress = undefined as unknown as string
     },
     load (listener?: () => void) {
       if (this.loaded) {

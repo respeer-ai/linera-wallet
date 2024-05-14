@@ -46,7 +46,7 @@ const notification = notify.useNotificationStore()
 const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
 const apolloClient = new ApolloClient(options)
 
-const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: () => void) => {
+const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void) => {
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
@@ -64,24 +64,25 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
     }
     const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
     if (newBlock) {
-      onNewBlock?.()
+      onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)
     }
   })
 }
 
-const signNewBlock = (chainId: string, notifiedHeight: number | undefined, keyPair: Ed25519SigningKey, recursive?: boolean) => {
-  getPendingRawBlock(chainId, (rawBlockAndRound: unknown) => {
-    if (!rawBlockAndRound) {
+const signNewBlock = (chainId: string, notifiedHeight: number | undefined, keyPair: Ed25519SigningKey, recursive?: boolean, done?: () => void) => {
+  getPendingRawBlock(chainId, (rawBlockPayload: unknown) => {
+    if (!rawBlockPayload) {
+      done?.()
       return
     }
-    const payloadBytes = graphqlResult.keyValue(rawBlockAndRound, 'payloadBytes')
+    const payloadBytes = graphqlResult.keyValue(rawBlockPayload, 'payloadBytes')
     const signature = _hex.toHex(keyPair.sign(new Memory(payloadBytes as Uint8Array)).to_bytes().bytes)
-    const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
+    const height = graphqlResult.keyValue(rawBlockPayload, 'height') as number
     if (notifiedHeight !== undefined && height !== notifiedHeight) {
       return
     }
     void submitBlockSignature(chainId, height, signature, () => {
-      if (recursive) signNewBlock(chainId, undefined, keyPair, recursive)
+      if (recursive) signNewBlock(chainId, undefined, keyPair, recursive, done)
     })
   })
 }
@@ -179,6 +180,87 @@ const getChainAccountBalances = (done: (balances: Record<string, ChainAccountBal
   })
 }
 
+const _getChainAccountBalances = () => {
+  getChainAccountBalances((balances: Record<string, ChainAccountBalances>) => {
+    Object.keys(balances).forEach((chainId: string) => {
+      const chainBalance = balances[chainId]
+      Object.keys(chainBalance?.account_balances).forEach((publicKey: string) => {
+        const balance = chainBalance?.account_balances[publicKey]
+        try {
+          _wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
+          _wallet.setAccountBalance(publicKey, chainId, balance)
+        } catch (e) {
+          // console.log('Fail get chain account balances', e)
+        }
+      })
+    })
+  })
+}
+
+const getBlockWithHash = (chainId: string, hash: string, done?: () => void) => {
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
+    query block($chainId: String!, $hash: String!) {
+      block(chainId: $chainId, hash: $hash) {
+        hash
+        value {
+          status
+          executedBlock {
+            block {
+              chainId
+              epoch
+              incomingMessages {
+                origin
+                action
+                event
+              }
+              operations
+              height
+              timestamp
+              authenticatedSigner
+              previousBlockHash
+            }
+            outcome {
+              messages {
+                destination
+                authenticatedSigner
+                grant
+                refundGrantTo
+                kind
+                message
+              }
+              messageCounts
+              stateHash
+              oracleRecords {
+                responses
+              }
+            }
+          }
+        }
+      }
+    }
+  `, {
+    chainId,
+    hash
+  }, {
+    fetchPolicy: 'network-only'
+  }))
+
+  onResult((res) => {
+    console.log(res.data)
+    done?.()
+  })
+
+  onError((error) => {
+    console.log('Get pending block', error)
+  })
+}
+
+const _getBlockWithHash = (chainId: string, hash: string) => {
+  getBlockWithHash(chainId, hash, () => {
+    // TODO
+  })
+}
+
 const processChains = () => {
   addresses.value.forEach((addr) => {
     const chains = _wallet.accountChains(addr)
@@ -190,24 +272,14 @@ const processChains = () => {
     chains.forEach((microchain, chainId) => {
       if (subscribedChains?.includes(chainId)) return
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
-      signNewBlock(chainId, undefined, keyPair, true)
+      signNewBlock(chainId, undefined, keyPair, true, () => {
+        _getChainAccountBalances()
+      })
       subscribe(chainId, (height: number) => {
         signNewBlock(chainId, height, keyPair, false)
-      }, () => {
-        getChainAccountBalances((balances: Record<string, ChainAccountBalances>) => {
-          Object.keys(balances).forEach((chainId: string) => {
-            const chainBalance = balances[chainId]
-            Object.keys(chainBalance?.account_balances).forEach((publicKey: string) => {
-              const balance = chainBalance?.account_balances[publicKey]
-              try {
-                _wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
-                _wallet.setAccountBalance(publicKey, chainId, balance)
-              } catch (e) {
-                // console.log('Fail get chain account balances', e)
-              }
-            })
-          })
-        })
+      }, (hash: string) => {
+        _getChainAccountBalances()
+        _getBlockWithHash(chainId, hash)
       })
       getAccountBalance(chainId, addr, (balance: number) => {
         _wallet.setAccountBalance(addr, chainId, balance)

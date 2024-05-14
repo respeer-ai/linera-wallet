@@ -46,7 +46,7 @@
         </div>
       </div>
       <div
-        v-for='chainId in microchains.keys()'
+        v-for='chainId in microchainIds'
         :key='chainId'
         class='row'
         :style='{
@@ -131,6 +131,7 @@ import { useRouter } from 'vue-router'
 
 const _wallet = wallet.useWalletStore()
 const microchains = computed(() => _wallet.currentChains)
+const microchainIds = computed(() => Array.from(microchains.value.keys()))
 
 const notification = notify.useNotificationStore()
 
