@@ -86,6 +86,9 @@ export const useWalletStore = defineStore('checko-wallet', {
           })
         })
       }
+    },
+    _activities (): Array<Activity> {
+      return this.activities
     }
   },
   actions: {
