@@ -150,6 +150,9 @@ const createAccount = () => {
     const publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
     const privateKey = _hex.toHex(keyPair.to_bytes().bytes)
     void _wallet.addAccount(publicKey, privateKey)
+    const account = _wallet.account(publicKey)
+    const _keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+    console.log('generateEd25519SigningKey', keyPair.to_bytes().bytes, privateKey, account, _keyPair.to_bytes().bytes)
     void openChain(publicKey, (chainId: string, messageId: string) => {
       _wallet.addChain(publicKey, chainId)
       void initMicrochainChainStore(publicKey, chainId, messageId, () => {

@@ -29,10 +29,10 @@ import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
-
-import lineraLogo from '../assets/LineraLogo.png'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { copyToClipboard } from 'quasar'
+
+import lineraLogo from '../assets/LineraLogo.png'
 
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
@@ -47,7 +47,6 @@ const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpo
 const apolloClient = new ApolloClient(options)
 
 const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void) => {
-  console.log('Subscribe', chainId)
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
@@ -88,7 +87,7 @@ const signNewBlock = (chainId: string, notifiedHeight: number | undefined, keyPa
   })
 }
 
-const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => void) => {
+const getPendingRawBlock = (chainId: string, done?: (rawBlockPayload: unknown) => void) => {
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query getPendingRawBlock($chainId: String!) {
       peekCandidateRawBlockPayload(chainId: $chainId) {
@@ -103,8 +102,12 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
   }))
 
   onResult((res) => {
-    const rawBlock = graphqlResult.data(res, 'peekCandidateRawBlockPayload')
-    done?.(rawBlock)
+    try {
+      const rawBlock = graphqlResult.data(res, 'peekCandidateRawBlockPayload')
+      done?.(rawBlock)
+    } catch (e) {
+      console.log('Fail process pending raw block', e)
+    }
   })
 
   onError((error) => {
@@ -121,8 +124,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
     console.log('Success submit block signature for', chainId)
     done?.()
   })
-  onError((/* error */) => {
-    // console.log('Fail submit block signature for', chainId, error)
+  onError((error) => {
+    console.log('Fail submit block signature for', chainId, error)
   })
   await mutate({
     chainId,
@@ -191,7 +194,7 @@ const _getChainAccountBalances = () => {
           _wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
           _wallet.setAccountBalance(publicKey, chainId, balance)
         } catch (e) {
-          // console.log('Fail get chain account balances', e)
+          console.log('Fail get chain account balances', e)
         }
       })
     })
@@ -276,13 +279,14 @@ const _getBlockWithHash = (chainId: string, hash: string) => {
               incomingMessage.event?.message?.System?.Credit?.amount,
               height,
               incomingMessage.event?.timestamp,
-              incomingMessage.event?.certificate_hash
+              incomingMessage.event?.certificate_hash,
+              incomingMessage.event?.grant
             )
           })
         })
       })
     } catch (e) {
-      // TODO
+      console.log('Fail process block', e, hash)
     }
   })
 }
@@ -299,14 +303,16 @@ const processChains = () => {
       subscribedChains = []
     }
     chains.forEach((microchain, chainId) => {
-      if (subscribedChains?.includes(chainId)) return
-      subscribedChains?.push(chainId)
+      if (subscribedChains.includes(chainId)) return
+      subscribedChains.push(chainId)
       subscriptions.value.set(addr, subscribedChains)
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
       signNewBlock(chainId, undefined, keyPair, true, () => {
         _getChainAccountBalances()
       })
       subscribe(chainId, (height: number) => {
+        // We must reinitialize key here due to the last one may be disposed
+        const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
         signNewBlock(chainId, height, keyPair, false)
       }, (hash: string) => {
         _getChainAccountBalances()

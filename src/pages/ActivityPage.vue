@@ -25,7 +25,7 @@
             fontWeight: 600
           }'
         >
-          AMOUNT/DATE/BLOCK HEIGHT
+          AMOUNT / DATE / BLOCK
         </div>
         <div
           :style='{
@@ -41,7 +41,7 @@
             fontWeight: 600
           }'
         >
-          TX HASH
+          TX HASH / GAS
         </div>
       </div>
       <div
@@ -120,7 +120,7 @@
               @click='onCopyClick(activity.targetAddress)'
             />
           </div>
-          <strong>On Microchain</strong>
+          <strong>{{ activity.targetAddress ? 'On ' : '' }}Microchain</strong>
           <div class='row'>
             <span>{{ shortid.shortId(activity.targetChain, addressDisplayLength) }}</span>
             <q-icon
@@ -140,19 +140,23 @@
             width: "280px",
             color: "#555555"
           }'
-          class='row'
         >
-          <span>{{ shortid.shortId(activity.certificateHash, addressDisplayLength) }}</span>
-          <q-icon
-            name='content_copy'
-            size='16px'
-            color='grey'
-            :style='{
-              margin: "10px 8px"
-            }'
-            class='cursor-pointer'
-            @click='onCopyClick(activity.certificateHash)'
-          />
+          <div class='row'>
+            <span>{{ shortid.shortId(activity.certificateHash, addressDisplayLength) }}</span>
+            <q-icon
+              name='content_copy'
+              size='16px'
+              color='grey'
+              :style='{
+                margin: "10px 8px"
+              }'
+              class='cursor-pointer'
+              @click='onCopyClick(activity.certificateHash)'
+            />
+          </div>
+          <div>
+            {{ Number(activity.grant || 0).toFixed(4) }} <strong>TLGAS</strong>
+          </div>
         </div>
       </div>
     </div>

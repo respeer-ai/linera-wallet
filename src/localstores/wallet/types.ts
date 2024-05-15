@@ -7,6 +7,7 @@ export interface Activity {
   blockHeight: number
   timestamp: number
   certificateHash: string
+  grant: string
 }
 
 export interface Microchain {

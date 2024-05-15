@@ -147,6 +147,7 @@ export const useWalletStore = defineStore('checko-wallet', {
       this.walletStorage.getItem('activities')
         .then((activites) => {
           this.activities = JSON.parse(activites as string) as Array<Activity> || []
+          this.activities.sort((a, b) => b.timestamp - a.timestamp)
         })
         .catch((e) => {
           console.log('Load activities', e)
@@ -247,11 +248,11 @@ export const useWalletStore = defineStore('checko-wallet', {
           })
       })
     },
-    addActivity (fromChainId: string, fromPublicKey: string | undefined, toChainId: string, toPublicKey: string | undefined, amount: string, blockHeight: number, timestamp: number, certificateHash: string) {
+    addActivity (fromChainId: string, fromPublicKey: string | undefined, toChainId: string, toPublicKey: string | undefined, amount: string, blockHeight: number, timestamp: number, certificateHash: string, grant: string) {
       if ((fromPublicKey && !this.existPublicKey(fromPublicKey)) && (toPublicKey && !this.existPublicKey(toPublicKey))) {
         throw Error('Invalid account')
       }
-      this.activities.push({
+      this.activities.splice(0, 0, {
         sourceChain: fromChainId,
         sourceAddress: fromPublicKey,
         targetChain: toChainId,
@@ -259,7 +260,8 @@ export const useWalletStore = defineStore('checko-wallet', {
         amount,
         blockHeight,
         timestamp,
-        certificateHash
+        certificateHash,
+        grant
       })
       this.saveActivities()
     }
