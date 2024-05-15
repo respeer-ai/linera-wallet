@@ -38,7 +38,7 @@ export interface Message {
 }
 
 export interface Event {
-  certification_hash: string
+  certificate_hash: string
   height: number
   index: number
   authenticated_signer: string

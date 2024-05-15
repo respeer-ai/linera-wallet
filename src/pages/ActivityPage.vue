@@ -13,7 +13,7 @@
       >
         <div
           :style='{
-            width: "400px",
+            width: "280px",
             fontWeight: 600
           }'
         >
@@ -29,11 +29,19 @@
         </div>
         <div
           :style='{
-            width: "400px",
+            width: "280px",
             fontWeight: 600
           }'
         >
           TO
+        </div>
+        <div
+          :style='{
+            width: "280px",
+            fontWeight: 600
+          }'
+        >
+          TX HASH
         </div>
       </div>
       <div
@@ -51,7 +59,7 @@
       >
         <div
           :style='{
-            width: "400px",
+            width: "280px",
             color: "#555555"
           }'
         >
@@ -68,7 +76,7 @@
               @click='onCopyClick(activity.sourceAddress)'
             />
           </div>
-          <strong>On Microchain</strong>
+          <strong>{{ activity.sourceAddress ? 'On ' : '' }}Microchain</strong>
           <div class='row'>
             <span>{{ shortid.shortId(activity.sourceChain, addressDisplayLength) }}</span>
             <q-icon
@@ -95,7 +103,7 @@
         </div>
         <div
           :style='{
-            width: "400px",
+            width: "280px",
             color: "#555555"
           }'
         >
@@ -127,6 +135,25 @@
             />
           </div>
         </div>
+        <div
+          :style='{
+            width: "280px",
+            color: "#555555"
+          }'
+          class='row'
+        >
+          <span>{{ shortid.shortId(activity.certificateHash, addressDisplayLength) }}</span>
+          <q-icon
+            name='content_copy'
+            size='16px'
+            color='grey'
+            :style='{
+              margin: "10px 8px"
+            }'
+            class='cursor-pointer'
+            @click='onCopyClick(activity.certificateHash)'
+          />
+        </div>
       </div>
     </div>
     <q-space />
@@ -143,7 +170,7 @@ const _wallet = wallet.useWalletStore()
 const activities = computed(() => _wallet._activities)
 
 const notification = notify.useNotificationStore()
-const addressDisplayLength = ref(16)
+const addressDisplayLength = ref(10)
 
 const onCopyClick = (address: string) => {
   copyToClipboard(address)

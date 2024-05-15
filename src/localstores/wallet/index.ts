@@ -89,12 +89,17 @@ export const useWalletStore = defineStore('checko-wallet', {
     },
     _activities (): Array<Activity> {
       return this.activities
+    },
+    existPublicKey (): (publicKey: string) => boolean {
+      return (publicKey: string) => {
+        return this.accounts.has(publicKey)
+      }
     }
   },
   actions: {
     reset () {
       void this.walletStorage.setItem('accounts', '{}')
-      void this.walletStorage.setItem('activity', '[]')
+      void this.walletStorage.setItem('activities', '[]')
 
       this.accounts.clear()
       this.currentAddress = undefined as unknown as string
@@ -242,15 +247,8 @@ export const useWalletStore = defineStore('checko-wallet', {
           })
       })
     },
-    addActivity (fromChainId: string, fromPublicKey: string | undefined, toChainId: string, toPublicKey: string | undefined, amount: string, blockHeight: number, timestamp: number) {
-      let account = undefined as unknown as Account | undefined
-      if (fromPublicKey) {
-        account = this.accounts.get(fromPublicKey)
-      }
-      if (!account && toPublicKey) {
-        account = this.accounts.get(toPublicKey)
-      }
-      if (!account) {
+    addActivity (fromChainId: string, fromPublicKey: string | undefined, toChainId: string, toPublicKey: string | undefined, amount: string, blockHeight: number, timestamp: number, certificateHash: string) {
+      if ((fromPublicKey && !this.existPublicKey(fromPublicKey)) && (toPublicKey && !this.existPublicKey(toPublicKey))) {
         throw Error('Invalid account')
       }
       this.activities.push({
@@ -260,7 +258,8 @@ export const useWalletStore = defineStore('checko-wallet', {
         targetAddress: toPublicKey,
         amount,
         blockHeight,
-        timestamp
+        timestamp,
+        certificateHash
       })
       this.saveActivities()
     }

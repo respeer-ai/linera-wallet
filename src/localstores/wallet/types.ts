@@ -6,6 +6,7 @@ export interface Activity {
   amount: string
   blockHeight: number
   timestamp: number
+  certificateHash: string
 }
 
 export interface Microchain {

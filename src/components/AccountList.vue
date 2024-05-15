@@ -47,6 +47,7 @@ const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpo
 const apolloClient = new ApolloClient(options)
 
 const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void) => {
+  console.log('Subscribe', chainId)
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
@@ -274,7 +275,8 @@ const _getBlockWithHash = (chainId: string, hash: string) => {
               toPublicKey,
               incomingMessage.event?.message?.System?.Credit?.amount,
               height,
-              incomingMessage.event?.timestamp
+              incomingMessage.event?.timestamp,
+              incomingMessage.event?.certificate_hash
             )
           })
         })
@@ -292,9 +294,14 @@ const processChains = () => {
     if (!account) {
       return
     }
-    const subscribedChains = subscriptions.value.get(addr)
+    let subscribedChains = subscriptions.value.get(addr)
+    if (!subscribedChains) {
+      subscribedChains = []
+    }
     chains.forEach((microchain, chainId) => {
       if (subscribedChains?.includes(chainId)) return
+      subscribedChains?.push(chainId)
+      subscriptions.value.set(addr, subscribedChains)
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
       signNewBlock(chainId, undefined, keyPair, true, () => {
         _getChainAccountBalances()
