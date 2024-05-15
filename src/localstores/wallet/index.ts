@@ -90,6 +90,19 @@ export const useWalletStore = defineStore('checko-wallet', {
     _activities (): Array<Activity> {
       return this.activities
     },
+    accountActivities (): (publicKey: string) => Array<Activity> {
+      return (publicKey: string) => {
+        return this.activities.filter((el) => {
+          return el.sourceAddress === publicKey ||
+                 el.targetAddress === publicKey ||
+                 this.accounts.get(publicKey)?.microchains?.has(el.sourceChain) ||
+                 this.accounts.get(publicKey)?.microchains?.has(el.targetChain)
+        })
+      }
+    },
+    currentAccountActivities (): Array<Activity> {
+      return this.accountActivities(this.currentAddress)
+    },
     existPublicKey (): (publicKey: string) => boolean {
       return (publicKey: string) => {
         return this.accounts.has(publicKey)

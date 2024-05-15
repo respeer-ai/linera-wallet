@@ -171,7 +171,7 @@ import { shortid } from 'src/utils'
 import { copyToClipboard } from 'quasar'
 
 const _wallet = wallet.useWalletStore()
-const activities = computed(() => _wallet._activities)
+const activities = computed(() => _wallet.currentAccountActivities)
 
 const notification = notify.useNotificationStore()
 const addressDisplayLength = ref(10)
