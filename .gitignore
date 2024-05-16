@@ -5,6 +5,7 @@
 debug/
 target/
 dist/
+.quasar/
 
 # Remove Cargo.lock from gitignore if creating an executable, leave it for libraries
 # More information here https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html
@@ -35,8 +36,8 @@ node_modules
 /src-capacitor/node_modules
 
 # BEX related directories and files
-/src-bex/www
-/src-bex/js/core
+# /src-bex/www
+# /src-bex/js/core
 
 # Log files
 npm-debug.log*
