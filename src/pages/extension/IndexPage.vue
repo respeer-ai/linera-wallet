@@ -2,7 +2,7 @@
   <q-card flat class='main-account-block'>
     <q-card-section>
       <div class='left'>
-        $ 0
+        $ {{ accountBalance.toFixed(2) }}
       </div>
     </q-card-section>
   </q-card>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { wallet, notify } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
@@ -40,6 +40,10 @@ import { useRouter } from 'vue-router'
 
 const _wallet = wallet.useWalletStore()
 const notification = notify.useNotificationStore()
+
+const accountBalance = computed(() =>
+  _wallet.accountBalance(undefined, undefined)
+)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
