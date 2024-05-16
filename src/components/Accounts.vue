@@ -58,7 +58,7 @@
           }'
           class='row'
         >
-          <span>{{ address }}</span>
+          <span>{{ _wallet.displayAddress(address) }}</span>
           <q-icon
             name='content_copy'
             size='16px'

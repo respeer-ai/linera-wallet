@@ -18,6 +18,18 @@ export const useWalletStore = defineStore('checko-wallet', {
     publicKeys (): Array<string> {
       return Array.from(this.accounts.keys())
     },
+    displayAddress (): (publicKey: string) => string {
+      return (publicKey: string) => {
+        return this.accounts.get(publicKey)?.ownerAddress || publicKey
+      }
+    },
+    displayAddresses (): Array<string> {
+      const addrs = [] as Array<string>
+      this.accounts.forEach((account: Account, publicKey: string) => {
+        addrs.push(account.ownerAddress || publicKey)
+      })
+      return addrs
+    },
     chainPublicKeys (): Map<string, Array<string>> {
       const chainPublicKeys = new Map<string, Array<string>>()
       this.accounts.forEach((account: Account, publicKey: string) => {
@@ -34,7 +46,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     },
     chainIds (): Array<string> {
       const chainIds = [] as Array<string>
-      this.accounts.forEach((account) => {
+      this.accounts.forEach((account: Account) => {
         chainIds.push(...Array.from(account.microchains.keys()))
       })
       return chainIds
@@ -98,6 +110,18 @@ export const useWalletStore = defineStore('checko-wallet', {
           }).catch(() => {
             // TODO
           })
+        })
+      }
+    },
+    publicKeyToOwner (): (publicKey: string, done: (owner: string) => void) => void {
+      return (publicKey: string, done: (owner: string) => void) => {
+        const publicKeyBytes = _hex.toBytes(publicKey)
+        const typeNameBytes = new TextEncoder().encode('PublicKey::')
+        const bytes = new Uint8Array([...typeNameBytes, ...publicKeyBytes])
+        sha3(bytes, 256).then((hash) => {
+          done(hash)
+        }).catch(() => {
+          // TODO
         })
       }
     },
@@ -207,11 +231,14 @@ export const useWalletStore = defineStore('checko-wallet', {
       })
     },
     addAccount (publicKey: string, privateKey: string) {
-      this.accounts.set(publicKey, {
-        privateKey,
-        microchains: new Map<string, Microchain>()
+      this.publicKeyToOwner(publicKey, (owner: string) => {
+        this.accounts.set(publicKey, {
+          privateKey,
+          microchains: new Map<string, Microchain>(),
+          ownerAddress: owner
+        })
+        this.saveAccount()
       })
-      this.saveAccount()
     },
     saveCurrentAddress () {
       this.storeReady(() => {

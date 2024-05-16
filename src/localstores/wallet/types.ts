@@ -21,4 +21,5 @@ export interface Microchain {
 export interface Account {
   microchains: Map<string, Microchain>
   privateKey: string
+  ownerAddress: string
 }

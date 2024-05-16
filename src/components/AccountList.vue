@@ -9,7 +9,7 @@
       <q-select
         dense
         v-model='address'
-        :options='displayAddress'
+        :options='displayAddreses'
         :style='{ height: "24px" }'
         option-label='label'
         option-value='value'
@@ -47,10 +47,10 @@ import { copyToClipboard } from 'quasar'
 
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
-const displayAddress = computed(() => addresses.value.map(el => {
+const displayAddreses = computed(() => addresses.value.map(el => {
   return {
     label: el?.length > 12 ? el.slice(0, 7) + '...' + el.slice(-5) : el.slice(0, 7) + '...',
-    value: el
+    value: _wallet.displayAddress(el)
   }
 }))
 
