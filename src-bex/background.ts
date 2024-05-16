@@ -72,7 +72,7 @@ export default bexBackground((bridge /* , allActiveConnections */) => {
       const windowLeft = currentWindow?.width as number - 40
       const windowTop = 0
       chrome.windows.create({
-        url: chrome.runtime.getURL('www/index.html#/popup'),
+        url: chrome.runtime.getURL('www/index.html#/extension/popup'),
         type: 'popup',
         width: windowWidth,
         height: windowHeight,
@@ -110,30 +110,6 @@ export default bexBackground((bridge /* , allActiveConnections */) => {
     if (message.action === 'getData') {
       sendResponse(receivedData)
     }
-    // if (message.action === 'sendToContentScript') { // 转发消息到内容脚本
-    // 转发消息到内容脚本
-    // chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    //   console.log('tab:', tabs[0].id as number)
-    //   console.log('data:', message)
-    //   if (tabs.length > 0) {
-    //     chrome.tabs.sendMessage(tabs[0].id as number, { action: 'receiveFromPopup', data: message.data })
-    //   }
-    // })
-    //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    //     if (tabs.length > 0) {
-    //       // 发送消息到内容脚本
-    //       chrome.tabs.sendMessage(tabs[0].id as number, { action: 'receiveFromPopup', data: message.data }, (response) => {
-    //         if (chrome.runtime.lastError) {
-    //           console.error('Error sending message to content script:', chrome.runtime.lastError.message)
-    //         } else {
-    //           console.log('Message sent to content script:', response)
-    //         }
-    //       })
-    //     } else {
-    //       console.error('No active tab found')
-    //     }
-    //   })
-    // }
   })
 
   bridge.on('getTime', ({ respond }) => {
