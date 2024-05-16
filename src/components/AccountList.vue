@@ -1,19 +1,25 @@
 <template>
   <div v-if='addresses.length'>
     <div class='row'>
-      <q-icon :name='"img:" + lineraLogo' size='24px' :style='{margin: "12px"}' />
+      <q-icon
+        :name='"img:" + lineraLogo'
+        size='24px'
+        :style='{ margin: "12px" }'
+      />
       <q-select
         dense
         v-model='address'
-        :options='addresses'
+        :options='displayAddress'
         :style='{ height: "24px" }'
+        option-label='label'
+        option-value='value'
       />
       <q-icon
         name='content_copy'
         size='16px'
         color='grey'
         :style='{
-          margin: "16px 8px"
+          margin: "16px 8px",
         }'
         class='cursor-pointer'
         @click='onCopyAddressClick'
@@ -22,22 +28,34 @@
   </div>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { wallet, notify } from 'src/localstores'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
-import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
+import {
+  provideApolloClient,
+  useMutation,
+  useQuery,
+  useSubscription
+} from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
+
+import lineraLogo from '../assets/LineraLogo.png'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { copyToClipboard } from 'quasar'
 
-import lineraLogo from '../assets/LineraLogo.png'
-
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
+const displayAddress = computed(() => addresses.value.map(el => {
+  return {
+    label: el?.length > 12 ? el.slice(0, 7) + '...' + el.slice(-5) : el.slice(0, 7) + '...',
+    value: el
+  }
+}))
+
 const currentAddress = computed(() => _wallet.currentAddress)
-const address = ref(_wallet.currentAddress || addresses.value[0])
+const address = ref(_wallet.currentAddress || addresses.value?.[0])
 const chains = computed(() => _wallet.chains)
 const subscriptions = ref(new Map<string, Array<string>>())
 
@@ -303,9 +321,9 @@ const processChains = () => {
       subscribedChains = []
     }
     chains.forEach((microchain, chainId) => {
-      if (subscribedChains.includes(chainId)) return
-      subscribedChains.push(chainId)
-      subscriptions.value.set(addr, subscribedChains)
+      if (subscribedChains?.includes(chainId)) return
+      subscribedChains?.push(chainId)
+      subscriptions.value?.set(addr, subscribedChains as [])
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
       signNewBlock(chainId, undefined, keyPair, true, () => {
         _getChainAccountBalances()
@@ -378,5 +396,6 @@ const onCopyAddressClick = () => {
       console.log('Fail copy address', e)
     })
 }
-
 </script>
+<style scoped lang="sass">
+</style>

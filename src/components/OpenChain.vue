@@ -7,13 +7,13 @@
       @click='onOpenChainClick'
       class='text-brown-10'
       :style='{
-        width: "100%"
+        width: "100%",
       }'
     />
   </div>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'

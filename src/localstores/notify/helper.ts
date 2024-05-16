@@ -69,6 +69,4 @@ const notify = (notification: Notification) => {
   }
 }
 
-export {
-  notify
-}
+export { notify }

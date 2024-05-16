@@ -30,16 +30,18 @@
     "eslint-plugin-n": "^16.0.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
+    "events": "^3.3.0",
     "fs": "^0.0.1-security",
     "graphql": "^16.8.1",
     "graphql-ws": "^5.16.0",
     "hash-wasm": "^4.11.0",
+
     "localforage": "^1.10.0",
     "multiformats": "^12.0.1",
     "path": "^0.12.7",
     "pinia": "^2.0.11",
     "pinia-plugin-persistedstate": "^3.2.1",
-    "quasar": "^2.6.0",
+    "quasar": "^2.16.3",
     "uuid": "^9.0.1",
     "vue": "^3.0.0",
     "vue-demi": "^0.14.5",
@@ -47,29 +49,22 @@
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
-    "@quasar/app-webpack": "^3.12.5",
+    "@quasar/app-vite": "^1.9.0",
     "@quasar/quasar-app-extension-apollo": "^2.0.0-beta.5",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
+    "autoprefixer": "^10.4.2",
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4",
+    "vite-plugin-checker": "^0.6.4",
+    "vue-tsc": "^1.8.22"
   },
-  "browserslist": [
-    "last 10 Chrome versions",
-    "last 10 Firefox versions",
-    "last 4 Edge versions",
-    "last 7 Safari versions",
-    "last 8 Android versions",
-    "last 8 ChromeAndroid versions",
-    "last 8 FirefoxAndroid versions",
-    "last 10 iOS versions",
-    "last 5 Opera versions"
-  ],
   "engines": {
-    "node": ">= 12.22.1",
+    "node": "^20 || ^18 || ^16",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   }

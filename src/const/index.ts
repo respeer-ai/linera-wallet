@@ -14,6 +14,10 @@ export enum WSSchema {
 }
 export const WSSchemas = Object.values(WSSchema)
 
-export const toUrl = (schema: HTTPSchema | WSSchema, host: string, port: number) => {
+export const toUrl = (
+  schema: HTTPSchema | WSSchema,
+  host: string,
+  port: number
+) => {
   return schema + '://' + host + ':' + port.toString()
 }
