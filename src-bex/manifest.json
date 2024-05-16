@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "linera-wallet",
+  "name": "checko-wallet",
   "version": "0.0.1",
   "icons": {
-    "16": "icons/icon-16x16.png",
-    "48": "icons/icon-48x48.png",
-    "128": "icons/icon-128x128.png"
+    "16": "icons/favicon.png",
+    "48": "icons/favicon.png",
+    "128": "icons/favicon.png"
   },
 
   "permissions": [
