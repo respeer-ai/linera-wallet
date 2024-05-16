@@ -1,5 +1,5 @@
 /dist
-/src-bex/www
+/extension/www
 /src-capacitor
 /src-cordova
 /.quasar
