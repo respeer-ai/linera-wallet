@@ -34,7 +34,9 @@ const routes: RouteRecordRaw[] = [
         path: 'setting',
         component: () => import('pages/extension/SettingPage.vue')
       },
-      { path: 'popup', component: () => import('pages/extension/PopupPage.vue') }
+      { path: 'popup', component: () => import('pages/extension/PopupPage.vue') },
+      { path: 'activity', component: () => import('pages/extension/ActivityPage.vue') }
+
     ]
   },
 

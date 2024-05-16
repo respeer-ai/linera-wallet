@@ -11,10 +11,24 @@
       avatar v-for='menu in menus' :key='menu.icon' class='items-center hot-menu'
       @click='onMenuClick(menu)'
     >
-      <q-icon :name='menu.icon' size='30px' />
+      <q-icon :name='menu.icon' size='25px' />
       <span class='menu-label'>{{ menu.label }}</span>
     </q-item-section>
   </div>
+  <q-card-section />
+  <!-- <q-tabs
+    v-model='tab'
+    inline-label
+    :breakpoint='0'
+    indicator-color='primary'
+    align='justify'
+    class='text-black'
+  >
+    <q-tab name='activity' label='Activity'>
+      <Activity />
+    </q-tab>
+    <q-tab name='contract' label='Contract' />
+  </q-tabs> -->
 </template>
 
 <script setup lang="ts">
@@ -94,6 +108,11 @@ const menus = ref([
     label: 'Application Portal'
   }, */
   {
+    icon: 'library_books',
+    label: 'Activity',
+    target: '/activity'
+  },
+  {
     icon: 'settings',
     label: 'Setting',
     target: '/setting'
@@ -108,6 +127,7 @@ const onMenuClick = (menu: MenuItem) => {
 
 <style scoped lang="sass">
 .hot-menu
+  padding: 10px
   &:hover
     cursor: pointer
 .main-account-block
@@ -116,6 +136,6 @@ const onMenuClick = (menu: MenuItem) => {
   .left
     text-align: center
     font-size: 45px
-::v-deep .q-card__section--vert
+::v-deep(.q-card__section--vert)
   padding: 0
 </style>
