@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * THIS FILE IS GENERATED AUTOMATICALLY.
  * DO NOT EDIT.
@@ -46,9 +47,7 @@ import quasarUserOptions from './quasar-user-options.js'
 console.info('[Quasar] Running SPA.')
 
 
-
 const publicPath = `/`
-
 
 async function start ({
   app,
@@ -153,15 +152,15 @@ createQuasarApp(createApp, quasarUserOptions)
 
     return Promise[ method ]([
       
-      import(/* webpackMode: "eager" */ 'boot/pinia'),
+      import('boot/pinia'),
       
-      import(/* webpackMode: "eager" */ 'boot/i18n'),
+      import('boot/i18n'),
       
-      import(/* webpackMode: "eager" */ 'boot/axios'),
+      import('boot/axios'),
       
-      import(/* webpackMode: "eager" */ 'boot/apollo'),
+      import('boot/apollo'),
       
-      import(/* webpackMode: "eager" */ 'boot/notify-defaults')
+      import('boot/notify-defaults')
       
     ]).then(bootFiles => {
       const boot = mapFn(bootFiles).filter(entry => typeof entry === 'function')
