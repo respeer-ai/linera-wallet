@@ -321,9 +321,9 @@ const processChains = () => {
       subscribedChains = []
     }
     chains.forEach((microchain, chainId) => {
-      if (subscribedChains.includes(chainId)) return
-      subscribedChains.push(chainId)
-      subscriptions.value.set(addr, subscribedChains)
+      if (subscribedChains?.includes(chainId)) return
+      subscribedChains?.push(chainId)
+      subscriptions.value?.set(addr, subscribedChains as [])
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
       signNewBlock(chainId, undefined, keyPair, true, () => {
         _getChainAccountBalances()
