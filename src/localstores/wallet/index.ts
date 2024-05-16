@@ -18,6 +18,20 @@ export const useWalletStore = defineStore('checko-wallet', {
     publicKeys (): Array<string> {
       return Array.from(this.accounts.keys())
     },
+    chainPublicKeys (): Map<string, Array<string>> {
+      const chainPublicKeys = new Map<string, Array<string>>()
+      this.accounts.forEach((account: Account, publicKey: string) => {
+        account.microchains.forEach((_, chainId: string) => {
+          let publicKeys = chainPublicKeys.get(chainId)
+          if (!publicKeys) {
+            publicKeys = []
+          }
+          publicKeys.push(publicKey)
+          chainPublicKeys.set(chainId, publicKeys)
+        })
+      })
+      return chainPublicKeys
+    },
     chainIds (): Array<string> {
       const chainIds = [] as Array<string>
       this.accounts.forEach((account) => {
@@ -138,7 +152,9 @@ export const useWalletStore = defineStore('checko-wallet', {
             Object.keys(microchains).forEach((k1: string) => {
               _account.microchains.set(k1, {
                 chain_balance: Number((microchains[k1] as Microchain).chain_balance),
-                account_balance: Number((microchains[k1] as Microchain).account_balance)
+                account_balance: Number((microchains[k1] as Microchain).account_balance),
+                message_id: (microchains[k1] as Microchain).message_id,
+                faucet_url: (microchains[k1] as Microchain).faucet_url
               })
             })
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -212,7 +228,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     deleteAddress (publicKey: string) {
       this.accounts.delete(publicKey)
     },
-    addChain (publicKey: string, chainId: string) {
+    addChain (publicKey: string, chainId: string, messageId: string, faucetUrl: string) {
       const account = this.accounts.get(publicKey)
       if (!account) {
         throw Error('Invalid account public key')
@@ -220,7 +236,9 @@ export const useWalletStore = defineStore('checko-wallet', {
       if (account.microchains.has(chainId)) return
       account.microchains.set(chainId, {
         chain_balance: 0,
-        account_balance: 0
+        account_balance: 0,
+        message_id: messageId,
+        faucet_url: faucetUrl
       })
       this.accounts.set(publicKey, account)
       this.saveAccount()

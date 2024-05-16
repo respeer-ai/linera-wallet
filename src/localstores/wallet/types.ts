@@ -13,6 +13,9 @@ export interface Activity {
 export interface Microchain {
   chain_balance: number
   account_balance: number
+  // MessageId of OpenChain
+  message_id: string
+  faucet_url: string
 }
 
 export interface Account {

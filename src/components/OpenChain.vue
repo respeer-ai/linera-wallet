@@ -140,7 +140,7 @@ const onOpenChainClick = () => {
     return
   }
   void openChain(_wallet.currentAddress, (chainId: string, messageId: string) => {
-    _wallet.addChain(_wallet.currentAddress, chainId)
+    _wallet.addChain(_wallet.currentAddress, chainId, messageId, endpoint.rpcUrl)
     void initMicrochainChainStore(_wallet.currentAddress, chainId, messageId, () => {
       signNewBlock(chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string))))
     })

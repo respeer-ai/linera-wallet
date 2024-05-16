@@ -42,3 +42,5 @@ export const rpcPort = (() => {
   const _setting = useSettingStore()
   return _setting.setting?.rpcPort || 30080
 })()
+
+export const rpcUrl = constant.toUrl(rpcSchema, rpcHost, rpcPort)
