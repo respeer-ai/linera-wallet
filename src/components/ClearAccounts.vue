@@ -1,7 +1,11 @@
 <template>
   <div>
     <p><strong>BE CAREFUL</strong></p>
-    <p>Press this button will clear all accounts stored in CheCko including their public keys and private keys. Please make sure you already backup them correctly.</p>
+    <p>
+      Press this button will clear all accounts stored in CheCko including their
+      public keys and private keys. Please make sure you already backup them
+      correctly.
+    </p>
   </div>
   <q-btn
     outline

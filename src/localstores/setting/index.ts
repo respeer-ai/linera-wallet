@@ -13,16 +13,32 @@ export const useSettingStore = defineStore('setting', {
   }),
   getters: {
     faucetHTTPUrl (): string {
-      return constant.toUrl(this.setting.faucetSchema, this.setting.faucetHost, this.setting.faucetPort)
+      return constant.toUrl(
+        this.setting.faucetSchema,
+        this.setting.faucetHost,
+        this.setting.faucetPort
+      )
     },
     faucetWSUrl (): string {
-      return constant.toUrl(this.setting.faucetWSSchema, this.setting.faucetHost, this.setting.faucetPort)
+      return constant.toUrl(
+        this.setting.faucetWSSchema,
+        this.setting.faucetHost,
+        this.setting.faucetPort
+      )
     },
     rpcHTTPUrl (): string {
-      return constant.toUrl(this.setting.rpcSchema, this.setting.rpcHost, this.setting.rpcPort)
+      return constant.toUrl(
+        this.setting.rpcSchema,
+        this.setting.rpcHost,
+        this.setting.rpcPort
+      )
     },
     rpcWSUrl (): string {
-      return constant.toUrl(this.setting.rpcWSSchema, this.setting.rpcHost, this.setting.rpcPort)
+      return constant.toUrl(
+        this.setting.rpcWSSchema,
+        this.setting.rpcHost,
+        this.setting.rpcPort
+      )
     }
   },
   actions: {
@@ -33,7 +49,8 @@ export const useSettingStore = defineStore('setting', {
       if (this.loaded) {
         return listener?.()
       }
-      this.walletStorage.getItem('setting')
+      this.walletStorage
+        .getItem('setting')
         .then((setting) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
           this.setting = JSON.parse(setting as string)
@@ -55,20 +72,31 @@ export const useSettingStore = defineStore('setting', {
     },
     saveSetting () {
       this.storeReady(() => {
-        this.walletStorage.setItem('accounts', JSON.stringify(this.setting))
+        this.walletStorage
+          .setItem('accounts', JSON.stringify(this.setting))
           .catch((e) => {
             console.log(e)
           })
       })
     },
-    setFaucet (schema: constant.HTTPSchema, wsSchema: constant.WSSchema, host: string, port: number) {
+    setFaucet (
+      schema: constant.HTTPSchema,
+      wsSchema: constant.WSSchema,
+      host: string,
+      port: number
+    ) {
       this.setting.faucetSchema = schema
       this.setting.faucetWSSchema = wsSchema
       this.setting.faucetHost = host
       this.setting.faucetPort = port
       this.saveSetting()
     },
-    setRPC (schema: constant.HTTPSchema, wsSchema: constant.WSSchema, host: string, port: number) {
+    setRPC (
+      schema: constant.HTTPSchema,
+      wsSchema: constant.WSSchema,
+      host: string,
+      port: number
+    ) {
       this.setting.rpcSchema = schema
       this.setting.rpcWSSchema = wsSchema
       this.setting.rpcHost = host

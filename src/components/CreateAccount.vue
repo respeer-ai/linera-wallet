@@ -13,11 +13,15 @@
   </div>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
-import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
+import {
+  provideApolloClient,
+  useMutation,
+  useQuery
+} from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
 import { wallet } from 'src/localstores'
 
@@ -165,5 +169,4 @@ const createAccount = () => {
 const onCreateAccountClick = () => {
   createAccount()
 }
-
 </script>

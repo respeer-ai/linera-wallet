@@ -1,1 +1,19 @@
-// app global css in Sass form
+// app global css in SCSS form
+.pc-only
+  display: none
+
+.mobile-only
+  display: none
+
+@media (min-width: 768px)
+  .pc-only
+    display: block
+
+@media (max-width: $breakpoint-sm-max)
+  .mobile-only 
+    display: block
+
+#popup-container
+  width: 340px
+  height: 605px
+  padding: 10px
