@@ -36,8 +36,8 @@ node_modules
 /src-capacitor/node_modules
 
 # BEX related directories and files
-/extension/www
-/extension/js/core
+/src-bex/www
+/src-bex/js/core
 
 # Log files
 npm-debug.log*
