@@ -14,7 +14,6 @@
       <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
     </q-footer>
     <TestnetTip />
-    <AccountLoader />
   </q-layout>
 </template>
 
@@ -26,7 +25,6 @@ import { useI18n } from 'vue-i18n'
 import HeaderMenu from 'src/components/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
-import AccountLoader from 'src/components/AccountLoader.vue'
 
 const notification = notify.useNotificationStore()
 

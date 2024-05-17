@@ -9,6 +9,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     accounts: new Map<string, Account>(),
     currentAddress: undefined as unknown as string,
     activities: [] as Array<Activity>,
+    password: undefined as unknown as string,
     walletStorage: localforage.createInstance({
       name: 'checko-wallet'
     }),
@@ -156,10 +157,7 @@ export const useWalletStore = defineStore('checko-wallet', {
       this.currentAddress = undefined as unknown as string
       this.activities = []
     },
-    load (listener?: () => void) {
-      if (this.loaded) {
-        return listener?.()
-      }
+    loadAccounts (listener?: () => void) {
       this.walletStorage.getItem('accounts')
         .then((accounts) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
@@ -184,27 +182,55 @@ export const useWalletStore = defineStore('checko-wallet', {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             this.accounts.set(k, _account)
           })
-          this.loaded = true
           listener?.()
         })
         .catch((e) => {
           console.log('Load accounts', e)
         })
+    },
+    loadCurrentAddress (listener?: () => void) {
       this.walletStorage.getItem('current-address')
         .then((currentAddress) => {
           this.currentAddress = currentAddress as string
+          listener?.()
         })
         .catch((e) => {
           console.log('Load current address', e)
         })
+    },
+    loadActivities (listener?: () => void) {
       this.walletStorage.getItem('activities')
         .then((activites) => {
           this.activities = JSON.parse(activites as string) as Array<Activity> || []
           this.activities.sort((a, b) => b.timestamp - a.timestamp)
+          listener?.()
         })
         .catch((e) => {
           console.log('Load activities', e)
         })
+    },
+    loadPassword (listener?: () => void) {
+      this.walletStorage.getItem('password')
+        .then((password) => {
+          this.password = password as string
+          listener?.()
+        })
+        .catch((e) => {
+          console.log('Load password', e)
+        })
+    },
+    load (listener?: () => void) {
+      if (this.loaded) {
+        return listener?.()
+      }
+      this.loadPassword(() => {
+        this.loadAccounts(() => {
+          this.loadCurrentAddress(() => {
+            this.loadActivities(listener)
+            this.loaded = true
+          })
+        })
+      })
     },
     storeReady (ready: () => void) {
       if (this.loaded) {

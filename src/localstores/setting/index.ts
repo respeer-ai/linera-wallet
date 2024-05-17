@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
-import { Setting } from './types'
+import { PersistentSetting, OneShotSetting } from './types'
 import localforage from 'localforage'
 import * as constant from 'src/const'
 
 export const useSettingStore = defineStore('setting', {
   state: () => ({
-    setting: {} as Setting,
+    persistentSetting: {} as PersistentSetting,
+    oneShotSetting: {} as OneShotSetting,
     walletStorage: localforage.createInstance({
       name: 'setting'
     }),
@@ -14,31 +15,34 @@ export const useSettingStore = defineStore('setting', {
   getters: {
     faucetHTTPUrl (): string {
       return constant.toUrl(
-        this.setting.faucetSchema,
-        this.setting.faucetHost,
-        this.setting.faucetPort
+        this.persistentSetting.faucetSchema,
+        this.persistentSetting.faucetHost,
+        this.persistentSetting.faucetPort
       )
     },
     faucetWSUrl (): string {
       return constant.toUrl(
-        this.setting.faucetWSSchema,
-        this.setting.faucetHost,
-        this.setting.faucetPort
+        this.persistentSetting.faucetWSSchema,
+        this.persistentSetting.faucetHost,
+        this.persistentSetting.faucetPort
       )
     },
     rpcHTTPUrl (): string {
       return constant.toUrl(
-        this.setting.rpcSchema,
-        this.setting.rpcHost,
-        this.setting.rpcPort
+        this.persistentSetting.rpcSchema,
+        this.persistentSetting.rpcHost,
+        this.persistentSetting.rpcPort
       )
     },
     rpcWSUrl (): string {
       return constant.toUrl(
-        this.setting.rpcWSSchema,
-        this.setting.rpcHost,
-        this.setting.rpcPort
+        this.persistentSetting.rpcWSSchema,
+        this.persistentSetting.rpcHost,
+        this.persistentSetting.rpcPort
       )
+    },
+    showHeaderMenu (): boolean {
+      return this.oneShotSetting.ShowHeaderMenu
     }
   },
   actions: {
@@ -53,7 +57,7 @@ export const useSettingStore = defineStore('setting', {
         .getItem('setting')
         .then((setting) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
-          this.setting = JSON.parse(setting as string)
+          this.persistentSetting = JSON.parse(setting as string)
           this.loaded = true
           listener?.()
         })
@@ -73,7 +77,7 @@ export const useSettingStore = defineStore('setting', {
     saveSetting () {
       this.storeReady(() => {
         this.walletStorage
-          .setItem('accounts', JSON.stringify(this.setting))
+          .setItem('accounts', JSON.stringify(this.persistentSetting))
           .catch((e) => {
             console.log(e)
           })
@@ -85,10 +89,10 @@ export const useSettingStore = defineStore('setting', {
       host: string,
       port: number
     ) {
-      this.setting.faucetSchema = schema
-      this.setting.faucetWSSchema = wsSchema
-      this.setting.faucetHost = host
-      this.setting.faucetPort = port
+      this.persistentSetting.faucetSchema = schema
+      this.persistentSetting.faucetWSSchema = wsSchema
+      this.persistentSetting.faucetHost = host
+      this.persistentSetting.faucetPort = port
       this.saveSetting()
     },
     setRPC (
@@ -97,10 +101,10 @@ export const useSettingStore = defineStore('setting', {
       host: string,
       port: number
     ) {
-      this.setting.rpcSchema = schema
-      this.setting.rpcWSSchema = wsSchema
-      this.setting.rpcHost = host
-      this.setting.rpcPort = port
+      this.persistentSetting.rpcSchema = schema
+      this.persistentSetting.rpcWSSchema = wsSchema
+      this.persistentSetting.rpcHost = host
+      this.persistentSetting.rpcPort = port
       this.saveSetting()
     }
   }

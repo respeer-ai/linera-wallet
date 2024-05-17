@@ -1,6 +1,6 @@
 import * as constant from 'src/const'
 
-export interface Setting {
+export interface PersistentSetting {
   faucetSchema: constant.HTTPSchema
   faucetWSSchema: constant.WSSchema
   faucetHost: string
@@ -10,4 +10,8 @@ export interface Setting {
   rpcWSSchema: constant.WSSchema
   rpcHost: string
   rpcPort: number
+}
+
+export interface OneShotSetting {
+  ShowHeaderMenu: boolean
 }
