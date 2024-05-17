@@ -16,6 +16,7 @@
         margin: "10px 4px",
         fontSize: "16px",
       }'
+      v-if='currentAddress'
     >
       {{ accountBalance.toFixed(2) }}
     </div>
@@ -29,6 +30,8 @@ import { wallet } from 'src/localstores'
 import AccountList from 'src/components/AccountList.vue'
 
 const _wallet = wallet.useWalletStore()
+const currentAddress = computed(() => _wallet.currentAddress)
+
 const accountBalance = computed(() =>
   _wallet.accountBalance(undefined, undefined)
 )

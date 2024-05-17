@@ -14,26 +14,26 @@
       <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
     </q-footer>
     <TestnetTip />
+    <AccountLoader />
   </q-layout>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { notify } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
 import HeaderMenu from 'src/components/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
+import AccountLoader from 'src/components/AccountLoader.vue'
 
-const _wallet = wallet.useWalletStore()
 const notification = notify.useNotificationStore()
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
 onMounted(() => {
-  _wallet.load()
   notification.$subscribe((_, state) => {
     state.Notifications.forEach((notif, index) => {
       if (notif.Popup) {

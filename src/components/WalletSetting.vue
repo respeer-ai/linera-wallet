@@ -128,9 +128,6 @@
       />
       <q-separator />
       <div :style='{ margin: "32px 0 0 0" }'>
-        <ClearAccounts />
-      </div>
-      <div :style='{ margin: "32px 0 0 0" }'>
         <OpenChain />
       </div>
       <div :style='{ margin: "8px 0" }'>
@@ -138,6 +135,9 @@
       </div>
       <div :style='{ margin: "16px 0" }'>
         <ExportAccounts />
+      </div>
+      <div :style='{ margin: "32px 0 0 0" }'>
+        <ClearAccounts />
       </div>
     </q-card>
   </div>

@@ -1,11 +1,7 @@
 <template>
-  <ChangeSetting />
+  <WalletSetting />
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-
-const ChangeSetting = defineAsyncComponent(
-  () => import('src/components/ChangeSetting.vue')
-)
+import WalletSetting from 'src/components/WalletSetting.vue'
 </script>
