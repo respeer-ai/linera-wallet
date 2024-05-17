@@ -11,98 +11,58 @@
     </p>
     <div class='row'>
       <q-space />
-      <div :style='{width: "400px"}' class='text-left'>
-        <div :style='{margin: "4px 0", lineHeight: "32px"}' class='text-brown-10 row'>
-          <span :style='{fontWeight: 500, marginRight: "4px"}'>New Password</span> (At least 8 letters)
-          <q-space />
-          <q-btn
-            flat
-            dense
-            size='0.8rem'
-            :label='displayHideText'
-            @click='display = !display'
-            color='blue-6'
-          />
+      <div class='text-brown-10'>
+        <div class='row'>
+          <span :style='{width: "160px"}' class='text-left'>Address</span>
+          <span class='text-bold'>{{ shortid.shortId(publicKey, 20) }}</span>
+          <q-icon name='content_copy' class='cursor-pointer' size='16px' :style='{margin: "2px 4px"}' />
         </div>
-        <q-input
-          outlined
-          dense
-          v-model='password'
-          @blur='onPasswordBlur'
-          @focus='onPasswordFocus'
-          :error='passwordError'
-          hide-bottom-space
-          :type='display ? "text" : "password"'
-        />
-        <div :style='{margin: "4px 0", fontWeight: 500, lineHeight: "32px"}' class='text-brown-10'>
-          Confirm Password
+        <div class='row'>
+          <span :style='{width: "160px"}' class='text-left'>Private Key</span>
+          <span class='text-bold'>{{ shortid.shortId(account?.privateKey as string, 20) }}</span>
+          <q-icon name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}' />
         </div>
-        <q-input
-          outlined
-          dense
-          v-model='confirmPassword'
-          @blur='onConfirmPasswordBlur'
-          @focus='onConfirmPasswordFocus'
-          :error='confirmPasswordError'
-          hide-bottom-space
-          :type='display ? "text" : "password"'
-        />
-        <p class='text-brown-10 text-center' :style='{margin: "24px 0 0 0"}'>
-          By continue you understand CheCko cannot recover this password and data which is protected by this password.
-        </p>
+        <div class='row'>
+          <span :style='{width: "160px"}' class='text-left'>Microchain</span>
+          <span class='text-bold'>{{ shortid.shortId(chainId as string, 20) }}</span>
+          <q-icon name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}' />
+        </div>
+        <div class='row'>
+          <span :style='{width: "160px"}' class='text-left'>Open Chain Message</span>
+          <span class='text-bold'>{{ shortid.shortId(messageId as string, 20) }}</span>
+          <q-icon name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}' />
+        </div>
       </div>
       <q-space />
     </div>
+    <CreateAccount :auto-run='true' :password='password' v-model:public-key='publicKey' :check-exist='true' />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { toRef, ref, computed } from 'vue'
+import { wallet } from 'src/localstores'
+import { shortid } from 'src/utils'
 
-const password = defineModel<string>('password', { default: '' })
-const confirmPassword = ref('')
-const display = ref(false)
-const displayHideText = ref('Display')
-const error = defineModel<boolean>('error', { default: false })
-const passwordError = ref(false)
-const confirmPasswordError = ref(false)
+import CreateAccount from './CreateAccount.vue'
 
-watch(display, () => {
-  displayHideText.value = display.value ? 'Hide' : 'Display'
-})
+interface Props {
+  password: string
+}
 
-const updateError = () => {
-  if (error.value) {
-    passwordError.value = error.value
-    confirmPasswordError.value = error.value
+const props = defineProps<Props>()
+const password = toRef(props, 'password')
+const publicKey = ref('')
+
+const _wallet = wallet.useWalletStore()
+
+const account = computed(() => _wallet.account(publicKey.value))
+const chainId = computed(() => {
+  if (!account.value?.microchains?.size) {
+    return undefined
   }
-}
-
-const resetError = () => {
-  confirmPasswordError.value = false
-  passwordError.value = false
-}
-
-const onPasswordBlur = () => {
-  updateError()
-}
-
-const onPasswordFocus = () => {
-  resetError()
-}
-
-const onConfirmPasswordBlur = () => {
-  updateError()
-}
-
-const onConfirmPasswordFocus = () => {
-  resetError()
-}
-
-watch([password, confirmPassword], () => {
-  passwordError.value = password.value === undefined || password.value.length < 8
-  confirmPasswordError.value = confirmPassword.value?.length < 8
-  error.value = password.value !== confirmPassword.value
+  return Array.from(account.value?.microchains?.keys())[0]
 })
+const messageId = computed(() => account.value?.microchains?.get(chainId.value as string)?.message_id)
 
 </script>

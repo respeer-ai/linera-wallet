@@ -28,13 +28,17 @@ import { wallet } from 'src/localstores'
 import { onMounted, toRef } from 'vue'
 
 interface Props {
+  checkExist?: boolean
   autoRun?: boolean
+  password?: string
 }
 
-const publicKey = defineModel<string>('publicKey', { default: '' })
+const publicKey = defineModel<string>('publicKey')
 
 const props = defineProps<Props>()
 const autoRun = toRef(props, 'autoRun')
+const password = toRef(props, 'password')
+const checkExist = toRef(props, 'checkExist')
 
 const _wallet = wallet.useWalletStore()
 
@@ -165,15 +169,15 @@ const createAccount = () => {
   generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
     const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
     const privateKey = _hex.toHex(keyPair.to_bytes().bytes)
-    // TODO: password
-    void _wallet.addAccount(_publicKey, privateKey, '', () => {
-      console.log('Invalid password')
-    })
     void openChain(_publicKey, (chainId: string, messageId: string) => {
-      _wallet.addChain(_publicKey, chainId, messageId, endpoint.rpcUrl)
       void initMicrochainChainStore(_publicKey, chainId, messageId, () => {
         signNewBlock(chainId, 0, keyPair, () => {
-          publicKey.value = _publicKey
+          void _wallet.addAccount(_publicKey, privateKey, password.value as string, () => {
+            _wallet.addChain(_publicKey, chainId, messageId, endpoint.rpcUrl)
+            publicKey.value = _publicKey
+          }, () => {
+            console.log('Invalid password')
+          })
         })
       })
     })
@@ -186,6 +190,16 @@ const onCreateAccountClick = () => {
 
 onMounted(() => {
   if (autoRun.value) {
+    if (checkExist.value) {
+      _wallet.load(() => {
+        if (_wallet.accounts.size > 0) {
+          publicKey.value = Array.from(_wallet.accounts.keys())[0]
+          return
+        }
+        createAccount()
+      })
+      return
+    }
     createAccount()
   }
 })

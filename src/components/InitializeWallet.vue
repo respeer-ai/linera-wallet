@@ -8,6 +8,7 @@
       done-color='green-6'
       animated
       alternative-labels
+      header-nav
     >
       <q-step
         :name='1'
@@ -21,7 +22,7 @@
         title='Create Account'
         :done='step > 2'
       >
-        <InitializeAccount />
+        <InitializeAccount :password='password' />
       </q-step>
       <q-step
         :name='3'
@@ -74,8 +75,9 @@ const btnText = computed(() => {
 })
 
 const savePassword = () => {
-  _wallet.savePassword(password.value)
-  step.value++
+  _wallet.savePassword(password.value, () => {
+    step.value++
+  })
 }
 
 const onNextStepClick = () => {

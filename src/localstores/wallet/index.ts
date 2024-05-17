@@ -148,13 +148,14 @@ export const useWalletStore = defineStore('checko-wallet', {
       }
     },
     initialized (): boolean {
-      return this.passwordHash !== undefined
+      return this.passwordHash?.length > 0
     }
   },
   actions: {
     reset () {
       void this.walletStorage.setItem('accounts', '{}')
       void this.walletStorage.setItem('activities', '[]')
+      void this.walletStorage.removeItem('password-hash')
 
       this.accounts.clear()
       this.currentAddress = undefined as unknown as string
@@ -259,7 +260,7 @@ export const useWalletStore = defineStore('checko-wallet', {
           })
       })
     },
-    addAccount (publicKey: string, privateKey: string, password: string, passwordError?: () => void) {
+    addAccount (publicKey: string, privateKey: string, password: string, done?: () => void, passwordError?: () => void) {
       this.verifyPassword(password, () => {
         this.publicKeyToOwner(publicKey, (owner: string) => {
           this.accounts.set(publicKey, {
@@ -268,6 +269,7 @@ export const useWalletStore = defineStore('checko-wallet', {
             ownerAddress: owner
           })
           this.saveAccount()
+          done?.()
         })
       }, () => {
         passwordError?.()
@@ -363,11 +365,14 @@ export const useWalletStore = defineStore('checko-wallet', {
         console.log('Fail hash password', e)
       })
     },
-    savePassword (password: string) {
+    savePassword (password: string, done?: () => void) {
       this.passwordToHash(password, (passwordHash: string) => {
         this.passwordHash = passwordHash
         this.storeReady(() => {
           this.walletStorage.setItem('password-hash', this.passwordHash)
+            .then(() => {
+              done?.()
+            })
             .catch((e) => {
               console.log(e)
             })
