@@ -1,7 +1,7 @@
 <template>
   <q-page class='flex justify-center items-center'>
     <div class='text-center'>
-      <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "8px"}'>
+      <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
         Start Web3 Trip on <q-img :src='lineraLogo' width='24px' /> Linera
       </h5>
       <p class='text-brown-6'>
@@ -12,9 +12,18 @@
       <div :style='{margin: "64px 0"}'>
         <q-img :src='cheCkoLogo' width='240px' />
       </div>
-      <p class='text-brown-6'>
-        By continue you agree with the <a href='#'>Terms of Usage</a> of CheCko.
+      <p class='text-brown-10'>
+        By continue you agree with the <a href='#'>Terms of Usage</a> of CheCko.<br>
       </p>
+      <div :style='{width: "100%"}' class='row'>
+        <q-space />
+        <p class='text-brown-8' :style='{lineHeight: "20px", maxWidth: "800px"}'>
+          <q-icon name='security' class='text-green-8' size='20px' />CheCko don't connect to any centeralized server. User accounts information in CheCko is stored locally.<br>
+          <q-icon name='verified_user' class='text-green-8' size='20px' />CheCko use ResPeer MaaS cluster as RPC endpoint in default. Users always able to set RPC endpoint to what they trust.<br>
+          <q-icon name='warning' class='text-orange-4' size='20px' />Users <strong>MUST</strong> backup their accounts carefully. There is no way to recover your assets if user loses password or accounts private keys.
+        </p>
+        <q-space />
+      </div>
       <div class='row' :style='{width: "100%"}'>
         <q-space />
         <div :style='{width: "400px", margin: "0 0 64px 0"}'>
@@ -23,12 +32,14 @@
             label='Create New Wallet'
             :style='{width: "100%", borderRadius: "16px", margin: "8px 0 0 0"}'
             class='text-brown-10 bg-red-2'
+            @click='onCreateWalletClick'
           />
           <q-btn
             flat
             label='Import Wallet'
             :style='{width: "100%", borderRadius: "16px", margin: "8px 0 0 0", border: "1px solid #ffcdd2"}'
             class='text-brown-10'
+            @click='onImportWaletClick'
           />
         </div>
         <q-space />
@@ -40,4 +51,12 @@
 <script setup lang='ts'>
 import cheCkoLogo from 'src/assets/CheCko.png'
 import lineraLogo from 'src/assets/LineraLogo.png'
+
+const onCreateWalletClick = () => {
+  // TODO
+}
+
+const onImportWaletClick = () => {
+  // TODO
+}
 </script>
