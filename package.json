@@ -12,8 +12,8 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "start": "quasar dev",
-    "bex": "quasar dev -m bex",
-    "build-bex": "quasar build -m bex"
+    "bex": "quasar dev -m bex extension",
+    "build-bex": "quasar build -m bex extension"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",
