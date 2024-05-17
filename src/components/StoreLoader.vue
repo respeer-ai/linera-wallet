@@ -32,7 +32,7 @@ onMounted(() => {
   _setting.load(() => {
     _wallet.load(() => {
       loading.value = false
-      if (_wallet.password) {
+      if (_wallet.initialized) {
         void router.push({ path: '/recovery' })
       } else {
         void router.push({ path: '/onboarding' })

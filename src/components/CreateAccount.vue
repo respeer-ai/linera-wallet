@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-btn
+      v-if='!autoRun'
       outline
       rounded
       label='Create Account'
@@ -24,6 +25,16 @@ import {
 } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
 import { wallet } from 'src/localstores'
+import { onMounted, toRef } from 'vue'
+
+interface Props {
+  autoRun?: boolean
+}
+
+const publicKey = defineModel<string>('publicKey', { default: '' })
+
+const props = defineProps<Props>()
+const autoRun = toRef(props, 'autoRun')
 
 const _wallet = wallet.useWalletStore()
 
@@ -135,9 +146,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey) => {
+const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey, done?: () => void) => {
   getPendingRawBlock(chainId, (rawBlockAndRound: unknown) => {
-    // TODO: here should be wrong
     const payloadBytes = graphqlResult.keyValue(rawBlockAndRound, 'payloadBytes')
     const signature = _hex.toHex(keyPair.sign(new Memory(payloadBytes as Uint8Array)).to_bytes().bytes)
     const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
@@ -145,19 +155,26 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
       console.log('Mismatch block height', height, notifiedHeight)
       return
     }
-    void submitBlockSignature(chainId, height, signature)
+    void submitBlockSignature(chainId, height, signature, () => {
+      done?.()
+    })
   })
 }
 
 const createAccount = () => {
   generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
-    const publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
+    const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
     const privateKey = _hex.toHex(keyPair.to_bytes().bytes)
-    void _wallet.addAccount(publicKey, privateKey)
-    void openChain(publicKey, (chainId: string, messageId: string) => {
-      _wallet.addChain(publicKey, chainId, messageId, endpoint.rpcUrl)
-      void initMicrochainChainStore(publicKey, chainId, messageId, () => {
-        signNewBlock(chainId, 0, keyPair)
+    // TODO: password
+    void _wallet.addAccount(_publicKey, privateKey, '', () => {
+      console.log('Invalid password')
+    })
+    void openChain(_publicKey, (chainId: string, messageId: string) => {
+      _wallet.addChain(_publicKey, chainId, messageId, endpoint.rpcUrl)
+      void initMicrochainChainStore(_publicKey, chainId, messageId, () => {
+        signNewBlock(chainId, 0, keyPair, () => {
+          publicKey.value = _publicKey
+        })
       })
     })
   })
@@ -166,4 +183,11 @@ const createAccount = () => {
 const onCreateAccountClick = () => {
   createAccount()
 }
+
+onMounted(() => {
+  if (autoRun.value) {
+    createAccount()
+  }
+})
+
 </script>

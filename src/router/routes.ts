@@ -11,7 +11,8 @@ const routes: RouteRecordRaw[] = [
       { path: '/transfer', component: () => import('pages/TransferPage.vue') },
       { path: '/activity', component: () => import('pages/ActivityPage.vue') },
       { path: '/setting', component: () => import('pages/SettingPage.vue') },
-      { path: '/onboarding', component: () => import('pages/OnBoardingPage.vue') }
+      { path: '/onboarding', component: () => import('pages/OnBoardingPage.vue') },
+      { path: '/initializewallet', component: () => import('pages/InitializeWalletPage.vue') }
     ]
   },
   {
