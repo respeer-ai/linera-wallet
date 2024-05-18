@@ -3,7 +3,7 @@ import { Account, Activity, Microchain } from './types'
 import localforage from 'localforage'
 import { sha3 } from 'hash-wasm'
 import { _hex } from 'src/utils'
-import { AES } from 'crypto-js'
+import { AES, enc } from 'crypto-js'
 
 export const useWalletStore = defineStore('checko-wallet', {
   state: () => ({
@@ -166,7 +166,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     accountFromStore (account: Record<string, unknown>, password?: string): Account {
       const _account = {
         // TODO: each type we need private key, decrypt it
-        privateKey: password ? AES.decrypt(account.privateKey as string, password).toString() : account.privateKey as string,
+        privateKey: password ? AES.decrypt(account.privateKey as string, password).toString(enc.Utf8) : account.privateKey as string,
         microchains: new Map<string, Microchain>()
       } as Account
       const microchains = account.microchains as Record<string, unknown>
@@ -238,8 +238,10 @@ export const useWalletStore = defineStore('checko-wallet', {
       this.verifyPassword(password, () => {
         this.loadAccounts(password, () => {
           this.loadCurrentAddress(() => {
-            this.loadActivities(done)
-            this.loaded = true
+            this.loadActivities(() => {
+              this.loaded = true
+              done?.()
+            })
           })
         })
       }, () => {
