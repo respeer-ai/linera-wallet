@@ -30,7 +30,7 @@ const loading = ref(true)
 
 onMounted(() => {
   _setting.load(() => {
-    _wallet.load(() => {
+    _wallet.loadPassword(() => {
       loading.value = false
       if (_wallet.initialized) {
         void router.push({ path: '/recovery' })

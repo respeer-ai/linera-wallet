@@ -8,7 +8,6 @@
       done-color='green-6'
       animated
       alternative-labels
-      header-nav
     >
       <q-step
         :name='1'
@@ -69,7 +68,7 @@ const btnText = computed(() => {
     case 1:
       return 'Create Account'
     case 2:
-      return 'Backup Account'
+      return 'Export Account'
   }
   return 'Next'
 })
@@ -84,6 +83,9 @@ const onNextStepClick = () => {
   switch (step.value) {
     case 1:
       savePassword()
+      break
+    case 2:
+
       break
   }
 }

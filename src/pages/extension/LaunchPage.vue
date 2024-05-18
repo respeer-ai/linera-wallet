@@ -49,7 +49,7 @@ const accountBalance = computed(() =>
 const { t } = useI18n({ useScope: 'global' })
 
 onMounted(() => {
-  _wallet.load()
+  _wallet.load('')
   notification.$subscribe((_, state) => {
     state.Notifications.forEach((notif, index) => {
       if (notif.Popup) {

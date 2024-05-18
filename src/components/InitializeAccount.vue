@@ -1,5 +1,5 @@
 <template>
-  <div :style='{maxWidth: "600px"}'>
+  <div :style='{maxWidth: "600px"}' class='text-center'>
     <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
       Initialize Account
     </h5>
@@ -44,7 +44,7 @@ import { toRef, ref, computed } from 'vue'
 import { wallet } from 'src/localstores'
 import { shortid } from 'src/utils'
 
-import CreateAccount from './CreateAccount.vue'
+import CreateAccount from 'src/components/CreateAccount.vue'
 
 interface Props {
   password: string

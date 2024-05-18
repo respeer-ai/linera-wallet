@@ -363,9 +363,7 @@ watch(addresses, () => {
 })
 
 watch(chains, () => {
-  _wallet.load(() => {
-    _processChains()
-  })
+  _processChains()
 })
 
 watch(address, () => {
@@ -377,9 +375,7 @@ watch(currentAddress, () => {
 })
 
 onMounted(() => {
-  _wallet.load(() => {
-    _processChains()
-  })
+  _processChains()
 })
 
 const onCopyAddressClick = () => {

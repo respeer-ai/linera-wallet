@@ -120,7 +120,10 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
 
   onResult((res) => {
     const rawBlock = graphqlResult.data(res, 'peekCandidateRawBlockPayload')
-    if (!rawBlock) return
+    if (!rawBlock) {
+      setTimeout(() => getPendingRawBlock(chainId, done), 1000)
+      return
+    }
     done?.(rawBlock)
   })
 
@@ -189,19 +192,14 @@ const onCreateAccountClick = () => {
 }
 
 onMounted(() => {
-  if (autoRun.value) {
-    if (checkExist.value) {
-      _wallet.load(() => {
-        if (_wallet.accounts.size > 0) {
-          publicKey.value = Array.from(_wallet.accounts.keys())[0]
-          return
-        }
-        createAccount()
-      })
-      return
-    }
-    createAccount()
+  if (!autoRun.value) {
+    return
   }
+  if (checkExist.value && _wallet.accounts.size > 0) {
+    publicKey.value = Array.from(_wallet.accounts.keys())[0]
+    return
+  }
+  createAccount()
 })
 
 </script>
