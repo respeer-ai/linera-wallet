@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { OneShotSetting } from './types'
 
-export const useSettingStore = defineStore('setting', {
+export const useSettingStore = defineStore('one-shot-setting', {
   state: () => ({
     oneShotSetting: {} as OneShotSetting
   }),

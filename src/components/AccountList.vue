@@ -49,7 +49,7 @@ const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
 const displayAddreses = computed(() => addresses.value.map(el => {
   return {
-    label: el?.length > 12 ? el.slice(0, 7) + '...' + el.slice(-5) : el.slice(0, 7) + '...',
+    label: el,
     value: _wallet.displayAddress(el)
   }
 }))

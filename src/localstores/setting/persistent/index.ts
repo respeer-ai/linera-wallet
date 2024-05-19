@@ -3,7 +3,7 @@ import { PersistentSetting } from './types'
 import localforage from 'localforage'
 import * as constant from 'src/const'
 
-export const useSettingStore = defineStore('setting', {
+export const useSettingStore = defineStore('persistent-setting', {
   state: () => ({
     persistentSetting: {} as PersistentSetting,
     walletStorage: localforage.createInstance({

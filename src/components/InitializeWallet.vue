@@ -28,7 +28,7 @@
         title='Validate Account'
         :done='step > 3'
       >
-        <ValidateAccount v-model:error='accountError' />
+        <ValidateAccount v-model:error='accountError' v-model:public-key='publicKey' />
       </q-step>
     </q-stepper>
     <q-btn
@@ -44,7 +44,8 @@
 
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
-import { wallet } from 'src/localstores'
+import { wallet, notify } from 'src/localstores'
+import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/NewPassword.vue'
 import InitializeAccount from 'src/components/InitializeAccount.vue'
@@ -54,7 +55,11 @@ const step = ref(1)
 const password = ref('')
 const passwordError = ref(false)
 const accountError = ref(true)
+const publicKey = ref('')
+
 const _wallet = wallet.useWalletStore()
+const notification = notify.useNotificationStore()
+const router = useRouter()
 
 const canGotoNext = () => {
   switch (step.value) {
@@ -85,6 +90,21 @@ const savePassword = () => {
   })
 }
 
+const validateAccount = () => {
+  const account = _wallet.account(publicKey.value)
+  if (account) {
+    // TODO: init wallet
+    void router.push({ path: '/microchains' })
+    return
+  }
+  notification.pushNotification({
+    Title: 'Validate Account',
+    Message: 'Please provide correct account information, or regenerate a new one',
+    Popup: true,
+    Type: notify.NotifyType.Error
+  })
+}
+
 const onNextStepClick = () => {
   switch (step.value) {
     case 1:
@@ -92,6 +112,9 @@ const onNextStepClick = () => {
       break
     case 2:
       step.value++
+      break
+    case 3:
+      validateAccount()
       break
   }
 }

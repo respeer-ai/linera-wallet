@@ -1,7 +1,7 @@
 <template>
   <div :style='{maxWidth: "600px"}'>
     <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
-      Import Account
+      Validate Account
     </h5>
     <p class='text-brown-8'>
       <q-icon name='info' class='text-blue-6' size='20px' />
@@ -28,6 +28,16 @@
       :error='privateKeyError'
       hide-bottom-space
       :type='display ? "text" : "password"'
+    />
+    <div :style='{margin: "4px 0", fontWeight: 500, lineHeight: "32px"}' class='text-brown-10 text-left'>
+      Address
+    </div>
+    <q-input
+      outlined
+      dense
+      v-model='publicKey'
+      hide-bottom-space
+      disable
     />
     <div :style='{margin: "4px 0", fontWeight: 500, lineHeight: "32px"}' class='text-brown-10 text-left'>
       Initialization Microchain ID
@@ -57,9 +67,12 @@
 </template>
 
 <script setup lang="ts">
+import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { _hex } from 'src/utils'
 import { ref, watch } from 'vue'
 
 const privateKey = ref('')
+const publicKey = defineModel<string>('publicKey')
 const microchainId = ref('')
 const messageId = ref('')
 const display = ref(false)
@@ -82,7 +95,7 @@ const onPrivateKeyFocus = () => {
 }
 
 const onMicrochainIdBlur = () => {
-  microchainIdError.value = microchainId.value.length !== 128
+  microchainIdError.value = microchainId.value.length !== 64
 }
 
 const onMicrochainIdFocus = () => {
@@ -90,7 +103,7 @@ const onMicrochainIdFocus = () => {
 }
 
 const onMessageIdBlur = () => {
-  messageIdError.value = messageId.value.length !== 128
+  messageIdError.value = messageId.value.length !== 88
 }
 
 const onMessageIdFocus = () => {
@@ -99,6 +112,14 @@ const onMessageIdFocus = () => {
 
 watch([privateKeyError, microchainIdError, messageIdError], () => {
   error.value = privateKeyError.value || microchainIdError.value || messageIdError.value
+})
+
+watch(privateKey, () => {
+  try {
+    publicKey.value = _hex.toHex(Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey.value))).public().to_bytes().bytes)
+  } catch (e) {
+    // TODO
+  }
 })
 
 </script>

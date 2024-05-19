@@ -39,7 +39,7 @@ const _wallet = wallet.useWalletStore()
 const currentAddress = computed(() => _wallet.currentAddress)
 
 const _setting = oneshotsetting.useSettingStore()
-const showSideMenu = computed(() => _setting.showHeaderMenu)
+const showSideMenu = computed(() => _setting.showSideMenu)
 
 const minimal = ref(false)
 const selectedMenu = ref('Microchains')

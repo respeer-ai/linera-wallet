@@ -69,9 +69,9 @@
 import { toRef, ref, computed } from 'vue'
 import { wallet, notify } from 'src/localstores'
 import { shortid } from 'src/utils'
+import { copyToClipboard } from 'quasar'
 
 import CreateAccount from 'src/components/CreateAccount.vue'
-import { copyToClipboard } from 'quasar'
 
 interface Props {
   password: string
