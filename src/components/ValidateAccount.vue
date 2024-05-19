@@ -1,6 +1,6 @@
 <template>
   <div :style='{maxWidth: "600px"}'>
-    <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
+    <h5 class='text-brown-8 text-center' :style='{fontWeight: 600, margin: "16px"}'>
       Validate Account
     </h5>
     <p class='text-brown-8'>
