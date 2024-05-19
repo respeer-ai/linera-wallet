@@ -1,4 +1,4 @@
-import { useSettingStore } from 'src/localstores/setting'
+import { useSettingStore } from 'src/localstores/setting/persistent'
 import * as constant from 'src/const'
 
 export const faucetWsSchema = (() => {

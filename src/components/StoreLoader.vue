@@ -19,12 +19,12 @@
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { wallet, setting } from 'src/localstores'
+import { wallet, persistentsetting } from 'src/localstores'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 
 const _wallet = wallet.useWalletStore()
-const _setting = setting.useSettingStore()
+const _setting = persistentsetting.useSettingStore()
 const router = useRouter()
 const loading = ref(true)
 

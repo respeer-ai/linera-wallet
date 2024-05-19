@@ -6,6 +6,7 @@ import {
   createWebHistory
 } from 'vue-router'
 import routes from './routes'
+import { useSettingStore } from 'src/localstores/setting/oneshot'
 
 /*
  * If not building with SSR mode, you can
@@ -23,7 +24,7 @@ export default route(function (/* { store, ssrContext } */) {
       ? createWebHistory
       : createWebHashHistory
 
-  const Router = createRouter({
+  const router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
 
@@ -33,5 +34,14 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
-  return Router
+  router.beforeEach((to) => {
+    const _setting = useSettingStore()
+    if (to.meta?.ShowSideMenu !== undefined) {
+      _setting.oneShotSetting.ShowSideMenu = to.meta.ShowSideMenu
+    } else {
+      _setting.oneShotSetting.ShowSideMenu = true
+    }
+  })
+
+  return router
 })

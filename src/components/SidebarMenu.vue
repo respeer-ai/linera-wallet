@@ -1,5 +1,5 @@
 <template>
-  <div v-if='currentAddress'>
+  <div v-if='currentAddress && showSideMenu'>
     <q-drawer
       v-model='minimal'
       show-if-above
@@ -33,10 +33,13 @@
 <script setup lang='ts'>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { wallet } from 'src/localstores'
+import { wallet, oneshotsetting } from 'src/localstores'
 
 const _wallet = wallet.useWalletStore()
 const currentAddress = computed(() => _wallet.currentAddress)
+
+const _setting = oneshotsetting.useSettingStore()
+const showSideMenu = computed(() => _setting.showHeaderMenu)
 
 const minimal = ref(false)
 const selectedMenu = ref('Microchains')

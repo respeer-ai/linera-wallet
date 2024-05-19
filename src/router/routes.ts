@@ -1,5 +1,11 @@
 import { RouteRecordRaw } from 'vue-router'
 
+declare module 'vue-router' {
+  interface RouteMeta {
+    ShowSideMenu?: boolean
+  }
+}
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -12,8 +18,20 @@ const routes: RouteRecordRaw[] = [
       { path: '/activity', component: () => import('pages/ActivityPage.vue') },
       { path: '/setting', component: () => import('pages/SettingPage.vue') },
       { path: '/onboarding', component: () => import('pages/OnBoardingPage.vue') },
-      { path: '/initializewallet', component: () => import('pages/InitializeWalletPage.vue') },
-      { path: '/recovery', component: () => import('pages/RecoveryPage.vue') }
+      {
+        path: '/initializewallet',
+        component: () => import('pages/InitializeWalletPage.vue'),
+        meta: {
+          ShowSideMenu: false
+        }
+      },
+      {
+        path: '/recovery',
+        component: () => import('pages/RecoveryPage.vue'),
+        meta: {
+          ShowSideMenu: false
+        }
+      }
     ]
   },
   {

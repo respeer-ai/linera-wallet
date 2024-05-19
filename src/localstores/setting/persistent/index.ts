@@ -1,12 +1,11 @@
 import { defineStore } from 'pinia'
-import { PersistentSetting, OneShotSetting } from './types'
+import { PersistentSetting } from './types'
 import localforage from 'localforage'
 import * as constant from 'src/const'
 
 export const useSettingStore = defineStore('setting', {
   state: () => ({
     persistentSetting: {} as PersistentSetting,
-    oneShotSetting: {} as OneShotSetting,
     walletStorage: localforage.createInstance({
       name: 'setting'
     }),
@@ -40,9 +39,6 @@ export const useSettingStore = defineStore('setting', {
         this.persistentSetting.rpcHost,
         this.persistentSetting.rpcPort
       )
-    },
-    showHeaderMenu (): boolean {
-      return this.oneShotSetting.ShowHeaderMenu
     }
   },
   actions: {

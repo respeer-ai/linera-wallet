@@ -25,10 +25,10 @@
       </q-step>
       <q-step
         :name='3'
-        title='Backup Account'
+        title='Validate Account'
         :done='step > 3'
       >
-        HHHHHHHHHHH
+        <ValidateAccount v-model:error='accountError' />
       </q-step>
     </q-stepper>
     <q-btn
@@ -47,17 +47,21 @@ import { ref, computed } from 'vue'
 import { wallet } from 'src/localstores'
 
 import NewPassword from 'src/components/NewPassword.vue'
-import InitializeAccount from './InitializeAccount.vue'
+import InitializeAccount from 'src/components/InitializeAccount.vue'
+import ValidateAccount from 'src/components/ValidateAccount.vue'
 
 const step = ref(1)
 const password = ref('')
 const passwordError = ref(false)
+const accountError = ref(true)
 const _wallet = wallet.useWalletStore()
 
 const canGotoNext = () => {
   switch (step.value) {
     case 1:
       return !passwordError.value && password.value.length
+    case 3:
+      return !accountError.value
     default:
       return true
   }
@@ -66,9 +70,11 @@ const canGotoNext = () => {
 const btnText = computed(() => {
   switch (step.value) {
     case 1:
-      return 'Create Account'
+      return 'Save Password'
     case 2:
-      return 'Export Account'
+      return 'Validate Account'
+    case 3:
+      return 'Linera Now'
   }
   return 'Next'
 })
@@ -85,7 +91,7 @@ const onNextStepClick = () => {
       savePassword()
       break
     case 2:
-
+      step.value++
       break
   }
 }

@@ -10,6 +10,7 @@
       :style='{
         width: "100%"
       }'
+      :loading='creating'
     />
   </div>
 </template>
@@ -25,7 +26,7 @@ import {
 } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
 import { wallet } from 'src/localstores'
-import { onMounted, toRef } from 'vue'
+import { onMounted, toRef, ref } from 'vue'
 
 interface Props {
   checkExist?: boolean
@@ -39,6 +40,7 @@ const props = defineProps<Props>()
 const autoRun = toRef(props, 'autoRun')
 const password = toRef(props, 'password')
 const checkExist = toRef(props, 'checkExist')
+const creating = ref(false)
 
 const _wallet = wallet.useWalletStore()
 
@@ -169,6 +171,7 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
 }
 
 const createAccount = () => {
+  creating.value = true
   generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
     const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
     const privateKey = _hex.toHex(keyPair.to_bytes().bytes)

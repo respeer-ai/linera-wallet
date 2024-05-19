@@ -145,7 +145,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { setting, notify } from 'src/localstores'
+import { persistentsetting, notify } from 'src/localstores'
 import { endpoint } from 'src/utils'
 import * as constant from 'src/const'
 
@@ -154,7 +154,7 @@ import OpenChain from 'src/components/OpenChain.vue'
 import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
 
-const _setting = setting.useSettingStore()
+const _setting = persistentsetting.useSettingStore()
 
 const faucetSchema = ref(endpoint.faucetSchema)
 const faucetWSSchema = ref(endpoint.faucetWsSchema)

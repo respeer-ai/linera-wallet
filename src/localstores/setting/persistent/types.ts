@@ -11,7 +11,3 @@ export interface PersistentSetting {
   rpcHost: string
   rpcPort: number
 }
-
-export interface OneShotSetting {
-  ShowHeaderMenu: boolean
-}
