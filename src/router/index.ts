@@ -35,7 +35,6 @@ export default route(function (/* { store, ssrContext } */) {
   })
 
   router.beforeEach((to) => {
-    console.log(to)
     const _setting = useSettingStore()
     if (to.meta?.ShowSideMenu !== undefined) {
       _setting.oneShotSetting.ShowSideMenu = to.meta.ShowSideMenu
