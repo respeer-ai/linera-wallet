@@ -1,15 +1,11 @@
 <template>
-  <div :style='{width: "100%"}'>
-    <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
+  <div class='fill-parent'>
+    <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px 16px 48px 16px"}'>
       Create Password
     </h5>
-    <p class='text-brown-8'>
-      <q-icon name='info' class='text-blue-6' size='20px' />
-      With this password, you can protect your CheCko wallet. You should know that CheCko is not able to recover your wallet if you lose your password.
-    </p>
     <div class='row'>
       <q-space />
-      <div :style='{width: "400px"}' class='text-left'>
+      <div :style='{width: "100%"}' class='text-left'>
         <div :style='{margin: "4px 0", lineHeight: "32px"}' class='text-brown-10 row'>
           <span :style='{fontWeight: 500, marginRight: "4px"}'>New Password</span> (At least 8 letters)
           <q-space />

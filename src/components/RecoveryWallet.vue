@@ -1,32 +1,34 @@
 <template>
-  <LoginPassword v-if='step === 0' v-model:password='password' @unlocked='unlocked' />
-  <div v-if='step === 1'>
-    <InitializeAccount :password='password' />
-    <div class='row'>
-      <q-space />
-      <q-btn
-        flat
-        class='text-brown-10 bg-red-2'
-        :style='{borderRadius: "16px", width: "400px", margin: "48px 0 0 0"}'
-        label='Validate Account'
-        @click='step = 2'
-      />
-      <q-space />
+  <div class='fill-parent'>
+    <LoginPassword v-if='step === 0' v-model:password='password' @unlocked='unlocked' />
+    <div v-if='step === 1'>
+      <InitializeAccount :password='password' />
+      <div class='row'>
+        <q-space />
+        <q-btn
+          flat
+          class='text-brown-10 bg-red-2'
+          :style='{borderRadius: "16px", width: "100%", margin: "48px 0 0 0"}'
+          label='Validate Account'
+          @click='step = 2'
+        />
+        <q-space />
+      </div>
     </div>
-  </div>
-  <div v-if='step === 2'>
-    <ValidateAccount v-model:error='accountError' v-model:public-key='publicKey' />
-    <div class='row'>
-      <q-space />
-      <q-btn
-        flat
-        class='text-brown-10 bg-red-2'
-        :style='{borderRadius: "16px", width: "400px", margin: "48px 0 0 0"}'
-        label='Linera Now'
-        @click='onLineraNowClick'
-        :disable='!publicKey.length || accountError'
-      />
-      <q-space />
+    <div v-if='step === 2'>
+      <ValidateAccount v-model:error='accountError' v-model:public-key='publicKey' />
+      <div class='row'>
+        <q-space />
+        <q-btn
+          flat
+          class='text-brown-10 bg-red-2'
+          :style='{borderRadius: "16px", width: "100%", margin: "48px 0 0 0"}'
+          label='Linera Now'
+          @click='onLineraNowClick'
+          :disable='!publicKey.length || accountError'
+        />
+        <q-space />
+      </div>
     </div>
   </div>
 </template>
@@ -50,7 +52,8 @@ const _wallet = wallet.useWalletStore()
 
 const unlocked = () => {
   if (_wallet.accounts.size) {
-    void router.push({ path: '/microchains' })
+    step.value = 1
+    // void router.push({ path: '/microchains' })
   } else {
     step.value = 1
   }

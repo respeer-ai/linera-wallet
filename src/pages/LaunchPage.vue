@@ -1,7 +1,5 @@
 <template>
-  <q-page class='flex justify-center items-center'>
-    <StoreLoader />
-  </q-page>
+  <StoreLoader />
 </template>
 
 <script setup lang='ts'>

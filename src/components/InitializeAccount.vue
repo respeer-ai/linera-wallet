@@ -1,5 +1,5 @@
 <template>
-  <div :style='{maxWidth: "600px"}' class='text-center'>
+  <div class='text-center fill-parent'>
     <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
       Initialize Account
     </h5>
@@ -51,9 +51,9 @@
           or account private key, CheCko isn't able to recover them.
         </p>
       </div>
-      <q-card v-else :style='{height: "160px"}' flat>
+      <q-card v-else :style='{height: "160px", width: "100%"}' flat>
         <q-inner-loading
-          :showing='!publicKey.length'
+          :showing='!publicKey.length || true'
           class='text-red-4'
         >
           <q-spinner-facebook size='80px' />

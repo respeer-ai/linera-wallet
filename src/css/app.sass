@@ -1,19 +1,16 @@
 // app global css in SCSS form
-.pc-only
-  display: none
+.popup-container
+  width: 378px
+  height: 600px
+  padding: 24px
 
-.mobile-only
-  display: none
+.hide
+  display: none !important
+  visibility: hidden !important
 
-@media (min-width: 768px)
-  .pc-only
-    display: block
+.fill-parent
+  width: 100%
+  height: 100%
 
-@media (max-width: $breakpoint-sm-max)
-  .mobile-only 
-    display: block
-
-#popup-container
-  width: 340px
-  height: 605px
-  padding: 10px
+.stepper-expand
+  margin: -24px

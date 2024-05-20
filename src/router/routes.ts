@@ -3,6 +3,10 @@ import { RouteRecordRaw } from 'vue-router'
 declare module 'vue-router' {
   interface RouteMeta {
     ShowSideMenu?: boolean
+    ShowHeaderMenu?: boolean
+    ExtensionMode?: boolean
+    ShowFooterMenu?: boolean
+    ShowTestTip?: boolean
   }
 }
 
@@ -12,14 +16,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/LaunchPage.vue') },
-      { path: '/accounts', component: () => import('pages/AccountsPage.vue') },
-      { path: '/microchains', component: () => import('pages/MicrochainsPage.vue') },
-      { path: '/transfer', component: () => import('pages/TransferPage.vue') },
-      { path: '/activity', component: () => import('pages/ActivityPage.vue') },
-      { path: '/setting', component: () => import('pages/SettingPage.vue') },
-      { path: '/onboarding', component: () => import('pages/OnBoardingPage.vue') },
+      { path: 'accounts', component: () => import('pages/AccountsPage.vue') },
+      { path: 'microchains', component: () => import('pages/MicrochainsPage.vue') },
+      { path: 'transfer', component: () => import('pages/TransferPage.vue') },
+      { path: 'activity', component: () => import('pages/ActivityPage.vue') },
+      { path: 'setting', component: () => import('pages/SettingPage.vue') },
+      { path: 'onboarding', component: () => import('pages/OnBoardingPage.vue') },
       {
-        path: '/initializewallet',
+        path: 'initializewallet',
         component: () => import('pages/InitializeWalletPage.vue'),
         meta: {
           ShowSideMenu: false
@@ -36,9 +40,48 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/extension',
-    component: () => import('layouts/ExtensionMainLayout.vue'),
+    component: () => import('layouts/MainLayout.vue'),
+    meta: {
+      ExtensionMode: true,
+      ShowFooterMenu: false,
+      ShowTestTip: false
+    },
     children: [
-      { path: '', component: () => import('pages/extension/LaunchPage.vue') },
+      {
+        path: '',
+        component: () => import('pages/LaunchPage.vue'),
+        meta: {
+          ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'onboarding',
+        component: () => import('pages/OnBoardingPage.vue'),
+        meta: {
+          ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'recovery',
+        component: () => import('pages/RecoveryPage.vue'),
+        meta: {
+          ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'importwallet',
+        component: () => import('pages/ImportWalletPage.vue'),
+        meta: {
+          ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'initializewallet',
+        component: () => import('pages/InitializeWalletPage.vue'),
+        meta: {
+          ShowHeaderMenu: false
+        }
+      },
       {
         path: 'accounts',
         component: () => import('pages/extension/AccountsPage.vue')
@@ -53,7 +96,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'setting',
-        component: () => import('pages/extension/SettingPage.vue')
+        component: () => import('pages/SettingPage.vue')
       },
       { path: 'popup', component: () => import('pages/extension/PopupPage.vue') },
       { path: 'activity', component: () => import('pages/extension/ActivityPage.vue') }

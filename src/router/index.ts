@@ -35,11 +35,30 @@ export default route(function (/* { store, ssrContext } */) {
   })
 
   router.beforeEach((to) => {
+    console.log(to)
     const _setting = useSettingStore()
     if (to.meta?.ShowSideMenu !== undefined) {
       _setting.oneShotSetting.ShowSideMenu = to.meta.ShowSideMenu
     } else {
       _setting.oneShotSetting.ShowSideMenu = true
+    }
+    if (to.meta?.ShowHeaderMenu !== undefined) {
+      _setting.oneShotSetting.ShowHeaderMenu = to.meta.ShowHeaderMenu
+    } else {
+      _setting.oneShotSetting.ShowHeaderMenu = true
+    }
+    if (to.meta?.ExtensionMode !== undefined) {
+      _setting.oneShotSetting.ExtensionMode = to.meta.ExtensionMode
+    }
+    if (to.meta?.ShowFooterMenu !== undefined) {
+      _setting.oneShotSetting.ShowFooterMenu = to.meta.ShowFooterMenu
+    } else {
+      _setting.oneShotSetting.ShowFooterMenu = true
+    }
+    if (to.meta?.ShowTestTip !== undefined) {
+      _setting.oneShotSetting.ShowTestTip = to.meta.ShowTestTip
+    } else {
+      _setting.oneShotSetting.ShowTestTip = true
     }
   })
 

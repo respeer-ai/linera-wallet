@@ -1,5 +1,5 @@
 <template>
-  <q-card class='text-center' :style='{padding: "48px", width: "496px"}'>
+  <q-card flat class='text-center fill-parent'>
     <h5 :style='{fontWeight: 600, margin: "8px 0"}' class='text-brown-8'>
       Welcome Back
     </h5>
@@ -9,13 +9,13 @@
     <div>
       <q-img :src='cheCkoLogo' width='240px' :style='{margin: "80px 0 0 0"}' />
     </div>
-    <div :style='{margin: "120px 0 0 0"}'>
+    <div :style='{margin: "80px 0 0 0"}'>
       <InputPassword v-model:password='password' v-model:error='passwordError' />
     </div>
     <q-btn
       flat
       class='text-brown-10 bg-red-2'
-      :style='{borderRadius: "16px", width: "400px", margin: "16px 0 0 0"}'
+      :style='{borderRadius: "16px", width: "100%", margin: "16px 0 0 0"}'
       label='Unlock'
       @click='onUnlockClick'
       :disable='password.length < 8 || passwordError'
@@ -24,7 +24,7 @@
       flat
       dense
       class='text-blue-6'
-      :style='{borderRadius: "16px", width: "400px"}'
+      :style='{borderRadius: "16px", width: "100%"}'
       label='Forget password?'
       @click='onForgetPasswordClick'
     />

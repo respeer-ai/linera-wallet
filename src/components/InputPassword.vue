@@ -1,8 +1,8 @@
 <template>
-  <div :style='{maxWidth: "600px"}'>
+  <div class='fill-parent'>
     <div class='row'>
       <q-space />
-      <div :style='{width: "400px"}' class='text-left'>
+      <div :style='{width: "100%"}' class='text-left'>
         <div :style='{margin: "4px 0", lineHeight: "32px"}' class='text-brown-10 row'>
           <span :style='{fontWeight: 500, marginRight: "4px"}'>Password</span>
           <q-space />

@@ -183,6 +183,9 @@ export const useWalletStore = defineStore('checko-wallet', {
     loadAccounts (password: string, listener?: () => void) {
       this.walletStorage.getItem('accounts')
         .then((accounts) => {
+          if (!accounts) {
+            return listener?.()
+          }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
           const _accounts = JSON.parse(accounts as string)
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

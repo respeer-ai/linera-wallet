@@ -1,25 +1,27 @@
 <template>
   <q-layout view='hHh Lpr hff'>
-    <q-header>
+    <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
         <HeaderMenu :style='{ width: "100%" }' />
       </q-toolbar>
     </q-header>
-    <SidebarMenu />
+    <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
-      <router-view />
+      <q-page :class='[ extensionMode ? "popup-container" : "", "flex justify-center items-center" ]'>
+        <router-view />
+      </q-page>
     </q-page-container>
-    <q-footer class='text-grey-8 bg-white' :style='{ margin: "6px 12px" }'>
-      Another browser wallet for Linera blockchain by
+    <q-footer v-if='showFooterMenu' class='text-grey-8 bg-white' :style='{ margin: "6px 12px" }'>
+      Another browser wallet for Linera blockchain by<br>
       <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
     </q-footer>
-    <TestnetTip />
+    <TestnetTip v-if='showTestTip' />
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { notify } from 'src/localstores'
+import { computed, onMounted } from 'vue'
+import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
 import HeaderMenu from 'src/components/HeaderMenu.vue'
@@ -27,6 +29,12 @@ import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
 
 const notification = notify.useNotificationStore()
+const setting = oneshotsetting.useSettingStore()
+const showFooterMenu = computed(() => setting.showFooterMenu)
+const showTestTip = computed(() => setting.showTestTip)
+const showHeaderMenu = computed(() => setting.showHeaderMenu)
+const showSideMenu = computed(() => setting.showSideMenu)
+const extensionMode = computed(() => setting.extensionMode)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

@@ -1,12 +1,8 @@
 <template>
   <div class='fill-parent'>
     <h5 class='text-brown-8 text-center' :style='{fontWeight: 600, margin: "16px"}'>
-      Validate Account
+      Import Account
     </h5>
-    <p class='text-brown-8'>
-      <q-icon name='info' class='text-blue-6' size='20px' />
-      CheCko need you to input your account which is backup in last step again to confirm you store them correctly.
-    </p>
     <div :style='{margin: "4px 0", fontWeight: 500, lineHeight: "32px"}' class='text-brown-10 text-left row'>
       <span>Private Key</span>
       <q-space />

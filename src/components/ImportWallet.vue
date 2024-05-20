@@ -10,7 +10,6 @@
       alternative-labels
       :header-class='extensionMode ? "hide" : ""'
       :class='[ extensionMode ? "stepper-expand" : "" ]'
-      :style='{width: "100%"}'
     >
       <q-step
         :name='1'
@@ -22,19 +21,11 @@
       </q-step>
       <q-step
         :name='2'
-        title='Create Account'
+        title='Import Account'
         :done='step > 2'
       >
-        <InitializeAccount v-if='!extensionMode' :password='password' />
-        <ExtensionInitializeAccount v-else :password='password' />
-      </q-step>
-      <q-step
-        :name='3'
-        title='Validate Account'
-        :done='step > 3'
-      >
-        <ValidateAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' />
-        <ExtensionValidateAccount v-else v-model:password='password' v-model:error='passwordError' />
+        <ImportAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' />
+        <ExtensionImportAccount v-else v-model:password='password' v-model:error='passwordError' />
       </q-step>
     </q-stepper>
     <q-btn
@@ -55,10 +46,8 @@ import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
-import InitializeAccount from 'src/components/InitializeAccount.vue'
-import ExtensionInitializeAccount from 'src/components/extension/InitializeAccount.vue'
-import ValidateAccount from 'src/components/ValidateAccount.vue'
-import ExtensionValidateAccount from 'src/components/extension/ValidateAccount.vue'
+import ImportAccount from 'src/components/ImportAccount.vue'
+import ExtensionImportAccount from 'src/components/extension/ImportAccount.vue'
 
 const step = ref(1)
 const password = ref('')
@@ -76,7 +65,7 @@ const canGotoNext = () => {
   switch (step.value) {
     case 1:
       return !passwordError.value && password.value.length
-    case 3:
+    case 2:
       return !accountError.value
     default:
       return true
@@ -88,9 +77,7 @@ const btnText = computed(() => {
     case 1:
       return 'Save Password'
     case 2:
-      return 'Validate Account'
-    case 3:
-      return 'Linera Now'
+      return 'Import Account'
   }
   return 'Next'
 })
@@ -122,9 +109,6 @@ const onNextStepClick = () => {
       savePassword()
       break
     case 2:
-      step.value++
-      break
-    case 3:
       validateAccount()
       break
   }

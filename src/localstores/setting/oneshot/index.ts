@@ -11,6 +11,15 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     showSideMenu (): boolean {
       return this.oneShotSetting.ShowSideMenu
+    },
+    extensionMode (): boolean {
+      return this.oneShotSetting.ExtensionMode
+    },
+    showFooterMenu (): boolean {
+      return this.oneShotSetting.ShowFooterMenu
+    },
+    showTestTip (): boolean {
+      return this.oneShotSetting.ShowTestTip
     }
   },
   actions: {}

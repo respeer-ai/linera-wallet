@@ -1,6 +1,6 @@
 <template>
-  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0"}' class='flex justify-center items-center fill-parent'>
-    <RecoveryWallet />
+  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0"}' class='flex justify-center items-center'>
+    <ImportWallet />
   </div>
 </template>
 
@@ -8,8 +8,9 @@
 import { oneshotsetting } from 'src/localstores'
 import { computed } from 'vue'
 
-import RecoveryWallet from 'src/components/RecoveryWallet.vue'
+import ImportWallet from 'src/components/ImportWallet.vue'
 
 const setting = oneshotsetting.useSettingStore()
 const extensionMode = computed(() => setting.extensionMode)
+
 </script>
