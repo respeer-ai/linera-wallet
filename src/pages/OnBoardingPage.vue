@@ -1,5 +1,5 @@
 <template>
-  <div class='flex justify-center items-center fill-parent'>
+  <div class='fill-parent'>
     <OnBoarding v-if='!extensionMode' />
     <ExtensionOnBoarding v-else />
   </div>

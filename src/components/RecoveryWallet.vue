@@ -8,7 +8,7 @@
         <q-btn
           flat
           class='text-brown-10 bg-red-2'
-          :style='{borderRadius: "16px", width: "100%", margin: "48px 0 0 0"}'
+          :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "48px 0 0 0"}'
           label='Validate Account'
           @click='step = 2'
         />
@@ -22,7 +22,7 @@
         <q-btn
           flat
           class='text-brown-10 bg-red-2'
-          :style='{borderRadius: "16px", width: "100%", margin: "48px 0 0 0"}'
+          :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "48px 0 0 0"}'
           label='Linera Now'
           @click='onLineraNowClick'
           :disable='!publicKey.length || accountError'
@@ -52,8 +52,7 @@ const _wallet = wallet.useWalletStore()
 
 const unlocked = () => {
   if (_wallet.accounts.size) {
-    step.value = 1
-    // void router.push({ path: '/microchains' })
+    void router.push({ path: '/microchains' })
   } else {
     step.value = 1
   }

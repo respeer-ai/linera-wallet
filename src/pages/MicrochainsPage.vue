@@ -1,5 +1,5 @@
 <template>
-  <div class='row' :style='{marginTop: "48px"}'>
+  <div class='row fill-parent' :style='{marginTop: "48px"}'>
     <q-space />
     <div>
       <div

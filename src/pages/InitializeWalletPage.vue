@@ -1,5 +1,5 @@
 <template>
-  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0"}'>
+  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0", width: "600px"}'>
     <InitializeWallet />
   </div>
 </template>

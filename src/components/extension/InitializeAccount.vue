@@ -49,7 +49,7 @@
       </div>
       <q-card v-else :style='{height: "160px", width: "100%"}' flat>
         <q-inner-loading
-          :showing='!publicKey.length || true'
+          :showing='!publicKey.length'
           class='text-red-4'
         >
           <q-spinner-facebook size='80px' />

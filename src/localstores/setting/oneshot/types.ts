@@ -4,4 +4,5 @@ export interface OneShotSetting {
   ExtensionMode: boolean
   ShowFooterMenu: boolean
   ShowTestTip: boolean
+  AlignPageCenter: boolean
 }

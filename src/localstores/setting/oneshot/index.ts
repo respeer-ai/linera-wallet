@@ -20,6 +20,9 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     showTestTip (): boolean {
       return this.oneShotSetting.ShowTestTip
+    },
+    alignPageCenter (): boolean {
+      return this.oneShotSetting.AlignPageCenter
     }
   },
   actions: {}

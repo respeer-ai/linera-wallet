@@ -7,6 +7,7 @@ declare module 'vue-router' {
     ExtensionMode?: boolean
     ShowFooterMenu?: boolean
     ShowTestTip?: boolean
+    AlignPageCenter?: boolean
   }
 }
 
@@ -16,10 +17,28 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/LaunchPage.vue') },
-      { path: 'accounts', component: () => import('pages/AccountsPage.vue') },
-      { path: 'microchains', component: () => import('pages/MicrochainsPage.vue') },
+      {
+        path: 'accounts',
+        component: () => import('pages/AccountsPage.vue'),
+        meta: {
+          AlignPageCenter: false
+        }
+      },
+      {
+        path: 'microchains',
+        component: () => import('pages/MicrochainsPage.vue'),
+        meta: {
+          AlignPageCenter: false
+        }
+      },
       { path: 'transfer', component: () => import('pages/TransferPage.vue') },
-      { path: 'activity', component: () => import('pages/ActivityPage.vue') },
+      {
+        path: 'activity',
+        component: () => import('pages/ActivityPage.vue'),
+        meta: {
+          AlignPageCenter: false
+        }
+      },
       { path: 'setting', component: () => import('pages/SettingPage.vue') },
       { path: 'onboarding', component: () => import('pages/OnBoardingPage.vue') },
       {

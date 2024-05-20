@@ -3,7 +3,7 @@
     <h5 class='text-brown-8 text-center' :style='{fontWeight: 600, margin: "16px"}'>
       Validate Account
     </h5>
-    <p class='text-brown-8'>
+    <p class='text-brown-8 text-center' :style='{margin: "32px 0 24px 0"}'>
       <q-icon name='info' class='text-blue-6' size='20px' />
       CheCko need you to input your account which is backup in last step again to confirm you store them correctly.
     </p>

@@ -7,12 +7,12 @@
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
-      <q-page :class='[ extensionMode ? "popup-container" : "", "flex justify-center items-center" ]'>
+      <q-page :class='[ extensionMode ? "popup-container" : "", "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
         <router-view />
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-white' :style='{ margin: "6px 12px" }'>
-      Another browser wallet for Linera blockchain by<br>
+      Another browser wallet for Linera blockchain by
       <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
     </q-footer>
     <TestnetTip v-if='showTestTip' />
@@ -35,6 +35,7 @@ const showTestTip = computed(() => setting.showTestTip)
 const showHeaderMenu = computed(() => setting.showHeaderMenu)
 const showSideMenu = computed(() => setting.showSideMenu)
 const extensionMode = computed(() => setting.extensionMode)
+const alignPageCneter = computed(() => setting.alignPageCenter)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
