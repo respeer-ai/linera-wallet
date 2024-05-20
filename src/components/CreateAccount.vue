@@ -12,6 +12,14 @@
       }'
     />
   </div>
+  <q-dialog
+    v-model='passwordVerifing'
+  >
+    <VerifyPassword
+      title='Create Account' v-model:password='shadowPassword' @verified='onPasswordVerified' @error='onPasswordError'
+      @calcel='onPasswordCancel'
+    />
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -25,7 +33,9 @@ import {
 } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
 import { wallet } from 'src/localstores'
-import { onMounted, toRef } from 'vue'
+import { onMounted, toRef, ref } from 'vue'
+
+import VerifyPassword from 'src/components/VerifyPassword.vue'
 
 interface Props {
   checkExist?: boolean
@@ -38,7 +48,9 @@ const publicKey = defineModel<string>('publicKey')
 const props = defineProps<Props>()
 const autoRun = toRef(props, 'autoRun')
 const password = toRef(props, 'password')
+const shadowPassword = ref(password.value)
 const checkExist = toRef(props, 'checkExist')
+const passwordVerifing = ref(false)
 
 const _wallet = wallet.useWalletStore()
 
@@ -175,7 +187,7 @@ const createAccount = () => {
     void openChain(_publicKey, (chainId: string, messageId: string) => {
       void initMicrochainChainStore(_publicKey, chainId, messageId, () => {
         signNewBlock(chainId, 0, keyPair, () => {
-          void _wallet.addAccount(_publicKey, privateKey, password.value as string, () => {
+          void _wallet.addAccount(_publicKey, privateKey, shadowPassword.value as string, () => {
             _wallet.addChain(_publicKey, chainId, messageId, endpoint.rpcUrl)
             publicKey.value = _publicKey
           }, () => {
@@ -187,8 +199,21 @@ const createAccount = () => {
   })
 }
 
-const onCreateAccountClick = () => {
+const onPasswordVerified = () => {
+  passwordVerifing.value = false
   createAccount()
+}
+
+const onPasswordError = () => {
+  passwordVerifing.value = false
+}
+
+const onPasswordCancel = () => {
+  passwordVerifing.value = false
+}
+
+const onCreateAccountClick = () => {
+  passwordVerifing.value = true
 }
 
 onMounted(() => {
