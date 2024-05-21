@@ -106,7 +106,6 @@
           height: "48px",
         }'
         use-input
-        fill-input
         label='Target microchain (press enter if input new chain id manually)'
         clearable
         new-value-mode='add-unique'

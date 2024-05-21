@@ -11,8 +11,6 @@
         v-model='address'
         :options='displayAddreses'
         :style='{ height: "24px" }'
-        option-label='label'
-        option-value='value'
         emit-value
       />
       <q-icon

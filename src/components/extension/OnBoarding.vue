@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center flex justify-center items-center'>
+  <div class='text-center'>
     <h5 class='text-brown-8' :style='{fontWeight: 600}'>
       Start Web3 Trip on <q-img :src='lineraLogo' width='24px' /> Linera
     </h5>
