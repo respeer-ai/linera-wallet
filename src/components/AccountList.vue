@@ -310,6 +310,29 @@ const _getBlockWithHash = (chainId: string, hash: string) => {
   })
 }
 
+const initMicrochainChainStore = async (publicKey: string, chainId: string, messageId: string, done?: () => void) => {
+  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const apolloClient = new ApolloClient(options)
+
+  const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
+    mutation walletInitWithoutKeypair ($publicKey: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $withOtherChains: [String!]!) {
+      walletInitWithoutKeypair(publicKey: $publicKey, faucetUrl: $faucetUrl, chainId: $chainId, messageId: $messageId, withOtherChains: $withOtherChains)
+    }`))
+  onDone(() => {
+    done?.()
+  })
+  onError((error) => {
+    console.log('Fail init microchain store for ', publicKey, error)
+  })
+  await mutate({
+    publicKey,
+    faucetUrl: endpoint.faucetUrl,
+    chainId,
+    messageId,
+    withOtherChains: []
+  })
+}
+
 const processChains = () => {
   addresses.value.forEach((addr) => {
     const chains = _wallet.accountChains(addr)
@@ -324,24 +347,26 @@ const processChains = () => {
     chains.forEach((microchain, chainId) => {
       if (subscribedChains?.includes(chainId)) return
       subscribedChains?.push(chainId)
-      subscriptions.value?.set(addr, subscribedChains as [])
-      const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
-      signNewBlock(chainId, undefined, keyPair, true, () => {
-        _getChainAccountBalances()
-      })
-      subscribe(chainId, (height: number) => {
-        // We must reinitialize key here due to the last one may be disposed
+      subscriptions.value.set(addr, subscribedChains as [])
+      void initMicrochainChainStore(addr, chainId, microchain.message_id, () => {
         const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
-        signNewBlock(chainId, height, keyPair, false)
-      }, (hash: string) => {
-        _getChainAccountBalances()
-        _getBlockWithHash(chainId, hash)
-      })
-      getAccountBalance(chainId, addr, (balance: number) => {
-        _wallet.setAccountBalance(addr, chainId, balance)
-      })
-      getAccountBalance(chainId, undefined, (balance: number) => {
-        _wallet.setChainBalance(addr, chainId, balance)
+        signNewBlock(chainId, undefined, keyPair, true, () => {
+          _getChainAccountBalances()
+        })
+        subscribe(chainId, (height: number) => {
+          // We must reinitialize key here due to the last one may be disposed
+          const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
+          signNewBlock(chainId, height, keyPair, false)
+        }, (hash: string) => {
+          _getChainAccountBalances()
+          _getBlockWithHash(chainId, hash)
+        })
+        getAccountBalance(chainId, addr, (balance: number) => {
+          _wallet.setAccountBalance(addr, chainId, balance)
+        })
+        getAccountBalance(chainId, undefined, (balance: number) => {
+          _wallet.setChainBalance(addr, chainId, balance)
+        })
       })
     })
   })
