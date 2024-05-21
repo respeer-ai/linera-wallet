@@ -1,5 +1,5 @@
 <template>
-  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0"}' class='flex justify-center items-center'>
+  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0", maxWidth: "600px"}' class='fill-parent'>
     <ImportWallet />
   </div>
 </template>

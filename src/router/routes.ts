@@ -49,6 +49,13 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
+        path: 'importwallet',
+        component: () => import('pages/ImportWalletPage.vue'),
+        meta: {
+          ShowHeaderMenu: false
+        }
+      },
+      {
         path: '/recovery',
         component: () => import('pages/RecoveryPage.vue'),
         meta: {
