@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center flex justify-center items-center'>
+  <div class='fill-parent text-center'>
     <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
       Start Web3 Trip on <q-img :src='lineraLogo' width='24px' /> Linera
     </h5>
@@ -27,7 +27,7 @@
       By continue you agree with the <a href='#'>Terms of Usage</a> of CheCko and know that<br>
       CheCko cannot recover your password and accounts private key if you lose them.<br>
     </p>
-    <div class='row' :style='{width: "100%"}'>
+    <div class='row' :style='{width: "100%", margin: "32px 0 0 0"}'>
       <q-space />
       <div :style='{width: "400px", margin: "0 0 64px 0"}'>
         <q-btn

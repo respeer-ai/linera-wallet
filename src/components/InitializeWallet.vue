@@ -40,7 +40,7 @@
     <q-btn
       flat
       class='text-brown-10 bg-red-2'
-      :style='{borderRadius: "16px", width: "100%", margin: "32px 0 0 0"}'
+      :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "32px 0 0 0"}'
       :label='btnText'
       :disable='!canGotoNext()'
       @click='onNextStepClick'

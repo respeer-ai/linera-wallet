@@ -138,6 +138,8 @@
       </div>
       <div :style='{ margin: "32px 0 0 0" }'>
         <ClearAccounts />
+      </div><div :style='{ margin: "32px 0 0 0" }'>
+        <ClearPassword />
       </div>
     </q-card>
   </div>
@@ -153,6 +155,7 @@ import CreateAccount from 'src/components/CreateAccount.vue'
 import OpenChain from 'src/components/OpenChain.vue'
 import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
+import ClearPassword from 'src/components/ClearPassword.vue'
 
 const _setting = persistentsetting.useSettingStore()
 

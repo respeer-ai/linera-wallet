@@ -154,14 +154,18 @@ export const useWalletStore = defineStore('checko-wallet', {
     }
   },
   actions: {
-    reset () {
+    reset (resetPassword?: boolean) {
       void this.walletStorage.setItem('accounts', '{}')
       void this.walletStorage.setItem('activities', '[]')
       void this.walletStorage.removeItem('current-address')
+      if (resetPassword) {
+        void this.walletStorage.removeItem('password-hash')
+      }
 
       this.accounts.clear()
       this.currentAddress = undefined as unknown as string
       this.activities = []
+      this.passwordHash = undefined as unknown as string
     },
     accountFromStore (account: Record<string, unknown>, password?: string): Account {
       const _account = {
