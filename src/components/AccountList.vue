@@ -13,6 +13,7 @@
         :style='{ height: "24px" }'
         option-label='label'
         option-value='value'
+        emit-value
       />
       <q-icon
         name='content_copy'
@@ -49,8 +50,8 @@ const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
 const displayAddreses = computed(() => addresses.value.map(el => {
   return {
-    label: el,
-    value: _wallet.displayAddress(el)
+    label: _wallet.displayAddress(el),
+    value: el
   }
 }))
 
@@ -128,8 +129,8 @@ const getPendingRawBlock = (chainId: string, done?: (rawBlockPayload: unknown) =
     }
   })
 
-  onError((error) => {
-    console.log('Get pending block', error)
+  onError(() => {
+    // console.log('Get pending block', error)
   })
 }
 
@@ -142,8 +143,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
     console.log('Success submit block signature for', chainId)
     done?.()
   })
-  onError((error) => {
-    console.log('Fail submit block signature for', chainId, error)
+  onError(() => {
+    // console.log('Fail submit block signature for', chainId, error)
   })
   await mutate({
     chainId,
@@ -168,8 +169,8 @@ const getAccountBalance = (chainId: string, publicKey?: string, done?: (balance:
     done?.(graphqlResult.data(res, 'balance') as number)
   })
 
-  onError((error) => {
-    console.log('Get pending block', error)
+  onError(() => {
+    // console.log('Get pending block', error)
   })
 }
 
@@ -197,8 +198,8 @@ const getChainAccountBalances = (done: (balances: Record<string, ChainAccountBal
     done?.(graphqlResult.data(res, 'balances') as Record<string, ChainAccountBalances>)
   })
 
-  onError((error) => {
-    console.log('Get pending block', error)
+  onError(() => {
+    // console.log('Get pending block', error)
   })
 }
 
@@ -212,7 +213,7 @@ const _getChainAccountBalances = () => {
           _wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
           _wallet.setAccountBalance(publicKey, chainId, balance)
         } catch (e) {
-          console.log('Fail get chain account balances', e)
+          // console.log('Fail get chain account balances', e)
         }
       })
     })
@@ -277,8 +278,8 @@ const getBlockWithHash = (chainId: string, hash: string, done?: (height: number,
     done?.(height, incomingMessages)
   })
 
-  onError((error) => {
-    console.log('Get pending block', error)
+  onError(() => {
+    // console.log('Get pending block', error)
   })
 }
 
@@ -371,7 +372,7 @@ watch(address, () => {
 })
 
 watch(currentAddress, () => {
-  address.value = _wallet.currentAddress
+  address.value = currentAddress.value
 })
 
 onMounted(() => {

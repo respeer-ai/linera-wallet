@@ -1,5 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
+  <div>{{ _wallet.currentAddress }}</div>
   <div class='row' :style='{ marginTop: "48px" }' style='overflow-x: auto;'>
     <q-space />
     <div>

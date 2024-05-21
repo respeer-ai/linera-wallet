@@ -327,7 +327,7 @@ export const useWalletStore = defineStore('checko-wallet', {
         faucet_url: faucetUrl
       }
       account.microchains.set(chainId, chain)
-      secureAccount?.microchains.set(chainId, chain)
+      secureAccount.microchains.set(chainId, chain)
       this.accounts.set(publicKey, account)
       this.secureAccounts.set(publicKey, secureAccount)
       this.saveAccount()

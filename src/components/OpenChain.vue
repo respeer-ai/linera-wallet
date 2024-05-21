@@ -95,8 +95,8 @@ const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => 
     done?.(rawBlock)
   })
 
-  onError((error) => {
-    console.log('Get pending block', error)
+  onError(() => {
+    // console.log('Get pending block', error)
   })
 }
 
@@ -111,8 +111,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   onDone(() => {
     done?.()
   })
-  onError((error) => {
-    console.log('Fail submit block signature for', chainId, error)
+  onError(() => {
+    // console.log('Fail submit block signature for', chainId, error)
   })
   await mutate({
     chainId,
