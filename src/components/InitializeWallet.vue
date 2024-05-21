@@ -10,7 +10,6 @@
       alternative-labels
       :header-class='extensionMode ? "hide" : ""'
       :class='[ extensionMode ? "stepper-expand" : "" ]'
-      :style='{width: "100%"}'
     >
       <q-step
         :name='1'
