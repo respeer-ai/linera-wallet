@@ -110,7 +110,10 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'accountinfo',
-        component: () => import('pages/AccountInfoPage.vue')
+        component: () => import('pages/AccountInfoPage.vue'),
+        meta: {
+          ShowFooterMenu: true
+        }
       },
       {
         path: 'accounts',

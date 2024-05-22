@@ -18,10 +18,14 @@
         <router-view />
       </q-page>
     </q-page-container>
-    <q-footer v-if='showFooterMenu' class='text-grey-8 bg-white' :style='{ margin: "6px 12px" }'>
-      <div>
+    <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>
+      <div v-if='!extensionMode' :style='{ margin: "6px 12px" }'>
         Another browser wallet for Linera blockchain by
         <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
+      </div>
+      <div v-else>
+        <q-separator />
+        <ExtensionFooterMenu />
       </div>
       <q-resize-observer @resize='onFooterResize' />
     </q-footer>
@@ -40,6 +44,7 @@ import HeaderMenu from 'src/components/HeaderMenu.vue'
 import ExtensionHeaderMenu from 'src/components/extension/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
+import ExtensionFooterMenu from 'src/components/extension/FooterMenu.vue'
 
 const notification = notify.useNotificationStore()
 const setting = oneshotsetting.useSettingStore()
