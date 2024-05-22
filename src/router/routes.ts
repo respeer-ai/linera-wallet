@@ -117,11 +117,17 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'accounts',
-        component: () => import('pages/extension/AccountsPage.vue')
+        component: () => import('pages/extension/AccountsPage.vue'),
+        meta: {
+          ShowFooterMenu: true
+        }
       },
       {
         path: 'microchains',
-        component: () => import('pages/extension/MicrochainsPage.vue')
+        component: () => import('pages/extension/MicrochainsPage.vue'),
+        meta: {
+          ShowFooterMenu: true
+        }
       },
       {
         path: 'transfer',
@@ -132,7 +138,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/SettingPage.vue')
       },
       { path: 'popup', component: () => import('pages/extension/PopupPage.vue') },
-      { path: 'activity', component: () => import('pages/extension/ActivityPage.vue') }
+      {
+        path: 'activity',
+        component: () => import('pages/extension/ActivityPage.vue'),
+        meta: {
+          ShowFooterMenu: true
+        }
+      }
 
     ]
   },
