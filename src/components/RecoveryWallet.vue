@@ -54,14 +54,14 @@ const extensionMode = computed(() => setting.extensionMode)
 
 const unlocked = () => {
   if (_wallet.accounts.size) {
-    void router.push({ path: extensionMode.value ? '/extension/main' : '/microchains' })
+    void router.push({ path: extensionMode.value ? '/extension/accountinfo' : '/microchains' })
   } else {
     step.value = 1
   }
 }
 
 const onLineraNowClick = () => {
-  void router.push({ path: extensionMode.value ? '/extension/main' : '/microchains' })
+  void router.push({ path: extensionMode.value ? '/extension/accountinfo' : '/microchains' })
 }
 
 </script>

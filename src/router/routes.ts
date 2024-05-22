@@ -109,8 +109,8 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: 'main',
-        component: () => import('pages/extension/MainPage.vue')
+        path: 'accountinfo',
+        component: () => import('pages/AccountInfoPage.vue')
       },
       {
         path: 'accounts',

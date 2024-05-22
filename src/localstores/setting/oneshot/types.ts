@@ -3,6 +3,5 @@ export interface OneShotSetting {
   ShowSideMenu: boolean
   ExtensionMode: boolean
   ShowFooterMenu: boolean
-  ShowTestTip: boolean
   AlignPageCenter: boolean
 }

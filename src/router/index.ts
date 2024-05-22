@@ -35,6 +35,7 @@ export default route(function (/* { store, ssrContext } */) {
   })
 
   router.beforeEach((to) => {
+    console.log(to)
     const _setting = useSettingStore()
     if (to.meta?.ShowSideMenu !== undefined) {
       _setting.oneShotSetting.ShowSideMenu = to.meta.ShowSideMenu
@@ -53,11 +54,6 @@ export default route(function (/* { store, ssrContext } */) {
       _setting.oneShotSetting.ShowFooterMenu = to.meta.ShowFooterMenu
     } else {
       _setting.oneShotSetting.ShowFooterMenu = true
-    }
-    if (to.meta?.ShowTestTip !== undefined) {
-      _setting.oneShotSetting.ShowTestTip = to.meta.ShowTestTip
-    } else {
-      _setting.oneShotSetting.ShowTestTip = true
     }
     if (to.meta?.AlignPageCenter !== undefined) {
       _setting.oneShotSetting.AlignPageCenter = to.meta.AlignPageCenter

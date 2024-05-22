@@ -18,9 +18,6 @@ export const useSettingStore = defineStore('one-shot-setting', {
     showFooterMenu (): boolean {
       return this.oneShotSetting.ShowFooterMenu
     },
-    showTestTip (): boolean {
-      return this.oneShotSetting.ShowTestTip
-    },
     alignPageCenter (): boolean {
       return this.oneShotSetting.AlignPageCenter
     }

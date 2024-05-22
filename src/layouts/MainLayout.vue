@@ -5,23 +5,34 @@
         <HeaderMenu v-if='!extensionMode' :style='{ width: "100%" }' />
         <ExtensionHeaderMenu v-else :style='{ width: "100%" }' />
       </q-toolbar>
+      <q-resize-observer @resize='onHeaderResize' />
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
-      <q-page :class='[ extensionMode ? "popup-container" : "", "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
+      <q-page
+        :class='[ extensionMode ? "popup-container" : "", "flex justify-center", alignPageCneter ? "items-center" : "" ]'
+        :style='{
+          height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`
+        }'
+      >
         <router-view />
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-white' :style='{ margin: "6px 12px" }'>
-      Another browser wallet for Linera blockchain by
-      <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
+      <div>
+        Another browser wallet for Linera blockchain by
+        <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
+      </div>
+      <q-resize-observer @resize='onFooterResize' />
     </q-footer>
-    <TestnetTip v-if='showTestTip' />
+    <div v-if='!extensionMode'>
+      <TestnetTip />
+    </div>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
@@ -33,7 +44,6 @@ import TestnetTip from 'src/components/TestnetTip.vue'
 const notification = notify.useNotificationStore()
 const setting = oneshotsetting.useSettingStore()
 const showFooterMenu = computed(() => setting.showFooterMenu)
-const showTestTip = computed(() => setting.showTestTip)
 const showHeaderMenu = computed(() => setting.showHeaderMenu)
 const showSideMenu = computed(() => setting.showSideMenu)
 const extensionMode = computed(() => setting.extensionMode)
@@ -61,6 +71,21 @@ onMounted(() => {
     })
   })
 })
+
+interface Size {
+  width: number
+  height: number
+}
+
+const headerHeight = ref(0)
+const footerHeight = ref(0)
+
+const onHeaderResize = (size: Size) => {
+  headerHeight.value = size.height
+}
+const onFooterResize = (size: Size) => {
+  footerHeight.value = size.height
+}
 
 </script>
 

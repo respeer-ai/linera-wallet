@@ -426,6 +426,9 @@ watch(address, () => {
 
 onMounted(() => {
   _processChains()
+  if (!currentAddress.value && selectedAddress.value) {
+    _wallet.selectAddress(selectedAddress.value.originValue)
+  }
 })
 
 const onCopyAddressClick = () => {
