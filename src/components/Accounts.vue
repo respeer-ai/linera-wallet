@@ -128,7 +128,6 @@ const addresses = computed(() => _wallet.publicKeys)
 const notification = notify.useNotificationStore()
 
 const onSwitchClick = (address: string) => {
-  console.log(1, address)
   _wallet.selectAddress(address)
 }
 

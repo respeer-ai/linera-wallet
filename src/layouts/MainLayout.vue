@@ -2,7 +2,8 @@
   <q-layout view='hHh Lpr hff'>
     <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
-        <HeaderMenu :style='{ width: "100%" }' />
+        <HeaderMenu v-if='!extensionMode' :style='{ width: "100%" }' />
+        <ExtensionHeaderMenu v-else :style='{ width: "100%" }' />
       </q-toolbar>
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
@@ -25,6 +26,7 @@ import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
 import HeaderMenu from 'src/components/HeaderMenu.vue'
+import ExtensionHeaderMenu from 'src/components/extension/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
 

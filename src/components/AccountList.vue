@@ -1,17 +1,18 @@
 <template>
-  <div v-if='addresses.length'>
+  <div v-if='displayAddresses.length'>
     <div class='row'>
       <q-icon
+        v-if='showLogo'
         :name='"img:" + lineraLogo'
         size='24px'
         :style='{ margin: "12px" }'
       />
       <q-select
         dense
-        v-model='address'
-        :options='displayAddreses'
+        v-model='selectedAddress'
+        :label='label'
+        :options='displayAddresses'
         :style='{ height: "24px" }'
-        emit-value
       />
       <q-icon
         name='content_copy'
@@ -28,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, toRef, watch } from 'vue'
 import { wallet, notify } from 'src/localstores'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
@@ -38,23 +39,50 @@ import {
   useQuery,
   useSubscription
 } from '@vue/apollo-composable'
-import { graphqlResult, _hex, endpoint } from 'src/utils'
-
-import lineraLogo from '../assets/LineraLogo.png'
+import { graphqlResult, _hex, endpoint, shortid } from 'src/utils'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { copyToClipboard } from 'quasar'
 
+import lineraLogo from '../assets/LineraLogo.png'
+
+interface Props {
+  showLogo?: boolean
+  showDigits?: number
+  label?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showLogo: true,
+  showDigits: undefined,
+  label: undefined
+})
+const showLogo = toRef(props, 'showLogo')
+const showDigits = toRef(props, 'showDigits')
+const label = toRef(props, 'label')
+
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
-const displayAddreses = computed(() => addresses.value.map(el => {
+
+interface SelectAddress {
+  label: string
+  value: string
+  originValue: string
+}
+
+const displayAddresses = computed(() => addresses.value.map(el => {
   return {
-    label: _wallet.displayAddress(el),
-    value: el
-  }
+    label: showDigits.value ? shortid.shortId(_wallet.displayAddress(el), showDigits.value) : _wallet.displayAddress(el),
+    originValue: el,
+    value: showDigits.value ? shortid.shortId(el, showDigits.value) : el
+  } as SelectAddress
 }))
 
+const addressCount = computed(() => displayAddresses.value.length)
 const currentAddress = computed(() => _wallet.currentAddress)
-const address = ref(_wallet.currentAddress || addresses.value?.[0])
+const selectedAddress = ref(displayAddresses.value.find((el) => el.originValue === currentAddress.value) ||
+                            displayAddresses.value.find((el) => el) ||
+                            undefined as unknown as SelectAddress)
+const address = computed(() => selectedAddress.value?.originValue)
 const chains = computed(() => _wallet.chains)
 const subscriptions = ref(new Map<string, Array<string>>())
 
@@ -380,22 +408,20 @@ const _processChains = () => {
     })
 }
 
-watch(addresses, () => {
-  if (!address.value) {
-    address.value = addresses.value[0]
-  }
-})
-
 watch(chains, () => {
   _processChains()
 })
 
-watch(address, () => {
-  _wallet.selectAddress(address.value)
+watch([addressCount, currentAddress], () => {
+  if (selectedAddress.value) return
+  selectedAddress.value = displayAddresses.value.find((el) => el.originValue === currentAddress.value) ||
+                          displayAddresses.value.find((el) => el) ||
+                          undefined as unknown as SelectAddress
 })
 
-watch(currentAddress, () => {
-  address.value = currentAddress.value
+watch(address, () => {
+  if (!address.value || address.value === currentAddress.value) return
+  _wallet.selectAddress(address.value)
 })
 
 onMounted(() => {
@@ -403,6 +429,7 @@ onMounted(() => {
 })
 
 const onCopyAddressClick = () => {
+  if (!address.value) return
   copyToClipboard(address.value)
     .then(() => {
       notification.pushNotification({
