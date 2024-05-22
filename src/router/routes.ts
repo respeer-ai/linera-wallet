@@ -135,7 +135,10 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'setting',
-        component: () => import('pages/SettingPage.vue')
+        component: () => import('pages/SettingPage.vue'),
+        meta: {
+          ShowFooterMenu: true
+        }
       },
       { path: 'popup', component: () => import('pages/extension/PopupPage.vue') },
       {

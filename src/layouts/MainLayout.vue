@@ -15,7 +15,9 @@
           height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`
         }'
       >
-        <router-view />
+        <transition enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in' :duration='300'>
+          <router-view />
+        </transition>
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>
