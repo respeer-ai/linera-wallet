@@ -34,9 +34,9 @@
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { wallet } from 'src/localstores'
+import { wallet, oneshotsetting } from 'src/localstores'
 
 import LoginPassword from 'src/components/LoginPassword.vue'
 import InitializeAccount from 'src/components/InitializeAccount.vue'
@@ -49,17 +49,19 @@ const accountError = ref(true)
 
 const router = useRouter()
 const _wallet = wallet.useWalletStore()
+const setting = oneshotsetting.useSettingStore()
+const extensionMode = computed(() => setting.extensionMode)
 
 const unlocked = () => {
   if (_wallet.accounts.size) {
-    void router.push({ path: '/microchains' })
+    void router.push({ path: extensionMode.value ? '/extension/main' : '/microchains' })
   } else {
     step.value = 1
   }
 }
 
 const onLineraNowClick = () => {
-  void router.push({ path: '/microchains' })
+  void router.push({ path: extensionMode.value ? '/extension/main' : '/microchains' })
 }
 
 </script>

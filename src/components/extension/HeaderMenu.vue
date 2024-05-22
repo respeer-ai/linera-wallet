@@ -5,11 +5,10 @@
       size='24px'
       :style='{ margin: "12px" }'
     />
-    <q-space />
     <AccountList :show-logo='false' :show-digits='6' label='Linera DevNet' />
     <q-space />
     <div :style='{lineHeight: "48px"}'>
-      <q-icon name='link' size='24px' color='blue-6' class='cursor-pointer' />
+      <q-icon name='stream' size='24px' color='blue-6' class='cursor-pointer' />
     </div>
     <div
       class='text-brown-10 text-bold'

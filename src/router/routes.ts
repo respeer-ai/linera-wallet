@@ -109,6 +109,10 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
+        path: 'main',
+        component: () => import('pages/extension/MainPage.vue')
+      },
+      {
         path: 'accounts',
         component: () => import('pages/extension/AccountsPage.vue')
       },
