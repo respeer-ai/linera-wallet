@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div :style='{marginTop: "48px"}'>
+  <div>
     <div
       v-for='(activity, i) in activities'
       :key='i'
