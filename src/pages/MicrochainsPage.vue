@@ -1,7 +1,7 @@
 <template>
   <div class='fill-parent'>
     <Microchains v-if='!extensionMode' :style='{marginTop: "48px"}' />
-    <ExtensionMicrochains v-else :show-title='false' :show-action='true' :style='{marginTop: "-12px"}' />
+    <ExtensionMicrochains v-else :show-title='false' :show-action='true' />
   </div>
 </template>
 

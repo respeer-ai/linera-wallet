@@ -1,31 +1,37 @@
 <template>
-  <q-card
-    :style='{
-      padding: "48px",
-      borderRadius: "16px",
-    }'
-  >
+  <div>
     <div
-      class='text-brown-10'
+      class='text-brown-10 row'
       :style='{
-        margin: "0 0 16px 0",
+        margin: "0 0 8px 0",
         fontSize: "20px",
         opacity: 0.8,
         width: "100%",
       }'
     >
       Faucet
+      <div :style='{ fontSize: "12px", opacity: 0.8, margin: "8px 0 0 8px" }'>
+        {{ constant.toUrl(faucetSchema, faucetHost, faucetPort) }}
+      </div>
     </div>
-    <div class='row wrap'>
+    <q-input
+      dense
+      v-model='faucetHost'
+      :style='{
+        width: "100%",
+      }'
+      label='Host or Domain'
+    />
+    <div class='row' :style='{width: "100%"}'>
       <q-select
         dense
         v-model='faucetSchema'
         :options='constant.HTTPSchemas'
         :style='{
           height: "48px",
-          width: "140px",
+          width: "40%",
         }'
-        label='Faucet HTTP Schema'
+        label='HTTP Schema'
       />
       <q-select
         dense
@@ -33,43 +39,43 @@
         :options='constant.WSSchemas'
         :style='{
           height: "48px",
-          width: "140px",
+          width: "40%",
         }'
-        label='Faucet WS Schema'
-      />
-      <q-input
-        dense
-        v-model='faucetHost'
-        :style='{
-          height: "48px",
-          width: "280px",
-        }'
-        label='Faucet Host'
+        label='WS Schema'
       />
       <q-input
         dense
         v-model='faucetPort'
         :style='{
           height: "48px",
-          width: "80px",
+          width: "20%",
         }'
-        label='Faucet Port'
+        label='Port'
       />
-    </div>
-    <div :style='{ fontSize: "12px", opacity: 0.8 }'>
-      {{ constant.toUrl(faucetSchema, faucetHost, faucetPort) }}
     </div>
     <div
       class='text-brown-10'
       :style='{
-        margin: "16px 0 16px 0",
+        margin: "16px 0 8px 0",
         fontSize: "20px",
         opacity: 0.8,
         width: "100%",
       }'
     >
       RPC
+      <div :style='{ fontSize: "12px", opacity: 0.8, margin: "8px 0 0 8px" }'>
+        {{ constant.toUrl(rpcSchema, rpcHost, rpcPort) }}
+      </div>
     </div>
+    <q-input
+      dense
+      v-model='rpcHost'
+      :style='{
+        height: "48px",
+        width: "100%",
+      }'
+      label='Host or Domain'
+    />
     <div class='row'>
       <q-select
         dense
@@ -77,9 +83,9 @@
         :options='constant.HTTPSchemas'
         :style='{
           height: "48px",
-          width: "140px",
+          width: "40%",
         }'
-        label='RPC HTTP Schema'
+        label='HTTP Schema'
       />
       <q-select
         dense
@@ -87,38 +93,27 @@
         :options='constant.WSSchemas'
         :style='{
           height: "48px",
-          width: "140px",
+          width: "40%",
         }'
-        label='RPC WS Schema'
-      />
-      <q-input
-        dense
-        v-model='rpcHost'
-        :style='{
-          height: "48px",
-          width: "280px",
-        }'
-        label='RPC Host'
+        label='WS Schema'
       />
       <q-input
         dense
         v-model='rpcPort'
         :style='{
           height: "48px",
-          width: "80px",
+          width: "20%",
         }'
-        label='RPC Port'
+        label='Port'
       />
     </div>
-    <div :style='{ fontSize: "12px", opacity: 0.8 }'>
-      {{ constant.toUrl(rpcSchema, rpcHost, rpcPort) }}
-    </div>
     <q-btn
+      dense
       rounded
       label='Save'
       class='text-brown-10 bg-red-1'
       :style='{
-        margin: "24px 0",
+        margin: "16px 0",
         width: "100%",
       }'
       @click='onSaveClick'
@@ -138,7 +133,7 @@
     </div><div :style='{ margin: "32px 0 0 0" }'>
       <ClearPassword />
     </div>
-  </q-card>
+  </div>
 </template>
 
 <script setup lang="ts">

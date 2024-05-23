@@ -112,7 +112,8 @@ const routes: RouteRecordRaw[] = [
         path: 'accountinfo',
         component: () => import('pages/AccountInfoPage.vue'),
         meta: {
-          ShowFooterMenu: true
+          ShowFooterMenu: true,
+          AlignPageCenter: false
         }
       },
       {
@@ -126,7 +127,8 @@ const routes: RouteRecordRaw[] = [
         path: 'microchains',
         component: () => import('pages/MicrochainsPage.vue'),
         meta: {
-          ShowFooterMenu: true
+          ShowFooterMenu: true,
+          AlignPageCenter: false
         }
       },
       {
@@ -137,7 +139,8 @@ const routes: RouteRecordRaw[] = [
         path: 'setting',
         component: () => import('pages/SettingPage.vue'),
         meta: {
-          ShowFooterMenu: true
+          ShowFooterMenu: true,
+          AlignPageCenter: false
         }
       },
       { path: 'popup', component: () => import('pages/extension/PopupPage.vue') },
@@ -145,7 +148,8 @@ const routes: RouteRecordRaw[] = [
         path: 'activity',
         component: () => import('pages/extension/ActivityPage.vue'),
         meta: {
-          ShowFooterMenu: true
+          ShowFooterMenu: true,
+          AlignPageCenter: false
         }
       }
 

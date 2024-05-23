@@ -1,5 +1,5 @@
 <template>
-  <q-layout view='hHh Lpr hff'>
+  <q-layout view='hHf Lpr hFf'>
     <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
         <HeaderMenu v-if='!extensionMode' :style='{ width: "100%" }' />
@@ -9,14 +9,19 @@
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
-      <q-page
-        :class='[ extensionMode ? "popup-container" : "", "flex justify-center", alignPageCneter ? "items-center" : "" ]'
-        :style='{
-          height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`
-        }'
-      >
-        <transition enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in' :duration='300'>
-          <router-view />
+      <q-page :class='[ "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
+        <router-view v-if='!extensionMode' />
+        <transition
+          v-else enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in'
+          :duration='300'
+        >
+          <router-view
+            :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
+            :style='{
+              height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`,
+              width: "368px"
+            }'
+          />
         </transition>
       </q-page>
     </q-page-container>
