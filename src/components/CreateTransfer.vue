@@ -1,5 +1,5 @@
 <template>
-  <div class='row justify-center transfer-container'>
+  <div class='row justify-center'>
     <q-card
       :style='{
         padding: "48px",
@@ -220,13 +220,3 @@ const onTransferClick = () => {
 }
 
 </script>
-<style scoped lang="sass">
-.transfer-container
-  margin: 48px
-  @media (max-width: $breakpoint-sm-max)
-    margin: 0
-.form-width
-  width: 680px
-  @media (max-width: $breakpoint-sm-max)
-    width: 100%
-</style>

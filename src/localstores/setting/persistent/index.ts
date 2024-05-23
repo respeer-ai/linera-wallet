@@ -53,12 +53,12 @@ export const useSettingStore = defineStore('persistent-setting', {
         .getItem('setting')
         .then((setting) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
-          this.persistentSetting = JSON.parse(setting as string)
+          this.persistentSetting = JSON.parse(setting as string) || {}
           this.loaded = true
           listener?.()
         })
         .catch((e) => {
-          console.log('Load accounts', e)
+          console.log('Load setting', e)
         })
     },
     storeReady (ready: () => void) {

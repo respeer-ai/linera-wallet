@@ -12,12 +12,10 @@
       }'
     />
   </div>
-  <q-dialog
-    v-model='passwordVerifing'
-  >
+  <q-dialog v-model='passwordVerifing'>
     <VerifyPassword
       title='Create Account' v-model:password='shadowPassword' @verified='onPasswordVerified' @error='onPasswordError'
-      @calcel='onPasswordCancel'
+      @cancel='onPasswordCancel'
     />
   </q-dialog>
 </template>
@@ -32,7 +30,7 @@ import {
   useQuery
 } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
-import { wallet } from 'src/localstores'
+import { wallet, notify } from 'src/localstores'
 import { onMounted, toRef, ref } from 'vue'
 
 import VerifyPassword from 'src/components/VerifyPassword.vue'
@@ -53,6 +51,7 @@ const checkExist = toRef(props, 'checkExist')
 const passwordVerifing = ref(false)
 
 const _wallet = wallet.useWalletStore()
+const notification = notify.useNotificationStore()
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string) => void) => {
   const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetHost, endpoint.faucetPort)
@@ -190,6 +189,12 @@ const createAccount = () => {
           void _wallet.addAccount(_publicKey, privateKey, shadowPassword.value as string, () => {
             _wallet.addChain(_publicKey, chainId, messageId, endpoint.rpcUrl)
             publicKey.value = _publicKey
+            notification.pushNotification({
+              Title: 'Create Account',
+              Message: 'Success create new account.',
+              Popup: true,
+              Type: notify.NotifyType.Info
+            })
           }, () => {
             console.log('Fail add account')
           })
