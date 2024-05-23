@@ -133,7 +133,11 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'transfer',
-        component: () => import('pages/extension/TransferPage.vue')
+        component: () => import('pages/TransferPage.vue'),
+        meta: {
+          ShowFooterMenu: true,
+          AlignPageCenter: false
+        }
       },
       {
         path: 'setting',

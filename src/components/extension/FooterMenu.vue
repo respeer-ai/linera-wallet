@@ -21,7 +21,7 @@
         to='/extension/microchains'
         exact
       >
-        Microchains
+        Microchain
       </q-route-tab>
       <q-route-tab
         name='activity'
