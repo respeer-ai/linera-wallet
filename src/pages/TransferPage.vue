@@ -1,7 +1,7 @@
 <template>
   <div class='fill-parent'>
     <CreateTransfer v-if='!extensionMode' />
-    <ExtensionCreateTransfer v-else />
+    <ExtensionCreateTransfer v-else :style='{marginTop: "-12px"}' />
   </div>
 </template>
 

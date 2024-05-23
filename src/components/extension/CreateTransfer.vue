@@ -12,29 +12,15 @@
     </div>
     <q-select
       dense
-      v-model='fromAddress'
-      :style='{
-        height: "48px",
-      }'
-      disable
-      :label='fromChainBalance ? "Send from microchain balance" : "From address"'
-    >
-      <template #selected-item='scope'>
-        <span class='ellipsis'>{{ scope.opt }}</span>
-      </template>
-    </q-select>
-    <q-select
-      dense
       v-model='fromChainId'
       :options='fromChains'
-      :style='{
-        height: "48px",
-      }'
       :disable='queryChainId !== undefined'
       label='From microchain'
     >
       <template #selected-item='scope'>
-        <span class='ellipsis'>{{ scope.opt }}</span>
+        <div :style='{wordBreak: "break-all"}'>
+          {{ scope.opt }}
+        </div>
       </template>
     </q-select>
     <q-toggle
@@ -47,23 +33,14 @@
         margin: "8px 0",
       }'
     />
-    <div
-      class='text-brown-10'
-      :style='{
-        margin: "16px 0 16px 0",
-        fontSize: "20px",
-        opacity: 0.8,
-        marginTop: "24px"
-      }'
-    >
-      Amount
-    </div>
     <q-input
-      dense
       v-model='amount'
       type='number'
       :style='{
         height: "48px",
+        fontSize: "48px",
+        fontWeight: "800",
+        marginTop: "24px"
       }'
     >
       <template #append>
@@ -79,7 +56,7 @@
     <div
       class='text-brown-10'
       :style='{
-        margin: "16px 0 16px 0",
+        margin: "0 0 8px 0",
         fontSize: "20px",
         opacity: 0.8,
         marginTop: "48px"
@@ -91,32 +68,30 @@
       dense
       v-model='targetAddress'
       :options='targetAddresses'
-      :style='{
-        height: "48px",
-      }'
       use-input
       :label='toChainBalance ? "Send to microchain balance" : "Target address (enter for new address)"'
       clearable
       new-value-mode='add-unique'
     >
       <template #selected-item='scope'>
-        <span class='ellipsis'>{{ scope.opt }}</span>
+        <div :style='{wordBreak: "break-all"}'>
+          {{ scope.opt }}
+        </div>
       </template>
     </q-select>
     <q-select
       dense
       v-model='targetChainId'
       :options='targetChains'
-      :style='{
-        height: "48px",
-      }'
       use-input
       label='Target microchain (enter for new chain)'
       clearable
       new-value-mode='add-unique'
     >
       <template #selected-item='scope'>
-        <span class='ellipsis'>{{ scope.opt }}</span>
+        <div :style='{wordBreak: "break-all"}'>
+          {{ scope.opt }}
+        </div>
       </template>
     </q-select>
     <div>

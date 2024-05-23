@@ -29,14 +29,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { wallet } from 'src/localstores'
+import { useRouter } from 'vue-router'
 
 import ExtensionMicrochains from './extension/Microchains.vue'
 
 const _wallet = wallet.useWalletStore()
+const router = useRouter()
 
 const accountBalance = computed(() => _wallet.accountBalance(undefined, undefined))
 
 const onTransferClick = () => {
-  // TODO
+  void router.push({ path: '/transfer' })
 }
 </script>
