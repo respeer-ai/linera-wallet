@@ -124,7 +124,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'microchains',
-        component: () => import('pages/extension/MicrochainsPage.vue'),
+        component: () => import('pages/MicrochainsPage.vue'),
         meta: {
           ShowFooterMenu: true
         }
