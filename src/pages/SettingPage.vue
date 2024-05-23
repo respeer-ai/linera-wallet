@@ -1,6 +1,8 @@
 <template>
-  <WalletSetting v-if='!extensionMode' :style='{maxWidth: "736px", margin: "48px 0"}' />
-  <ExtensionWalletSetting v-else :style='{height: "478px"}' />
+  <div class='fill-parent'>
+    <WalletSetting v-if='!extensionMode' :style='{maxWidth: "736px", margin: "48px 0"}' />
+    <ExtensionWalletSetting v-else />
+  </div>
 </template>
 
 <script setup lang="ts">

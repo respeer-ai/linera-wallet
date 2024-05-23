@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <q-card flat dense>
     <div
       class='text-brown-10 row'
       :style='{
@@ -54,7 +54,7 @@
       />
     </div>
     <div
-      class='text-brown-10'
+      class='text-brown-10 row'
       :style='{
         margin: "16px 0 8px 0",
         fontSize: "20px",
@@ -76,7 +76,7 @@
       }'
       label='Host or Domain'
     />
-    <div class='row'>
+    <div class='row' :style='{width: "100%"}'>
       <q-select
         dense
         v-model='rpcSchema'
@@ -114,7 +114,7 @@
       class='text-brown-10 bg-red-1'
       :style='{
         margin: "16px 0",
-        width: "100%",
+        width: "100%"
       }'
       @click='onSaveClick'
     />
@@ -130,10 +130,11 @@
     </div>
     <div :style='{ margin: "32px 0 0 0" }'>
       <ClearAccounts />
-    </div><div :style='{ margin: "32px 0 0 0" }'>
+    </div>
+    <div :style='{ margin: "32px 0 0 0" }'>
       <ClearPassword />
     </div>
-  </div>
+  </q-card>
 </template>
 
 <script setup lang="ts">

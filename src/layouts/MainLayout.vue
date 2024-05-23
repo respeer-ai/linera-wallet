@@ -1,5 +1,5 @@
 <template>
-  <q-layout view='hHf Lpr hFf'>
+  <q-layout view='hHh Lpr fFf'>
     <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
         <HeaderMenu v-if='!extensionMode' :style='{ width: "100%" }' />
@@ -19,7 +19,8 @@
             :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
             :style='{
               height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`,
-              width: "368px"
+              width: "368px",
+              overflow: "scroll"
             }'
           />
         </transition>
