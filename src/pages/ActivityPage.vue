@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='fill-parent'>
     <Activity v-if='!extensionMode' />
     <ExtensionActivity v-else />
   </div>

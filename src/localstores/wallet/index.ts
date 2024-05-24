@@ -151,6 +151,35 @@ export const useWalletStore = defineStore('checko-wallet', {
     },
     initialized (): boolean {
       return this.passwordHash?.length > 0
+    },
+    moveBetweenChain (): (activity: Activity) => boolean {
+      return (activity: Activity) => {
+        return (this.currentAddress === activity.targetAddress && this.currentAddress === activity.sourceAddress) ||
+              (this.accounts.get(this.currentAddress)?.microchains?.has(activity.sourceChain) === true &&
+              this.accounts.get(this.currentAddress)?.microchains?.has(activity.targetChain) === true)
+      }
+    },
+    receivedByAccount (): (activity: Activity) => boolean {
+      return (activity: Activity) => {
+        if (this.moveBetweenChain(activity)) {
+          return false
+        }
+        if (activity.targetAddress) {
+          return this.currentAddress === activity.targetAddress
+        }
+        return this.accounts.get(this.currentAddress)?.microchains?.has(activity.targetChain) === true
+      }
+    },
+    sendFromAccount (): (activity: Activity) => boolean {
+      return (activity: Activity) => {
+        if (this.moveBetweenChain(activity)) {
+          return false
+        }
+        if (activity.sourceAddress) {
+          return this.currentAddress === activity.sourceAddress
+        }
+        return this.accounts.get(this.currentAddress)?.microchains?.has(activity.sourceChain) === true
+      }
     }
   },
   actions: {
@@ -416,3 +445,5 @@ export const useWalletStore = defineStore('checko-wallet', {
     }
   }
 })
+
+export * from './types'

@@ -7,59 +7,61 @@
     <div
       v-for='chainId in microchains.keys()'
       :key='chainId'
+      class='cursor-pointer hover list-expand'
       :style='{
-        width: "100%",
-        fontSize: "16px",
+        paddingTop: "8px",
+        paddingBottom: "8px",
+        fontSize: "16px"
       }'
-      class='cursor-pointer'
     >
-      <div :style='{padding: "0 0 16px 0", width: "100%"}'>
-        <div class='row flex justify-center items-center' :style='{width: "100%"}'>
-          <q-avatar
-            class='bg-red-1' icon='diamond' text-color='brown-6' size='md'
-            :style='{marginRight: "8px"}'
-          />
-          <div>
-            <div
-              :style='{
-                width: "100%",
-                color: "#555555",
-                fontSize: "16px"
-              }'
-              class='row'
-            >
-              <span>{{ shortid.shortId(chainId, 8) }}</span>
-              <q-icon
-                name='content_copy'
-                size='16px'
-                color='grey'
-                :style='{
-                  margin: "2px 0 2px 8px",
-                }'
-                class='cursor-pointer'
-                @click='onCopyChainIdClick(chainId)'
-              />
-            </div>
-            <div
-              :style='{
-                color: "#555555",
-                fontSize: "12px"
-              }'
-            >
-              {{ _wallet.chainBalance(undefined, chainId).toFixed(4) }}
-              <strong>TLINERA</strong>
-            </div>
+      <div class='row text-grey-7'>
+        <q-avatar
+          class='bg-red-1' icon='diamond' text-color='brown-6' size='md'
+          :style='{marginRight: "8px"}'
+        />
+        <div>
+          <div :style='{fontSize: "12px"}'>
+            Chain ID
           </div>
-          <q-space />
+          <div
+            :style='{
+              width: "100%",
+              color: "#555555",
+              fontSize: "16px"
+            }'
+            class='row'
+          >
+            <span>{{ shortid.shortId(chainId, 8) }}</span>
+            <q-icon
+              name='content_copy'
+              size='16px'
+              color='grey'
+              :style='{
+                margin: "2px 0 2px 8px",
+              }'
+              class='cursor-pointer'
+              @click='onCopyChainIdClick(chainId)'
+            />
+          </div>
           <div
             :style='{
               color: "#555555",
-              fontSize: "22px"
+              fontSize: "12px"
             }'
-            class='text-bold'
           >
-            {{ _wallet.accountBalance(undefined, chainId).toFixed(4) }}
+            {{ _wallet.chainBalance(undefined, chainId).toFixed(4) }}
+            <strong>TLINERA</strong>
           </div>
+        </div>
+        <q-space />
+        <div
+          :style='{
+            color: "#555555",
+            fontSize: "22px"
+          }'
+          class='text-bold'
+        >
+          {{ _wallet.accountBalance(undefined, chainId).toFixed(4) }}
         </div>
         <div
           v-if='showAction'
