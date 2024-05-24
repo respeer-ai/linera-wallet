@@ -1,7 +1,3 @@
-// const faucetSchema = 'https'
-// const faucetHost = 'faucet.devnet.linera.net'
-// const faucetPort = 443
-
 export enum HTTPSchema {
   HTTP = 'http',
   HTTPS = 'https'
