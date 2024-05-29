@@ -133,6 +133,9 @@
       />
     </q-card>
   </div>
+  <q-btn type='primary' @click='callMetamask'>
+    调用Metamask
+  </q-btn>
 </template>
 
 <script setup lang='ts'>
@@ -143,6 +146,23 @@ import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import { _hex, endpoint } from 'src/utils'
+
+const callMetamask = () => {
+  window.postMessage(
+    {
+      target: 'metamask-contentscript', // the post-message-stream "target"
+      data: {
+        // this object gets passed to @metamask/object-multiplex
+        name: 'metamask-provider', // the @metamask/object-multiplex channel name
+        data: {
+          jsonrpc: '2.0',
+          method: 'eth_requestAccounts'
+        }
+      }
+    },
+    window.location.origin
+  )
+}
 
 const _wallet = wallet.useWalletStore()
 const fromChainBalance = ref(false)
