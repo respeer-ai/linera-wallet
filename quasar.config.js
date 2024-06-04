@@ -63,9 +63,6 @@ module.exports = configure(function (/* ctx */) {
 
       rawDefine: {
         'process.version': JSON.stringify(process.version)
-        // 'process.stdout': JSON.stringify(process.stdout),
-        // 'process.stderr': JSON.stringify(process.stderr),
-        // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       },
 
       // ignorePublicFolder: true,
@@ -272,6 +269,11 @@ module.exports = configure(function (/* ctx */) {
 
       extendBexScriptsConf (esbuildConf) {
         esbuildConf.target = 'es2020'
+        esbuildConf.define = {
+          'process.version': JSON.stringify(process.version),
+          'process.stdout': JSON.stringify(process.stdout),
+          'process.stderr': JSON.stringify(process.stderr)
+        }
       }
       // extendBexManifestJson (json) {}
     }
