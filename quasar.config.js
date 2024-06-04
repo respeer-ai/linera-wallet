@@ -56,12 +56,18 @@ module.exports = configure(function (/* ctx */) {
       // vueDevtools,
       // vueOptionsAPI: false,
 
-      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
-
       // publicPath: '/',
       // analyze: true,
+
       // env: {},
-      // rawDefine: {}
+
+      rawDefine: {
+        'process.version': JSON.stringify(process.version)
+        // 'process.stdout': JSON.stringify(process.stdout),
+        // 'process.stderr': JSON.stringify(process.stderr),
+        // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      },
+
       // ignorePublicFolder: true,
       // minify: false,
       // polyfillModulePreload: true,
@@ -262,9 +268,11 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: ['my-content-script']
+      contentScripts: ['content'],
 
-      // extendBexScriptsConf (esbuildConf) {}
+      extendBexScriptsConf (esbuildConf) {
+        esbuildConf.target = 'es2020'
+      }
       // extendBexManifestJson (json) {}
     }
   }

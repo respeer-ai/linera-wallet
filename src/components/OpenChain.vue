@@ -19,9 +19,10 @@ import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
-import { wallet } from 'src/localstores'
+import { wallet, notify } from 'src/localstores'
 
 const _wallet = wallet.useWalletStore()
+const notification = notify.useNotificationStore()
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string) => void) => {
   const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetHost, endpoint.faucetPort)
@@ -121,7 +122,7 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey) => {
+const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey, done?: () => void) => {
   getPendingRawBlock(chainId, (rawBlockAndRound: unknown) => {
     // TODO: here should be wrong
     const payloadBytes = graphqlResult.keyValue(rawBlockAndRound, 'payloadBytes')
@@ -131,7 +132,7 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
       console.log('Mismatch block height', height, notifiedHeight)
       return
     }
-    void submitBlockSignature(chainId, height, signature)
+    void submitBlockSignature(chainId, height, signature, done)
   })
 }
 
@@ -142,7 +143,14 @@ const onOpenChainClick = () => {
   void openChain(_wallet.currentAddress, (chainId: string, messageId: string) => {
     _wallet.addChain(_wallet.currentAddress, chainId, messageId, endpoint.rpcUrl)
     void initMicrochainChainStore(_wallet.currentAddress, chainId, messageId, () => {
-      signNewBlock(chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string))))
+      signNewBlock(chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string))), () => {
+        notification.pushNotification({
+          Title: 'Open Chain',
+          Message: 'Success open microchain.',
+          Popup: true,
+          Type: notify.NotifyType.Info
+        })
+      })
     })
   })
 }

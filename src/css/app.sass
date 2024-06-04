@@ -1,8 +1,15 @@
 // app global css in SCSS form
 .popup-container
   width: 378px
-  height: 600px
-  padding: 24px
+  padding: 12px 24px
+
+html,
+body,
+div
+  -ms-overflow-style: none
+  scrollbar-width: none
+  ::-webkit-scrollbar
+    display: none
 
 .hide
   display: none !important
@@ -14,3 +21,13 @@
 
 .stepper-expand
   margin: -24px
+
+.q-body--prevent-scroll
+  position: relative !important
+
+.hover:hover
+  background: rgba(#1976d2, 0.03)
+
+.list-expand
+  margin: 0 -24px
+  padding: 0 24px

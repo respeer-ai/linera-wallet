@@ -1,5 +1,5 @@
 <template>
-  <q-layout view='hHh Lpr hff'>
+  <q-layout view='hHh Lpr fFf'>
     <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
         <HeaderMenu v-if='!extensionMode' :style='{ width: "100%" }' />
@@ -9,15 +9,24 @@
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
-      <q-page
-        :class='[ extensionMode ? "popup-container" : "", "flex justify-center", alignPageCneter ? "items-center" : "" ]'
-        :style='{
-          height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`
-        }'
-      >
-        <transition enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in' :duration='300'>
-          <router-view />
-        </transition>
+      <q-page :class='[ "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
+        <router-view v-if='!extensionMode' />
+        <router-view v-else v-slot='{ Component }'>
+          <transition
+            enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in'
+            :duration='300'
+          >
+            <component
+              :is='Component'
+              :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
+              :style='{
+                height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`,
+                width: "368px",
+                overflow: "scroll"
+              }'
+            />
+          </transition>
+        </router-view>
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>
