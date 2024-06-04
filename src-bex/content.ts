@@ -8,6 +8,8 @@ import ObjMultiplex from '@metamask/object-multiplex'
 import pump from 'pump'
 import * as process from 'process'
 import * as constant from './const'
+import { JsonRpcEngine } from '@metamask/json-rpc-engine'
+import { createEngineStream } from 'json-rpc-middleware-stream'
 
 window.process = process
 
@@ -28,9 +30,17 @@ const setupPageStreams = () => {
   )
 
   const pageChannel = pageMux.createStream(constant.PROVIDER)
-  pageChannel.on('data', msg => {
-    console.log(msg)
+
+  const engine = new JsonRpcEngine()
+  engine.push((req, res, next, end) => {
+    res.result = req
+    end()
   })
+  const providerStream = createEngineStream({ engine })
+
+  pump(pageChannel, providerStream, pageChannel, (err) =>
+    console.log('CheCko Inpage Multiplex', err)
+  )
 }
 
 export default bexContent((bridge) => {

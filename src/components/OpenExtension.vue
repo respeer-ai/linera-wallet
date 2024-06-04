@@ -14,7 +14,7 @@
 <script setup lang='ts'>
 const onOpenExtensionClick = () => {
   window.linera.request({
-    method: 'eth_requestAccounts'
+    method: 'test-message'
   }).then((result) => {
     console.log(result)
   }).catch((e) => {
