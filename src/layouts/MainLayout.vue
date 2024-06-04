@@ -11,19 +11,22 @@
     <q-page-container>
       <q-page :class='[ "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
         <router-view v-if='!extensionMode' />
-        <transition
-          v-else enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in'
-          :duration='300'
-        >
-          <router-view
-            :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
-            :style='{
-              height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`,
-              width: "368px",
-              overflow: "scroll"
-            }'
-          />
-        </transition>
+        <router-view v-else v-slot='{ Component }'>
+          <transition
+            enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in'
+            :duration='300'
+          >
+            <component
+              :is='Component'
+              :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
+              :style='{
+                height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`,
+                width: "368px",
+                overflow: "scroll"
+              }'
+            />
+          </transition>
+        </router-view>
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>

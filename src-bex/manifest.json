@@ -29,7 +29,7 @@
     {
       "matches": [ "*://*/*" ],
       "css": [ "assets/content.css" ],
-      "js": [ "my-content-script.js" ]
+      "js": [ "content.js" ]
     }
   ],
 

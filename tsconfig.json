@@ -1,7 +1,12 @@
 {
+  // "extends": ["@quasar/app-vite/tsconfig-preset", "@tsconfig/node20/tsconfig.json"],
   "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
-    "baseUrl": "."
+    "allowJs": true,
+    "baseUrl": ".",
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/typescript/tsconfig.tsbuildinfo",
+    "useUnknownInCatchVariables": true
   },
   "esModuleInterop": true,
   "exclude": [
@@ -11,5 +16,5 @@
     "./src-capacitor",
     "./src-cordova",
     "./quasar.config.*.temporary.compiled*"
-  ]
+  ],
 }

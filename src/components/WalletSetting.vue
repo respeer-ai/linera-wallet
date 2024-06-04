@@ -138,6 +138,9 @@
     </div><div :style='{ margin: "32px 0 0 0" }'>
       <ClearPassword />
     </div>
+    <div :style='{ margin: "32px 0 0 0" }'>
+      <OpenExtension />
+    </div>
   </q-card>
 </template>
 
@@ -152,6 +155,7 @@ import OpenChain from 'src/components/OpenChain.vue'
 import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
 import ClearPassword from 'src/components/ClearPassword.vue'
+import OpenExtension from 'src/components/OpenExtension.vue'
 
 const _setting = persistentsetting.useSettingStore()
 
