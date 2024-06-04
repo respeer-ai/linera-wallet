@@ -63,6 +63,9 @@ module.exports = configure(function (/* ctx */) {
 
       rawDefine: {
         'process.version': JSON.stringify(process.version)
+        // 'process.stdout': JSON.stringify(process.stdout),
+        // 'process.stderr': JSON.stringify(process.stderr),
+        // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       },
 
       // ignorePublicFolder: true,
@@ -265,9 +268,11 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: ['content']
+      contentScripts: ['content'],
 
-      // extendBexScriptsConf (esbuildConf) {}
+      extendBexScriptsConf (esbuildConf) {
+        esbuildConf.target = 'es2020'
+      }
       // extendBexManifestJson (json) {}
     }
   }

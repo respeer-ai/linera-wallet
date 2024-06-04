@@ -6,7 +6,8 @@
     "baseUrl": ".",
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/typescript/tsconfig.tsbuildinfo",
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "target": "ES2020"
   },
   "esModuleInterop": true,
   "exclude": [
