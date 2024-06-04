@@ -3,5 +3,8 @@
   "editor.guides.bracketPairs": true,
   "editor.codeActionsOnSave": ["source.fixAll.eslint"],
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.words": [
+    "linera"
+  ]
 }

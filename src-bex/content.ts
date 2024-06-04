@@ -13,8 +13,6 @@ import * as constant from './const'
 window.process = process
 
 const setupPageStreams = () => {
-  console.log('Setup page streams')
-
   // the transport-specific streams for communication between inpage and background
   const pageStream = new WindowPostMessageStream({
     name: constant.CONTENT_SCRIPT,
@@ -27,7 +25,7 @@ const setupPageStreams = () => {
   pageMux.setMaxListeners(25)
 
   pump(pageMux, pageStream, pageMux, (err) =>
-    console.log('MetaMask Inpage Multiplex', err)
+    console.log('CheCko Inpage Multiplex', err)
   )
 
   // pageChannel = pageMux.createStream(PROVIDER)
