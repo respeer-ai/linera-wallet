@@ -25,7 +25,7 @@ const setupPageStreams = () => {
   pageMux.setMaxListeners(25)
 
   pump(pageMux, pageStream, pageMux, (err) =>
-    console.log('MetaMask Inpage Multiplex', err)
+    console.log('CheCko Inpage Multiplex', err)
   )
 
   pageChannel = pageMux.createStream(PROVIDER)
