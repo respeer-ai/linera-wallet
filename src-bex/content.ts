@@ -8,7 +8,6 @@ import ObjMultiplex from '@metamask/object-multiplex'
 import pump from 'pump'
 import * as process from 'process'
 import * as constant from './const'
-import { PROVIDER } from './const'
 
 window.process = process
 
@@ -28,9 +27,10 @@ const setupPageStreams = () => {
     console.log('CheCko Inpage Multiplex', err)
   )
 
-  pageChannel = pageMux.createStream(PROVIDER)
-
-  // pageChannel.onMessage()
+  const pageChannel = pageMux.createStream(constant.PROVIDER)
+  pageChannel.on('data', msg => {
+    console.log(msg)
+  })
 }
 
 export default bexContent((bridge) => {

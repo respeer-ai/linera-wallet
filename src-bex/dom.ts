@@ -20,6 +20,7 @@ const setupProvider = () => {
 
   const provider = initializeProvider({
     connectionStream: metamaskStream,
+    jsonRpcStreamName: constant.PROVIDER,
     logger: log,
     shouldShimWeb3: true,
     shouldSetOnWindow: false,

@@ -13,8 +13,12 @@
 
 <script setup lang='ts'>
 const onOpenExtensionClick = () => {
-  console.log(window.linera)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  window.postMessage('test-message')
+  window.linera.request({
+    method: 'eth_requestAccounts'
+  }).then((result) => {
+    console.log(result)
+  }).catch((e) => {
+    console.log(e)
+  })
 }
 </script>
