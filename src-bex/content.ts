@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 // Hooks added here have a bridge allowing communication between the BEX Content Script and the Quasar Application.
 // More info: https://quasar.dev/quasar-cli/developing-browser-extensions/content-hooks
 
@@ -9,12 +8,11 @@ import ObjMultiplex from '@metamask/object-multiplex'
 import pump from 'pump'
 import * as process from 'process'
 import * as constant from './const'
+import { PROVIDER } from './const'
 
 window.process = process
 
 const setupPageStreams = () => {
-  console.log('Setup page streams')
-
   // the transport-specific streams for communication between inpage and background
   const pageStream = new WindowPostMessageStream({
     name: constant.CONTENT_SCRIPT,
@@ -30,7 +28,9 @@ const setupPageStreams = () => {
     console.log('MetaMask Inpage Multiplex', err)
   )
 
-  // pageChannel = pageMux.createStream(PROVIDER)
+  pageChannel = pageMux.createStream(PROVIDER)
+
+  // pageChannel.onMessage()
 }
 
 export default bexContent((bridge) => {
