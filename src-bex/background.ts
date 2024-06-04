@@ -12,8 +12,6 @@ import pump from 'pump'
 import * as process from 'process'
 import { Buffer as BufferPolyfill } from 'buffer'
 
-globalThis.Buffer = BufferPolyfill
-globalThis.process = process
 window.Buffer = BufferPolyfill
 window.process = process
 
