@@ -30,11 +30,7 @@ const setupProvider = () => {
       rdns: 'ai.respeer.checko.main'
     }
   })
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-  const _window = window as any
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  _window.linera = provider
+  window.linera = provider
   window.dispatchEvent(new Event('linera#initialized'))
 }
 

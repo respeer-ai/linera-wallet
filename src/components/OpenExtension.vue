@@ -13,7 +13,7 @@
 
 <script setup lang='ts'>
 const onOpenExtensionClick = () => {
-  console.log(window)
+  console.log(window.linera)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   window.postMessage('test-message')
 }
