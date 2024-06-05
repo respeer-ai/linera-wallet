@@ -69,4 +69,13 @@ export default class ExtensionPlatform {
     // prerelease and the version requires no modification.
     return version
   }
+
+  addOnRemovedListener (listener: (windowId: number) => void) {
+    browser.windows.onRemoved.addListener(listener)
+  }
+
+  async getAllWindows () {
+    const windows = await browser.windows.getAll()
+    return windows
+  }
 }
