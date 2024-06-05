@@ -18,7 +18,7 @@
   "dependencies": {
     "@apollo/client": "^3.9.11",
     "@hazae41/berith": "^1.2.6",
-    "@metamask/json-rpc-engine": "^9.0.0",
+    "@metamask/json-rpc-engine": "^8.0.0",
     "@metamask/object-multiplex": "^2.0.0",
     "@metamask/post-message-stream": "^8.1.0",
     "@metamask/providers": "^17.0.0",
@@ -51,7 +51,6 @@
     "graphql": "^16.8.1",
     "graphql-ws": "^5.16.0",
     "hash-wasm": "^4.11.0",
-    "json-rpc-middleware-stream": "^5.0.1",
     "localforage": "^1.10.0",
     "loglevel": "^1.9.1",
     "multiformats": "^12.0.1",
@@ -88,11 +87,8 @@
     "vue-tsc": "^1.8.22"
   },
   "engines": {
-    "node": "^20, ^22",
+    "node": "^20",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
-  },
-  "resolutions": {
-    "@metamask/json-rpc-engine": "^9.0.0"
   }
 }

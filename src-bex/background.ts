@@ -6,14 +6,17 @@
 import { bexBackground } from 'quasar/wrappers'
 import browser, { Runtime } from 'webextension-polyfill'
 import { JsonRpcEngine } from '@metamask/json-rpc-engine'
-import { createEngineStream } from 'json-rpc-middleware-stream'
+import { createEngineStream } from '@metamask/json-rpc-middleware-stream'
 import PortStream from 'extension-port-stream'
 import pump from 'pump'
 import * as process from 'process'
 import { Buffer as BufferPolyfill } from 'buffer'
+import ObjectMultiplex from '@metamask/object-multiplex'
+import * as constant from './const'
+import { Duplex } from 'readable-stream'
 
-window.Buffer = BufferPolyfill
-window.process = process
+globalThis.Buffer = BufferPolyfill
+globalThis.process = process
 
 declare module '@quasar/app-vite' {
   interface BexEventMap {
@@ -41,27 +44,27 @@ const initBackground = () => {
 }
 
 const connectRemote = (remotePort: Runtime.Port) => {
-  console.log(1, remotePort)
-  remotePort.onMessage.addListener(msg => {
-    console.log(msg)
-  })
   connectExternal(remotePort)
 }
 
 const connectExternal = (remotePort: Runtime.Port) => {
-  console.log(remotePort)
   const portStream = new PortStream(remotePort)
-  setupRpcEngine(portStream)
+  const mux = new ObjectMultiplex()
+  pump(portStream, mux, portStream, (err) => {
+    console.log('CheCko Background Multiplex', err)
+  })
+  const providerStream = mux.createStream(constant.PROVIDER)
+  setupRpcEngine(providerStream)
 }
 
-const setupRpcEngine = (portStream: PortStream) => {
+const setupRpcEngine = (mux: Duplex) => {
   const engine = new JsonRpcEngine()
   engine.push((req, res, next, end) => {
     res.result = req
     end()
   })
   const providerStream = createEngineStream({ engine })
-  pump(portStream, providerStream, portStream, (err) =>
+  pump(mux, providerStream, mux, (err) =>
     console.log('CheCko Background Multiplex', err)
   )
 }
