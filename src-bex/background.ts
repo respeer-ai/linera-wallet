@@ -4,16 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { bexBackground } from 'quasar/wrappers'
-import browser, { Runtime } from 'webextension-polyfill'
-import { JsonRpcEngine } from '@metamask/json-rpc-engine'
-import { createEngineStream } from '@metamask/json-rpc-middleware-stream'
-import PortStream from 'extension-port-stream'
-import pump from 'pump'
+import browser from 'webextension-polyfill'
 import * as process from 'process'
 import { Buffer as BufferPolyfill } from 'buffer'
-import ObjectMultiplex from '@metamask/object-multiplex'
-import * as constant from './const'
-import { Duplex } from 'readable-stream'
+import { engine } from './engine'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
@@ -35,38 +29,12 @@ const initBackground = () => {
   console.log('Initialize CheCko background')
   browser.runtime.onConnect.addListener((...args) => {
     // This is set in `setupController`, which is called as part of initialization
-    connectRemote(...args)
+    engine.connectRemote(...args)
   })
   browser.runtime.onConnectExternal.addListener((...args) => {
     // This is set in `setupController`, which is called as part of initialization
-    connectExternal(...args)
+    engine.connectExternal(...args)
   })
-}
-
-const connectRemote = (remotePort: Runtime.Port) => {
-  connectExternal(remotePort)
-}
-
-const connectExternal = (remotePort: Runtime.Port) => {
-  const portStream = new PortStream(remotePort)
-  const mux = new ObjectMultiplex()
-  pump(portStream, mux, portStream, (err) => {
-    console.log('CheCko Background Multiplex', err)
-  })
-  const providerStream = mux.createStream(constant.PROVIDER)
-  setupRpcEngine(providerStream)
-}
-
-const setupRpcEngine = (mux: Duplex) => {
-  const engine = new JsonRpcEngine()
-  engine.push((req, res, next, end) => {
-    res.result = req
-    end()
-  })
-  const providerStream = createEngineStream({ engine })
-  pump(mux, providerStream, mux, (err) =>
-    console.log('CheCko Background Multiplex', err)
-  )
 }
 
 export default bexBackground((/* bridge, allActiveConnections */) => {
