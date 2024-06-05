@@ -21,16 +21,16 @@ export const showPopup = async () => {
       left,
       top
     })
-  })
 
-  // Firefox currently ignores left/top for create, but it works for update
-  // if (popupWindow.left !== left && popupWindow.state !== 'fullscreen') {
-  //   await platform.updateWindowPosition(popupWindow.id as number, left, top)
-  // }
-  // pass new created popup window id to appController setter
-  // and store the id to private variable this._popupId for future access
-  // this._setCurrentPopupId(popupWindow.id)
-  // this._popupId = popupWindow.id
+    // Firefox currently ignores left/top for create, but it works for update
+    if (popupWindow.left !== left && popupWindow.state !== 'fullscreen') {
+      await platform.updateWindowPosition(popupWindow.id as number, left, top)
+    }
+    // pass new created popup window id to appController setter
+    // and store the id to private variable this._popupId for future access
+    // this._setCurrentPopupId(popupWindow.id)
+    // this._popupId = popupWindow.id
+  })
 }
 
 export const needConfirm = () => {
