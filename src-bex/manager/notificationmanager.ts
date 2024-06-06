@@ -20,7 +20,7 @@ export default class NotificationManager {
   public async showPopup (): Promise<Error | undefined> {
     const currentPopupId = await sharedStore.getCurrentPopupId()
     if (currentPopupId > 0) {
-      await basebridge.EventBus.bridge?.send('popup.new', { a: 'b' })
+      await basebridge.EventBus.bridge?.send('popup.new')
     } else {
       browser.windows.getCurrent().then(async (window: Windows.Window) => {
         const { width } = window

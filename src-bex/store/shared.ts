@@ -14,10 +14,10 @@ export const getAccounts = async () => {
 }
 
 export const getCurrentPopupId = async () => {
-  const popupId = await store.getItem('current_popup_id')
+  const setting = await store.getItem('setting')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const _popupId = JSON.parse(popupId as string)
-  if (_popupId === undefined) return -1
+  const _setting = JSON.parse(setting as string) as Record<string, number>
+  if (!_setting) return -1
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return Number(_popupId)
+  return Number(_setting.currentPopupId)
 }

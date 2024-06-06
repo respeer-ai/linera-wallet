@@ -1,26 +1,26 @@
 <template>
-  <div>popup页面</div>
-  <div>数据: {{ data }}</div>
-  <q-input type='text' v-model='text' />
-  <q-btn @click='sendDataBack'>
-    Send Data Back to Webpage
-  </q-btn>
+  <div>
+    <PupupHeader />
+  </div>
 </template>
-<script setup lang="ts">
-import { ref } from 'vue'
+<script setup lang='ts'>
+import { useQuasar } from 'quasar'
+import { onMounted, computed, onUnmounted } from 'vue'
+import { persistentsetting } from 'src/localstores'
 
-const data = ref({})
-// 请求 background.js 提供数据
-chrome.runtime.sendMessage({ action: 'getData' }, (response) => {
-  if (response) {
-    console.log('Data received in popup:', response)
-    data.value = JSON.stringify(response, null, 2)
-  }
+import PupupHeader from 'src/components/extension/PupupHeader.vue'
+
+const quasar = useQuasar()
+const _persistentsetting = persistentsetting.useSettingStore()
+const nextPopupId = computed(() => _persistentsetting.nextPopupId)
+
+onMounted(() => {
+  quasar.bex.on('popup.new', () => {
+    _persistentsetting.setCurrentPopupId(nextPopupId.value)
+  })
 })
 
-const text = ref('')
-// 把消息返回给Webpage
-const sendDataBack = () => {
-  void chrome.runtime.sendMessage({ type: 'RESULT_FROM_POPUP', data: { Message: text } })
-}
+onUnmounted(() => {
+  _persistentsetting.setCurrentPopupId(-1)
+})
 </script>
