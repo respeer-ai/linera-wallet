@@ -1,10 +1,8 @@
 import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { RpcMethod } from './rpc'
 import NotificationManager from '../manager/notification-manager'
-import AppStateController from '../controller/app-state'
 
 const notificationManager = new NotificationManager()
-const appStateController = new AppStateController()
 
 const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.GET_PROVIDER_STATE, false],
@@ -12,15 +10,12 @@ const confirmations = new Map<RpcMethod, boolean>([
 ])
 
 export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
-  return confirmations.get(req.method as RpcMethod) || false
+  return !!confirmations.get(req.method as RpcMethod)
 }
 
-export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>) => {
+export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<Error | undefined> => {
   if (!needConfirm(req)) {
-    return
+    return await Promise.resolve(undefined)
   }
-  return await notificationManager.showPopup(
-    (newPopupId: number | undefined) => appStateController.setCurrentPopupId(newPopupId),
-    appStateController.getCurrentPopupId()
-  )
+  return await notificationManager.showPopup()
 }

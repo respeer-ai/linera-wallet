@@ -13,11 +13,11 @@ export const getAccounts = async () => {
   return Array.from(Object.keys(_accounts))
 }
 
-export const getPopupIDs = async () => {
-  const popupIDs = await store.getItem('popup_ids')
+export const getCurrentPopupId = async () => {
+  const popupId = await store.getItem('current_popup_id')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const _popupIDs = JSON.parse(popupIDs as string)
-  if (!_popupIDs) return []
+  const _popupId = JSON.parse(popupId as string)
+  if (_popupId === undefined) return -1
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return Array.from(_popupIDs)
+  return Number(_popupId)
 }
