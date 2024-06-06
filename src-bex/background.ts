@@ -19,6 +19,7 @@ const initBackground = () => {
   })
 }
 
-export default bexBackground((/* bridge, allActiveConnections */) => {
+export default bexBackground((bridge /*, allActiveConnections */) => {
+  globalThis.bridge = bridge
   initBackground()
 })
