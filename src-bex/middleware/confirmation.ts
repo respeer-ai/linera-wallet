@@ -1,6 +1,6 @@
 import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { RpcMethod } from './rpc'
-import NotificationManager from '../manager/notification-manager'
+import NotificationManager from '../manager/notificationmanager'
 
 const notificationManager = new NotificationManager()
 

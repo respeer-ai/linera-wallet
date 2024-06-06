@@ -10,4 +10,7 @@ export interface PersistentSetting {
   rpcWSSchema: constant.WSSchema
   rpcHost: string
   rpcPort: number
+
+  nextPopupId: number
+  currentPopupId: number
 }
