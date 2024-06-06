@@ -79,7 +79,7 @@ export const useSettingStore = defineStore('persistent-setting', {
     saveSetting () {
       this.storeReady(() => {
         this.walletStorage
-          .setItem('accounts', JSON.stringify(this.persistentSetting))
+          .setItem('setting', JSON.stringify(this.persistentSetting))
           .catch((e) => {
             console.log(e)
           })
