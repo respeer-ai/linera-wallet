@@ -17,13 +17,13 @@ export default class NotificationManager extends EventEmitter {
   private platform: ExtensionPlatform
   private _popupId?: number
   private _popupAutomaticallyClosed?: boolean
-  private _setCurrentPopupId: ((id: number | undefined) => void)
+  private _setCurrentPopupId: ((newPopupId: number | undefined) => void)
 
   constructor () {
     super()
     this.platform = new ExtensionPlatform()
     this.platform.addOnRemovedListener(this._onWindowClosed.bind(this))
-    this._setCurrentPopupId = () => { /* TODO */ }
+    this._setCurrentPopupId = () => { /* NOTING TODO */ }
   }
 
   /**
@@ -43,7 +43,7 @@ export default class NotificationManager extends EventEmitter {
    * @param {Function} setCurrentPopupId - setter of current popup id from appStateController
    * @param {number} currentPopupId - id of current opened metamask popup window
    */
-  async showPopup (setCurrentPopupId: () => void, currentPopupId: number) {
+  async showPopup (setCurrentPopupId: (newPopupId: number | undefined) => void, currentPopupId: number | undefined) {
     this._popupId = currentPopupId
     this._setCurrentPopupId = setCurrentPopupId
     const popup = await this._getPopup()
