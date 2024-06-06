@@ -52,7 +52,7 @@ const setupExtensionStreams = () => {
   extensionMux.setMaxListeners(25)
 
   pump(extensionMux, extensionStream, extensionMux, (e) => {
-    console.log('CheCko Background Multiplex', e)
+    console.log('CheCko content multiplex extension', e)
   })
 
   // forward communication across inpage-background for these channels only
@@ -66,7 +66,7 @@ const setupExtensionStreams = () => {
 
   // eslint-disable-next-line no-use-before-define
   extensionPort.onDisconnect.addListener((port) => {
-    console.log('Disconnect', port)
+    console.log('CheCko content multiplex extension disconnected', port)
   })
 }
 

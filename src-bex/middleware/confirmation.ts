@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import type { JsonRpcRequest, Json, PendingJsonRpcResponse, JsonRpcParams } from '@metamask/utils'
+import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { NOTIFICATION_HEIGHT, NOTIFICATION_WIDTH } from '../const'
 import ExtensionPlatform from '../platforms/extension'
 import browser from 'webextension-polyfill'
-type JsonRpcEngineReturnHandler = (done: (error?: unknown) => void) => void;
-type JsonRpcEngineEndCallback = (error?: unknown) => void;
-type JsonRpcEngineNextCallback = (returnHandlerCallback?: JsonRpcEngineReturnHandler) => void;
+import { RpcMethod } from './rpc'
 
 const platform = new ExtensionPlatform()
 
@@ -33,18 +30,17 @@ export const showPopup = async () => {
   })
 }
 
-export const needConfirm = () => {
-  return false
+const confirmations = new Map<RpcMethod, boolean>([
+  [RpcMethod.ETH_REQUEST_ACCOUNTS, true]
+])
+
+export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
+  return confirmations.get(req.method as RpcMethod) || true
 }
 
-export const userConfirm = (req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcResponse<Json>, next: JsonRpcEngineNextCallback, end: JsonRpcEngineEndCallback) => {
-  if (req.method === 'eth_requestAccounts') {
-    showPopup().then((resp) => {
-      console.log('resp: ', resp)
-    }).catch((error) => {
-      console.log('popup: ', error)
-    })
+export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>) => {
+  if (!needConfirm(req)) {
+    return
   }
-  res.result = req
-  end()
+  return await showPopup()
 }
