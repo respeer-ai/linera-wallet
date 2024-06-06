@@ -5,6 +5,7 @@ const getAccounts = async () => {
     name: 'checko-wallet'
   })
   const accounts = await store.getItem('accounts')
+  console.log(accounts)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const _accounts = JSON.parse(accounts as string)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
