@@ -20,6 +20,7 @@
     "@hazae41/berith": "^1.2.6",
     "@metamask/json-rpc-engine": "^8.0.0",
     "@metamask/object-multiplex": "^2.0.0",
+    "@metamask/obs-store": "^9.0.0",
     "@metamask/post-message-stream": "^8.1.0",
     "@metamask/providers": "^17.0.0",
     "@quasar/extras": "^1.16.11",
