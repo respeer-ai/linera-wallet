@@ -3807,6 +3807,13 @@ pinia-plugin-persistedstate@^3.2.1:
   resolved "https://registry.yarnpkg.com/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-3.2.1.tgz#66780602aecd6c7b152dd7e3ddc249a1f7a13fe5"
   integrity sha512-MK++8LRUsGF7r45PjBFES82ISnPzyO6IZx3CH5vyPseFLZCk1g2kgx6l/nW8pEBKxxd4do0P6bJw+mUSZIEZUQ==
 
+pinia-plugin-webext-storage@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/pinia-plugin-webext-storage/-/pinia-plugin-webext-storage-2.4.1.tgz#94eb1055f504999fc1aab73a90c7a1855bd49bf5"
+  integrity sha512-jMwhTIPubhXHdNcs+3hEUXAwZX1Ec8NlRw+uuIPVrENjgTLrTDOUWJdTvJau/6PqMqQR/MgQN3ZIP7Tw4WM4JQ==
+  dependencies:
+    lodash.merge "^4.6.2"
+
 pinia@^2.0.11:
   version "2.1.7"
   resolved "https://registry.yarnpkg.com/pinia/-/pinia-2.1.7.tgz#4cf5420d9324ca00b7b4984d3fbf693222115bbc"

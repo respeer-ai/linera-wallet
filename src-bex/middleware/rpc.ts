@@ -36,13 +36,13 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export const rpcHandler = (req: JsonRpcRequest<JsonRpcParams>): RpcResult => {
+export const rpcHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<RpcResult> => {
   if (!handlers.has(req.method as RpcMethod)) {
     return {
       err: new Error('Invalid rpc method')
     }
   }
-  return handlers.get(req.method as RpcMethod)?.() || {
+  return await handlers.get(req.method as RpcMethod)?.() || {
     err: new Error('Unknown rpc error')
   }
 }

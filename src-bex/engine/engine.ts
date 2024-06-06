@@ -35,7 +35,7 @@ const rpcExec = async (req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcRe
       return end()
     }
   }
-  const rc = rpc.rpcHandler(req)
+  const rc = await rpc.rpcHandler(req)
   if (rc.err !== undefined) {
     console.log('CheCko engine rpc', req.method, req.params, rc.err)
     res.error = {

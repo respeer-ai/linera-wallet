@@ -3,22 +3,22 @@ import * as constant from 'src/const'
 
 export const faucetWsSchema = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.faucetWSSchema || constant.WSSchema.WSS // constant.WSSchema.WS
+  return _setting.persistentSetting?.faucetWSSchema || constant.WSSchema.WS
 })()
 
 export const faucetSchema = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.faucetSchema || constant.HTTPSchema.HTTPS // constant.HTTPSchema.HTTP
+  return _setting.persistentSetting?.faucetSchema || constant.HTTPSchema.HTTP
 })()
 
 export const faucetHost = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.faucetHost || 'faucet.devnet-2024-05-07.linera.net' // '172.16.31.73'
+  return _setting.persistentSetting?.faucetHost || '172.16.31.73'
 })()
 
 export const faucetPort = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.faucetPort || 443 // 8080
+  return _setting.persistentSetting?.faucetPort || 8080
 })()
 
 export const faucetUrl = constant.toUrl(faucetSchema, faucetHost, faucetPort)

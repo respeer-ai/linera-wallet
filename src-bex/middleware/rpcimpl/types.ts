@@ -5,4 +5,4 @@ export interface RpcResult {
   res?: unknown
 }
 
-export type RpcImplHandler = (arg1?: JsonRpcParams) => RpcResult
+export type RpcImplHandler = (arg1?: JsonRpcParams) => Promise<RpcResult>
