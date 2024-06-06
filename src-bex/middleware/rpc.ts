@@ -1,4 +1,9 @@
-import type { JsonRpcRequest, Json, PendingJsonRpcResponse, JsonRpcParams } from '@metamask/utils'
+import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
+import { RpcResult, RpcImplHandler } from './rpcimpl/types'
+import {
+  getProviderState,
+  ethRequestAccounts
+} from './rpcimpl'
 
 export enum RpcMethod {
   ADD_ETHEREUM_CHAIN = 'wallet_addEthereumChain',
@@ -25,13 +30,21 @@ export enum RpcMethod {
   WATCH_ASSET_LEGACY = 'metamask_watchAsset'
 }
 
-export interface RpcResult {
-  err: Error
-  res: unknown
-}
+const handlers = new Map<RpcMethod, RpcImplHandler>([
+  [RpcMethod.GET_PROVIDER_STATE, getProviderState.getProviderStateHandler],
+  [RpcMethod.ETH_REQUEST_ACCOUNTS, ethRequestAccounts.ethRequestAccountsHandler]
+])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export const rpcHandler = (req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcResponse<Json>): RpcResult => {
-  console.log(req.method, req.params)
-  return {} as RpcResult
+export const rpcHandler = (req: JsonRpcRequest<JsonRpcParams>): RpcResult => {
+  if (!handlers.has(req.method as RpcMethod)) {
+    return {
+      err: new Error('Invalid rpc method')
+    }
+  }
+  return handlers.get(req.method as RpcMethod)?.() || {
+    err: new Error('Unknown rpc error')
+  }
 }
+
+export * from './rpcimpl/types'

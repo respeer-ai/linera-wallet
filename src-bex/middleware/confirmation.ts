@@ -31,6 +31,7 @@ export const showPopup = async () => {
 }
 
 const confirmations = new Map<RpcMethod, boolean>([
+  [RpcMethod.GET_PROVIDER_STATE, true],
   [RpcMethod.ETH_REQUEST_ACCOUNTS, true]
 ])
 
