@@ -18,9 +18,10 @@ onMounted(() => {
   quasar.bex.on('popup.new', () => {
     _persistentsetting.setCurrentPopupId(nextPopupId.value)
   })
+  _persistentsetting.setCurrentPopupId(nextPopupId.value)
 })
 
 onUnmounted(() => {
-  _persistentsetting.setCurrentPopupId(-1)
+  _persistentsetting.setCurrentPopupId(0)
 })
 </script>
