@@ -14,11 +14,17 @@ const quasar = useQuasar()
 const _persistentsetting = persistentsetting.useSettingStore()
 const nextPopupId = computed(() => _persistentsetting.nextPopupId)
 
-onMounted(() => {
-  quasar.bex.on('popup.new', () => {
+const saveCurrentPopupId = () => {
+  _persistentsetting.load(() => {
     _persistentsetting.setCurrentPopupId(nextPopupId.value)
   })
-  _persistentsetting.setCurrentPopupId(nextPopupId.value)
+}
+
+onMounted(() => {
+  quasar.bex.on('popup.new', () => {
+    saveCurrentPopupId()
+  })
+  saveCurrentPopupId()
 })
 
 onUnmounted(() => {

@@ -1,11 +1,14 @@
 import localforage from 'localforage'
 
-const store = localforage.createInstance({
+const walletStore = localforage.createInstance({
   name: 'checko-wallet'
+})
+const settingStore = localforage.createInstance({
+  name: 'setting'
 })
 
 export const getAccounts = async () => {
-  const accounts = await store.getItem('accounts')
+  const accounts = await walletStore.getItem('accounts')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const _accounts = JSON.parse(accounts as string)
   if (!_accounts) return []
@@ -14,9 +17,10 @@ export const getAccounts = async () => {
 }
 
 export const getCurrentPopupId = async () => {
-  const setting = await store.getItem('setting')
+  const setting = await settingStore.getItem('setting')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const _setting = JSON.parse(setting as string) as Record<string, number>
+  console.log(_setting, setting)
   if (!_setting) return -1
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Number(_setting.currentPopupId)
