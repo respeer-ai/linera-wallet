@@ -10,6 +10,16 @@ import {
 export default class NotificationManager {
   currentPopupId?: number
 
+  onWindowClosed (requestId: number, _window: Windows.Window, onWindowClosed: (requestId: number) => void) {
+    const listener = (windowId: number) => {
+      if (_window.id === windowId) {
+        browser.windows.onRemoved.removeListener(listener)
+        onWindowClosed(requestId)
+      }
+    }
+    return listener
+  }
+
   createPopupWindow (
     resolve: (newWindowId?: number) => void,
     reject: (err: Error) => void,
@@ -23,6 +33,8 @@ export default class NotificationManager {
         })
         if (_window) {
           await browser.windows.update(_window.id as number, { focused: true })
+          const listener = this.onWindowClosed(requestId, _window, onWindowClosed)
+          browser.windows.onRemoved.addListener(listener)
           return resolve()
         }
         browser.windows.getCurrent()
@@ -40,12 +52,7 @@ export default class NotificationManager {
               focused: true
             }).then((_window: Windows.Window) => {
               this.currentPopupId = _window.id
-              const listener = (windowId: number) => {
-                if (_window.id === windowId) {
-                  browser.windows.onRemoved.removeListener(listener)
-                  onWindowClosed(requestId)
-                }
-              }
+              const listener = this.onWindowClosed(requestId, _window, onWindowClosed)
               browser.windows.onRemoved.addListener(listener)
               resolve(_window.id)
             }).catch((e: Error) => {
