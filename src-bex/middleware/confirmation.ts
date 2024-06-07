@@ -2,7 +2,7 @@ import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { RpcMethod } from './rpc'
 import NotificationManager from '../manager/notificationmanager'
 import { basebridge } from '../event'
-import { BexPayload } from '@quasar/app-vite'
+// import { BexPayload } from '@quasar/app-vite'
 
 const notificationManager = new NotificationManager()
 
@@ -15,14 +15,16 @@ export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
   return !!confirmations.get(req.method as RpcMethod)
 }
 
-const confirmationWithExistPopup = (resolve: () => void, reject: (err: Error) => void) => {
-  basebridge.EventBus.bridge?.send('popup.new')
-    .then(() => {
-      resolve()
-    })
-    .catch((e: Error) => {
-      reject(e)
-    })
+const confirmationWithExistPopup = (requestId: number, resolve: () => void, reject: (err: Error) => void, delayMs: number) => {
+  setTimeout(() => {
+    basebridge.EventBus.bridge?.send('popup.new', { requestId })
+      .then(() => {
+        resolve()
+      })
+      .catch((e: Error) => {
+        reject(e)
+      })
+  }, delayMs)
 }
 
 export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<void> => {
@@ -32,6 +34,7 @@ export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): P
 
   return new Promise<void>((resolve, reject) => {
     const requestId = Number(req.id)
+    /*
     const newHPopupHandler = (payload: BexPayload<number, undefined>) => {
       console.log('New popup.done', payload)
       // basebridge.EventBus.bridge?.off('popup.done', newHPopupHandler)
@@ -40,13 +43,10 @@ export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): P
       }
     }
     basebridge.EventBus.bridge?.on('popup.done', newHPopupHandler)
+    */
     notificationManager.showPopup(requestId, req.params)
       .then((newWindowId?: number) => {
-        if (newWindowId) {
-          // Params already sent with query url, we need to wait for popup.done
-          return
-        }
-        confirmationWithExistPopup(resolve, reject)
+        confirmationWithExistPopup(requestId, resolve, reject, newWindowId !== undefined ? 100 : 0)
       })
       .catch((e: Error) => {
         reject(e)

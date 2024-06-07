@@ -11,7 +11,7 @@ import {
 export default class NotificationManager {
   currentPopupId?: number
 
-  createPopupWindow (resolve: (newWindowId?: number) => void, reject: (err: Error) => void, requestId: string | number, params?: JsonRpcParams) {
+  createPopupWindow (resolve: (newWindowId?: number) => void, reject: (err: Error) => void, requestId: number, params?: JsonRpcParams) {
     browser.windows.getAll()
       .then(async (windows: Windows.Window[]) => {
         const _window = windows?.find((window: Windows.Window) => {
@@ -53,7 +53,7 @@ export default class NotificationManager {
       })
   }
 
-  public async showPopup (requestId: string | number, params?: JsonRpcParams): Promise<number | undefined> {
+  public async showPopup (requestId: number, params?: JsonRpcParams): Promise<number | undefined> {
     return new Promise<number | undefined>((resolve, reject) => {
       this.createPopupWindow(resolve, reject, requestId, params)
     })
