@@ -37,7 +37,8 @@ export default class NotificationManager {
               height: NOTIFICATION_HEIGHT,
               left,
               top,
-              focused: true
+              focused: true,
+              allowScriptsToClose: false
             }).then((_window: Windows.Window) => {
               this.currentPopupId = _window.id
               resolve(_window.id)

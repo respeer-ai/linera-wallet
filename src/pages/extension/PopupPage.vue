@@ -20,7 +20,6 @@ interface Query {
 const quasar = useQuasar()
 const route = useRoute()
 const params = computed(() => (route.query as unknown as Query).params)
-const requestId = computed(() => (route.query as unknown as Query).requestId)
 
 interface PopupNewRequest {
   requestId: number
@@ -31,12 +30,14 @@ interface PopupNewResponse {
 }
 
 onMounted(() => {
-  quasar.bex.on('popup.new', (payload: BexPayload<PopupNewRequest, PopupNewResponse>) => {
+  const handleCloseWindow = () => {
+    quasar.bex.off('popup.new', handleNewPopup)
+    void quasar.bex.send('popup.done', {})
+  }
+  const handleNewPopup = (payload: BexPayload<PopupNewRequest, PopupNewResponse>) => {
     void payload.respond({ requestId: payload.data?.requestId })
-    void quasar.bex.send('popup.done', { requestId: requestId.value })
-  })
-  setTimeout(() => {
-    void quasar.bex.send('popup.done', { requestId: requestId.value })
-  }, 100)
+  }
+  window.addEventListener('beforeunload', handleCloseWindow)
+  quasar.bex.on('popup.new', handleNewPopup)
 })
 </script>
