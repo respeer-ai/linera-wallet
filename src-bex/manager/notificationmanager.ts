@@ -1,4 +1,5 @@
 import browser, { Windows } from 'webextension-polyfill'
+import type { JsonRpcParams } from '@metamask/utils'
 import {
   NOTIFICATION_HEIGHT,
   NOTIFICATION_WIDTH
@@ -10,7 +11,7 @@ import {
 export default class NotificationManager {
   currentPopupId?: number
 
-  createPopupWindow (resolve: () => void, reject: (err: Error) => void) {
+  createPopupWindow (resolve: (newWindowId?: number) => void, reject: (err: Error) => void, requestId: string | number, params?: JsonRpcParams) {
     browser.windows.getAll()
       .then(async (windows: Windows.Window[]) => {
         const _window = windows?.find((window: Windows.Window) => {
@@ -25,8 +26,12 @@ export default class NotificationManager {
             const { width } = _window
             const left = (width || 1280) - NOTIFICATION_WIDTH - 48
             const top = 48
+            let _params = ''
+            if (params) {
+              _params = '&params=' + encodeURIComponent(JSON.stringify(params))
+            }
             browser.windows.create({
-              url: browser.runtime.getURL('www/index.html#/extension/popup'),
+              url: browser.runtime.getURL('www/index.html#/extension/popup?requestId=' + requestId.toString() + _params),
               type: 'popup',
               width: NOTIFICATION_WIDTH,
               height: NOTIFICATION_HEIGHT,
@@ -35,7 +40,7 @@ export default class NotificationManager {
               focused: true
             }).then((_window: Windows.Window) => {
               this.currentPopupId = _window.id
-              resolve()
+              resolve(_window.id)
             }).catch((e: Error) => {
               reject(e)
             })
@@ -48,9 +53,9 @@ export default class NotificationManager {
       })
   }
 
-  public async showPopup (): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.createPopupWindow(resolve, reject)
+  public async showPopup (requestId: string | number, params?: JsonRpcParams): Promise<number | undefined> {
+    return new Promise<number | undefined>((resolve, reject) => {
+      this.createPopupWindow(resolve, reject, requestId, params)
     })
   }
 }

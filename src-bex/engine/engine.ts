@@ -37,7 +37,7 @@ export class Engine {
       return done()
     }
     this.middlewareHandlers[middlewareIndex](req).then(() => {
-      done()
+      this.rpcRecursiveExec(middlewareIndex + 1, req, done, error)
     }).catch((e: Error) => {
       error(e)
     })
@@ -56,6 +56,7 @@ export class Engine {
             code: -1,
             message: e.message
           }
+          end()
         })
     }, (e) => {
       console.log('CheCko engine middleware', req.method, req.params, e)
@@ -63,7 +64,7 @@ export class Engine {
         code: -2,
         message: e.message
       }
-      return end()
+      end()
     })
   }
 
