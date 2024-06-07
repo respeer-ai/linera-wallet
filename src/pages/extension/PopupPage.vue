@@ -6,9 +6,11 @@
 </template>
 <script setup lang='ts'>
 import { useQuasar } from 'quasar'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { BexPayload } from '@quasar/app-vite'
 import { useRoute } from 'vue-router'
+import { popup } from 'src/localstores'
+import { commontypes } from 'src/types'
 
 import PupupHeader from 'src/components/extension/PupupHeader.vue'
 
@@ -21,23 +23,18 @@ const quasar = useQuasar()
 const route = useRoute()
 const params = computed(() => (route.query as unknown as Query).params)
 
-interface PopupNewRequest {
-  requestId: number
-}
+const _popup = popup.usePopupStore()
 
-interface PopupNewResponse {
-  requestId: number
+const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
+  _popup.insertRequest(payload)
 }
 
 onMounted(() => {
-  const handleCloseWindow = () => {
-    quasar.bex.off('popup.new', handleNewPopup)
-    void quasar.bex.send('popup.done', {})
-  }
-  const handleNewPopup = (payload: BexPayload<PopupNewRequest, PopupNewResponse>) => {
-    void payload.respond({ requestId: payload.data?.requestId })
-  }
-  window.addEventListener('beforeunload', handleCloseWindow)
-  quasar.bex.on('popup.new', handleNewPopup)
+  _popup.$reset()
+  quasar.bex.on('popup.new', handleNewRequest)
+})
+
+onUnmounted(() => {
+  quasar.bex.off('popup.new', handleNewRequest)
 })
 </script>

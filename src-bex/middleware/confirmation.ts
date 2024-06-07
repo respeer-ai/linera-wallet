@@ -2,6 +2,7 @@ import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { RpcMethod } from './rpc'
 import NotificationManager from '../manager/notificationmanager'
 import { basebridge } from '../event'
+import { commontypes } from '../../src/types'
 
 const notificationManager = new NotificationManager()
 
@@ -15,15 +16,16 @@ export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
 }
 
 // TODO: DelayMs is workaround for the first message of bridge
-const confirmationWithExistPopup = (requestId: number, resolve: () => void, reject: (err: Error) => void, delayMs: number) => {
+const confirmationWithExistPopup = (req: JsonRpcRequest<JsonRpcParams>, resolve: () => void, reject: (err: Error) => void, delayMs: number) => {
   setTimeout(() => {
-    basebridge.EventBus.bridge?.send('popup.new', { requestId })
-      .then(() => {
-        resolve()
-      })
-      .catch((e: Error) => {
-        reject(e)
-      })
+    basebridge.EventBus.bridge?.send('popup.new', {
+      type: commontypes.PopupRequestType.CONFIRMATION,
+      req
+    }).then(() => {
+      resolve()
+    }).catch((e: Error) => {
+      reject(e)
+    })
   }, delayMs)
 }
 
@@ -39,12 +41,10 @@ export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): P
       if (requestId === _requestId) {
         return reject(new Error('Rejected by user'))
       }
-    }, req.params)
-      .then((newWindowId?: number) => {
-        confirmationWithExistPopup(requestId, resolve, reject, newWindowId !== undefined ? 1000 : 0)
-      })
-      .catch((e: Error) => {
-        reject(e)
-      })
+    }).then((newWindowId?: number) => {
+      confirmationWithExistPopup(req, resolve, reject, newWindowId !== undefined ? 1000 : 0)
+    }).catch((e: Error) => {
+      reject(e)
+    })
   })
 }

@@ -1,5 +1,4 @@
 import browser, { Windows } from 'webextension-polyfill'
-import type { JsonRpcParams } from '@metamask/utils'
 import {
   NOTIFICATION_HEIGHT,
   NOTIFICATION_WIDTH
@@ -15,8 +14,7 @@ export default class NotificationManager {
     resolve: (newWindowId?: number) => void,
     reject: (err: Error) => void,
     requestId: number,
-    onWindowClosed: (requestId: number) => void,
-    params?: JsonRpcParams
+    onWindowClosed: (requestId: number) => void
   ) {
     browser.windows.getAll()
       .then(async (windows: Windows.Window[]) => {
@@ -32,12 +30,8 @@ export default class NotificationManager {
             const { width } = _window
             const left = (width || 1280) - NOTIFICATION_WIDTH - 48
             const top = 48
-            let _params = ''
-            if (params) {
-              _params = '&params=' + encodeURIComponent(JSON.stringify(params))
-            }
             browser.windows.create({
-              url: browser.runtime.getURL('www/index.html#/extension/popup?requestId=' + requestId.toString() + _params),
+              url: browser.runtime.getURL('www/index.html#/extension/popup'),
               type: 'popup',
               width: NOTIFICATION_WIDTH,
               height: NOTIFICATION_HEIGHT,
@@ -68,11 +62,10 @@ export default class NotificationManager {
 
   public async showPopup (
     requestId: number,
-    onWindowClosed: (requestId: number) => void,
-    params?: JsonRpcParams
+    onWindowClosed: (requestId: number) => void
   ): Promise<number | undefined> {
     return new Promise<number | undefined>((resolve, reject) => {
-      this.createPopupWindow(resolve, reject, requestId, onWindowClosed, params)
+      this.createPopupWindow(resolve, reject, requestId, onWindowClosed)
     })
   }
 }
