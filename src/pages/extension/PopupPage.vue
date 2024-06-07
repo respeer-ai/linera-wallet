@@ -5,29 +5,21 @@
 </template>
 <script setup lang='ts'>
 import { useQuasar } from 'quasar'
-import { onMounted, computed, onUnmounted } from 'vue'
-import { persistentsetting } from 'src/localstores'
+import { onMounted } from 'vue'
+import { BexPayload } from '@quasar/app-vite'
 
 import PupupHeader from 'src/components/extension/PupupHeader.vue'
 
 const quasar = useQuasar()
-const _persistentsetting = persistentsetting.useSettingStore()
-const nextPopupId = computed(() => _persistentsetting.nextPopupId)
 
-const saveCurrentPopupId = () => {
-  _persistentsetting.load(() => {
-    _persistentsetting.setCurrentPopupId(nextPopupId.value)
-  })
+interface PopupNewRequest {
+  popupId: number
 }
 
 onMounted(() => {
-  quasar.bex.on('popup.new', () => {
-    saveCurrentPopupId()
+  quasar.bex.on('popup.new', (payload: BexPayload<PopupNewRequest, number>) => {
+    console.log(payload.data)
+    void payload.respond(100000)
   })
-  saveCurrentPopupId()
-})
-
-onUnmounted(() => {
-  _persistentsetting.setCurrentPopupId(0)
 })
 </script>

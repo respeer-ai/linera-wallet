@@ -32,32 +32,46 @@ export class Engine {
     this.setupRpcEngine(providerStream)
   }
 
-  async rpcExec (req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcResponse<Json>, end: JsonRpcEngineEndCallback) {
-    for (const handler of this.middlewareHandlers) {
-      const err = await handler(req)
-      if (err !== undefined) {
-        console.log('CheCko engine middleware', req.method, req.params, err)
-        return end()
-      }
+  rpcRecursiveExec (middlewareIndex: number, req: JsonRpcRequest<JsonRpcParams>, done: () => void, error: (e: Error) => void) {
+    if (this.middlewareHandlers.length <= middlewareIndex) {
+      return done()
     }
-    const rc = await rpc.rpcHandler(req)
-    if (rc.err !== undefined) {
-      console.log('CheCko engine rpc', req.method, req.params, rc.err)
+    this.middlewareHandlers[middlewareIndex](req).then(() => {
+      done()
+    }).catch((e: Error) => {
+      error(e)
+    })
+  }
+
+  rpcExec (req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcResponse<Json>, end: JsonRpcEngineEndCallback) {
+    this.rpcRecursiveExec(0, req, () => {
+      rpc.rpcHandler(req)
+        .then((rc) => {
+          res.result = rc as Json
+          end()
+        })
+        .catch((e: Error) => {
+          console.log('CheCko engine rpc', req.method, req.params, e)
+          res.error = {
+            code: -1,
+            message: e.message
+          }
+        })
+    }, (e) => {
+      console.log('CheCko engine middleware', req.method, req.params, e)
       res.error = {
-        code: -1,
-        message: rc.err.message
+        code: -2,
+        message: e.message
       }
-    } else {
-      res.result = rc.res as Json
-    }
-    end()
+      return end()
+    })
   }
 
   setupRpcEngine (mux: Duplex) {
     const engine = new JsonRpcEngine()
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    engine.push(async (req, res, next, end) => {
-      await this.rpcExec(req, res, end)
+    engine.push((req, res, next, end) => {
+      this.rpcExec(req, res, end)
     })
     const providerStream = createEngineStream({ engine })
     pump(mux, providerStream, mux, (err) =>

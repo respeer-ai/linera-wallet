@@ -1,6 +1,8 @@
 import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { RpcMethod } from './rpc'
 import NotificationManager from '../manager/notificationmanager'
+import { basebridge } from '../event'
+import { nextTick } from 'process'
 
 const notificationManager = new NotificationManager()
 
@@ -13,9 +15,27 @@ export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
   return !!confirmations.get(req.method as RpcMethod)
 }
 
-export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<Error | undefined> => {
+export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<void> => {
   if (!needConfirm(req)) {
     return await Promise.resolve(undefined)
   }
-  return await notificationManager.showPopup()
+  return new Promise<void>((resolve, reject) => {
+    notificationManager.showPopup()
+      .then(() => {
+        // TODO: storage or post parameter
+        nextTick(() => {
+          basebridge.EventBus.bridge?.send('popup.new')
+            .then(() => {
+              console.log('Popuped')
+              resolve()
+            })
+            .catch((e) => {
+              reject(e)
+            })
+        })
+      })
+      .catch((e: Error) => {
+        reject(e)
+      })
+  })
 }

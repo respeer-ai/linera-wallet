@@ -39,12 +39,6 @@ export const useSettingStore = defineStore('persistent-setting', {
         this.persistentSetting.rpcHost,
         this.persistentSetting.rpcPort
       )
-    },
-    currentPopupId (): number {
-      return this.persistentSetting.currentPopupId
-    },
-    nextPopupId (): number {
-      return this.persistentSetting.nextPopupId
     }
   },
   actions: {
@@ -107,11 +101,6 @@ export const useSettingStore = defineStore('persistent-setting', {
       this.persistentSetting.rpcWSSchema = wsSchema
       this.persistentSetting.rpcHost = host
       this.persistentSetting.rpcPort = port
-      this.saveSetting()
-    },
-    setCurrentPopupId (popupId: number) {
-      this.persistentSetting.currentPopupId = popupId
-      this.persistentSetting.nextPopupId = popupId + 1
       this.saveSetting()
     }
   }

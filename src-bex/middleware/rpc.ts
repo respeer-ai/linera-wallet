@@ -1,5 +1,5 @@
 import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
-import { RpcResult, RpcImplHandler } from './rpcimpl/types'
+import { RpcImplHandler } from './rpcimpl/types'
 import {
   getProviderState,
   ethRequestAccounts
@@ -36,15 +36,12 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export const rpcHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<RpcResult> => {
-  if (!handlers.has(req.method as RpcMethod)) {
-    return {
-      err: new Error('Invalid rpc method')
-    }
+export const rpcHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<unknown> => {
+  const handler = handlers.get(req.method as RpcMethod)
+  if (!handler) {
+    return Promise.reject(new Error('Invalid rpc method'))
   }
-  return await handlers.get(req.method as RpcMethod)?.() || {
-    err: new Error('Unknown rpc error')
-  }
+  return handler()
 }
 
 export * from './rpcimpl/types'
