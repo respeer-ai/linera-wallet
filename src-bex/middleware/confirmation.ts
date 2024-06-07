@@ -20,7 +20,7 @@ const confirmationWithExistPopup = (req: JsonRpcRequest<JsonRpcParams>, resolve:
   setTimeout(() => {
     basebridge.EventBus.bridge?.send('popup.new', {
       type: commontypes.PopupRequestType.CONFIRMATION,
-      req
+      request: req
     }).then(() => {
       resolve()
     }).catch((e: Error) => {

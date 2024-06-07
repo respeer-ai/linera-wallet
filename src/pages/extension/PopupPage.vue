@@ -16,7 +16,12 @@ const quasar = useQuasar()
 const _popup = popup.usePopupStore()
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
-  _popup.insertRequest(payload)
+  switch (payload.data.type) {
+    case commontypes.PopupRequestType.CONFIRMATION:
+      return _popup.insertRequest(payload)
+    default:
+      return void payload.respond({})
+  }
 }
 
 onMounted(() => {
