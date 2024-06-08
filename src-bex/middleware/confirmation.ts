@@ -9,7 +9,10 @@ const notificationManager = new NotificationManager()
 const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.GET_PROVIDER_STATE, false],
   [RpcMethod.ETH_REQUEST_ACCOUNTS, true],
-  [RpcMethod.CHECKO_PING, false]
+  [RpcMethod.CHECKO_PING, false],
+  [RpcMethod.LINERA_GRAPHQL_MUTATION, true],
+  [RpcMethod.LINERA_GRAPHQL_QUERY, false],
+  [RpcMethod.LINERA_GRAPHQL_SUBSCRIPTION, false]
 ])
 
 export const needConfirm = (req: RpcRequest): boolean => {

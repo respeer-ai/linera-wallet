@@ -23,6 +23,7 @@
     "@metamask/obs-store": "^9.0.0",
     "@metamask/post-message-stream": "^8.1.0",
     "@metamask/providers": "^17.0.0",
+    "@metamask/safe-event-emitter": "^3.1.1",
     "@quasar/extras": "^1.16.11",
     "@tsconfig/node20": "^20.1.4",
     "@types/bson": "^4.2.0",

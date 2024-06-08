@@ -73,6 +73,21 @@ const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
   pump(mux, providerStream, mux, (err) =>
     console.log('CheCko background multiplex provider', err)
   )
+  bridge.on('subscription', (payload: BexPayload<unknown, unknown>) => {
+    // TODO: We should use notification in provider
+    window.postMessage({
+      target: constant.INPAGE,
+      data: {
+        name: constant.PROVIDER,
+        data: {
+          jsonrpc: '2.0',
+          method: 'linera_subscription',
+          params: payload.data
+        },
+        result: {}
+      }
+    }, window.location.origin)
+  })
 }
 
 export default bexContent((bridge: BexBridge) => {
