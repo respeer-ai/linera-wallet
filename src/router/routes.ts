@@ -147,7 +147,14 @@ const routes: RouteRecordRaw[] = [
           AlignPageCenter: false
         }
       },
-      { path: 'popup', component: () => import('pages/extension/PopupPage.vue') },
+      {
+        path: 'popup',
+        component: () => import('pages/extension/PopupPage.vue'),
+        meta: {
+          ShowHeaderMenu: false,
+          AlignPageCenter: false
+        }
+      },
       {
         path: 'activity',
         component: () => import('pages/ActivityPage.vue'),

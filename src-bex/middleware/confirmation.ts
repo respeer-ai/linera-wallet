@@ -1,8 +1,6 @@
-import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
-import { RpcMethod } from './rpc'
 import NotificationManager from '../manager/notificationmanager'
 import { basebridge } from '../event'
-import { commontypes } from '../../src/types'
+import { PopupRequestType, RpcRequest, RpcMethod } from './types'
 
 const notificationManager = new NotificationManager()
 
@@ -12,16 +10,16 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.CHECKO_PING, false]
 ])
 
-export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
-  const shouldConfirm = confirmations.get(req.method as RpcMethod)
+export const needConfirm = (req: RpcRequest): boolean => {
+  const shouldConfirm = confirmations.get(req.request.method as RpcMethod)
   return shouldConfirm === undefined || shouldConfirm
 }
 
 // TODO: DelayMs is workaround for the first message of bridge
-const confirmationWithExistPopup = (req: JsonRpcRequest<JsonRpcParams>, resolve: () => void, reject: (err: Error) => void, delayMs: number) => {
+const confirmationWithExistPopup = (req: RpcRequest, resolve: () => void, reject: (err: Error) => void, delayMs: number) => {
   setTimeout(() => {
     basebridge.EventBus.bridge?.send('popup.new', {
-      type: commontypes.PopupRequestType.CONFIRMATION,
+      type: PopupRequestType.CONFIRMATION,
       request: req
     }).then(() => {
       resolve()
@@ -31,13 +29,13 @@ const confirmationWithExistPopup = (req: JsonRpcRequest<JsonRpcParams>, resolve:
   }, delayMs)
 }
 
-export const confirmationHandler = async (req: JsonRpcRequest<JsonRpcParams>): Promise<void> => {
+export const confirmationHandler = async (req: RpcRequest): Promise<void> => {
   if (!needConfirm(req)) {
     return await Promise.resolve(undefined)
   }
 
   return new Promise<void>((resolve, reject) => {
-    const requestId = Number(req.id)
+    const requestId = Number(req.request.id)
 
     notificationManager.showPopup(requestId, (_requestId: number) => {
       if (requestId === _requestId) {

@@ -1,23 +1,40 @@
 <template>
-  <div>
-    <PupupHeader />
+  <div class='bg-grey-2'>
+    <div class='bg-white' :style='{width: "calc(100% + 48px)", height: "84px", margin: "-16px -24px 0 -24px"}'>
+      <PopupHeader />
+    </div>
+    <div v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS'>
+      <EthRequestAccountsConfirmation />
+    </div>
   </div>
 </template>
 <script setup lang='ts'>
 import { useQuasar } from 'quasar'
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { BexPayload } from '@quasar/app-vite'
 import { popup } from 'src/localstores'
+import * as middlewaretypes from '../../../src-bex/middleware/types'
 import { commontypes } from 'src/types'
 
-import PupupHeader from 'src/components/extension/PupupHeader.vue'
+import PopupHeader from 'src/components/extension/PopupHeader.vue'
+import EthRequestAccountsConfirmation from 'src/components/extension/popup/EthRequestAccountsConfirmation.vue'
 
 const quasar = useQuasar()
 const _popup = popup.usePopupStore()
+const popupType = computed(() => _popup._popupType)
+const popupRequest = computed(() => _popup._popupRequest)
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
   switch (payload.data.type) {
-    case commontypes.PopupRequestType.CONFIRMATION:
+    case middlewaretypes.PopupRequestType.CONFIRMATION:
+      if (payload.data.type === middlewaretypes.PopupRequestType.CONFIRMATION &&
+        payload.data.request.request.method === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS) {
+        _popup.addConnection({
+          origin: payload.data.request.origin,
+          favicon: payload.data.request.favicon,
+          name: payload.data.request.name
+        })
+      }
       return _popup.insertRequest(payload)
     default:
       return void payload.respond({})

@@ -13,6 +13,7 @@ import { Buffer as BufferPolyfill } from 'buffer'
 import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { JsonRpcEngine } from '@metamask/json-rpc-engine'
 import type { Json, PendingJsonRpcResponse } from '@metamask/utils'
+import { RpcRequest } from './middleware/types'
 
 window.Buffer = BufferPolyfill
 window.process = process
@@ -39,7 +40,15 @@ const setupPageStream = () => {
 const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
   const engine = new JsonRpcEngine()
   engine.push((req, res, _next, end) => {
-    bridge.send('data', req)
+    const favicon = window.document.querySelector('link[rel=icon]') ||
+                    window.document.querySelector('link[rel="shortcut icon"]')
+    const rpcRequest = {
+      origin: window.location.origin,
+      name: window.document.title,
+      favicon: (favicon as HTMLLinkElement)?.href || 'favicon.ico',
+      request: req
+    } as RpcRequest
+    bridge.send('data', rpcRequest)
       .then((payload: BexPayload<PendingJsonRpcResponse<Json>, undefined>) => {
         if (!payload.data.result && !payload.data.error) {
           console.log('Invalid rpc response')

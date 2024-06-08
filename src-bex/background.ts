@@ -4,7 +4,8 @@ import { Buffer as BufferPolyfill } from 'buffer'
 import { engine } from './engine'
 import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { basebridge } from './event'
-import type { JsonRpcParams, JsonRpcRequest, PendingJsonRpcResponse, Json } from '@metamask/utils'
+import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
+import { RpcRequest } from './middleware/types'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
@@ -12,7 +13,7 @@ globalThis.process = process
 export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => {
   basebridge.EventBus.instance.setBridge(bridge)
   const _engine = new engine.Engine()
-  bridge.on('data', (payload: BexPayload<JsonRpcRequest<JsonRpcParams>, unknown>) => {
+  bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
     const res = {} as PendingJsonRpcResponse<Json>
     _engine.rpcExec(payload.data)
       .then((rc) => {

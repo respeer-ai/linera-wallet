@@ -1,10 +1,6 @@
-import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
-
-export enum PopupRequestType {
-  CONFIRMATION = 'confirmation'
-}
+import * as middlewaretypes from '../../src-bex/middleware/types'
 
 export interface PopupRequest {
-  type: PopupRequestType
-  request: JsonRpcRequest<JsonRpcParams>
+  type: middlewaretypes.PopupRequestType
+  request: middlewaretypes.RpcRequest
 }
