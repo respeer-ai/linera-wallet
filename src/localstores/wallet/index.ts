@@ -19,7 +19,7 @@ export const useWalletStore = defineStore('checko-wallet', {
   }),
   getters: {
     publicKeys (): Array<string> {
-      return Array.from(this.accounts.keys())
+      return Array.from(this.secureAccounts.keys())
     },
     displayAddress (): (publicKey: string) => string {
       return (publicKey: string) => {
@@ -213,7 +213,7 @@ export const useWalletStore = defineStore('checko-wallet', {
       })
       return _account
     },
-    loadAccounts (password: string, listener?: () => void) {
+    loadAccounts (password: string | undefined, listener?: () => void) {
       this.walletStorage.getItem('accounts')
         .then((accounts) => {
           if (!accounts) {
@@ -225,8 +225,10 @@ export const useWalletStore = defineStore('checko-wallet', {
           Object.keys(_accounts).forEach((k: string) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             const account = _accounts[k] as Record<string, unknown>
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            this.accounts.set(k, this.accountFromStore(account, password))
+            if (password) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              this.accounts.set(k, this.accountFromStore(account, password))
+            }
             this.secureAccounts.set(k, this.accountFromStore(account))
           })
           listener?.()
@@ -265,6 +267,19 @@ export const useWalletStore = defineStore('checko-wallet', {
         .catch((e) => {
           console.log('Load password hash', e)
         })
+    },
+    loadWithoutDecrypt (done?: () => VoidFunction) {
+      if (this.loaded) {
+        return done?.()
+      }
+      this.loadAccounts(undefined, () => {
+        this.loadCurrentAddress(() => {
+          this.loadActivities(() => {
+            this.loaded = true
+            done?.()
+          })
+        })
+      })
     },
     load (password: string, done?: () => void, fail?: () => void) {
       if (this.loaded) {

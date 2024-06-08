@@ -20,7 +20,7 @@
               :is='Component'
               :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
               :style='{
-                height: `calc(600px - ${headerHeight}px - ${footerHeight}px)`,
+                height: `calc(600px - ${headerHeight}px - ${footerHeight}px - (${outerHeight}px - ${innerHeight}px))`,
                 width: "368px",
                 overflow: "scroll"
               }'
@@ -97,6 +97,8 @@ interface Size {
 
 const headerHeight = ref(0)
 const footerHeight = ref(0)
+const outerHeight = ref(window.outerHeight)
+const innerHeight = ref(window.innerHeight)
 
 const onHeaderResize = (size: Size) => {
   headerHeight.value = size.height

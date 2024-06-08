@@ -1,9 +1,12 @@
 <template>
-  <div class='bg-grey-2'>
-    <div class='bg-white' :style='{width: "calc(100% + 48px)", height: "84px", margin: "-16px -24px 0 -24px"}'>
+  <div class='bg-grey-2' :style='{height: "100%"}'>
+    <div class='bg-white' :style='{width: "calc(100% + 48px)", height: "84px", margin: "-12px -24px 0 -24px"}'>
       <PopupHeader />
     </div>
-    <div v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS'>
+    <div
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS'
+      :style='{height: "calc(100% - 84px - 12px)", width: "100%"}'
+    >
       <EthRequestAccountsConfirmation />
     </div>
   </div>
@@ -12,7 +15,7 @@
 import { useQuasar } from 'quasar'
 import { computed, onMounted, onUnmounted } from 'vue'
 import { BexPayload } from '@quasar/app-vite'
-import { popup } from 'src/localstores'
+import { popup, wallet } from 'src/localstores'
 import * as middlewaretypes from '../../../src-bex/middleware/types'
 import { commontypes } from 'src/types'
 
@@ -23,6 +26,7 @@ const quasar = useQuasar()
 const _popup = popup.usePopupStore()
 const popupType = computed(() => _popup._popupType)
 const popupRequest = computed(() => _popup._popupRequest)
+const _wallet = wallet.useWalletStore()
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
   switch (payload.data.type) {
@@ -43,6 +47,7 @@ const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>
 
 onMounted(() => {
   _popup.$reset()
+  _wallet.loadWithoutDecrypt()
   quasar.bex.on('popup.new', handleNewRequest)
 })
 
