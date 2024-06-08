@@ -30,6 +30,10 @@ export const usePopupStore = defineStore('popups', {
     },
     _popupRequest (): middlewaretypes.RpcMethod {
       return this.popupRequest
+    },
+    _popupRespond (): (...payload: unknown extends never ? [] : [unknown]) => Promise<BexPayload<commontypes.PopupRequest, unknown>> | undefined {
+      const popup = this.popups.get(this.popupRequestId) as BexPayload<commontypes.PopupRequest, unknown>
+      return popup?.respond
     }
   },
   actions: {
@@ -38,6 +42,9 @@ export const usePopupStore = defineStore('popups', {
       this.popupRequest = payload.data.request.request.method as middlewaretypes.RpcMethod
       this.popupRequestId = Number(payload.data.request.request.id)
       this.popups.set(Number(payload.data.request.request.id), payload)
+    },
+    removeRequest (requestId: number) {
+      this.popups.delete(requestId)
     },
     addConnection (connection: ConnectionInfo) {
       this.popupOrigin = connection.origin

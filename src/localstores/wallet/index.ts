@@ -81,7 +81,10 @@ export const useWalletStore = defineStore('checko-wallet', {
           return this.accounts.get(publicKey || this.currentAddress)?.microchains.get(chainId)?.account_balance || 0
         }
         let balance = 0
-        this.accounts.get(publicKey || this.currentAddress)?.microchains.forEach((microchain) => {
+        if (!publicKey) {
+          publicKey = this.currentAddress
+        }
+        this.accounts.get(publicKey)?.microchains.forEach((microchain) => {
           balance += microchain.account_balance + microchain.chain_balance
         })
         return balance
@@ -228,6 +231,8 @@ export const useWalletStore = defineStore('checko-wallet', {
             if (password) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               this.accounts.set(k, this.accountFromStore(account, password))
+            } else {
+              this.accounts.set(k, this.accountFromStore(account))
             }
             this.secureAccounts.set(k, this.accountFromStore(account))
           })

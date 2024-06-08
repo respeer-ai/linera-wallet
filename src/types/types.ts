@@ -4,3 +4,7 @@ export interface PopupRequest {
   type: middlewaretypes.PopupRequestType
   request: middlewaretypes.RpcRequest
 }
+
+export interface ConfirmationPopupResponse {
+  approved: boolean
+}

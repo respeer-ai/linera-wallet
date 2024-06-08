@@ -13,7 +13,7 @@
 </template>
 <script setup lang='ts'>
 import { useQuasar } from 'quasar'
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { BexPayload } from '@quasar/app-vite'
 import { popup, wallet } from 'src/localstores'
 import * as middlewaretypes from '../../../src-bex/middleware/types'
@@ -24,6 +24,7 @@ import EthRequestAccountsConfirmation from 'src/components/extension/popup/EthRe
 
 const quasar = useQuasar()
 const _popup = popup.usePopupStore()
+const popupCount = computed(() => _popup.popups.size)
 const popupType = computed(() => _popup._popupType)
 const popupRequest = computed(() => _popup._popupRequest)
 const _wallet = wallet.useWalletStore()
@@ -54,4 +55,13 @@ onMounted(() => {
 onUnmounted(() => {
   quasar.bex.off('popup.new', handleNewRequest)
 })
+
+watch(popupCount, () => {
+  console.log(popupCount.value, 2222)
+  if (popupCount.value > 0) {
+    return
+  }
+  window.close()
+})
+
 </script>

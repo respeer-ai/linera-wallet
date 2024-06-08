@@ -1,5 +1,5 @@
 <template>
-  <div v-if='displayAddresses.length'>
+  <div v-if='displayAddresses.length && display'>
     <div class='row'>
       <q-icon
         v-if='showLogo'
@@ -49,16 +49,19 @@ interface Props {
   showLogo?: boolean
   showDigits?: number
   label?: string
+  display?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showLogo: true,
   showDigits: undefined,
-  label: undefined
+  label: undefined,
+  display: true
 })
 const showLogo = toRef(props, 'showLogo')
 const showDigits = toRef(props, 'showDigits')
 const label = toRef(props, 'label')
+const display = toRef(props, 'display')
 
 const _wallet = wallet.useWalletStore()
 const addresses = computed(() => _wallet.publicKeys)
