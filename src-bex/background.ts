@@ -12,8 +12,8 @@ globalThis.process = process
 export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => {
   basebridge.EventBus.instance.setBridge(bridge)
   const _engine = new engine.Engine()
-  const res = {} as PendingJsonRpcResponse<Json>
   bridge.on('data', (payload: BexPayload<JsonRpcRequest<JsonRpcParams>, unknown>) => {
+    const res = {} as PendingJsonRpcResponse<Json>
     _engine.rpcExec(payload.data)
       .then((rc) => {
         res.result = rc as Json

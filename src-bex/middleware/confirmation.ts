@@ -8,11 +8,13 @@ const notificationManager = new NotificationManager()
 
 const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.GET_PROVIDER_STATE, false],
-  [RpcMethod.ETH_REQUEST_ACCOUNTS, true]
+  [RpcMethod.ETH_REQUEST_ACCOUNTS, true],
+  [RpcMethod.CHECKO_PING, false]
 ])
 
 export const needConfirm = (req: JsonRpcRequest<JsonRpcParams>): boolean => {
-  return !!confirmations.get(req.method as RpcMethod)
+  const shouldConfirm = confirmations.get(req.method as RpcMethod)
+  return shouldConfirm === undefined || shouldConfirm
 }
 
 // TODO: DelayMs is workaround for the first message of bridge
