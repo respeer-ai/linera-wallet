@@ -45,7 +45,7 @@ const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
           console.log('Invalid rpc response')
         }
         if (payload.data.error) {
-          console.log('CheCko inpage error', res.error)
+          console.log('CheCko inpage error', payload.data.error)
         }
         res.result = payload.data.result
         res.error = payload.data.error

@@ -2,7 +2,8 @@ import type { JsonRpcRequest, JsonRpcParams } from '@metamask/utils'
 import { RpcImplHandler } from './rpcimpl/types'
 import {
   getProviderState,
-  ethRequestAccounts
+  ethRequestAccounts,
+  ping
 } from './rpcimpl'
 
 export enum RpcMethod {
@@ -27,12 +28,13 @@ export enum RpcMethod {
   TRANSACTION = 'transaction',
   WALLET_REQUEST_PERMISSIONS = 'wallet_requestPermissions',
   WATCH_ASSET = 'wallet_watchAsset',
-  WATCH_ASSET_LEGACY = 'metamask_watchAsset'
+  CHECKO_PING = 'checko_ping'
 }
 
 const handlers = new Map<RpcMethod, RpcImplHandler>([
   [RpcMethod.GET_PROVIDER_STATE, getProviderState.getProviderStateHandler],
-  [RpcMethod.ETH_REQUEST_ACCOUNTS, ethRequestAccounts.ethRequestAccountsHandler]
+  [RpcMethod.ETH_REQUEST_ACCOUNTS, ethRequestAccounts.ethRequestAccountsHandler],
+  [RpcMethod.CHECKO_PING, ping.pingHandler]
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */

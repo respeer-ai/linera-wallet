@@ -44,6 +44,7 @@
       <TestnetTip />
     </div>
   </q-layout>
+  <ExtensionKeepAlived v-if='!extensionMode' />
 </template>
 
 <script setup lang="ts">
@@ -56,6 +57,7 @@ import ExtensionHeaderMenu from 'src/components/extension/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
 import ExtensionFooterMenu from 'src/components/extension/FooterMenu.vue'
+import ExtensionKeepAlived from 'src/components/ExtensionKeepAlived.vue'
 
 const notification = notify.useNotificationStore()
 const setting = oneshotsetting.useSettingStore()
