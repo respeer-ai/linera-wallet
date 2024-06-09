@@ -22,7 +22,7 @@ export const rpcHandler = async (req: RpcRequest): Promise<unknown> => {
   if (!handler) {
     return Promise.reject(new Error('Invalid rpc method'))
   }
-  return handler(req.request.params)
+  return handler(req)
 }
 
 export * from './rpcimpl/types'

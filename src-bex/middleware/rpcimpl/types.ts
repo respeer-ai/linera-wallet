@@ -1,3 +1,3 @@
-import type { JsonRpcParams } from '@metamask/utils'
+import { RpcRequest } from '../types'
 
-export type RpcImplHandler = (params?: JsonRpcParams) => Promise<unknown>
+export type RpcImplHandler = (request?: RpcRequest) => Promise<unknown>

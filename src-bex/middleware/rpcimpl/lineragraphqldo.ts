@@ -1,16 +1,69 @@
-import type { JsonRpcParams } from '@metamask/utils'
+import { sharedStore } from '../../../src-bex/store'
+import axios from 'axios'
+import { RpcRequest } from '../types'
 
-export const lineraGraphqlMutationHandler = async (params?: JsonRpcParams) => {
-  console.log(params)
+interface GraphqlQuery {
+  operationName: string
+  query: string
+  variables: Record<string, unknown>
+}
+
+interface RpcGraphqlQuery {
+  applicationId?: string
+  query: GraphqlQuery
+}
+
+export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
+  if (!request) {
+    return Promise.reject('Invalid request')
+  }
+  const auth = await sharedStore.getRpcAuth(request.origin)
+  if (!auth) {
+    return Promise.reject('Mutation not authenticated')
+  }
+  const query = request.request.params as unknown as RpcGraphqlQuery
+  if (!query || !query.query) {
+    return Promise.reject('Invalid query')
+  }
+  if (!query.query.variables) {
+    query.query.variables = {}
+  }
+  query.query.variables.chainId = auth.chainId
+  // If application id is not null, then we should query to application
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'post',
+      url: 'http://172.16.31.73:30080',
+      data: (request.request.params as unknown as RpcGraphqlQuery)?.query
+    }).then((res) => {
+      if (!res.data) {
+        return reject('Invalid response')
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if ((res.data.errors as unknown[])?.length) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        return reject(new Error(JSON.stringify(res.data.errors)))
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      resolve(res.data.data)
+    }).catch((e) => {
+      reject(e)
+    })
+  })
+}
+
+export const lineraGraphqlQueryHandler = async (request?: RpcRequest) => {
+  if (!request) {
+    return Promise.reject('Invalid request')
+  }
+  console.log(request.request.params)
   return Promise.resolve('pong')
 }
 
-export const lineraGraphqlQueryHandler = async (params?: JsonRpcParams) => {
-  console.log(params)
-  return Promise.resolve('pong')
-}
-
-export const lineraGraphqlSubscriptionHandler = async (params?: JsonRpcParams) => {
-  console.log(params)
+export const lineraGraphqlSubscriptionHandler = async (request?: RpcRequest) => {
+  if (!request) {
+    return Promise.reject('Invalid request')
+  }
+  console.log(request.request.params)
   return Promise.resolve('pong')
 }

@@ -25,3 +25,11 @@ export const authenticated = async (origin: string, method: RpcMethod) => {
   if (!auth || !auth.methods) return false
   return auth.methods.includes(method)
 }
+
+export const getRpcAuth = async (origin: string): Promise<OriginRpcAuth | undefined> => {
+  const authenticates = await permissionStore.getItem('authenticates')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const _authenticates = JSON.parse(authenticates as string) || {}
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  return Promise.resolve(_authenticates[origin] as OriginRpcAuth)
+}
