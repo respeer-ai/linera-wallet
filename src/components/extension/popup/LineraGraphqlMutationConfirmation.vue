@@ -28,7 +28,7 @@
               :key='_publicKey'
               :val='_publicKey'
               :style='{
-                padding: "24px",
+                padding: "24px 12px",
                 borderBottom: index < publicKeys.length - 1 ? "1px solid grey" : "",
                 width: "100%"
               }'
@@ -89,6 +89,7 @@
             <q-checkbox
               v-model='allowCheckAccount'
               :style='{
+                padding: "24px 12px",
                 width: "100%"
               }'
               class='cursor-pointer'
@@ -174,7 +175,7 @@
 </template>
 
 <script setup lang='ts'>
-import { wallet, popup } from 'src/localstores'
+import { wallet, popup, auth } from 'src/localstores'
 import { computed, ref } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
@@ -188,7 +189,10 @@ const step = ref(1)
 const allowCheckAccount = ref(false)
 const _popup = popup.usePopupStore()
 const respond = computed(() => _popup._popupRespond)
+const origin = computed(() => _popup.popupOrigin)
+const method = computed(() => _popup._popupRequest)
 const processing = ref(false)
+const _auth = auth.useAuthStore()
 
 const onNextStepClick = () => {
   step.value += 1
@@ -200,6 +204,7 @@ const onNextStepClick = () => {
         approved: true
       } as commontypes.ConfirmationPopupResponse)
       _popup.removeRequest(_popup.popupRequestId)
+      _auth.addAuth(origin.value, method.value)
     }, 2000)
   }
 }

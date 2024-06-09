@@ -3,6 +3,7 @@ import { basebridge } from '../event'
 import { PopupRequestType, RpcRequest, RpcMethod } from './types'
 import { commontypes } from '../../src/types'
 import { BexPayload } from '@quasar/app-vite'
+import { sharedStore } from '../store'
 
 const notificationManager = new NotificationManager()
 
@@ -15,8 +16,12 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.LINERA_GRAPHQL_SUBSCRIPTION, false]
 ])
 
-export const needConfirm = (req: RpcRequest): boolean => {
-  const shouldConfirm = confirmations.get(req.request.method as RpcMethod)
+export const needConfirm = async (req: RpcRequest) => {
+  let shouldConfirm = confirmations.get(req.request.method as RpcMethod)
+  if (shouldConfirm) {
+    shouldConfirm = !await sharedStore.authenticated(req.origin, req.request.method as RpcMethod)
+    console.log(666, shouldConfirm, req.origin, req.request.method)
+  }
   return shouldConfirm === undefined || shouldConfirm
 }
 
@@ -38,7 +43,7 @@ const confirmationWithExistPopup = (req: RpcRequest, resolve: () => void, reject
 }
 
 export const confirmationHandler = async (req: RpcRequest): Promise<void> => {
-  if (!needConfirm(req)) {
+  if (!await needConfirm(req)) {
     return await Promise.resolve(undefined)
   }
 

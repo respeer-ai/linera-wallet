@@ -21,7 +21,7 @@
 import { useQuasar } from 'quasar'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { BexPayload } from '@quasar/app-vite'
-import { popup, wallet } from 'src/localstores'
+import { popup, wallet, auth } from 'src/localstores'
 import * as middlewaretypes from '../../../src-bex/middleware/types'
 import { commontypes } from 'src/types'
 
@@ -35,6 +35,7 @@ const popupCount = computed(() => _popup.popups.size)
 const popupType = computed(() => _popup._popupType)
 const popupRequest = computed(() => _popup._popupRequest)
 const _wallet = wallet.useWalletStore()
+const _auth = auth.useAuthStore()
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
   switch (payload.data.type) {
@@ -53,6 +54,7 @@ const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>
 }
 
 onMounted(() => {
+  _auth.load()
   _popup.$reset()
   _wallet.loadWithoutDecrypt()
   quasar.bex.on('popup.new', handleNewRequest)

@@ -223,7 +223,7 @@ export const useWalletStore = defineStore('checko-wallet', {
             return listener?.()
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
-          const _accounts = JSON.parse(accounts as string)
+          const _accounts = JSON.parse(accounts as string) || {}
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           Object.keys(_accounts).forEach((k: string) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
