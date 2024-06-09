@@ -14,10 +14,12 @@ import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { JsonRpcEngine, JsonRpcEngineEndCallback, JsonRpcEngineNextCallback } from '@metamask/json-rpc-engine'
 import type { Json, PendingJsonRpcResponse, JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
 import { RpcMethod, RpcRequest } from './middleware/types'
-import { unsafeRandomBytes } from '@metamask/eth-json-rpc-filters/hexUtils'
+import * as subscription from './middleware/subscription'
 
 window.Buffer = BufferPolyfill
 window.process = process
+
+const _subscription = new subscription.Subscription()
 
 const setupPageStream = () => {
   // the transport-specific streams for communication between inpage and background
@@ -38,7 +40,12 @@ const setupPageStream = () => {
   return pageMux.createStream(constant.PROVIDER)
 }
 
-const rpcHandler = (bridge: BexBridge, req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcResponse<Json>, end: JsonRpcEngineEndCallback) => {
+const rpcHandler = (
+  bridge: BexBridge,
+  req: JsonRpcRequest<JsonRpcParams>,
+  res: PendingJsonRpcResponse<Json>,
+  end: JsonRpcEngineEndCallback
+) => {
   const favicon = window.document.querySelector('link[rel=icon]') ||
                   window.document.querySelector('link[rel="shortcut icon"]')
   const rpcRequest = {
@@ -80,15 +87,36 @@ const subscriptionHandler = (
   switch (req.method) {
     case RpcMethod.LINERA_SUBSCRIBE:
     {
-      const subscriptionId = unsafeRandomBytes(16)
-      bridge.on('linera_subscription', (payload: BexPayload<unknown, unknown>) => {
+      let subscriptionId = ''
+      const handler = (payload: BexPayload<unknown, unknown>) => {
         notifier(subscriptionId, payload.data)
-      })
+      }
+      subscriptionId = _subscription.subscribe(req.params as string[], handler)
+      bridge.on('linera_subscription', handler)
       res.result = subscriptionId
       return end()
     }
     case RpcMethod.LINERA_UNSUBSCRIBE:
+    {
+      const subscriptionId = (req.params?.length ? (req.params as Json[])[0] : undefined) as string
+      if (!subscriptionId) {
+        res.error = {
+          code: -3,
+          message: 'Invalid subscription id'
+        }
+        return end()
+      }
+      const handler = _subscription.unsubscribe(subscriptionId)
+      if (!handler) {
+        res.error = {
+          code: -4,
+          message: 'Already unsubscribed'
+        }
+        return end()
+      }
+      bridge.off('linera_subscription', handler)
       return
+    }
   }
   next()
 }
