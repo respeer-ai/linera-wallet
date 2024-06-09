@@ -11,9 +11,10 @@ import { createEngineStream } from '@metamask/json-rpc-middleware-stream'
 import { Duplex } from 'readable-stream'
 import { Buffer as BufferPolyfill } from 'buffer'
 import { BexBridge, BexPayload } from '@quasar/app-vite'
-import { JsonRpcEngine } from '@metamask/json-rpc-engine'
-import type { Json, PendingJsonRpcResponse } from '@metamask/utils'
-import { RpcRequest } from './middleware/types'
+import { JsonRpcEngine, JsonRpcEngineEndCallback, JsonRpcEngineNextCallback } from '@metamask/json-rpc-engine'
+import type { Json, PendingJsonRpcResponse, JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
+import { RpcMethod, RpcRequest } from './middleware/types'
+import { unsafeRandomBytes } from '@metamask/eth-json-rpc-filters/hexUtils'
 
 window.Buffer = BufferPolyfill
 window.process = process
@@ -37,57 +38,82 @@ const setupPageStream = () => {
   return pageMux.createStream(constant.PROVIDER)
 }
 
+const rpcHandler = (bridge: BexBridge, req: JsonRpcRequest<JsonRpcParams>, res: PendingJsonRpcResponse<Json>, end: JsonRpcEngineEndCallback) => {
+  const favicon = window.document.querySelector('link[rel=icon]') ||
+                  window.document.querySelector('link[rel="shortcut icon"]')
+  const rpcRequest = {
+    origin: window.location.origin,
+    name: window.document.title,
+    favicon: (favicon as HTMLLinkElement)?.href || 'favicon.ico',
+    request: req
+  } as RpcRequest
+  bridge.send('data', rpcRequest)
+    .then((payload: BexPayload<PendingJsonRpcResponse<Json>, undefined>) => {
+      if (!payload.data.result && !payload.data.error) {
+        console.log('Invalid rpc response')
+      }
+      if (payload.data.error) {
+        console.log('CheCko inpage error', payload.data.error)
+      }
+      res.result = payload.data.result
+      res.error = payload.data.error
+      end()
+    })
+    .catch((e: Error) => {
+      console.log('CheCko inpage dispatcher', req.method, req.params, e)
+      res.error = {
+        code: -2,
+        message: e.message
+      }
+      end()
+    })
+}
+
+const subscriptionHandler = (
+  bridge: BexBridge,
+  req: JsonRpcRequest<JsonRpcParams>,
+  res: PendingJsonRpcResponse<Json>,
+  next: JsonRpcEngineNextCallback,
+  end: JsonRpcEngineEndCallback,
+  notifier: (subscriptionId: string, payload: unknown) => void
+) => {
+  switch (req.method) {
+    case RpcMethod.LINERA_SUBSCRIBE:
+    {
+      const subscriptionId = unsafeRandomBytes(16)
+      bridge.on('linera_subscription', (payload: BexPayload<unknown, unknown>) => {
+        notifier(subscriptionId, payload.data)
+      })
+      res.result = subscriptionId
+      return end()
+    }
+    case RpcMethod.LINERA_UNSUBSCRIBE:
+      return
+  }
+  next()
+}
+
 const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
   const engine = new JsonRpcEngine()
+  engine.push((req, res, next, end) => {
+    subscriptionHandler(bridge, req, res, next, end, (subscriptionId: string, payload: unknown) => {
+      engine.emit('notification', {
+        jsonrpc: '2.0',
+        method: 'eth_subscription', // Here it must be eth_subscription to compatibility for web3.js
+        params: {
+          subscription: subscriptionId,
+          result: payload
+        }
+      })
+    })
+  })
   engine.push((req, res, _next, end) => {
-    const favicon = window.document.querySelector('link[rel=icon]') ||
-                    window.document.querySelector('link[rel="shortcut icon"]')
-    const rpcRequest = {
-      origin: window.location.origin,
-      name: window.document.title,
-      favicon: (favicon as HTMLLinkElement)?.href || 'favicon.ico',
-      request: req
-    } as RpcRequest
-    bridge.send('data', rpcRequest)
-      .then((payload: BexPayload<PendingJsonRpcResponse<Json>, undefined>) => {
-        if (!payload.data.result && !payload.data.error) {
-          console.log('Invalid rpc response')
-        }
-        if (payload.data.error) {
-          console.log('CheCko inpage error', payload.data.error)
-        }
-        res.result = payload.data.result
-        res.error = payload.data.error
-        end()
-      })
-      .catch((e: Error) => {
-        console.log('CheCko inpage dispatcher', req.method, req.params, e)
-        res.error = {
-          code: -2,
-          message: e.message
-        }
-        end()
-      })
+    rpcHandler(bridge, req, res, end)
   })
   const providerStream = createEngineStream({ engine })
   pump(mux, providerStream, mux, (err) =>
     console.log('CheCko background multiplex provider', err)
   )
-  bridge.on('subscription', (payload: BexPayload<unknown, unknown>) => {
-    // TODO: We should use notification in provider
-    window.postMessage({
-      target: constant.INPAGE,
-      data: {
-        name: constant.PROVIDER,
-        data: {
-          jsonrpc: '2.0',
-          method: 'linera_subscription',
-          params: payload.data
-        },
-        result: {}
-      }
-    }, window.location.origin)
-  })
 }
 
 export default bexContent((bridge: BexBridge) => {

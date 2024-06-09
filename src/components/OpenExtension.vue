@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const onOpenExtensionClick = () => {
   window.linera.request({
@@ -44,23 +44,29 @@ const onLineraGraphqlDoClick = () => {
   })
 }
 
-const subscriptionHandler = (ev: MessageEvent) => {
-  // TODO: We should use notification in provider window.linera.on('message')
-  const data = ((ev.data as Record<string, unknown>).data as Record<string, unknown>)?.data as Record<string, unknown>
-  if (!data) {
-    return
-  }
-  if (data.method !== 'linera_subscription') {
-    return
-  }
-  console.log(4, data)
+const subscriptionHandler = (msg: unknown) => {
+  console.log('Subscription', msg)
 }
 
+const subscriptionId = ref(undefined as unknown as string)
+
 onMounted(() => {
-  window.addEventListener('message', subscriptionHandler)
+  window.linera.request({
+    method: 'linera_subscribe'
+  }).then((_subscriptionId) => {
+    subscriptionId.value = _subscriptionId as string
+    window.linera.on('message', subscriptionHandler)
+  }).catch((e) => {
+    console.log('Fail subscribe', e)
+  })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('message', subscriptionHandler)
+  if (subscriptionId.value) {
+    void window.linera.request({
+      method: 'linera_unsubscribe',
+      params: [subscriptionId.value]
+    })
+  }
 })
 </script>

@@ -28,8 +28,4 @@ export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => 
         void payload.respond(res)
       })
   })
-  globalThis.setInterval(() => {
-    console.log('Send subscription')
-    void bridge.send('subscription', { aaa: '1111' })
-  }, 3000)
 })
