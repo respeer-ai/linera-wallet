@@ -65,11 +65,12 @@ onUnmounted(() => {
 })
 
 watch(popupCount, () => {
-  console.log(popupCount.value, 2222)
   if (popupCount.value > 0) {
     return
   }
-  window.close()
+  setTimeout(() => {
+    window.close()
+  }, 100000)
 })
 
 </script>

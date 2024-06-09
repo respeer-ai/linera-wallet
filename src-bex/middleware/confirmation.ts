@@ -20,7 +20,6 @@ export const needConfirm = async (req: RpcRequest) => {
   let shouldConfirm = confirmations.get(req.request.method as RpcMethod)
   if (shouldConfirm) {
     shouldConfirm = !await sharedStore.authenticated(req.origin, req.request.method as RpcMethod)
-    console.log(666, shouldConfirm, req.origin, req.request.method)
   }
   return shouldConfirm === undefined || shouldConfirm
 }
@@ -32,8 +31,9 @@ const confirmationWithExistPopup = (req: RpcRequest, resolve: () => void, reject
       type: PopupRequestType.CONFIRMATION,
       request: req
     }).then((payload: BexPayload<commontypes.ConfirmationPopupResponse, unknown>) => {
+      console.log(999, payload.data)
       if (!payload.data.approved) {
-        return reject(new Error('Rejected by user'))
+        return reject(new Error(payload.data.message))
       }
       resolve()
     }).catch((e: Error) => {

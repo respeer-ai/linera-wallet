@@ -1,5 +1,5 @@
 import localforage from 'localforage'
-import { RpcMethod } from '../middleware/types'
+import { OriginRpcAuth, RpcMethod } from '../middleware/types'
 
 const walletStore = localforage.createInstance({
   name: 'checko-wallet'
@@ -18,11 +18,10 @@ export const getAccounts = async () => {
 
 export const authenticated = async (origin: string, method: RpcMethod) => {
   const authenticates = await permissionStore.getItem('authenticates')
-  console.log(444, authenticates)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const _authenticates = JSON.parse(authenticates as string) || {}
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const methods = _authenticates[origin] as RpcMethod[]
-  if (!methods) return false
-  return methods.includes(method)
+  const auth = _authenticates[origin] as OriginRpcAuth
+  if (!auth || !auth.methods) return false
+  return auth.methods.includes(method)
 }

@@ -42,3 +42,9 @@ export type MiddlewareImplHandler = (req: RpcRequest) => Promise<void>
 export enum PopupRequestType {
   CONFIRMATION = 'confirmation'
 }
+
+export interface OriginRpcAuth {
+  publicKey: string
+  chainId: string
+  methods: RpcMethod[]
+}

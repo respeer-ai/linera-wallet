@@ -200,18 +200,28 @@ const onNextStepClick = () => {
     processing.value = true
     setTimeout(() => {
       processing.value = false
-      void respond.value?.({
-        approved: true
-      } as commontypes.ConfirmationPopupResponse)
-      _popup.removeRequest(_popup.popupRequestId)
-      _auth.addAuth(origin.value, method.value)
+      const _respond = respond.value
+      try {
+        _popup.removeRequest(_popup.popupRequestId)
+        _auth.addAuth(origin.value, method.value)
+        void _respond?.({
+          approved: true
+        } as commontypes.ConfirmationPopupResponse)
+      } catch (e) {
+        console.log(888, e, respond.value)
+        void _respond?.({
+          approved: false,
+          message: (e as Error).message
+        } as commontypes.ConfirmationPopupResponse)
+      }
     }, 2000)
   }
 }
 
 const onCancelClick = () => {
   void respond.value?.({
-    approved: false
+    approved: false,
+    message: 'Canceled by user'
   } as commontypes.ConfirmationPopupResponse)
   _popup.removeRequest(_popup.popupRequestId)
 }

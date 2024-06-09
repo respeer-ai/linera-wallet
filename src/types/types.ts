@@ -7,4 +7,5 @@ export interface PopupRequest {
 
 export interface ConfirmationPopupResponse {
   approved: boolean
+  message?: string
 }

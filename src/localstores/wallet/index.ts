@@ -65,6 +65,11 @@ export const useWalletStore = defineStore('checko-wallet', {
         return this.accounts.get(publicKey)?.microchains || new Map<string, Microchain>()
       }
     },
+    accountChainIds (): (publicKey: string) => Array<string> {
+      return (publicKey: string) => {
+        return Array.from(this.accounts.get(publicKey)?.microchains?.keys() || [])
+      }
+    },
     account (): (publicKey: string) => Account | undefined {
       return (publicKey: string) => {
         return this.accounts.get(publicKey)
