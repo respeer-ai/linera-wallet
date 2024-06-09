@@ -208,7 +208,6 @@ const onNextStepClick = () => {
           approved: true
         } as commontypes.ConfirmationPopupResponse)
       } catch (e) {
-        console.log(888, e, respond.value)
         void _respond?.({
           approved: false,
           message: (e as Error).message

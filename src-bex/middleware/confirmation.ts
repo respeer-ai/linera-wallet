@@ -31,7 +31,6 @@ const confirmationWithExistPopup = (req: RpcRequest, resolve: () => void, reject
       type: PopupRequestType.CONFIRMATION,
       request: req
     }).then((payload: BexPayload<commontypes.ConfirmationPopupResponse, unknown>) => {
-      console.log(999, payload.data)
       if (!payload.data.approved) {
         return reject(new Error(payload.data.message))
       }

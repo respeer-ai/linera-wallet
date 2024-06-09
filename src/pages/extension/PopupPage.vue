@@ -70,7 +70,7 @@ watch(popupCount, () => {
   }
   setTimeout(() => {
     window.close()
-  }, 100000)
+  }, 100)
 })
 
 </script>
