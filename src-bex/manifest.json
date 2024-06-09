@@ -14,7 +14,12 @@
     "activeTab"
   ],
   "host_permissions": [
-    "*://*/*"
+    "http://localhost:8080/",
+    "http://localhost:8081/",
+    "http://localhost:8082/",
+    "file://*/*",
+    "http://*/*",
+    "https://*/*"
   ],
 
   "action": {
@@ -27,7 +32,7 @@
 
   "content_scripts": [
     {
-      "matches": [ "*://*/*" ],
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
       "css": [ "assets/content.css" ],
       "js": [ "content.js" ]
     }
@@ -40,7 +45,7 @@
   "web_accessible_resources": [
     {
       "resources": [ "*" ],
-      "matches": [ "*://*/*" ]
+      "matches": ["file://*/*", "http://*/*", "https://*/*"]
     }
   ]
 }

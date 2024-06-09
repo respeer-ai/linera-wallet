@@ -12,11 +12,12 @@
   <q-btn
     outline
     rounded
-    label='Linera Graphql DO'
-    @click='onLineraGraphqlDoClick'
+    label='Linera Graphql Query'
+    @click='onLineraGraphqlQueryClick'
     class='text-brown-10'
     :style='{
-      width: "100%"
+      width: "100%",
+      marginTop: "8px"
     }'
   />
 </template>
@@ -34,7 +35,7 @@ const onOpenExtensionClick = () => {
   })
 }
 
-const onLineraGraphqlDoClick = () => {
+const onLineraGraphqlQueryClick = () => {
   window.linera.request({
     method: 'linera_graphqlQuery'
   }).then((result) => {

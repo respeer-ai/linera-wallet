@@ -16,7 +16,6 @@ export class Subscription {
   }
 
   subscribe (topics: string[], handler: SubscriptionHandler): string {
-    console.log(topics)
     const subscriptionId = unsafeRandomBytes(16)
     this.subscribers.set(subscriptionId, {
       topics,
