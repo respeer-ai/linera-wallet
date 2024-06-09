@@ -8,7 +8,7 @@
     >
       <div>
         <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Connect to CheCko
+          Mutate Linera Wallet
         </div>
         <q-resize-observer @resize='onHeaderResize' />
       </div>
@@ -97,7 +97,7 @@
             >
               <div :style='{margin: "0 0 0 16px"}' class='text-left'>
                 <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                  Access allowed account information
+                  Change Linera account state (transfer, generate block, etc.)
                 </div>
                 <div class='text-brown-6'>
                   Requested now for {{ shortid.shortId(publicKey, 4) }}

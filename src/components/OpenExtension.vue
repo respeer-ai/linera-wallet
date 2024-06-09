@@ -20,6 +20,17 @@
       marginTop: "8px"
     }'
   />
+  <q-btn
+    outline
+    rounded
+    label='Linera Graphql Mutation'
+    @click='onLineraGraphqlMutationClick'
+    class='text-brown-10'
+    :style='{
+      width: "100%",
+      marginTop: "8px"
+    }'
+  />
 </template>
 
 <script setup lang='ts'>
@@ -38,6 +49,16 @@ const onOpenExtensionClick = () => {
 const onLineraGraphqlQueryClick = () => {
   window.linera.request({
     method: 'linera_graphqlQuery'
+  }).then((result) => {
+    console.log(result)
+  }).catch((e) => {
+    console.log(e)
+  })
+}
+
+const onLineraGraphqlMutationClick = () => {
+  window.linera.request({
+    method: 'linera_graphqlMutation'
   }).then((result) => {
     console.log(result)
   }).catch((e) => {

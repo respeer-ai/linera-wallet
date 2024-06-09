@@ -9,6 +9,12 @@
     >
       <EthRequestAccountsConfirmation />
     </div>
+    <div
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION'
+      :style='{height: "calc(100% - 84px - 12px)", width: "100%"}'
+    >
+      <LineraGraphqlMutationConfirmation />
+    </div>
   </div>
 </template>
 <script setup lang='ts'>
@@ -21,6 +27,7 @@ import { commontypes } from 'src/types'
 
 import PopupHeader from 'src/components/extension/PopupHeader.vue'
 import EthRequestAccountsConfirmation from 'src/components/extension/popup/EthRequestAccountsConfirmation.vue'
+import LineraGraphqlMutationConfirmation from 'src/components/extension/popup/LineraGraphqlMutationConfirmation.vue'
 
 const quasar = useQuasar()
 const _popup = popup.usePopupStore()
@@ -32,8 +39,7 @@ const _wallet = wallet.useWalletStore()
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
   switch (payload.data.type) {
     case middlewaretypes.PopupRequestType.CONFIRMATION:
-      if (payload.data.type === middlewaretypes.PopupRequestType.CONFIRMATION &&
-        payload.data.request.request.method === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS) {
+      if (payload.data.type === middlewaretypes.PopupRequestType.CONFIRMATION) {
         _popup.addConnection({
           origin: payload.data.request.origin,
           favicon: payload.data.request.favicon,

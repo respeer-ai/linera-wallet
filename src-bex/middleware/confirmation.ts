@@ -57,8 +57,8 @@ export const confirmationHandler = async (req: RpcRequest): Promise<void> => {
       confirmationWithExistPopup(req, () => {
         resolve()
         responded = true
-      }, () => {
-        reject()
+      }, (e: Error) => {
+        reject(e)
         responded = true
       }, newWindowId !== undefined ? 1000 : 0)
     }).catch((e: Error) => {
