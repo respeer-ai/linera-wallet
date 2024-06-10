@@ -60,14 +60,14 @@ const rpcHandler = (
         console.log('Invalid rpc response')
       }
       if (payload.data.error) {
-        console.log('CheCko inpage error', payload.data.error)
+        console.log('CheCko inpage error', req, payload.data.error)
       }
       res.result = payload.data.result
       res.error = payload.data.error
       end()
     })
     .catch((e: Error) => {
-      console.log('CheCko inpage dispatcher', req.method, req.params, e)
+      console.log('CheCko inpage dispatcher', req, e)
       res.error = {
         code: -2,
         message: e.message

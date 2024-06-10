@@ -39,7 +39,7 @@ export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
     return Promise.reject('Invalid graphql endpoint')
   }
   if (query.applicationId) {
-    graphqlUrl += '/chains/' + auth.chainId + '/applications/' + query.applicationId
+    graphqlUrl += '/checko/chains/' + auth.chainId + '/applications/' + query.applicationId
   }
   console.log('Linera mutation', graphqlUrl, query)
   return new Promise((resolve, reject) => {
