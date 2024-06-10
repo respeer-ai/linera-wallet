@@ -43,7 +43,6 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (query.applicationId) {
     graphqlUrl += '/checko/chains/' + auth.chainId + '/applications/' + query.applicationId
   }
-  console.log('Linera mutation', graphqlUrl, query)
   return new Promise((resolve, reject) => {
     axios({
       method: 'post',
@@ -105,7 +104,7 @@ export const setupLineraSubscription = async () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
         void basebridge.EventBus.bridge?.send(
           'linera_subscription',
-          (((data as Record<string, unknown>).result as Record<string, unknown>).data as Record<string, unknown>).notifications
+          (data as Record<string, unknown>).data
         )
       }
     })
