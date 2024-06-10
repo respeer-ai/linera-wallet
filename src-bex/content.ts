@@ -15,7 +15,6 @@ import { JsonRpcEngine, JsonRpcEngineEndCallback, JsonRpcEngineNextCallback } fr
 import type { Json, PendingJsonRpcResponse, JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
 import { RpcMethod, RpcRequest } from './middleware/types'
 import * as subscription from './middleware/subscription'
-import { sharedStore } from './store'
 
 window.Buffer = BufferPolyfill
 window.process = process
@@ -90,26 +89,9 @@ const subscriptionHandler = (
     {
       let subscriptionId = ''
       const handler = (payload: BexPayload<unknown, unknown>) => {
-        const origin = _subscription.subscriberOrigin(subscriptionId)
-        if (!origin) {
-          return
-        }
-        sharedStore.getRpcAuth(origin)
-          .then((auth) => {
-            if (!auth) {
-              return
-            }
-            const data = payload.data as Record<string, Record<string, string>>
-            if (!data.notifications || data.notifications.chain_id !== auth.chainId) {
-              return
-            }
-            notifier(subscriptionId, data)
-          })
-          .catch((e) => {
-            console.log('Get rpc auth', e)
-          })
+        notifier(subscriptionId, payload.data)
       }
-      subscriptionId = _subscription.subscribe(window.location.origin, req.params as string[], handler)
+      subscriptionId = _subscription.subscribe(req.params as string[], handler)
       bridge.on('linera_subscription', handler)
       res.result = subscriptionId
       return end()
