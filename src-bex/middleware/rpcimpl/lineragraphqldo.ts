@@ -102,7 +102,11 @@ export const setupLineraSubscription = async () => {
       }
     }).subscribe({
       next (data: unknown) {
-        void basebridge.EventBus.bridge?.send('linera_subscription', data)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        void basebridge.EventBus.bridge?.send(
+          'linera_subscription',
+          (((data as Record<string, unknown>).result as Record<string, unknown>).data as Record<string, unknown>).notifications
+        )
       }
     })
   })
