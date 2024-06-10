@@ -6,6 +6,7 @@ import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { basebridge } from './event'
 import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { RpcRequest } from './middleware/types'
+import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
@@ -28,4 +29,5 @@ export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => 
         void payload.respond(res)
       })
   })
+  void setupLineraSubscription()
 })

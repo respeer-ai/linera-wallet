@@ -1,6 +1,8 @@
 import { sharedStore } from '../../../src-bex/store'
 import axios from 'axios'
 import { RpcRequest } from '../types'
+import { SubscriptionClient } from 'graphql-subscriptions-client'
+import { basebridge } from 'app/src-bex/event'
 
 interface GraphqlQuery {
   operationName: string
@@ -78,4 +80,30 @@ export const lineraGraphqlSubscriptionHandler = async (request?: RpcRequest) => 
   }
   console.log(request.request.params)
   return Promise.resolve('pong')
+}
+
+export const setupLineraSubscription = async () => {
+  const subscriptionEndpoint = await sharedStore.getSubscriptionEndpoint()
+  const client = new SubscriptionClient(subscriptionEndpoint, {
+    reconnect: true,
+    lazy: true,
+    connectionCallback: (e) => {
+      console.log('Subscribed', e)
+    }
+  })
+  const microchains = await sharedStore.getMicrochains()
+  microchains.forEach((microchain) => {
+    client.request({
+      query: `subscription notifications($chainId: String!) {
+        notifications(chainId: $chainId)
+      }`,
+      variables: {
+        chainId: microchain
+      }
+    }).subscribe({
+      next (data: unknown) {
+        void basebridge.EventBus.bridge?.send('linera_subscription', data)
+      }
+    })
+  })
 }

@@ -51,6 +51,7 @@
     "extension-port-stream": "^3.0.0",
     "fs": "^0.0.1-security",
     "graphql": "^16.8.1",
+    "graphql-subscriptions-client": "^0.16.4",
     "graphql-ws": "^5.16.0",
     "hash-wasm": "^4.11.0",
     "localforage": "^1.10.0",

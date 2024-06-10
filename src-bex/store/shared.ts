@@ -19,6 +19,19 @@ export const getAccounts = async () => {
   return Array.from(Object.keys(_accounts))
 }
 
+export const getMicrochains = async () => {
+  const accounts = await walletStore.getItem('accounts')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const _accounts = JSON.parse(accounts as string) || {}
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const microchains = [] as string[]
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  Object.values(_accounts).forEach((account) => {
+    microchains.push(...Object.keys(((account as Record<string, unknown>).microchains as Record<string, unknown>)))
+  })
+  return microchains
+}
+
 export const authenticated = async (origin: string, method: RpcMethod) => {
   const authenticates = await permissionStore.getItem('authenticates')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -45,4 +58,14 @@ export const getRpcEndpoint = async () => {
   if (!_setting.rpcHost || !_setting.rpcSchema || !_setting.rpcPort) return Promise.reject(new Error('Invalid rpc endpoint'))
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-member-access
   return _setting.rpcSchema + '://' + _setting.rpcHost + ':' + _setting.rpcPort
+}
+
+export const getSubscriptionEndpoint = async () => {
+  const setting = await settingStore.getItem('setting')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const _setting = JSON.parse(setting as string) || {}
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  if (!_setting.rpcHost || !_setting.rpcWSSchema || !_setting.rpcPort) return Promise.reject(new Error('Invalid subscription endpoint'))
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-member-access
+  return _setting.rpcWSSchema + '://' + _setting.rpcHost + ':' + _setting.rpcPort + '/ws'
 }
