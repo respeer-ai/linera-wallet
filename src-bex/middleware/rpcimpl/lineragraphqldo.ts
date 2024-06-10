@@ -15,7 +15,7 @@ interface RpcGraphqlQuery {
   query: GraphqlQuery
 }
 
-export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
+const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!request) {
     return Promise.reject('Invalid request')
   }
@@ -66,12 +66,12 @@ export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
   })
 }
 
+export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
+  return lineraGraphqlDoHandler(request)
+}
+
 export const lineraGraphqlQueryHandler = async (request?: RpcRequest) => {
-  if (!request) {
-    return Promise.reject('Invalid request')
-  }
-  console.log(request.request.params)
-  return Promise.resolve('pong')
+  return lineraGraphqlDoHandler(request)
 }
 
 export const lineraGraphqlSubscriptionHandler = async (request?: RpcRequest) => {
