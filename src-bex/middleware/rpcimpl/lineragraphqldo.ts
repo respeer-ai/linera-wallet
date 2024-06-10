@@ -29,11 +29,23 @@ export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
     query.query.variables = {}
   }
   query.query.variables.chainId = auth.chainId
-  // If application id is not null, then we should query to application
+  let graphqlUrl: string
+  try {
+    graphqlUrl = await sharedStore.getRpcEndpoint()
+  } catch (e) {
+    return Promise.reject(e)
+  }
+  if (!graphqlUrl) {
+    return Promise.reject('Invalid graphql endpoint')
+  }
+  if (query.applicationId) {
+    graphqlUrl += '/chains/' + auth.chainId + '/applications/' + query.applicationId
+  }
+  console.log('Linera mutation', graphqlUrl, query)
   return new Promise((resolve, reject) => {
     axios({
       method: 'post',
-      url: 'http://172.16.31.73:30080',
+      url: graphqlUrl,
       data: (request.request.params as unknown as RpcGraphqlQuery)?.query
     }).then((res) => {
       if (!res.data) {
