@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='full-width'>
     <LoginPassword v-if='step === 0' v-model:password='password' @unlocked='unlocked' />
     <div v-if='step === 1'>
       <InitializeAccount :password='password' />

@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center'>
+  <div class='text-center full-width'>
     <q-stepper
       flat
       v-model='step'

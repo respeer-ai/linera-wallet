@@ -1,5 +1,5 @@
 <template>
-  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0", maxWidth: "600px"}'>
+  <div :style='{margin: extensionMode ? "0" : "0 0 160px 0", maxWidth: "600px", width: "100%"}'>
     <RecoveryWallet />
   </div>
 </template>

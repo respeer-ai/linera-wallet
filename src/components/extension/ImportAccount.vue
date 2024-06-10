@@ -1,5 +1,5 @@
 <template>
-  <div class='fill-parent'>
+  <div class='full-width'>
     <h5 class='text-brown-8 text-center' :style='{fontWeight: 600, margin: "16px"}'>
       Import Account
     </h5>

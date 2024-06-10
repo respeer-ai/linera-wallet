@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center fill-parent'>
+  <div class='text-center full-width'>
     <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
       Initialize Account
     </h5>
@@ -10,7 +10,7 @@
           Address
         </div>
         <div class='text-bold text-left row'>
-          <span>{{ shortid.shortId(publicKey, 12) }}</span>
+          <span>{{ shortid.shortId(publicKey, 16) }}</span>
           <q-icon
             name='content_copy' class='cursor-pointer' size='16px' :style='{margin: "2px 4px"}'
             @click='onCopyClick(publicKey)'
@@ -20,7 +20,7 @@
           Private Key
         </div>
         <div class='text-bold text-left row'>
-          <span>{{ shortid.shortId(account?.privateKey as string, 12) }}</span>
+          <span>{{ shortid.shortId(account?.privateKey as string, 16) }}</span>
           <q-icon
             name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}'
             @click='onCopyClick(account?.privateKey as string)'
@@ -30,7 +30,7 @@
           Microchain
         </div>
         <div class='text-bold text-left row'>
-          <span>{{ shortid.shortId(chainId as string, 12) }}</span>
+          <span>{{ shortid.shortId(chainId as string, 16) }}</span>
           <q-icon
             name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}'
             @click='onCopyClick(chainId as string)'
@@ -40,7 +40,7 @@
           Open Chain Message
         </div>
         <div class='text-bold'>
-          <span>{{ shortid.shortId(messageId as string, 12) }}</span>
+          <span>{{ shortid.shortId(messageId as string, 16) }}</span>
           <q-icon
             name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}'
             @click='onCopyClick(messageId as string)'
