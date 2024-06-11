@@ -45,7 +45,6 @@ export class Subscription {
 
   public static handle (data: unknown) {
     Subscription.instance.#subscribers.forEach((subscriber, subscriptionId) => {
-      console.log('Notification to', subscriptionId)
       void subscriber.handler(subscriptionId, data)
     })
   }
