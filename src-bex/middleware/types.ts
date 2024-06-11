@@ -26,8 +26,7 @@ export enum RpcMethod {
   LINERA_SUBSCRIBE = 'linera_subscribe',
   LINERA_UNSUBSCRIBE = 'linera_unsubscribe',
   LINERA_GRAPHQL_MUTATION = 'linera_graphqlMutation',
-  LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery',
-  LINERA_GRAPHQL_SUBSCRIPTION = 'linera_graphqlSubscription'
+  LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery'
 }
 
 export interface RpcRequest {

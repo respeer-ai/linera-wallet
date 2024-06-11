@@ -14,12 +14,11 @@ import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { JsonRpcEngine, JsonRpcEngineEndCallback, JsonRpcEngineNextCallback } from '@metamask/json-rpc-engine'
 import type { Json, PendingJsonRpcResponse, JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
 import { RpcMethod, RpcRequest } from './middleware/types'
-import * as subscription from './middleware/subscription'
+import { subscription } from './content/subscription'
+import { subscription as bgSubscription } from './subscription'
 
 window.Buffer = BufferPolyfill
 window.process = process
-
-const _subscription = new subscription.Subscription()
 
 const setupPageStream = () => {
   // the transport-specific streams for communication between inpage and background
@@ -40,20 +39,24 @@ const setupPageStream = () => {
   return pageMux.createStream(constant.PROVIDER)
 }
 
+const req2RpcRequest = (req: JsonRpcRequest<JsonRpcParams>) => {
+  const favicon = window.document.querySelector('link[rel=icon]') ||
+                  window.document.querySelector('link[rel="shortcut icon"]')
+  return {
+    origin: window.location.origin,
+    name: window.document.title,
+    favicon: (favicon as HTMLLinkElement)?.href || 'favicon.ico',
+    request: req
+  } as RpcRequest
+}
+
 const rpcHandler = (
   bridge: BexBridge,
   req: JsonRpcRequest<JsonRpcParams>,
   res: PendingJsonRpcResponse<Json>,
   end: JsonRpcEngineEndCallback
 ) => {
-  const favicon = window.document.querySelector('link[rel=icon]') ||
-                  window.document.querySelector('link[rel="shortcut icon"]')
-  const rpcRequest = {
-    origin: window.location.origin,
-    name: window.document.title,
-    favicon: (favicon as HTMLLinkElement)?.href || 'favicon.ico',
-    request: req
-  } as RpcRequest
+  const rpcRequest = req2RpcRequest(req)
   bridge.send('data', rpcRequest)
     .then((payload: BexPayload<PendingJsonRpcResponse<Json>, undefined>) => {
       if (!payload.data.result && !payload.data.error) {
@@ -84,41 +87,61 @@ const subscriptionHandler = (
   end: JsonRpcEngineEndCallback,
   notifier: (subscriptionId: string, payload: unknown) => void
 ) => {
+  const rpcRequest = req2RpcRequest(req)
   switch (req.method) {
     case RpcMethod.LINERA_SUBSCRIBE:
     {
-      let subscriptionId = ''
-      const handler = (payload: BexPayload<unknown, unknown>) => {
-        notifier(subscriptionId, payload.data)
-      }
-      subscriptionId = _subscription.subscribe(req.params as string[], handler)
-      bridge.on('linera_subscription', handler)
-      res.result = subscriptionId
-      return end()
+      bridge.send('data', rpcRequest)
+        .then((payload: BexPayload<PendingJsonRpcResponse<string>, undefined>) => {
+          const subscriptionId = payload.data.result as string
+          const handler = (payload: BexPayload<bgSubscription.SubscriptionPayload, unknown>) => {
+            notifier(subscriptionId, payload.data.payload)
+          }
+          subscription.Subscription.subscribe(subscriptionId, handler)
+          bridge.on('linera_subscription', handler)
+          res.result = subscriptionId
+          end()
+        })
+        .catch((e: Error) => {
+          console.log('CheCko inpage subscription', req, e)
+          res.error = {
+            code: -2,
+            message: e.message
+          }
+          console.log('Fail subscription', e)
+        })
+      break
     }
     case RpcMethod.LINERA_UNSUBSCRIBE:
     {
-      const subscriptionId = (req.params?.length ? (req.params as Json[])[0] : undefined) as string
-      if (!subscriptionId) {
-        res.error = {
-          code: -3,
-          message: 'Invalid subscription id'
-        }
-        return end()
-      }
-      const handler = _subscription.unsubscribe(subscriptionId)
-      if (!handler) {
-        res.error = {
-          code: -4,
-          message: 'Already unsubscribed'
-        }
-        return end()
-      }
-      bridge.off('linera_subscription', handler)
-      return
+      bridge.send('data', rpcRequest)
+        .then((payload: BexPayload<PendingJsonRpcResponse<string>, undefined>) => {
+          const subscriptionId = payload.data.result as string
+          const handler = subscription.Subscription.unsubscribe(subscriptionId)
+          if (!handler) {
+            res.error = {
+              code: -4,
+              message: 'Already unsubscribed'
+            }
+            return end()
+          }
+          bridge.off('linera_subscription', handler)
+          res.result = subscriptionId
+          end()
+        })
+        .catch((e: Error) => {
+          console.log('CheCko inpage unsubscription', req, e)
+          res.error = {
+            code: -2,
+            message: e.message
+          }
+          console.log('Fail subscription', e)
+        })
+      break
     }
+    default:
+      next()
   }
-  next()
 }
 
 const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {

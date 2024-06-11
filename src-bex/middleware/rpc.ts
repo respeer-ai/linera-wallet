@@ -13,7 +13,8 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
   [RpcMethod.CHECKO_PING, ping.pingHandler],
   [RpcMethod.LINERA_GRAPHQL_MUTATION, lineraGraphqlDo.lineraGraphqlMutationHandler],
   [RpcMethod.LINERA_GRAPHQL_QUERY, lineraGraphqlDo.lineraGraphqlMutationHandler],
-  [RpcMethod.LINERA_GRAPHQL_SUBSCRIPTION, lineraGraphqlDo.lineraGraphqlSubscriptionHandler]
+  [RpcMethod.LINERA_SUBSCRIBE, lineraGraphqlDo.lineraGraphqlSubscribeHandler],
+  [RpcMethod.LINERA_UNSUBSCRIBE, lineraGraphqlDo.lineraGraphqlUnsubscribeHandler]
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
