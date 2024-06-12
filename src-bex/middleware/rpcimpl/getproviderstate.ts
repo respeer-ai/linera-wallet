@@ -1,7 +1,10 @@
 import { sharedStore } from 'app/src-bex/store'
 import { RpcRequest } from '../types'
 
-export const getProviderStateHandler = async (request: RpcRequest) => {
+export const getProviderStateHandler = async (request?: RpcRequest) => {
+  if (!request) {
+    return Promise.reject(new Error('Invalid request'))
+  }
   try {
     const auth = await sharedStore.getRpcAuth(request.origin)
     if (!auth) {
