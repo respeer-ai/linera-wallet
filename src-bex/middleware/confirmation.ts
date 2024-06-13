@@ -14,7 +14,8 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.LINERA_GRAPHQL_MUTATION, true],
   [RpcMethod.LINERA_GRAPHQL_QUERY, false],
   [RpcMethod.LINERA_SUBSCRIBE, false],
-  [RpcMethod.LINERA_UNSUBSCRIBE, false]
+  [RpcMethod.LINERA_UNSUBSCRIBE, false],
+  [RpcMethod.ETH_GET_BALANCE, false]
 ])
 
 export const needConfirm = async (req: RpcRequest) => {

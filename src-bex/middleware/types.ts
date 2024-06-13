@@ -26,8 +26,12 @@ export enum RpcMethod {
   LINERA_SUBSCRIBE = 'linera_subscribe',
   LINERA_UNSUBSCRIBE = 'linera_unsubscribe',
   LINERA_GRAPHQL_MUTATION = 'linera_graphqlMutation',
-  LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery'
+  LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery',
+
+  ETH_GET_BALANCE = 'eth_getBalance'
 }
+
+export const RpcMethods = Object.values(RpcMethod)
 
 export interface RpcRequest {
   origin: string

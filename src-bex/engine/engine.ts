@@ -1,5 +1,5 @@
 import { confirmation, rpc, types } from '../middleware'
-import { RpcRequest } from '../middleware/types'
+import { RpcMethod, RpcMethods, RpcRequest } from '../middleware/types'
 
 export class Engine {
   middlewareHandlers = [] as Array<types.MiddlewareImplHandler>
@@ -22,6 +22,9 @@ export class Engine {
   }
 
   rpcExec (req: RpcRequest): Promise<unknown> {
+    if (!RpcMethods.includes(req.request.method as RpcMethod)) {
+      return Promise.reject(new Error('Invalid rpc method'))
+    }
     return new Promise((resolve, reject) => {
       this.rpcRecursiveExec(0, req, () => {
         rpc.rpcHandler(req)

@@ -14,21 +14,39 @@ const settingStore = localforage.createInstance({
 export const getAccounts = async () => {
   const accounts = await walletStore.getItem('accounts')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const _accounts = JSON.parse(accounts as string) || []
+  const _accounts = JSON.parse(accounts as string) || {}
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Array.from(Object.keys(_accounts))
 }
 
-export const getMicrochains = async () => {
+export const getAccountWithPrefix = async (prefix: string) => {
+  const accounts = await walletStore.getItem('accounts')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const _accounts = JSON.parse(accounts as string) || {}
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  for (const account of Object.keys(_accounts)) {
+    if (account.startsWith(prefix.slice(2))) {
+      return account
+    }
+  }
+  return undefined
+}
+
+export const getMicrochains = async (account?: string) => {
   const accounts = await walletStore.getItem('accounts')
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const _accounts = JSON.parse(accounts as string) || {}
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const microchains = [] as string[]
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  Object.values(_accounts).forEach((account) => {
-    microchains.push(...Object.keys(((account as Record<string, unknown>).microchains as Record<string, unknown>)))
-  })
+  if (account) {
+    const _account = (_accounts as Record<string, unknown>)[account]
+    microchains.push(...Object.keys(((_account as Record<string, unknown>).microchains as Record<string, unknown>)))
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    Object.values(_accounts).forEach((_account) => {
+      microchains.push(...Object.keys(((_account as Record<string, unknown>).microchains as Record<string, unknown>)))
+    })
+  }
   return microchains
 }
 

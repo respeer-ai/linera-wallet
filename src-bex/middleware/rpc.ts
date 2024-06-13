@@ -3,7 +3,8 @@ import {
   getProviderState,
   ethRequestAccounts,
   ping,
-  lineraGraphqlDo
+  lineraGraphqlDo,
+  ethGetBalance
 } from './rpcimpl'
 import { RpcMethod, RpcRequest } from './types'
 
@@ -14,7 +15,8 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
   [RpcMethod.LINERA_GRAPHQL_MUTATION, lineraGraphqlDo.lineraGraphqlMutationHandler],
   [RpcMethod.LINERA_GRAPHQL_QUERY, lineraGraphqlDo.lineraGraphqlMutationHandler],
   [RpcMethod.LINERA_SUBSCRIBE, lineraGraphqlDo.lineraGraphqlSubscribeHandler],
-  [RpcMethod.LINERA_UNSUBSCRIBE, lineraGraphqlDo.lineraGraphqlUnsubscribeHandler]
+  [RpcMethod.LINERA_UNSUBSCRIBE, lineraGraphqlDo.lineraGraphqlUnsubscribeHandler],
+  [RpcMethod.ETH_GET_BALANCE, ethGetBalance.ethGetBalanceHandler]
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
