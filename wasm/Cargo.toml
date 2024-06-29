@@ -1,10 +1,10 @@
 [package]
-name = "linera-web"
+name = "checko-wasm"
 description = "The Linera Web client"
 version = "0.1.0"
 authors = ["Linera <contact@linera.io>"]
 edition = "2021"
-repository = "https://github.com/linera-io/linera-web/"
+repository = "https://github.com/respeer-ai/linera-wallet/"
 license = "Apache-2.0"
 
 [lib]
@@ -24,40 +24,40 @@ chrono = "0.4.38"
 serde_json = "1.0.116"
 
 [dependencies.linera-base]
-path = "../linera-protocol/linera-base"
+path = "./linera-protocol/linera-base"
 features = ["web"]
 
 [dependencies.linera-chain]
-path = "../linera-protocol/linera-chain"
+path = "./linera-protocol/linera-chain"
 features = ["web"]
 
 [dependencies.linera-core]
-path = "../linera-protocol/linera-core"
+path = "./linera-protocol/linera-core"
 features = ["web", "wasmer"]
 
 # TODO I'm not totally convinced this should be here — used just for
 # some network config that I'm not sure belongs in `linera-execution`
 [dependencies.linera-execution]
-path = "../linera-protocol/linera-execution"
+path = "./linera-protocol/linera-execution"
 features = ["web"]
 
 [dependencies.linera-rpc]
-path = "../linera-protocol/linera-rpc"
+path = "./linera-protocol/linera-rpc"
 features = ["web"]
 
 [dependencies.linera-storage]
-path = "../linera-protocol/linera-storage"
+path = "./linera-protocol/linera-storage"
 features = ["web"]
 
 [dependencies.linera-views]
-path = "../linera-protocol/linera-views"
+path = "./linera-protocol/linera-views"
 features = ["web", "indexeddb"]
 
 [dependencies.web-sys]
 version = "0.3"
 features = [
-    "console",
-    "Window",
+  "console",
+  "Window",
 ]
 
 [dependencies.getrandom]

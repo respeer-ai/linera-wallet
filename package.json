@@ -14,7 +14,7 @@
     "start": "quasar dev",
     "bex": "quasar dev -m bex extension",
     "build-bex": "quasar build -m bex extension",
-    "build-wasm": "cd wasm; wasm-pack build --target web"
+    "build-wasm": "wasm-pack build --target web wasm"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",
