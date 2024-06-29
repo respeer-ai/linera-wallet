@@ -1,5 +1,5 @@
 [package]
-name = "checko-wasm"
+name = "linera-wasm"
 description = "The Linera Web client"
 version = "0.1.0"
 authors = ["Linera <contact@linera.io>"]
