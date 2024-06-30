@@ -17,6 +17,7 @@ use linera_base::{
         ChainId,
     },
 };
+use linera_chain::data_types::IncomingMessage;
 use linera_core::{
     client::{ArcChainClient, ChainClient, ChainClientBuilder},
     node::{
@@ -24,6 +25,7 @@ use linera_core::{
         LocalValidatorNodeProvider as _,
     },
 };
+use linera_execution::Operation;
 use linera_rpc::node_provider::{NodeOptions, NodeProvider};
 
 use wasm_bindgen::prelude::*;
@@ -236,8 +238,9 @@ pub async fn dapp_query(n: u32) -> u32 {
     n + 1
 }
 
+// Execute operation to get
 #[wasm_bindgen]
-pub async fn dapp_query_1(n: u32) -> u32 {
+pub async fn execute_operation_with_messages(operation: Operation, messages: Vec<IncomingMessage>) -> u32 {
     n + 1
 }
 
