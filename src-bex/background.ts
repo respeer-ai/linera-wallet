@@ -8,6 +8,9 @@ import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { RpcRequest } from './middleware/types'
 import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 
+import wasmModuleUrl from '../wasm/pkg/linera_wasm_bg.wasm?url'
+import initWasm from '../wasm/pkg/linera_wasm'
+
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
 
@@ -30,4 +33,12 @@ export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => 
       })
   })
   void setupLineraSubscription()
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  fetch(wasmModuleUrl)
+    .then((buffer) => {
+      void initWasm(buffer)
+    })
+    .catch(() => {
+      // TODO
+    })
 })
