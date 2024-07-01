@@ -12,9 +12,9 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "start": "quasar dev",
-    "bex": "quasar dev -m bex extension",
-    "build-bex": "quasar build -m bex extension",
-    "build-wasm": "wasm-pack build --target web wasm"
+    "bex": "quasar dev -m bex",
+    "build-bex": "quasar build -m bex",
+    "build-wasm": "wasm-pack build --out-dir ../src-bex/wasm --target web wasm"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",

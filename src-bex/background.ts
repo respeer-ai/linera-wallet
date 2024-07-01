@@ -8,8 +8,8 @@ import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { RpcRequest } from './middleware/types'
 import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 
-import wasmModuleUrl from '../wasm/pkg/linera_wasm_bg.wasm?url'
-import initWasm from '../wasm/pkg/linera_wasm'
+import wasmModuleUrl from './wasm/linera_wasm_bg.wasm?url'
+import initWasm from './wasm/linera_wasm'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
