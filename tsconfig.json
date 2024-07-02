@@ -22,6 +22,7 @@
     "./node_modules",
     "./src-capacitor",
     "./src-cordova",
-    "./quasar.config.*.temporary.compiled*"
+    "./quasar.config.*.temporary.compiled*",
+    "./wasm"
   ],
 }
