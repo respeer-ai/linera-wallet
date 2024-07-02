@@ -274,6 +274,8 @@ module.exports = configure(function (/* ctx */) {
           'process.stdout': JSON.stringify(process.stdout),
           'process.stderr': JSON.stringify(process.stderr)
         }
+        esbuildConf.loader = esbuildConf.loader || {}
+        esbuildConf.loader['.wasm'] = 'file'
       }
       // extendBexManifestJson (json) {}
     }

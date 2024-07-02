@@ -19,6 +19,9 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v3
+      - run: git submodule update --init --recursive
       - run: yarn
+      - run: yarn build-wasm
       - run: yarn build
+      - run: yarn build-bex
       - run: yarn lint

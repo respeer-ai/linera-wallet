@@ -12,8 +12,9 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "start": "quasar dev",
-    "bex": "quasar dev -m bex extension",
-    "build-bex": "quasar build -m bex extension"
+    "bex": "quasar dev -m bex",
+    "build-bex": "quasar build -m bex",
+    "build-wasm": "wasm-pack build --out-dir ../src-bex/wasm --target web wasm"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",
@@ -25,6 +26,7 @@
     "@metamask/post-message-stream": "^8.1.0",
     "@metamask/providers": "^17.0.0",
     "@quasar/extras": "^1.16.11",
+    "@shoelace-style/shoelace": "^2.15.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/bson": "^4.2.0",
     "@types/crypto-js": "^4.2.2",
@@ -73,6 +75,7 @@
     "vue-demi": "^0.14.5",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.0",
+    "webext-bridge": "^6.0.1",
     "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {
@@ -85,6 +88,7 @@
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",
+    "lit": "^3.1.2",
     "prettier": "^2.5.1",
     "typescript": "~4.9.3",
     "vite-plugin-checker": "^0.6.4",

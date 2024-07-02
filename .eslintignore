@@ -8,3 +8,5 @@
 babel.config.js
 /src-ssr
 /quasar.config.*.temporary.compiled*
+/wasm
+/src-bex/wasm

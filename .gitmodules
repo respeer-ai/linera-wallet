@@ -1,0 +1,4 @@
+[submodule "wasm/linera-protocol"]
+	path = wasm/linera-protocol
+	url = https://github.com/respeer-ai/linera-protocol.git
+	branch = respeer-maas-d331ec51-2024_06_28
