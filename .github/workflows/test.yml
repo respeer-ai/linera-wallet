@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: git submodule update --init --recursive
       - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - run: wget https://github.com/protocolbuffers/protobuf/releases/download/v27.2/protoc-27.2-linux-x86_64.zip -o /tmp/protoc-27.2-linux-x86_64.zip
+      - run: wget https://github.com/protocolbuffers/protobuf/releases/download/v27.2/protoc-27.2-linux-x86_64.zip -O /tmp/protoc-27.2-linux-x86_64.zip
       - run: sudo apt install unzip
       - run: ls /tmp -lh
       - run: mkdir -p /tmp/protoc; cd /tmp/protoc; unzip /tmp/protoc-27.2-linux-x86_64.zip
