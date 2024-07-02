@@ -23,6 +23,7 @@ jobs:
       - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: wget https://github.com/protocolbuffers/protobuf/releases/download/v27.2/protoc-27.2-linux-x86_64.zip -o protoc-27.2-linux-x86_64.zip
       - run: sudo apt install unzip
+      - run: ls; ls ../
       - run: mkdir -p protoc; cd protoc; unzip ../protoc-27.2-linux-x86_64.zip
       - run: yarn
       - run: PATH=$PATH:$PWD/protoc/bin yarn build-wasm
