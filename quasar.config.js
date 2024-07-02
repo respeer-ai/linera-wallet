@@ -12,10 +12,6 @@
 const { configure } = require('quasar/wrappers')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path')
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
-const wasm = require('vite-plugin-wasm')
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
-const topLevelAwait = require('vite-plugin-top-level-await')
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -103,11 +99,7 @@ module.exports = configure(function (/* ctx */) {
             }
           },
           { server: false }
-        ],
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
-        wasm(),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
-        topLevelAwait()
+        ]
       ]
     },
 
@@ -282,6 +274,8 @@ module.exports = configure(function (/* ctx */) {
           'process.stdout': JSON.stringify(process.stdout),
           'process.stderr': JSON.stringify(process.stderr)
         }
+        esbuildConf.loader = esbuildConf.loader || {}
+        esbuildConf.loader['.wasm'] = 'file'
       }
       // extendBexManifestJson (json) {}
     }
