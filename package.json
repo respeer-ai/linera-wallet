@@ -26,6 +26,7 @@
     "@metamask/post-message-stream": "^8.1.0",
     "@metamask/providers": "^17.0.0",
     "@quasar/extras": "^1.16.11",
+    "@shoelace-style/shoelace": "^2.15.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/bson": "^4.2.0",
     "@types/crypto-js": "^4.2.2",
@@ -55,6 +56,7 @@
     "graphql-subscriptions-client": "^0.16.4",
     "graphql-ws": "^5.16.0",
     "hash-wasm": "^4.11.0",
+    "lit": "^3.1.2",
     "localforage": "^1.10.0",
     "loglevel": "^1.9.1",
     "multiformats": "^12.0.1",
@@ -74,10 +76,8 @@
     "vue-demi": "^0.14.5",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.0",
-    "webextension-polyfill": "^0.12.0",
-    "@shoelace-style/shoelace": "^2.15.0",
-    "lit": "^3.1.2",
-    "webext-bridge": "^6.0.1"
+    "webext-bridge": "^6.0.1",
+    "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {
     "@quasar/app-vite": "^1.9.0",
