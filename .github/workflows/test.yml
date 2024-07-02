@@ -29,4 +29,4 @@ jobs:
       - run: yarn build
       - run: yarn build-bex
       - run: yarn lint
-      - run: rm /tmp/protoc*
+      - run: rm /tmp/protoc* -rf
