@@ -12,6 +12,8 @@
 const { configure } = require('quasar/wrappers')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { stringify } = require('flatted')
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -271,7 +273,7 @@ module.exports = configure(function (/* ctx */) {
         esbuildConf.target = 'es2020'
         esbuildConf.define = {
           'process.version': JSON.stringify(process.version),
-          'process.stdout': JSON.stringify(process.stdout),
+          'process.stdout': stringify(process.stdout),
           'process.stderr': JSON.stringify(process.stderr)
         }
         esbuildConf.loader = esbuildConf.loader || {}
