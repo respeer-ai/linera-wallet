@@ -11,8 +11,7 @@
   "permissions": [
     "storage",
     "tabs",
-    "activeTab",
-    "webAssembly"
+    "activeTab"
   ],
   "host_permissions": [
     "http://localhost:8080/",

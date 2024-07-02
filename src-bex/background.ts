@@ -10,6 +10,7 @@ import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 
 import wasmModuleUrl from './wasm/linera_wasm_bg.wasm?url'
 import initWasm from './wasm/linera_wasm'
+// import * as lineraWasm from './wasm/linera_wasm'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
