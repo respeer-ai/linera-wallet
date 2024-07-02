@@ -34,11 +34,9 @@ export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => 
   })
   void setupLineraSubscription()
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  fetch(wasmModuleUrl)
-    .then((buffer) => {
-      void initWasm(buffer)
-    })
-    .catch(() => {
-      // TODO
-    })
+  fetch(wasmModuleUrl).then((buffer) => {
+    void initWasm(buffer)
+  }).catch(() => {
+    // TODO
+  })
 })
