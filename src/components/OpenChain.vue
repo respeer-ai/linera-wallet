@@ -56,7 +56,7 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation walletInitWithoutKeypair ($publicKey: String!, $signature: string, $faucetUrl: String!, $chainId: String!, $messageId: String!, certificateHash: String!) {
+    mutation walletInitWithoutKeypair ($publicKey: String!, $signature: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $certificateHash: String!) {
       walletInitWithoutKeypair(publicKey: $publicKey, signature: $signature, faucetUrl: $faucetUrl, chainId: $chainId, messageId: $messageId, certificateHash: $certificateHash)
     }`))
   onDone(() => {
