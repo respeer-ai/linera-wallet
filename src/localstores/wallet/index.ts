@@ -216,6 +216,7 @@ export const useWalletStore = defineStore('checko-wallet', {
           chain_balance: Number((microchains[k1] as Microchain).chain_balance),
           account_balance: Number((microchains[k1] as Microchain).account_balance),
           message_id: (microchains[k1] as Microchain).message_id,
+          certificate_hash: (microchains[k1] as Microchain).certificate_hash,
           faucet_url: (microchains[k1] as Microchain).faucet_url
         })
       })
@@ -368,7 +369,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     deleteAddress (publicKey: string) {
       this.accounts.delete(publicKey)
     },
-    addChain (publicKey: string, chainId: string, messageId: string, faucetUrl: string) {
+    addChain (publicKey: string, chainId: string, messageId: string, certificateHash: string, faucetUrl: string) {
       const account = this.accounts.get(publicKey)
       if (!account) {
         throw Error('Invalid account public key')
@@ -382,6 +383,7 @@ export const useWalletStore = defineStore('checko-wallet', {
         chain_balance: 0,
         account_balance: 0,
         message_id: messageId,
+        certificate_hash: certificateHash,
         faucet_url: faucetUrl
       }
       account.microchains.set(chainId, chain)

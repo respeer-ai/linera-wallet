@@ -7,10 +7,7 @@ import { basebridge } from './event'
 import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { RpcRequest } from './middleware/types'
 import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
-
-import wasmModuleUrl from './wasm/linera_wasm_bg.wasm?url'
-import initWasm from './wasm/linera_wasm'
-// import * as lineraWasm from './wasm/linera_wasm'
+import { sentinel } from './microchain'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
@@ -33,11 +30,6 @@ export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => 
         void payload.respond(res)
       })
   })
+  sentinel.Sentinel.run()
   void setupLineraSubscription()
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  fetch(wasmModuleUrl).then((buffer) => {
-    void initWasm(buffer)
-  }).catch(() => {
-    // TODO
-  })
 })
