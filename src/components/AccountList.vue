@@ -42,6 +42,9 @@ import {
 import { graphqlResult, _hex, endpoint, shortid } from 'src/utils'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { copyToClipboard } from 'quasar'
+import wasmModuleUrl from '../../src-bex/wasm/linera_wasm_bg.wasm?url'
+import initWasm from '../../src-bex/wasm/linera_wasm'
+import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 
 import lineraLogo from '../assets/LineraLogo.png'
 
@@ -94,7 +97,7 @@ const notification = notify.useNotificationStore()
 const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
 const apolloClient = new ApolloClient(options)
 
-const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void) => {
+const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingMessage?: () => void) => {
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
@@ -113,6 +116,10 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
     const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
     if (newBlock) {
       onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)
+    }
+    const newIncomingMessage = graphqlResult.keyValue(reason, 'NewIncomingMessage')
+    if (newIncomingMessage) {
+      onNewIncomingMessage?.()
     }
   })
 }
@@ -363,6 +370,51 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   })
 }
 
+const getPendingMessages = (chainId: string, done?: (messages: Array<graphqlResult.IncomingMessage>) => void) => {
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
+    query getPendingMessages($chainId: String!) {
+      pendingMessages(chainId: $chainId) {
+        action
+        origin
+        event
+      }
+    }
+  `, {
+    chainId
+  }, {
+    fetchPolicy: 'network-only'
+  }))
+
+  onResult((res) => {
+    done?.(graphqlResult.data(res, 'pendingMessages') as Array<graphqlResult.IncomingMessage>)
+  })
+
+  onError((error) => {
+    console.log('Get pending messages', error)
+  })
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const constructNewBlockWithIncomingMessages = (chainId: string, keyPair: Ed25519SigningKey) => {
+  getPendingMessages(chainId, (messages: Array<graphqlResult.IncomingMessage>) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    fetch(wasmModuleUrl).then((buffer) => {
+      initWasm(buffer).then(() => {
+        console.log('Signing', chainId, messages)
+        lineraWasm.execute_operation_with_messages(chainId, '', JSON.stringify(messages)).then((signedMsg) => {
+          console.log(signedMsg)
+        }).catch((error) => {
+          console.log('execute_operation_with_messages', error)
+        })
+      }).catch(() => {
+        // TODO
+      })
+    }).catch(() => {
+      // TODO
+    })
+  })
+}
+
 const processChains = () => {
   addresses.value.forEach((addr) => {
     const chains = _wallet.accountChains(addr)
@@ -394,6 +446,9 @@ const processChains = () => {
         }, (hash: string) => {
           _getChainAccountBalances()
           _getBlockWithHash(chainId, hash)
+        }, () => {
+          const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
+          constructNewBlockWithIncomingMessages(chainId, keyPair)
         })
         getAccountBalance(chainId, addr, (balance: number) => {
           _wallet.setAccountBalance(addr, chainId, balance)

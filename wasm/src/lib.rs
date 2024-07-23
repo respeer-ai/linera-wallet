@@ -31,6 +31,7 @@ use linera_views::views::ViewError;
 use linera_storage::Storage;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
+use local_encoding::{Encoding, Encoder};
 
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{RwLock, Arc};
@@ -259,18 +260,29 @@ pub async fn dapp_query(n: u32) -> u32 {
 // Execute operation to get
 #[wasm_bindgen]
 pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, messages: &str) -> Result<Option<String>, JsError> {
-  let chain_id: ChainId = serde_json::from_str(chain_id)?;
+  log::info!("Parse chain_id {}", chain_id);
+  let chain_id: ChainId = serde_json::from_str(Encoding::ANSI.to_string(chain_id.to_string().as_bytes())?.as_str())?;
+  log::info!("Parse operation {}", operation);
   let operation: Operation = serde_json::from_str(operation)?;
+  log::info!("Parse messages {}", messages);
   let messages: Vec<IncomingMessage> = serde_json::from_str(messages)?;
 
+  log::info!("Read wallet");
   let wallet = WALLET.read()?;
+  log::info!("Refer wallet");
   let wallet = wallet.as_ref().ok_or(JsError::new("no wallet set"))?;
+  log::info!("Get storage");
   let mut storage = get_storage().await?;
+  log::info!("Initialize storage");
   wallet.genesis_config().initialize_storage(&mut storage).await?;
+  log::info!("Get client context");
   let mut client_context: ClientContext<WebStorage> = get_client_context(wallet).await?;
+  log::info!("Make chain client");
   let mut chain_client = client_context.make_chain_client(chain_id);
 
+  log::info!("Execute block without block proposal");
   chain_client.execute_block_without_block_proposal(messages, [operation].to_vec()).await?;
+  log::info!("Peek candidate block proposal");
   match chain_client.peek_candidate_block_proposal().await {
     Some(block_proposal) => {
       let json = serde_json::to_string(block_proposal)?;
