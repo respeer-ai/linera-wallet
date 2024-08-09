@@ -12,6 +12,8 @@
 const { configure } = require('quasar/wrappers')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path')
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
+const { stringify } = require('flatted')
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -62,7 +64,7 @@ module.exports = configure(function (/* ctx */) {
       // env: {},
 
       rawDefine: {
-        'process.version': JSON.stringify(process.version)
+        'process.version': stringify(process.version)
       },
 
       // ignorePublicFolder: true,
@@ -270,9 +272,9 @@ module.exports = configure(function (/* ctx */) {
       extendBexScriptsConf (esbuildConf) {
         esbuildConf.target = 'es2020'
         esbuildConf.define = {
-          'process.version': JSON.stringify(process.version),
-          'process.stdout': JSON.stringify(process.stdout),
-          'process.stderr': JSON.stringify(process.stderr)
+          'process.version': stringify(process.version),
+          'process.stdout': stringify(process.stdout),
+          'process.stderr': stringify(process.stderr)
         }
         esbuildConf.loader = esbuildConf.loader || {}
         esbuildConf.loader['.wasm'] = 'file'
