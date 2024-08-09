@@ -15,6 +15,12 @@
     >
       <LineraGraphqlMutationConfirmation />
     </div>
+    <div
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_SIGN'
+      :style='{height: "calc(100% - 84px - 12px)", width: "100%"}'
+    >
+      <EthSignConfirmation />
+    </div>
   </div>
 </template>
 <script setup lang='ts'>
@@ -28,6 +34,7 @@ import { commontypes } from 'src/types'
 import PopupHeader from 'src/components/extension/PopupHeader.vue'
 import EthRequestAccountsConfirmation from 'src/components/extension/popup/EthRequestAccountsConfirmation.vue'
 import LineraGraphqlMutationConfirmation from 'src/components/extension/popup/LineraGraphqlMutationConfirmation.vue'
+import EthSignConfirmation from 'src/components/extension/popup/EthSignConfirmation.vue'
 
 const quasar = useQuasar()
 const _popup = popup.usePopupStore()

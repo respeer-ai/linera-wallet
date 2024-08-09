@@ -15,11 +15,18 @@ export const useWalletStore = defineStore('checko-wallet', {
     walletStorage: localforage.createInstance({
       name: 'checko-wallet'
     }),
-    loaded: false
+    loaded: false,
+    decrypted: false
   }),
   getters: {
     publicKeys (): Array<string> {
       return Array.from(this.secureAccounts.keys())
+    },
+    publicKeyByPrefix (): (prefix: string) => string | undefined {
+      return (prefix: string) => {
+        prefix = prefix.replace('0x', '')
+        return this.publicKeys.find((el: string) => el.includes(prefix))
+      }
     },
     displayAddress (): (publicKey: string) => string {
       return (publicKey: string) => {
@@ -188,6 +195,9 @@ export const useWalletStore = defineStore('checko-wallet', {
         }
         return this.accounts.get(this.currentAddress)?.microchains?.has(activity.sourceChain) === true
       }
+    },
+    _decrypted (): boolean {
+      return this.decrypted
     }
   },
   actions: {
@@ -242,6 +252,7 @@ export const useWalletStore = defineStore('checko-wallet', {
             }
             this.secureAccounts.set(k, this.accountFromStore(account))
           })
+          if (password) this.decrypted = true
           listener?.()
         })
         .catch((e) => {
@@ -279,7 +290,7 @@ export const useWalletStore = defineStore('checko-wallet', {
           console.log('Load password hash', e)
         })
     },
-    loadWithoutDecrypt (done?: () => VoidFunction) {
+    loadWithoutDecrypt (done?: () => void) {
       if (this.loaded) {
         return done?.()
       }
@@ -293,7 +304,7 @@ export const useWalletStore = defineStore('checko-wallet', {
       })
     },
     load (password: string, done?: () => void, fail?: () => void) {
-      if (this.loaded) {
+      if (this.loaded && this.decrypted) {
         return done?.()
       }
       // Here the password should already be loaded
