@@ -1,6 +1,6 @@
 import { sharedStore } from '../../../src-bex/store'
 import axios from 'axios'
-import { RpcRequest } from '../types'
+import { RpcMethod, RpcRequest } from '../types'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import { basebridge } from '../../../src-bex/event'
 import { subscription } from '../../subscription'
@@ -17,6 +17,18 @@ interface RpcGraphqlQuery {
   query: GraphqlQuery
 }
 
+interface RpcRequestAttr {
+  needChainId: boolean
+}
+
+const RpcRequestAttrs: Map<RpcMethod, RpcRequestAttr> = new Map<RpcMethod, RpcRequestAttr>(
+  [
+    [RpcMethod.ETH_SIGN, {
+      needChainId: false
+    }]
+  ]
+)
+
 const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!request) {
     return await Promise.reject('Invalid request')
@@ -32,7 +44,10 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!query.query.variables) {
     query.query.variables = {}
   }
-  query.query.variables.chainId = auth.chainId
+  const attr = RpcRequestAttrs.get(request.request.method as RpcMethod)
+  if (!attr || attr.needChainId) {
+    query.query.variables.chainId = auth.chainId
+  }
   let graphqlUrl: string
   try {
     graphqlUrl = await sharedStore.getRpcEndpoint()
