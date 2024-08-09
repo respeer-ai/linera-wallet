@@ -15,7 +15,8 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.LINERA_GRAPHQL_QUERY, false],
   [RpcMethod.LINERA_SUBSCRIBE, false],
   [RpcMethod.LINERA_UNSUBSCRIBE, false],
-  [RpcMethod.ETH_GET_BALANCE, false]
+  [RpcMethod.ETH_GET_BALANCE, false],
+  [RpcMethod.ETH_SIGN, true]
 ])
 
 export const needConfirm = async (req: RpcRequest) => {
@@ -23,11 +24,11 @@ export const needConfirm = async (req: RpcRequest) => {
   if (shouldConfirm) {
     shouldConfirm = !await sharedStore.authenticated(req.origin, req.request.method as RpcMethod)
   }
-  return shouldConfirm === undefined || shouldConfirm
+  return shouldConfirm === undefined || shouldConfirm || req.request.method === RpcMethod.ETH_SIGN
 }
 
 // TODO: DelayMs is workaround for the first message of bridge
-const confirmationWithExistPopup = (req: RpcRequest, resolve: () => void, reject: (err: Error) => void, delayMs: number) => {
+const confirmationWithExistPopup = (req: RpcRequest, resolve: (message: string | undefined) => void, reject: (err: Error) => void, delayMs: number) => {
   setTimeout(() => {
     basebridge.EventBus.bridge?.send('popup.new', {
       type: PopupRequestType.CONFIRMATION,
@@ -36,19 +37,19 @@ const confirmationWithExistPopup = (req: RpcRequest, resolve: () => void, reject
       if (!payload.data.approved) {
         return reject(new Error(payload.data.message))
       }
-      resolve()
+      resolve(payload.data.message)
     }).catch((e: Error) => {
       reject(e)
     })
   }, delayMs)
 }
 
-export const confirmationHandler = async (req: RpcRequest): Promise<void> => {
+export const confirmationHandler = async (req: RpcRequest): Promise<string | undefined> => {
   if (!await needConfirm(req)) {
     return await Promise.resolve(undefined)
   }
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<string | undefined>((resolve, reject) => {
     const requestId = Number(req.request.id)
     let responded = false
 
@@ -60,8 +61,8 @@ export const confirmationHandler = async (req: RpcRequest): Promise<void> => {
         return reject(new Error('Rejected by user'))
       }
     }).then((newWindowId?: number) => {
-      confirmationWithExistPopup(req, () => {
-        resolve()
+      confirmationWithExistPopup(req, (message: string | undefined) => {
+        resolve(message)
         responded = true
       }, (e: Error) => {
         reject(e)

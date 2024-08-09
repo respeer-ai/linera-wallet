@@ -31,6 +31,9 @@ export const usePopupStore = defineStore('popups', {
     _popupRequest (): middlewaretypes.RpcMethod {
       return this.popupRequest
     },
+    _popupPayload (): BexPayload<commontypes.PopupRequest, unknown> {
+      return this.popups.get(this.popupRequestId) as BexPayload<commontypes.PopupRequest, unknown>
+    },
     _popupRespond (): (...payload: unknown extends never ? [] : [unknown]) => Promise<BexPayload<commontypes.PopupRequest, unknown>> | undefined {
       const popup = this.popups.get(this.popupRequestId) as BexPayload<commontypes.PopupRequest, unknown>
       return popup?.respond

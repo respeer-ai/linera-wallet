@@ -60,7 +60,7 @@ const rpcHandler = (
   bridge.send('data', rpcRequest)
     .then((payload: BexPayload<PendingJsonRpcResponse<Json>, undefined>) => {
       if (!payload.data.result && !payload.data.error) {
-        console.log('Invalid rpc response')
+        console.log('Invalid rpc response', payload.data)
       }
       if (payload.data.error) {
         console.log('CheCko inpage error', req, payload.data.error)
