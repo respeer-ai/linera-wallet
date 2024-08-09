@@ -31,8 +31,9 @@ use linera_views::views::ViewError;
 use linera_storage::Storage;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
+use local_encoding::{Encoding, Encoder};
 
-use std::collections::{BTreeMap, HashMap};
+use std::{collections::{BTreeMap, HashMap}, str::FromStr};
 use std::sync::{RwLock, Arc};
 use std::time::Duration;
 use tokio::task::JoinSet;
@@ -259,8 +260,11 @@ pub async fn dapp_query(n: u32) -> u32 {
 // Execute operation to get
 #[wasm_bindgen]
 pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, messages: &str) -> Result<Option<String>, JsError> {
-  let chain_id: ChainId = serde_json::from_str(chain_id)?;
-  let operation: Operation = serde_json::from_str(operation)?;
+  let chain_id: ChainId = ChainId::from_str(chain_id)?;
+  let operations: Vec<Operation> = match serde_json::from_str(operation) {
+    Ok(operation) => [operation].to_vec(),
+    Err(_) => Vec::new(),
+  };
   let messages: Vec<IncomingMessage> = serde_json::from_str(messages)?;
 
   let wallet = WALLET.read()?;
@@ -270,7 +274,7 @@ pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, me
   let mut client_context: ClientContext<WebStorage> = get_client_context(wallet).await?;
   let mut chain_client = client_context.make_chain_client(chain_id);
 
-  chain_client.execute_block_without_block_proposal(messages, [operation].to_vec()).await?;
+  chain_client.execute_block_without_block_proposal(messages, operations).await?;
   match chain_client.peek_candidate_block_proposal().await {
     Some(block_proposal) => {
       let json = serde_json::to_string(block_proposal)?;

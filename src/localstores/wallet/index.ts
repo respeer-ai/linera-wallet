@@ -15,11 +15,18 @@ export const useWalletStore = defineStore('checko-wallet', {
     walletStorage: localforage.createInstance({
       name: 'checko-wallet'
     }),
-    loaded: false
+    loaded: false,
+    decrypted: false
   }),
   getters: {
     publicKeys (): Array<string> {
       return Array.from(this.secureAccounts.keys())
+    },
+    publicKeyByPrefix (): (prefix: string) => string | undefined {
+      return (prefix: string) => {
+        prefix = prefix.replace('0x', '')
+        return this.publicKeys.find((el: string) => el.includes(prefix))
+      }
     },
     displayAddress (): (publicKey: string) => string {
       return (publicKey: string) => {
@@ -188,6 +195,9 @@ export const useWalletStore = defineStore('checko-wallet', {
         }
         return this.accounts.get(this.currentAddress)?.microchains?.has(activity.sourceChain) === true
       }
+    },
+    _decrypted (): boolean {
+      return this.decrypted
     }
   },
   actions: {
@@ -216,6 +226,7 @@ export const useWalletStore = defineStore('checko-wallet', {
           chain_balance: Number((microchains[k1] as Microchain).chain_balance),
           account_balance: Number((microchains[k1] as Microchain).account_balance),
           message_id: (microchains[k1] as Microchain).message_id,
+          certificate_hash: (microchains[k1] as Microchain).certificate_hash,
           faucet_url: (microchains[k1] as Microchain).faucet_url
         })
       })
@@ -241,6 +252,7 @@ export const useWalletStore = defineStore('checko-wallet', {
             }
             this.secureAccounts.set(k, this.accountFromStore(account))
           })
+          if (password) this.decrypted = true
           listener?.()
         })
         .catch((e) => {
@@ -278,7 +290,7 @@ export const useWalletStore = defineStore('checko-wallet', {
           console.log('Load password hash', e)
         })
     },
-    loadWithoutDecrypt (done?: () => VoidFunction) {
+    loadWithoutDecrypt (done?: () => void) {
       if (this.loaded) {
         return done?.()
       }
@@ -292,7 +304,7 @@ export const useWalletStore = defineStore('checko-wallet', {
       })
     },
     load (password: string, done?: () => void, fail?: () => void) {
-      if (this.loaded) {
+      if (this.loaded && this.decrypted) {
         return done?.()
       }
       // Here the password should already be loaded
@@ -368,7 +380,7 @@ export const useWalletStore = defineStore('checko-wallet', {
     deleteAddress (publicKey: string) {
       this.accounts.delete(publicKey)
     },
-    addChain (publicKey: string, chainId: string, messageId: string, faucetUrl: string) {
+    addChain (publicKey: string, chainId: string, messageId: string, certificateHash: string, faucetUrl: string) {
       const account = this.accounts.get(publicKey)
       if (!account) {
         throw Error('Invalid account public key')
@@ -382,6 +394,7 @@ export const useWalletStore = defineStore('checko-wallet', {
         chain_balance: 0,
         account_balance: 0,
         message_id: messageId,
+        certificate_hash: certificateHash,
         faucet_url: faucetUrl
       }
       account.microchains.set(chainId, chain)

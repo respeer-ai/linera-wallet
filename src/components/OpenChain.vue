@@ -24,7 +24,7 @@ import { wallet, notify } from 'src/localstores'
 const _wallet = wallet.useWalletStore()
 const notification = notify.useNotificationStore()
 
-const openChain = async (publicKey: string, done?: (chainId: string, messageId: string) => void) => {
+const openChain = async (publicKey: string, done?: (chainId: string, messageId: string, certificateHash: string) => void) => {
   const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetHost, endpoint.faucetPort)
   const apolloClient = new ApolloClient(options)
 
@@ -39,7 +39,8 @@ const openChain = async (publicKey: string, done?: (chainId: string, messageId: 
   onDone((res) => {
     done?.(
       graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'chainId') as string,
-      graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'messageId') as string
+      graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'messageId') as string,
+      graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'certificateHash') as string
     )
   })
   onError((error) => {
@@ -50,13 +51,13 @@ const openChain = async (publicKey: string, done?: (chainId: string, messageId: 
   })
 }
 
-const initMicrochainChainStore = async (publicKey: string, chainId: string, messageId: string, done?: () => void) => {
+const initMicrochainChainStore = async (publicKey: string, signature: string, chainId: string, messageId: string, certificateHash: string, done?: () => void) => {
   const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation walletInitWithoutKeypair ($publicKey: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $withOtherChains: [String!]!) {
-      walletInitWithoutKeypair(publicKey: $publicKey, faucetUrl: $faucetUrl, chainId: $chainId, messageId: $messageId, withOtherChains: $withOtherChains)
+    mutation walletInitWithoutKeypair ($publicKey: String!, $signature: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $certificateHash: String!) {
+      walletInitWithoutKeypair(publicKey: $publicKey, signature: $signature, faucetUrl: $faucetUrl, chainId: $chainId, messageId: $messageId, certificateHash: $certificateHash)
     }`))
   onDone(() => {
     done?.()
@@ -66,10 +67,11 @@ const initMicrochainChainStore = async (publicKey: string, chainId: string, mess
   })
   await mutate({
     publicKey,
+    signature,
     faucetUrl: endpoint.faucetUrl,
     chainId,
     messageId,
-    withOtherChains: []
+    certificateHash
   })
 }
 
@@ -140,9 +142,13 @@ const onOpenChainClick = () => {
   if (!_wallet.currentAddress) {
     return
   }
-  void openChain(_wallet.currentAddress, (chainId: string, messageId: string) => {
-    _wallet.addChain(_wallet.currentAddress, chainId, messageId, endpoint.rpcUrl)
-    void initMicrochainChainStore(_wallet.currentAddress, chainId, messageId, () => {
+  void openChain(_wallet.currentAddress, (chainId: string, messageId: string, certificateHash: string) => {
+    _wallet.addChain(_wallet.currentAddress, chainId, messageId, certificateHash, endpoint.rpcUrl)
+    const typeNameBytes = new TextEncoder().encode('Nonce::')
+    const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
+    const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string)))
+    const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+    void initMicrochainChainStore(_wallet.currentAddress, signature, chainId, messageId, certificateHash, () => {
       signNewBlock(chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string))), () => {
         notification.pushNotification({
           Title: 'Open Chain',

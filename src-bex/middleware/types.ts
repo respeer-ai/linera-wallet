@@ -40,7 +40,7 @@ export interface RpcRequest {
   request: JsonRpcRequest<JsonRpcParams>
 }
 
-export type MiddlewareImplHandler = (req: RpcRequest) => Promise<void>
+export type MiddlewareImplHandler = (req: RpcRequest) => Promise<string | undefined>
 
 export enum PopupRequestType {
   CONFIRMATION = 'confirmation'

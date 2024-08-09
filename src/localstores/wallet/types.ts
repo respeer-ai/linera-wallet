@@ -15,6 +15,7 @@ export interface Microchain {
   account_balance: number
   // MessageId of OpenChain
   message_id: string
+  certificate_hash: string
   faucet_url: string
 }
 
