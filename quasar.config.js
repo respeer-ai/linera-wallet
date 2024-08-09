@@ -64,7 +64,7 @@ module.exports = configure(function (/* ctx */) {
       // env: {},
 
       rawDefine: {
-        'process.version': JSON.stringify(process.version)
+        'process.version': stringify(process.version)
       },
 
       // ignorePublicFolder: true,
