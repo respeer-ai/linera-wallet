@@ -161,7 +161,7 @@ const _setting = persistentsetting.useSettingStore()
 
 const faucetSchema = ref(endpoint.faucetSchema)
 const faucetWSSchema = ref(endpoint.faucetWsSchema)
-const faucetHost = ref(endpoint.faucetHost)
+const faucetHost = ref(endpoint.faucetPublicHost)
 const faucetPort = ref(endpoint.faucetPort)
 
 const rpcSchema = ref(endpoint.rpcSchema)

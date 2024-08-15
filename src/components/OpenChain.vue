@@ -25,7 +25,7 @@ const _wallet = wallet.useWalletStore()
 const notification = notify.useNotificationStore()
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string, certificateHash: string) => void) => {
-  const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetHost, endpoint.faucetPort)
+  const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetPublicHost, endpoint.faucetPort)
   const apolloClient = new ApolloClient(options)
 
   const { mutate, onDone, onError } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -68,7 +68,7 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   await mutate({
     publicKey,
     signature,
-    faucetUrl: endpoint.faucetUrl,
+    faucetUrl: endpoint.faucetLocalUrl,
     chainId,
     messageId,
     certificateHash

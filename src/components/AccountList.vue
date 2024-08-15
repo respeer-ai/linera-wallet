@@ -287,9 +287,8 @@ const getBlockWithHash = (chainId: string, hash: string, done?: (height: number,
                 kind
                 message
               }
-              messageCounts
               stateHash
-              oracleRecords {
+              oracleResponses {
                 responses
               }
             }
@@ -363,7 +362,7 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   await mutate({
     publicKey,
     signature,
-    faucetUrl: endpoint.faucetUrl,
+    faucetUrl: endpoint.faucetLocalUrl,
     chainId,
     messageId,
     certificateHash
