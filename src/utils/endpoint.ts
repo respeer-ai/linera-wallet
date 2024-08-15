@@ -13,12 +13,12 @@ export const faucetSchema = (() => {
 
 export const faucetPublicHost = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.faucetHost || /* '172.16.31.73' */ '210.209.69.36'
+  return _setting.persistentSetting?.faucetHost || '172.16.31.73' /* '210.209.69.36' */
 })()
 
 export const faucetLocalHost = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.faucetHost || /* '172.16.31.73' */ '172.21.132.203'
+  return _setting.persistentSetting?.faucetHost || '172.16.31.73' /* '210.209.69.36' */
 })()
 
 export const faucetPort = (() => {
@@ -41,7 +41,7 @@ export const rpcSchema = (() => {
 
 export const rpcHost = (() => {
   const _setting = useSettingStore()
-  return _setting.persistentSetting?.rpcHost || /* '172.16.31.73' */ '210.209.69.36'
+  return _setting.persistentSetting?.rpcHost || '172.16.31.73' /* '210.209.69.36' */
 })()
 
 export const rpcPort = (() => {
