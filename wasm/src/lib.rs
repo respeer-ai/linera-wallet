@@ -9,43 +9,18 @@ connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
 
-use linera_base::{
-    crypto::{CryptoRng, CryptoHash, KeyPair, PublicKey},
-    data_types::{Amount, BlockHeight, Timestamp},
-    identifiers::{
-        ChainDescription,
-        ChainId,
-    },
-};
-use linera_chain::data_types::IncomingMessage;
-use linera_core::{
-    client::{ArcChainClient, ChainClient, Client}, data_types::RawBlockProposal, node::{
-        CrossChainMessageDelivery, LocalValidatorNode as _, LocalValidatorNodeProvider as _
-    }
+use linera_base::identifiers::ChainId;
+use linera_chain::data_types::IncomingBundle;
+use linera_core::node::{
+    LocalValidatorNode as _,
+    LocalValidatorNodeProvider as _,
 };
 use linera_execution::Operation;
-use linera_rpc::node_provider::{NodeOptions, NodeProvider};
-use linera_views::views::ViewError;
 
-
-use linera_storage::Storage;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
-use local_encoding::{Encoding, Encoder};
 
-use std::{collections::{BTreeMap, HashMap}, str::FromStr};
-use std::sync::{RwLock, Arc};
-use std::time::Duration;
-use tokio::task::JoinSet;
-
-mod config;
-mod options;
-mod wallet;
-
-use options::ClientOptions;
-use wallet::Wallet;
-
-type ChainClients<P, S> = std::collections::BTreeMap<ChainId, ArcChainClient<P, S>>;
+use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions, wallet::Wallet};
 
 // TODO convert to IndexedDbStore once we refactor Context
 type WebStorage = linera_storage::DbStorage<
@@ -53,164 +28,75 @@ type WebStorage = linera_storage::DbStorage<
     linera_storage::WallClock,
 >;
 
-pub async fn get_storage() -> Result<WebStorage, <WebStorage as linera_storage::Storage>::ContextError> {
+pub async fn get_storage() -> Result<WebStorage, <WebStorage as linera_storage::Storage>::StoreError> {
+    let root_key = &[];
     linera_storage::DbStorage::new(
         linera_views::memory::MemoryStoreConfig::new(1),
         "linera",
+        root_key,
         None,
     ).await
 }
 
-pub struct ClientContext<S>
-where
-    S: linera_storage::Storage,
-    ViewError: From<S::ContextError>,
-{
-    wallet_state: WalletState,
-    client: Arc<Client<NodeProvider, S>>,
-    send_timeout: Duration,
-    recv_timeout: Duration,
-    notification_retry_delay: Duration,
-    notification_retries: u32,
-    chain_listeners: JoinSet<()>,
-}
+type PersistentWallet = linera_client::persistent::LocalStorage<Wallet>;
+type ClientContext = linera_client::client_context::ClientContext<WebStorage, PersistentWallet>;
 
-impl<S> ClientContext<S>
-where
-    S: Storage + Clone + Send + Sync + 'static,
-    ViewError: From<S::ContextError>,
-{
-    fn wallet_state(&self) -> &WalletState {
-        &self.wallet_state
-    }
+// TODO get from config
+pub const OPTIONS: ClientOptions = ClientOptions {
+    wallet_state_path: None,
+    storage_config: None,
+    with_wallet: None,
 
-    pub fn new(storage: S, options: &ClientOptions, wallet_state: WalletState) -> Self {
-        let node_options = NodeOptions {
-            send_timeout: options.send_timeout,
-            recv_timeout: options.recv_timeout,
-            notification_retry_delay: options.notification_retry_delay,
-            notification_retries: options.notification_retries,
-        };
-        let node_provider = NodeProvider::new(node_options);
-        let delivery = CrossChainMessageDelivery::new(options.wait_for_outgoing_messages);
-        let client = Arc::new(
-            Client::new(
-                node_provider,
-                storage,
-                options.max_pending_messages,
-                delivery,
-            )
-            .with_message_policy(options.message_policy),
-        );
-        ClientContext {
-            client,
-            wallet_state,
-            send_timeout: options.send_timeout,
-            recv_timeout: options.recv_timeout,
-            notification_retry_delay: options.notification_retry_delay,
-            notification_retries: options.notification_retries,
-            chain_listeners: JoinSet::new(),
-        }
-    }
+    // Timeout for sending queries (milliseconds)
+    send_timeout: std::time::Duration::from_millis(4000),
+    recv_timeout: std::time::Duration::from_millis(4000),
+    max_pending_messages: 10,
 
-    fn make_chain_client(&self, chain_id: ChainId) -> ChainClient<NodeProvider, S> {
-      let chain = self
-          .wallet_state.0
-          .get(chain_id)
-          .unwrap_or_else(|| panic!("Unknown chain: {}", chain_id));
-      let known_key_pairs = chain
-          .key_pair
-          .as_ref()
-          .map(|kp| kp.copy())
-          .into_iter()
-          .collect();
-      self.client.build(
-          chain_id,
-          known_key_pairs,
-          self.wallet_state.0.genesis_admin_chain(),
-          chain.block_hash,
-          chain.timestamp,
-          chain.next_block_height,
-          chain.pending_block.clone(),
-          chain.pending_blobs.clone(),
-      )
-  }
+    // The WebAssembly runtime to use.
+    wasm_runtime: None,
 
-    fn update_wallet_for_new_chain(
-        &mut self,
-        chain_id: ChainId,
-        key_pair: Option<KeyPair>,
-        timestamp: Timestamp,
-    ) {
-        if self.wallet_state.0.get(chain_id).is_none() {
-            self.wallet_state.0.insert(wallet::UserChain {
-                chain_id,
-                key_pair: key_pair.as_ref().map(|kp| kp.copy()),
-                block_hash: None,
-                timestamp,
-                next_block_height: BlockHeight::ZERO,
-                pending_block: None,
-                pending_blobs: BTreeMap::default(),
-            });
-        }
-    }
+    // The maximal number of simultaneous queries to the database
+    max_concurrent_queries: None,
 
-    pub async fn update_and_save_wallet<'a>(&mut self, state: &mut ChainClient<NodeProvider, S>)
-    where
-        S: linera_storage::Storage + Clone + Send + Sync + 'static,
-        linera_views::views::ViewError: From<S::ContextError>,
-    {
-        self.wallet_state.0.update_from_state(state).await;
-        self.wallet_state.write();
-    }
+    // The maximal number of simultaneous stream queries to the database
+    max_stream_queries: 10,
 
-    pub fn make_node_provider(&self) -> NodeProvider {
-        NodeProvider::new(self.make_node_options())
-    }
+    // The maximal number of entries in the storage cache.
+    cache_size: 1000,
 
-    fn make_node_options(&self) -> NodeOptions {
-        NodeOptions {
-            send_timeout: self.send_timeout,
-            recv_timeout: self.recv_timeout,
-            notification_retry_delay: self.notification_retry_delay,
-            notification_retries: self.notification_retries,
-        }
-    }
-}
+    // Delay increment for retrying to connect to a validator for notifications.
+    notification_retry_delay: std::time::Duration::from_millis(1000),
 
-pub async fn get_client_context(wallet: &Wallet) -> Result<ClientContext<WebStorage>, JsError> {
-    let mut storage = get_storage().await.expect("invalid storage");
-    // TODO get from config
-    let options: ClientOptions = options::OPTIONS;
+    // Number of times to retry connecting to a validator for notifications.
+    notification_retries: 10,
 
-    Ok(ClientContext::new(storage, &options, WalletState(wallet.copy())))
-}
+    // Whether to wait until a quorum of validators has confirmed that all sent cross-chain
+    // messages have been delivered.
+    wait_for_outgoing_messages: false,
 
-struct WalletState(Wallet);
+    // The policy for handling incoming messages.
+    blanket_message_policy: linera_core::client::BlanketMessagePolicy::Accept,
 
-impl WalletState {
-    fn refresh_prng_seed(&mut self) {
-        // TODO
-    }
+    // A dummy command, for now
+    command: linera_client::client_options::ClientCommand::Keygen,
 
-    fn write(&self) {
-        // TODO
-    }
+    restrict_chain_ids_to: None,
+
+    tokio_threads: Some(1),
+};
+
+pub async fn get_client_context() -> Result<ClientContext, JsError> {
+    let wallet = linera_client::config::WalletState::read_from_local_storage("linera-wallet")?;
+    let mut storage = get_storage().await?;
+    wallet.genesis_config().initialize_storage(&mut storage).await?;
+    Ok(ClientContext::new(get_storage().await?, OPTIONS, wallet))
 }
 
 #[wasm_bindgen]
 pub async fn dapp_query_validators() -> Result<(), JsError> {
-    let wallet = WALLET.read()?;
-    let wallet = wallet.as_ref().ok_or(JsError::new("no wallet set"))?;
-
-    let mut storage = get_storage().await?;
-
-    wallet.genesis_config().initialize_storage(&mut storage).await?;
-
-    let chain_id = wallet.default_chain().expect("No default chain");
-
-    let mut client_context: ClientContext<WebStorage> = get_client_context(wallet).await?;
-
+    let mut client_context: ClientContext = get_client_context().await?;
+    let chain_id = client_context.wallet().default_chain().expect("No default chain");
+    
     let mut chain_client = client_context.make_chain_client(chain_id);
     log::info!(
         "Querying the validators of the current epoch of chain {}",
@@ -244,11 +130,9 @@ pub async fn dapp_query_validators() -> Result<(), JsError> {
     Ok(())
 }
 
-static WALLET: RwLock<Option<Wallet>> = RwLock::new(None);
-
 #[wasm_bindgen]
 pub async fn set_wallet(wallet: &str) -> Result<(), wasm_bindgen::JsError> {
-    *WALLET.write()? = serde_json::from_str(wallet)?;
+    linera_client::config::WalletState::create_from_local_storage("linera-wallet", serde_json::from_str(wallet)?)?;
     Ok(())
 }
 
@@ -260,35 +144,31 @@ pub async fn dapp_query(n: u32) -> u32 {
 // Execute operation to get
 #[wasm_bindgen]
 pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, messages: &str) -> Result<Option<String>, JsError> {
-  let chain_id: ChainId = ChainId::from_str(chain_id)?;
-  let operations: Vec<Operation> = match serde_json::from_str(operation) {
-    Ok(operation) => [operation].to_vec(),
-    Err(_) => Vec::new(),
-  };
-  let messages: Vec<IncomingMessage> = serde_json::from_str(messages)?;
+//   let chain_id: ChainId = ChainId::from_str(chain_id)?;
+//   let operations: Vec<Operation> = match serde_json::from_str(operation) {
+//     Ok(operation) => [operation].to_vec(),
+//     Err(_) => Vec::new(),
+//   };
+//   let messages: Vec<IncomingBundle> = serde_json::from_str(messages)?;
+//   let mut client_context: ClientContext = get_client_context().await?;
+//   let mut chain_client = client_context.make_chain_client(chain_id);
 
-  let wallet = WALLET.read()?;
-  let wallet = wallet.as_ref().ok_or(JsError::new("no wallet set"))?;
-  let mut storage = get_storage().await?;
-  wallet.genesis_config().initialize_storage(&mut storage).await?;
-  let mut client_context: ClientContext<WebStorage> = get_client_context(wallet).await?;
-  let mut chain_client = client_context.make_chain_client(chain_id);
-
-  chain_client.execute_block_without_block_proposal(messages, operations).await?;
-  match chain_client.peek_candidate_block_proposal().await {
-    Some(block_proposal) => {
-      let json = serde_json::to_string(block_proposal)?;
-      Ok(Some(String::from(json)))
-    }
-    _ => Ok(None),
-  }
+//   chain_client.execute_block_without_block_proposal(messages, operations).await?;
+//   match chain_client.peek_candidate_block_proposal().await {
+//     Some(block_proposal) => {
+//       let json = serde_json::to_string(block_proposal)?;
+//       Ok(Some(String::from(json)))
+//     }
+//     _ => Ok(None),
+//   }
+    Ok(None)
 }
 
 #[wasm_bindgen(start)]
 pub async fn main() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-    console_log::init_with_level(log::Level::Debug);
+    console_log::init_with_level(log::Level::Debug).unwrap();
 
     log::info!("Hello World!");
 }
