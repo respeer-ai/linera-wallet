@@ -4,7 +4,7 @@ description = "The Linera Web client"
 version = "0.1.0"
 authors = ["Linera <contact@linera.io>"]
 edition = "2021"
-repository = "https://github.com/respeer-ai/linera-wallet/"
+repository = "https://github.com/respeer-ai/linera-wallet.git"
 license = "Apache-2.0"
 
 [lib]
