@@ -3,7 +3,7 @@
     <q-img
       src='~assets/CheCko.png'
       height='24px'
-      width='160px'
+      width='140px'
       fit='contain'
       class='cursor-pointer'
     />
