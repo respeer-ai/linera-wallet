@@ -61,7 +61,7 @@ import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
-import InitializeAccount from 'src/components/InitializeAccount.vue'
+import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ExtensionInitializeAccount from 'src/components/extension/InitializeAccount.vue'
 import ValidateAccount from 'src/components/ValidateAccount.vue'
 import ExtensionValidateAccount from 'src/components/extension/ValidateAccount.vue'

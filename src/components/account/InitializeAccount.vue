@@ -1,7 +1,7 @@
 <template>
   <div class='text-center fill-parent'>
     <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
-      Initialize Account
+      Create account
     </h5>
     <div class='row' :style='{margin: "48px 0 0 0"}'>
       <q-space />
@@ -71,7 +71,7 @@ import { wallet, notify } from 'src/localstores'
 import { shortid } from 'src/utils'
 import { copyToClipboard } from 'quasar'
 
-import CreateAccount from 'src/components/CreateAccount.vue'
+import CreateAccount from 'src/components/account/CreateAccount.vue'
 
 interface Props {
   password: string
