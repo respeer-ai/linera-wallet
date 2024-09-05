@@ -30,19 +30,13 @@
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>
-      <div v-if='!extensionMode' :style='{ margin: "6px 12px" }'>
-        Another browser wallet for Linera blockchain by
-        <a href='https://respeer.ai'>respeer.ai</a> <strong>MaaS</strong>
-      </div>
+      <FooterMenu v-if='!extensionMode' />
       <div v-else>
         <q-separator />
         <ExtensionFooterMenu />
       </div>
       <q-resize-observer @resize='onFooterResize' />
     </q-footer>
-    <div v-if='!extensionMode'>
-      <TestnetTip />
-    </div>
   </q-layout>
   <ExtensionKeepAlived v-if='!extensionMode' />
 </template>
@@ -53,9 +47,9 @@ import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
 import HeaderMenu from 'src/components/header/HeaderMenu.vue'
+import FooterMenu from 'src/components/footer/FooterMenu.vue'
 import ExtensionHeaderMenu from 'src/components/extension/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
-import TestnetTip from 'src/components/TestnetTip.vue'
 import ExtensionFooterMenu from 'src/components/extension/FooterMenu.vue'
 import ExtensionKeepAlived from 'src/components/ExtensionKeepAlived.vue'
 
