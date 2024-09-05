@@ -49,11 +49,11 @@
 
 <script setup lang='ts'>
 import { LangOption, langOptions } from 'src/i18n'
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { locale } = useI18n({ useScope: 'global' })
-const label = ref(langOptions.find((el) => el.value === locale.value)?.label)
+const label = computed(() => langOptions.find((el) => el.value === locale.value)?.label)
 
 const onLangClick = (opt: LangOption) => {
   locale.value = opt.value
