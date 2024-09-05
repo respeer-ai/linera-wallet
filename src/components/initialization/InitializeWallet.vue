@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center full-width'>
+  <div class='fill-parent text-center onboarding-container shadow-1 onboarding-padding'>
     <q-stepper
       flat
       v-model='step'
@@ -13,7 +13,7 @@
     >
       <q-step
         :name='1'
-        title='Create Password'
+        title='Create password'
         :done='step > 1'
       >
         <NewPassword v-if='!extensionMode' v-model:password='password' v-model:error='passwordError' />
@@ -21,7 +21,7 @@
       </q-step>
       <q-step
         :name='2'
-        title='Create Account'
+        title='Create account'
         :done='step > 2'
       >
         <InitializeAccount v-if='!extensionMode' :password='password' />
@@ -29,21 +29,28 @@
       </q-step>
       <q-step
         :name='3'
-        title='Validate Account'
+        title='Validate account'
         :done='step > 3'
       >
         <ValidateAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' />
         <ExtensionValidateAccount v-else v-model:password='password' v-model:error='passwordError' />
       </q-step>
     </q-stepper>
-    <q-btn
-      flat
-      class='text-brown-10 bg-red-2'
-      :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "32px 0 0 0"}'
-      :label='btnText'
-      :disable='!canGotoNext()'
-      @click='onNextStepClick'
-    />
+    <div class='row'>
+      <q-space />
+      <div class='onboarding-btns row'>
+        <q-btn
+          flat
+          class='text-brown-10 bg-red-2'
+          :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "32px 0 0 0"}'
+          :label='btnText'
+          :disable='!canGotoNext()'
+          @click='onNextStepClick'
+          no-caps
+        />
+      </div>
+      <q-space />
+    </div>
   </div>
 </template>
 
@@ -52,7 +59,7 @@ import { ref, computed } from 'vue'
 import { wallet, notify, oneshotsetting } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
-import NewPassword from 'src/components/NewPassword.vue'
+import NewPassword from 'src/components/password/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
 import InitializeAccount from 'src/components/InitializeAccount.vue'
 import ExtensionInitializeAccount from 'src/components/extension/InitializeAccount.vue'
@@ -85,9 +92,9 @@ const canGotoNext = () => {
 const btnText = computed(() => {
   switch (step.value) {
     case 1:
-      return 'Save Password'
+      return 'Create a new wallet'
     case 2:
-      return 'Validate Account'
+      return 'Backup & Validate account'
     case 3:
       return 'Linera Now'
   }

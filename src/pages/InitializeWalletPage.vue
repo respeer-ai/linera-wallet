@@ -8,7 +8,7 @@
 import { oneshotsetting } from 'src/localstores'
 import { computed } from 'vue'
 
-import InitializeWallet from 'src/components/InitializeWallet.vue'
+import InitializeWallet from 'src/components/initialization/InitializeWallet.vue'
 
 const setting = oneshotsetting.useSettingStore()
 const extensionMode = computed(() => setting.extensionMode)

@@ -41,6 +41,7 @@ const routes: RouteRecordRaw[] = [
       },
       { path: 'setting', component: () => import('pages/SettingPage.vue') },
       { path: 'onboarding', component: () => import('pages/OnBoardingPage.vue') },
+      { path: 'improvement', component: () => import('pages/ImprovementPage.vue') },
       {
         path: 'initializewallet',
         component: () => import('pages/InitializeWalletPage.vue'),

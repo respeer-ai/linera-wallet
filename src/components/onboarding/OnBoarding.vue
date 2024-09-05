@@ -81,10 +81,20 @@ const router = useRouter()
 const slide = ref('first')
 
 const onCreateWalletClick = () => {
-  void router.push({ path: '/initializewallet' })
+  void router.push({
+    path: '/improvement',
+    query: {
+      target: '/initializewallet'
+    }
+  })
 }
 
 const onImportWalletClick = () => {
-  void router.push({ path: '/importwallet' })
+  void router.push({
+    path: '/improvement',
+    query: {
+      target: '/importwallet'
+    }
+  })
 }
 </script>
