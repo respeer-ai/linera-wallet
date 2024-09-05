@@ -8,12 +8,16 @@ import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { RpcRequest } from './middleware/types'
 import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 import { sentinel } from './microchain'
+import InstallationManager from './manager/installationmanager'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
 
+const installationManager = new InstallationManager()
+
 export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => {
   basebridge.EventBus.instance.setBridge(bridge)
+
   const _engine = new engine.Engine()
   bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
     const res = {} as PendingJsonRpcResponse<Json>
@@ -30,6 +34,9 @@ export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => 
         void payload.respond(res)
       })
   })
+
   sentinel.Sentinel.run()
   void setupLineraSubscription()
 })
+
+installationManager.initializeOnInstalledListener()

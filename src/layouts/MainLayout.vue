@@ -52,7 +52,7 @@ import { computed, onMounted, ref } from 'vue'
 import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
-import HeaderMenu from 'src/components/HeaderMenu.vue'
+import HeaderMenu from 'src/components/header/HeaderMenu.vue'
 import ExtensionHeaderMenu from 'src/components/extension/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 import TestnetTip from 'src/components/TestnetTip.vue'
