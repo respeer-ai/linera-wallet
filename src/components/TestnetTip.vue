@@ -1,6 +1,6 @@
 <template>
   <div class='cursor-pointer like-link'>
-    Testnet Must Read
+    Testnet must read
     <q-popup-proxy>
       <div
         class='text-brown-10'

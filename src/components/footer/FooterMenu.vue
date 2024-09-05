@@ -6,7 +6,7 @@
     <q-space />
     <TestnetTip />
     <a href='https://testnet.respeer.ai/policy' class='footer-menu-margin-x-left'>Policy</a>
-    <a href='https://testnet.respeer.ai/terms' class='footer-menu-margin-x-left'>Terms of User</a>
+    <a href='https://testnet.respeer.ai/terms' class='footer-menu-margin-x-left'>Terms of use</a>
   </div>
 </template>
 
