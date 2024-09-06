@@ -14,9 +14,14 @@
       <li>Store in a safe deposit box</li>
       <li>Write down and store in multiple secret places</li>
     </ul>
-    <q-card dark :style='{height: "160px", marginTop: "24px"}' class='flex items-center justify-center'>
-      <div v-if='showMnemonic'>
-        {{ mnemonic }}
+    <q-card
+      flat bordered :dark='!showMnemonic' :style='{height: "160px", marginTop: "24px", padding: "24px"}'
+      class='flex items-center justify-center'
+    >
+      <div v-if='showMnemonic' class='row'>
+        <div v-for='(word, i) in mnemonicWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
+          {{ word }}
+        </div>
       </div>
       <div v-else>
         <q-icon name='bi-eye' size='20px' />
@@ -25,7 +30,7 @@
         </div>
       </div>
     </q-card>
-    <div class='onboarding-padding' :style='{marginTop: "24px"}'>
+    <div class='onboarding-padding' :style='{marginTop: "32px"}' v-if='showInnerActionBtn'>
       <q-btn
         flat
         label='Reveal Secret Recovery Phrase'
@@ -44,9 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { toRef, ref, onMounted } from 'vue'
-// import { notify } from 'src/localstores'
-// import { copyToClipboard } from 'quasar'
+import { toRef, ref, onMounted, computed, watch } from 'vue'
 
 import GenerateKey from './GenerateKey.vue'
 
@@ -58,30 +61,16 @@ const props = defineProps<Props>()
 const password = toRef(props, 'password')
 
 const showInnerActionBtn = defineModel<boolean>('showInnerActionBtn')
+const mnemonic = defineModel<string>('mnemonic')
 
 const publicKey = ref('')
 const privateKey = ref('')
-const mnemonic = ref('')
+const mnemonicWords = computed(() => mnemonic.value?.split(' '))
 const showMnemonic = ref(false)
 
-// const notification = notify.useNotificationStore()
-
-/*
-const onCopyClick = (content: string) => {
-  copyToClipboard(content)
-    .then(() => {
-      notification.pushNotification({
-        Title: 'Copy',
-        Message: `Success copy ${content} to clipboard.`,
-        Popup: true,
-        Type: notify.NotifyType.Info
-      })
-    })
-    .catch((e) => {
-      console.log('Fail copy', e)
-    })
-}
-*/
+watch(showMnemonic, () => {
+  showInnerActionBtn.value = !showMnemonic.value
+})
 
 onMounted(() => {
   showInnerActionBtn.value = true

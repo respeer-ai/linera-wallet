@@ -1,12 +1,18 @@
 <template>
-  <div class='fill-parent'>
-    <h5 class='text-brown-8 text-center' :style='{fontWeight: 600, margin: "16px"}'>
-      Validate Account
+  <div class='fill-parent text-center'>
+    <h5 class='onboarding-page-title'>
+      Validate secret recovery phrase
     </h5>
-    <p class='text-brown-8 text-center' :style='{margin: "32px 0 24px 0"}'>
-      <q-icon name='info' class='text-blue-6' size='20px' />
-      CheCko need you to input your account which is backup in last step again to confirm you store them correctly.
-    </p>
+    <q-card
+      flat bordered :style='{height: "160px", marginTop: "24px", padding: "24px"}'
+      class='flex items-center justify-center'
+    >
+      <div class='row'>
+        <div v-for='(word, i) in mnemonicWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
+          {{ word }}
+        </div>
+      </div>
+    </q-card>
     <div :style='{margin: "4px 0", fontWeight: 500, lineHeight: "32px"}' class='text-brown-10 text-left row'>
       <span>Private Key</span>
       <q-space />
@@ -69,7 +75,15 @@
 <script setup lang="ts">
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
-import { ref, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
+
+interface Props {
+  mnemonic: string
+}
+
+const props = defineProps<Props>()
+const mnemonic = toRef(props, 'mnemonic')
+const mnemonicWords = computed(() => mnemonic.value.split(' '))
 
 const privateKey = ref('')
 const publicKey = defineModel<string>('publicKey')

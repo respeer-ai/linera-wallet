@@ -22,7 +22,7 @@
         title='Secure wallet'
         :done='step > 2'
       >
-        <InitializeAccount v-if='!extensionMode' :password='password' v-model:show-inner-action-btn='showInnerActionBtn' />
+        <InitializeAccount v-if='!extensionMode' :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic' />
         <ExtensionInitializeAccount v-else :password='password' />
       </q-step>
       <q-step
@@ -30,7 +30,7 @@
         title='Validate recovery'
         :done='step > 3'
       >
-        <ValidateAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' />
+        <ValidateAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' :mnemonic='mnemonic' />
         <ExtensionValidateAccount v-else v-model:password='password' v-model:error='passwordError' />
       </q-step>
     </q-stepper>
@@ -61,7 +61,7 @@ import NewPassword from 'src/components/password/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ExtensionInitializeAccount from 'src/components/extension/InitializeAccount.vue'
-import ValidateAccount from 'src/components/ValidateAccount.vue'
+import ValidateAccount from 'src/components/account/ValidateAccount.vue'
 import ExtensionValidateAccount from 'src/components/extension/ValidateAccount.vue'
 
 const step = ref(1)
@@ -69,6 +69,7 @@ const password = ref('')
 const passwordError = ref(false)
 const accountError = ref(true)
 const publicKey = ref('')
+const mnemonic = ref('')
 const showInnerActionBtn = ref(false)
 
 const _wallet = wallet.useWalletStore()
@@ -93,7 +94,7 @@ const btnText = computed(() => {
     case 1:
       return 'Create a new wallet'
     case 2:
-      return 'Backup & Validate account'
+      return 'Validate secret recovery phrase'
     case 3:
       return 'Linera Now'
   }
