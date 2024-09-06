@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import {
@@ -105,16 +105,6 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   })
 }
 
-const generateEd25519SigningKey = (done?: (keyPair: Ed25519SigningKey) => void) => {
-  Berith.initBundledOnce()
-    .then(() => {
-      done?.(new Ed25519SigningKey())
-    })
-    .catch((reason) => {
-      console.log('Rejected:', reason)
-    })
-}
-
 const getPendingRawBlock = (chainId: string, done?: (blockAndRound: unknown) => void) => {
   const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
@@ -183,39 +173,31 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
 }
 
 const createAccount = async () => {
-  let keyPair = await lineraWasm.generate_key_pair('')
-  console.log('Generate key pair 1: ', keyPair)
+  const _keyPair = await lineraWasm.generate_key_pair(shadowPassword.value as string)
 
-  const mnemonic = (JSON.parse(keyPair) as Record<string, string>).mnemonic
-  const privateKey = (JSON.parse(keyPair) as Record<string, string>).secret_key
+  // const mnemonic = (JSON.parse(_keyPair) as Record<string, string>).mnemonic
+  const privateKey = (JSON.parse(_keyPair) as Record<string, string>).secret_key
 
-  keyPair = await lineraWasm.generate_key_pair_from_mnemonic(mnemonic, '')
-  console.log('Generate key pair 2: ', keyPair)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+  const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
 
-  const _keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  console.log('Generate key with private key: ', _hex.toHex(_keyPair.public().to_bytes().bytes), _hex.toHex(_keyPair.to_bytes().bytes))
-
-  generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
-    const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
-    const privateKey = _hex.toHex(keyPair.to_bytes().bytes)
-    void openChain(_publicKey, (chainId: string, messageId: string, certificateHash: string) => {
-      const typeNameBytes = new TextEncoder().encode('Nonce::')
-      const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
-      const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
-      void initMicrochainChainStore(_publicKey, signature, chainId, messageId, certificateHash, () => {
-        signNewBlock(chainId, 0, keyPair, () => {
-          void _wallet.addAccount(_publicKey, privateKey, shadowPassword.value as string, () => {
-            _wallet.addChain(_publicKey, chainId, messageId, certificateHash, endpoint.rpcUrl)
-            publicKey.value = _publicKey
-            notification.pushNotification({
-              Title: 'Create Account',
-              Message: 'Success create new account.',
-              Popup: true,
-              Type: notify.NotifyType.Info
-            })
-          }, () => {
-            console.log('Fail add account')
+  void openChain(_publicKey, (chainId: string, messageId: string, certificateHash: string) => {
+    const typeNameBytes = new TextEncoder().encode('Nonce::')
+    const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
+    const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+    void initMicrochainChainStore(_publicKey, signature, chainId, messageId, certificateHash, () => {
+      signNewBlock(chainId, 0, keyPair, () => {
+        void _wallet.addAccount(_publicKey, privateKey, shadowPassword.value as string, () => {
+          _wallet.addChain(_publicKey, chainId, messageId, certificateHash, endpoint.rpcUrl)
+          publicKey.value = _publicKey
+          notification.pushNotification({
+            Title: 'Create Account',
+            Message: 'Success create new account.',
+            Popup: true,
+            Type: notify.NotifyType.Info
           })
+        }, () => {
+          console.log('Fail add account')
         })
       })
     })

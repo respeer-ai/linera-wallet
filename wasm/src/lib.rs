@@ -194,7 +194,6 @@ pub async fn generate_key_pair_from_mnemonic(mnemonic: &str, passphrase: &str) -
     let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
     let key_pair = KeyPair::generate_from(&mut rng);
     let key_str = format!("{}", serde_json::to_string(&key_pair)?);
-    log::info!("{}", key_str);
     let key_str = key_str.replace("\"", "");
     Ok(key_str[..64].to_string())
 }

@@ -3,8 +3,6 @@
     <q-stepper
       flat
       v-model='step'
-      active-color='brown-8'
-      inactive-color='brown-4'
       done-color='green-6'
       animated
       alternative-labels
@@ -21,22 +19,22 @@
       </q-step>
       <q-step
         :name='2'
-        title='Create account'
+        title='Secure wallet'
         :done='step > 2'
       >
-        <InitializeAccount v-if='!extensionMode' :password='password' />
+        <InitializeAccount v-if='!extensionMode' :password='password' v-model:show-inner-action-btn='showInnerActionBtn' />
         <ExtensionInitializeAccount v-else :password='password' />
       </q-step>
       <q-step
         :name='3'
-        title='Validate account'
+        title='Validate recovery'
         :done='step > 3'
       >
         <ValidateAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' />
         <ExtensionValidateAccount v-else v-model:password='password' v-model:error='passwordError' />
       </q-step>
     </q-stepper>
-    <div class='row'>
+    <div v-if='!showInnerActionBtn' class='row'>
       <q-space />
       <div class='onboarding-btns row'>
         <q-btn
@@ -71,6 +69,7 @@ const password = ref('')
 const passwordError = ref(false)
 const accountError = ref(true)
 const publicKey = ref('')
+const showInnerActionBtn = ref(false)
 
 const _wallet = wallet.useWalletStore()
 const notification = notify.useNotificationStore()

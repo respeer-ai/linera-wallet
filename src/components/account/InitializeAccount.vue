@@ -1,77 +1,54 @@
 <template>
   <div class='text-center fill-parent'>
-    <h5 class='text-brown-8' :style='{fontWeight: 600, margin: "16px"}'>
-      Create account
+    <h5 class='onboarding-page-title'>
+      Write down your Secret<br>Recovery Phrase
     </h5>
-    <div class='row' :style='{margin: "48px 0 0 0"}'>
-      <q-space />
-      <div v-if='publicKey.length' class='text-brown-10'>
-        <div class='row'>
-          <q-space />
-          <div>
-            <div class='row'>
-              <span :style='{width: "160px"}' class='text-left'>Address</span>
-              <span class='text-bold'>{{ shortid.shortId(publicKey, 20) }}</span>
-              <q-icon
-                name='content_copy' class='cursor-pointer' size='16px' :style='{margin: "2px 4px"}'
-                @click='onCopyClick(publicKey)'
-              />
-            </div>
-            <div class='row'>
-              <span :style='{width: "160px"}' class='text-left'>Private Key</span>
-              <span class='text-bold'>{{ shortid.shortId(account?.privateKey as string, 20) }}</span>
-              <q-icon
-                name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}'
-                @click='onCopyClick(account?.privateKey as string)'
-              />
-            </div>
-            <div class='row'>
-              <span :style='{width: "160px"}' class='text-left'>Microchain</span>
-              <span class='text-bold'>{{ shortid.shortId(chainId as string, 20) }}</span>
-              <q-icon
-                name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}'
-                @click='onCopyClick(chainId as string)'
-              />
-            </div>
-            <div class='row'>
-              <span :style='{width: "160px"}' class='text-left'>Open Chain Message</span>
-              <span class='text-bold'>{{ shortid.shortId(messageId as string, 20) }}</span>
-              <q-icon
-                name='content_copy' size='16px' class='cursor-pointer' :style='{margin: "2px 4px"}'
-                @click='onCopyClick(messageId as string)'
-              />
-            </div>
-          </div>
-          <q-space />
-        </div>
-        <p class='text-brown-8' :style='{margin: "48px 0 0 0"}'>
-          <q-icon name='info' class='text-blue-6' size='20px' />
-          CheCko initialize a default account. You can backup this account to your local device.
-          You can also recover this account with your password. You should understand if you lose your password,
-          or account private key, CheCko isn't able to recover them.
-        </p>
-      </div>
-      <q-card v-else :style='{height: "160px", width: "100%"}' flat>
-        <q-inner-loading
-          :showing='!publicKey.length'
-          class='text-red-4'
-        >
-          <q-spinner-facebook size='80px' />
-        </q-inner-loading>
-      </q-card>
-      <q-space />
+    <p>
+      Write donw this 24-words Secret Recovery Phrase and save it in a place that you trust and only you can access.
+    </p>
+    <div class='text-left text-bold' :style='{paddingLeft: "20px"}'>
+      Tips:
     </div>
-    <CreateAccount :auto-run='true' :password='password' v-model:public-key='publicKey' :check-exist='true' />
+    <ul class='text-left' :style='{marginTop: "8px"}'>
+      <li>Save in a password manager</li>
+      <li>Store in a safe deposit box</li>
+      <li>Write down and store in multiple secret places</li>
+    </ul>
+    <q-card dark :style='{height: "160px", marginTop: "24px"}' class='flex items-center justify-center'>
+      <div v-if='showMnemonic'>
+        {{ mnemonic }}
+      </div>
+      <div v-else>
+        <q-icon name='bi-eye' size='20px' />
+        <div :style='{marginTop: "16px", fontSize: "12px"}'>
+          Make sure nobody is looking.
+        </div>
+      </div>
+    </q-card>
+    <div class='onboarding-padding' :style='{marginTop: "24px"}'>
+      <q-btn
+        flat
+        label='Reveal Secret Recovery Phrase'
+        class='btn'
+        no-caps
+        @click='showMnemonic = !showMnemonic'
+      />
+    </div>
+    <GenerateKey
+      :password='password'
+      v-model:mnemonic='mnemonic'
+      v-model:private-key='privateKey'
+      v-model:public-key='publicKey'
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { toRef, ref, computed } from 'vue'
-import { wallet, notify } from 'src/localstores'
-import { shortid } from 'src/utils'
-import { copyToClipboard } from 'quasar'
+import { toRef, ref, onMounted } from 'vue'
+// import { notify } from 'src/localstores'
+// import { copyToClipboard } from 'quasar'
 
-import CreateAccount from 'src/components/account/CreateAccount.vue'
+import GenerateKey from './GenerateKey.vue'
 
 interface Props {
   password: string
@@ -79,20 +56,17 @@ interface Props {
 
 const props = defineProps<Props>()
 const password = toRef(props, 'password')
+
+const showInnerActionBtn = defineModel<boolean>('showInnerActionBtn')
+
 const publicKey = ref('')
+const privateKey = ref('')
+const mnemonic = ref('')
+const showMnemonic = ref(false)
 
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
+// const notification = notify.useNotificationStore()
 
-const account = computed(() => _wallet.account(publicKey.value))
-const chainId = computed(() => {
-  if (!account.value?.microchains?.size) {
-    return undefined
-  }
-  return Array.from(account.value?.microchains?.keys())[0]
-})
-const messageId = computed(() => account.value?.microchains?.get(chainId.value as string)?.message_id)
-
+/*
 const onCopyClick = (content: string) => {
   copyToClipboard(content)
     .then(() => {
@@ -107,5 +81,10 @@ const onCopyClick = (content: string) => {
       console.log('Fail copy', e)
     })
 }
+*/
+
+onMounted(() => {
+  showInnerActionBtn.value = true
+})
 
 </script>
