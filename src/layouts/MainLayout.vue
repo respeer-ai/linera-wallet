@@ -45,6 +45,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
+import wasmModuleUrl from '../../src-bex/wasm/linera_wasm_bg.wasm?url'
+import initWasm from '../../src-bex/wasm/linera_wasm'
+import { Berith } from '@hazae41/berith'
 
 import HeaderMenu from 'src/components/header/HeaderMenu.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
@@ -64,7 +67,10 @@ const alignPageCneter = computed(() => setting.alignPageCenter)
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-onMounted(() => {
+onMounted(async () => {
+  await initWasm(await fetch(wasmModuleUrl))
+  await Berith.initBundledOnce()
+
   notification.$subscribe((_, state) => {
     state.Notifications.forEach((notif, index) => {
       if (notif.Popup) {

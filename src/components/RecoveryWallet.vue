@@ -39,7 +39,7 @@ import { useRouter } from 'vue-router'
 import { wallet, oneshotsetting } from 'src/localstores'
 
 import LoginPassword from 'src/components/LoginPassword.vue'
-import InitializeAccount from 'src/components/InitializeAccount.vue'
+import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ValidateAccount from 'src/components/ValidateAccount.vue'
 
 const password = ref('')

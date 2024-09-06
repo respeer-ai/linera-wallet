@@ -176,9 +176,11 @@ struct MnemonicKeyPair {
 pub async fn generate_key_pair(passphrase: &str) -> Result<String, JsError> {
     let mut rng = bip39::rand::thread_rng();
     let mnemonic = bip39::Mnemonic::generate_in_with(&mut rng, bip39::Language::English, 24)?;
+    let secret_key = generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?;
+    let secret_key = secret_key.replace("\"", "");
     Ok(serde_json::to_string(&MnemonicKeyPair {
         mnemonic: mnemonic.clone(),
-        secret_key: generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?
+        secret_key
     })?)
 }
 
@@ -188,10 +190,13 @@ pub async fn generate_key_pair_from_mnemonic(mnemonic: &str, passphrase: &str) -
     let seed = mnemonic.to_seed(passphrase);
     use rand_chacha::rand_core::SeedableRng;
     let mut _seed = [0u8; 32];
-    _seed.copy_from_slice(&seed);
+    _seed.copy_from_slice(&seed[0..32]);
     let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
     let key_pair = KeyPair::generate_from(&mut rng);
-    Ok(format!("{:?}", serde_json::to_string(&key_pair)))
+    let key_str = format!("{}", serde_json::to_string(&key_pair)?);
+    log::info!("{}", key_str);
+    let key_str = key_str.replace("\"", "");
+    Ok(key_str[..64].to_string())
 }
 
 #[wasm_bindgen(start)]

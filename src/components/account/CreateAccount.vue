@@ -32,6 +32,7 @@ import {
 import { graphqlResult, _hex, endpoint } from 'src/utils'
 import { wallet, notify } from 'src/localstores'
 import { onMounted, toRef, ref } from 'vue'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
 import VerifyPassword from 'src/components/VerifyPassword.vue'
 
@@ -181,7 +182,19 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
   })
 }
 
-const createAccount = () => {
+const createAccount = async () => {
+  let keyPair = await lineraWasm.generate_key_pair('')
+  console.log('Generate key pair 1: ', keyPair)
+
+  const mnemonic = (JSON.parse(keyPair) as Record<string, string>).mnemonic
+  const privateKey = (JSON.parse(keyPair) as Record<string, string>).secret_key
+
+  keyPair = await lineraWasm.generate_key_pair_from_mnemonic(mnemonic, '')
+  console.log('Generate key pair 2: ', keyPair)
+
+  const _keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+  console.log('Generate key with private key: ', _hex.toHex(_keyPair.public().to_bytes().bytes), _hex.toHex(_keyPair.to_bytes().bytes))
+
   generateEd25519SigningKey((keyPair: Ed25519SigningKey) => {
     const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
     const privateKey = _hex.toHex(keyPair.to_bytes().bytes)
@@ -211,7 +224,7 @@ const createAccount = () => {
 
 const onPasswordVerified = () => {
   passwordVerifing.value = false
-  createAccount()
+  void createAccount()
 }
 
 const onPasswordError = () => {
@@ -234,7 +247,7 @@ onMounted(() => {
     publicKey.value = Array.from(_wallet.accounts.keys())[0]
     return
   }
-  createAccount()
+  void createAccount()
 })
 
 </script>
