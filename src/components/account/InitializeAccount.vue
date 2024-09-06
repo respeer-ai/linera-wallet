@@ -62,9 +62,9 @@ const password = toRef(props, 'password')
 
 const showInnerActionBtn = defineModel<boolean>('showInnerActionBtn')
 const mnemonic = defineModel<string>('mnemonic')
+const publicKey = defineModel<string>('publicKey')
+const privateKey = defineModel<string>('privateKey')
 
-const publicKey = ref('')
-const privateKey = ref('')
 const mnemonicWords = computed(() => mnemonic.value?.split(' '))
 const showMnemonic = ref(false)
 

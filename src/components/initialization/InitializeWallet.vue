@@ -22,7 +22,10 @@
         title='Secure wallet'
         :done='step > 2'
       >
-        <InitializeAccount v-if='!extensionMode' :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic' />
+        <InitializeAccount
+          v-if='!extensionMode' :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic'
+          v-model:public-key='publicKey' v-model:private-key='privateKey'
+        />
         <ExtensionInitializeAccount v-else :password='password' />
       </q-step>
       <q-step
@@ -54,7 +57,7 @@
 
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
-import { wallet, notify, oneshotsetting } from 'src/localstores'
+import { wallet, oneshotsetting } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
@@ -68,12 +71,12 @@ const step = ref(1)
 const password = ref('')
 const passwordError = ref(false)
 const publicKey = ref('')
+const privateKey = ref('')
 const mnemonic = ref('')
 const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
 
 const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
 const router = useRouter()
 const setting = oneshotsetting.useSettingStore()
 const extensionMode = computed(() => setting.extensionMode)
@@ -107,18 +110,9 @@ const savePassword = () => {
   })
 }
 
-const validateAccount = () => {
-  const account = _wallet.account(publicKey.value)
-  if (account) {
-    // TODO: init wallet
-    void router.push({ path: '/microchains' })
-    return
-  }
-  notification.pushNotification({
-    Title: 'Validate Account',
-    Message: 'Please provide correct account information, or regenerate a new one',
-    Popup: true,
-    Type: notify.NotifyType.Error
+const saveAccount = () => {
+  _wallet.addAccount(publicKey.value, privateKey.value, password.value, () => {
+    void router.push({ path: '/accounts' })
   })
 }
 
@@ -131,7 +125,7 @@ const onNextStepClick = () => {
       step.value++
       break
     case 3:
-      validateAccount()
+      saveAccount()
       break
   }
 }
