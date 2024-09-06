@@ -1,3 +1,4 @@
+use bip39::Mnemonic;
 /**
 This module defines the client API for the Web extension.
 
@@ -9,7 +10,7 @@ connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
 
-use linera_base::identifiers::ChainId;
+use linera_base::{crypto::KeyPair, identifiers::ChainId};
 use linera_chain::data_types::IncomingBundle;
 use linera_core::node::{
     LocalValidatorNode as _,
@@ -17,6 +18,7 @@ use linera_core::node::{
 };
 use linera_execution::Operation;
 
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
 
@@ -96,7 +98,7 @@ pub async fn get_client_context() -> Result<ClientContext, JsError> {
 pub async fn dapp_query_validators() -> Result<(), JsError> {
     let mut client_context: ClientContext = get_client_context().await?;
     let chain_id = client_context.wallet().default_chain().expect("No default chain");
-    
+
     let mut chain_client = client_context.make_chain_client(chain_id);
     log::info!(
         "Querying the validators of the current epoch of chain {}",
@@ -162,6 +164,34 @@ pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, me
 //     _ => Ok(None),
 //   }
     Ok(None)
+}
+
+#[derive(Serialize)]
+struct MnemonicKeyPair {
+    mnemonic: Mnemonic,
+    secret_key: String
+}
+
+#[wasm_bindgen]
+pub async fn generate_key_pair(passphrase: &str) -> Result<String, JsError> {
+    let mut rng = bip39::rand::thread_rng();
+    let mnemonic = bip39::Mnemonic::generate_in_with(&mut rng, bip39::Language::English, 24)?;
+    Ok(serde_json::to_string(&MnemonicKeyPair {
+        mnemonic: mnemonic.clone(),
+        secret_key: generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?
+    })?)
+}
+
+#[wasm_bindgen]
+pub async fn generate_key_pair_from_mnemonic(mnemonic: &str, passphrase: &str) -> Result<String, JsError> {
+    let mnemonic = bip39::Mnemonic::parse_normalized(mnemonic)?;
+    let seed = mnemonic.to_seed(passphrase);
+    use rand_chacha::rand_core::SeedableRng;
+    let mut _seed = [0u8; 32];
+    _seed.copy_from_slice(&seed);
+    let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
+    let key_pair = KeyPair::generate_from(&mut rng);
+    Ok(format!("{:?}", serde_json::to_string(&key_pair)))
 }
 
 #[wasm_bindgen(start)]
