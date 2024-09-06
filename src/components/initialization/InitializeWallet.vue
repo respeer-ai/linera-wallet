@@ -30,7 +30,7 @@
         title='Validate recovery'
         :done='step > 3'
       >
-        <ValidateAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' :mnemonic='mnemonic' />
+        <ValidateAccount v-if='!extensionMode' :mnemonic='mnemonic' v-model='mnemonicValid' />
         <ExtensionValidateAccount v-else v-model:password='password' v-model:error='passwordError' />
       </q-step>
     </q-stepper>
@@ -67,9 +67,9 @@ import ExtensionValidateAccount from 'src/components/extension/ValidateAccount.v
 const step = ref(1)
 const password = ref('')
 const passwordError = ref(false)
-const accountError = ref(true)
 const publicKey = ref('')
 const mnemonic = ref('')
+const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
 
 const _wallet = wallet.useWalletStore()
@@ -83,7 +83,7 @@ const canGotoNext = () => {
     case 1:
       return !passwordError.value && password.value.length
     case 3:
-      return !accountError.value
+      return mnemonicValid.value
     default:
       return true
   }
@@ -96,7 +96,7 @@ const btnText = computed(() => {
     case 2:
       return 'Validate secret recovery phrase'
     case 3:
-      return 'Linera Now'
+      return 'Linera now'
   }
   return 'Next'
 })
