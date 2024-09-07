@@ -4,7 +4,7 @@ description = "The Linera Web client"
 version = "0.1.0"
 authors = ["Linera <contact@linera.io>"]
 edition = "2021"
-repository = "https://github.com/respeer-ai/linera-wallet.git"
+repository = "https://github.com/respeer-ai/linera-wallet/"
 license = "Apache-2.0"
 
 [lib]
@@ -24,12 +24,6 @@ chrono = "0.4.38"
 serde_json = "1.0.116"
 tokio = "1.38.0"
 local-encoding = "0.2.0"
-rand_chacha = "0.3.1"
-
-[dependencies.bip39]
-git = "https://github.com/rust-bitcoin/rust-bip39.git"
-version = "2.1.0"
-features = [ "rand" ]
 
 [dependencies.linera-base]
 path = "./linera-protocol/linera-base"
@@ -42,7 +36,7 @@ features = ["web"]
 [dependencies.linera-client]
 path = "./linera-protocol/linera-client"
 default-features = false
-features = ["web", "local-storage"]
+features = ["web", "local-storage", "no-storage"]
 
 [dependencies.linera-core]
 path = "./linera-protocol/linera-core"
