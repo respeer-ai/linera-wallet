@@ -18,7 +18,7 @@ export class Sentinel {
     })
 
     subscription.Subscription.subscribe(
-      ['NewIncomingMessage'],
+      ['NewIncomingBundle'],
       (subscriptionId: string, data: unknown) => Sentinel.onMessage(subscriptionId, data)
     )
   }

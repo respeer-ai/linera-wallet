@@ -97,7 +97,7 @@ const notification = notify.useNotificationStore()
 const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
 const apolloClient = new ApolloClient(options)
 
-const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingMessage?: () => void) => {
+const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingBundle?: () => void) => {
   const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
@@ -117,9 +117,9 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
     if (newBlock) {
       onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)
     }
-    const newIncomingMessage = graphqlResult.keyValue(reason, 'NewIncomingMessage')
-    if (newIncomingMessage) {
-      onNewIncomingMessage?.()
+    const newIncomingBundle = graphqlResult.keyValue(reason, 'NewIncomingBundle')
+    if (newIncomingBundle) {
+      onNewIncomingBundle?.()
     }
   })
 }
@@ -256,7 +256,7 @@ const _getChainAccountBalances = () => {
   })
 }
 
-const getBlockWithHash = (chainId: string, hash: string, done?: (height: number, incomingMessages: Array<graphqlResult.IncomingMessage>) => void) => {
+const getBlockWithHash = (chainId: string, hash: string, done?: (height: number, incomingBundles: Array<graphqlResult.IncomingBundle>) => void) => {
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query block($chainId: String!, $hash: String!) {
       block(chainId: $chainId, hash: $hash) {
@@ -267,7 +267,7 @@ const getBlockWithHash = (chainId: string, hash: string, done?: (height: number,
             block {
               chainId
               epoch
-              incomingMessages {
+              incomingBundles {
                 origin
                 action
                 event
@@ -308,9 +308,9 @@ const getBlockWithHash = (chainId: string, hash: string, done?: (height: number,
     const value = graphqlResult.keyValue(block, 'value')
     const executedBlock = graphqlResult.keyValue(value, 'executedBlock')
     const _block = graphqlResult.keyValue(executedBlock, 'block')
-    const incomingMessages = graphqlResult.keyValue(_block, 'incomingMessages') as Array<graphqlResult.IncomingMessage>
+    const incomingBundles = graphqlResult.keyValue(_block, 'incomingBundles') as Array<graphqlResult.IncomingBundle>
     const height = graphqlResult.keyValue(_block, 'height') as number
-    done?.(height, incomingMessages)
+    done?.(height, incomingBundles)
   })
 
   onError(() => {
@@ -319,22 +319,22 @@ const getBlockWithHash = (chainId: string, hash: string, done?: (height: number,
 }
 
 const _getBlockWithHash = (chainId: string, hash: string) => {
-  getBlockWithHash(chainId, hash, (height: number, incomingMessages: Array<graphqlResult.IncomingMessage>) => {
+  getBlockWithHash(chainId, hash, (height: number, incomingBundles: Array<graphqlResult.IncomingBundle>) => {
     try {
-      incomingMessages.forEach((incomingMessage: graphqlResult.IncomingMessage) => {
-        if (!incomingMessage.event?.message?.System?.Credit) return
-        _wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.source, (fromPublicKey: string | undefined) => {
-          _wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.target, (toPublicKey: string | undefined) => {
+      incomingBundles.forEach((incomingBundle: graphqlResult.IncomingBundle) => {
+        if (!incomingBundle.event?.message?.System?.Credit) return
+        _wallet.publicKeyFromOwner(incomingBundle.event?.message?.System?.Credit?.source, (fromPublicKey: string | undefined) => {
+          _wallet.publicKeyFromOwner(incomingBundle.event?.message?.System?.Credit?.target, (toPublicKey: string | undefined) => {
             _wallet.addActivity(
-              incomingMessage.origin.sender,
+              incomingBundle.origin.sender,
               fromPublicKey,
               chainId,
               toPublicKey,
-              incomingMessage.event?.message?.System?.Credit?.amount,
+              incomingBundle.event?.message?.System?.Credit?.amount,
               height,
-              incomingMessage.event?.timestamp,
-              incomingMessage.event?.certificate_hash,
-              incomingMessage.event?.grant
+              incomingBundle.event?.timestamp,
+              incomingBundle.event?.certificate_hash,
+              incomingBundle.event?.grant
             )
           })
         })
@@ -369,13 +369,13 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   })
 }
 
-const getPendingMessages = (chainId: string, done?: (messages: Array<graphqlResult.IncomingMessage>) => void) => {
+const getPendingMessages = (chainId: string, done?: (messages: Array<graphqlResult.IncomingBundle>) => void) => {
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query getPendingMessages($chainId: String!) {
       pendingMessages(chainId: $chainId) {
         action
         origin
-        event
+        bundle
       }
     }
   `, {
@@ -385,7 +385,8 @@ const getPendingMessages = (chainId: string, done?: (messages: Array<graphqlResu
   }))
 
   onResult((res) => {
-    done?.(graphqlResult.data(res, 'pendingMessages') as Array<graphqlResult.IncomingMessage>)
+    console.log('Get pending messages: ', res)
+    done?.(graphqlResult.data(res, 'pendingMessages') as Array<graphqlResult.IncomingBundle>)
   })
 
   onError((error) => {
@@ -394,8 +395,8 @@ const getPendingMessages = (chainId: string, done?: (messages: Array<graphqlResu
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const constructNewBlockWithIncomingMessages = (chainId: string, keyPair: Ed25519SigningKey) => {
-  getPendingMessages(chainId, (messages: Array<graphqlResult.IncomingMessage>) => {
+const constructNewBlockWithIncomingBundles = (chainId: string, keyPair: Ed25519SigningKey) => {
+  getPendingMessages(chainId, (messages: Array<graphqlResult.IncomingBundle>) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     fetch(wasmModuleUrl).then((buffer) => {
       initWasm(buffer).then(() => {
@@ -447,7 +448,7 @@ const processChains = () => {
           _getBlockWithHash(chainId, hash)
         }, () => {
           const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
-          constructNewBlockWithIncomingMessages(chainId, keyPair)
+          constructNewBlockWithIncomingBundles(chainId, keyPair)
         })
         getAccountBalance(chainId, addr, (balance: number) => {
           _wallet.setAccountBalance(addr, chainId, balance)

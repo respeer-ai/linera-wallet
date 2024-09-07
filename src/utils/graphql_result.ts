@@ -48,7 +48,7 @@ export interface Event {
   message: Message
 }
 
-export interface IncomingMessage {
+export interface IncomingBundle {
   origin: Origin
   action: string
   event: Event
