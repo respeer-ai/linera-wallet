@@ -25,6 +25,10 @@ serde_json = "1.0.116"
 tokio = "1.38.0"
 local-encoding = "0.2.0"
 
+[features]
+default = ["no-storage"]
+no-storage = ["linera-client/no-storage"]
+
 [dependencies.linera-base]
 path = "./linera-protocol/linera-base"
 features = ["web"]
@@ -36,7 +40,7 @@ features = ["web"]
 [dependencies.linera-client]
 path = "./linera-protocol/linera-client"
 default-features = false
-features = ["web", "local-storage", "no-storage"]
+features = ["web", "local-storage"]
 
 [dependencies.linera-core]
 path = "./linera-protocol/linera-core"

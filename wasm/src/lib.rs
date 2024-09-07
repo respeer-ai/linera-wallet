@@ -40,10 +40,21 @@ pub async fn get_storage() -> Result<WebStorage, <WebStorage as linera_storage::
     ).await
 }
 
+pub async fn get_fake_storage() -> Result<WebStorage, <WebStorage as linera_storage::Storage>::StoreError> {
+    let root_key = &[];
+    linera_storage::MemoryStorage::initialize(
+        linera_views::memory::MemoryStoreConfig::new(1),
+        "linera",
+        root_key,
+        None,
+    ).await
+}
+
 type PersistentWallet = linera_client::persistent::LocalStorage<Wallet>;
 type ClientContext = linera_client::client_context::ClientContext<WebStorage, PersistentWallet>;
 
-type SignClientContext = linera_client::client_context::ClientContext<WebStorage, FakeWallet>;
+type MemoryFakeWallet = linera_client::persistent::Memory<FakeWallet>;
+type SignClientContext = linera_client::client_context::ClientContext<WebStorage, MemoryFakeWallet>;
 
 // TODO get from config
 pub const OPTIONS: ClientOptions = ClientOptions {
@@ -92,12 +103,11 @@ pub const OPTIONS: ClientOptions = ClientOptions {
 pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
     info!(">>get_sign_client_context");
     // let wallet = linera_client::config::WalletState::read_from_local_storage("checko-wallet")?;
-    let mock_wallet = FakeWallet::new();
-    let wallet = linera_client::config::WalletState::new_no_storage(&mock_wallet);
+    let wallet = linera_client::config::WalletState::new_no_storage(FakeWallet::new());
     info!(">>get wallet successful");
     let mut storage = get_storage().await?;
     info!(">>get storage successful");
-    Ok(SignClientContext::new_no_storage(get_storage().await?, OPTIONS, wallet))
+    Ok(SignClientContext::new_no_storage(get_fake_storage().await?, OPTIONS, wallet))
 }
 
 // pub async fn get_client_context() -> Result<ClientContext, JsError> {
@@ -116,7 +126,7 @@ pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
 // pub async fn dapp_query_validators() -> Result<(), JsError> {
 //     let mut client_context: ClientContext = get_client_context().await?;
 //     let chain_id = client_context.wallet().default_chain().expect("No default chain");
-    
+
 //     let mut chain_client = client_context.make_chain_client(chain_id);
 //     log::info!(
 //         "Querying the validators of the current epoch of chain {}",
@@ -151,6 +161,7 @@ pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
 // }
 
 #[wasm_bindgen]
+#[cfg(not(feature = "no-storage"))]
 pub async fn set_wallet(wallet: &str) -> Result<(), wasm_bindgen::JsError> {
     log::info!("--set_wallet");
     log::info!("-- wallet: {:?}", wallet);
