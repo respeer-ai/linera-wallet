@@ -57,7 +57,7 @@
 
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
-import { wallet, oneshotsetting } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
@@ -76,10 +76,8 @@ const mnemonic = ref('')
 const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
 
-const _wallet = wallet.useWalletStore()
 const router = useRouter()
-const setting = oneshotsetting.useSettingStore()
-const extensionMode = computed(() => setting.extensionMode)
+const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 const canGotoNext = () => {
   switch (step.value) {
@@ -105,14 +103,14 @@ const btnText = computed(() => {
 })
 
 const savePassword = () => {
-  _wallet.savePassword(password.value, () => {
+  localStore.wallet.savePassword(password.value, () => {
     step.value++
   })
 }
 
 const saveAccount = () => {
-  _wallet.addAccount(publicKey.value, privateKey.value, password.value, () => {
-    _wallet.selectAddress(publicKey.value)
+  localStore.wallet.addAccount(publicKey.value, privateKey.value, password.value, () => {
+    localStore.wallet.selectAddress(publicKey.value)
     void router.push({ path: '/accounts' })
   })
 }

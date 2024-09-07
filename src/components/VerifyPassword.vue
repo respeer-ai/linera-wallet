@@ -27,7 +27,7 @@
 
 <script setup lang='ts'>
 import { ref, toRef, watch } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 
 import InputPassword from 'src/components/InputPassword.vue'
 
@@ -42,23 +42,21 @@ const password = defineModel<string>('password', { default: '' })
 const shadowPassword = ref('')
 const emit = defineEmits(['verified', 'error', 'cancel'])
 const passwordError = ref(false)
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
 
 watch(shadowPassword, () => {
   password.value = shadowPassword.value
 })
 
 const onVerifyClick = () => {
-  _wallet.verifyPassword(password.value, () => {
+  localStore.wallet.verifyPassword(password.value, () => {
     emit('verified')
   }, () => {
     emit('error')
-    notification.pushNotification({
+    localStore.notification.pushNotification({
       Title: 'Verify Password',
       Message: 'Fail to verify password. Please confirm you input correct password.',
       Popup: true,
-      Type: notify.NotifyType.Error
+      Type: localStore.notify.NotifyType.Error
     })
   })
 }

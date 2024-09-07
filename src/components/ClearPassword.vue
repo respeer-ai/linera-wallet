@@ -19,20 +19,16 @@
 </template>
 
 <script setup lang='ts'>
-import { notify, wallet, persistentsetting } from 'src/localstores'
-
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
-const _persistentsetting = persistentsetting.useSettingStore()
+import { localStore } from 'src/localstores'
 
 const onClearAccountsClick = () => {
-  _wallet.reset(true)
-  _persistentsetting.reset()
-  notification.pushNotification({
+  localStore.wallet.reset(true)
+  localStore.persistentSetting.reset()
+  localStore.notification.pushNotification({
     Title: 'Clear Accounts',
     Message: 'Success clear all accounts.',
     Popup: true,
-    Type: notify.NotifyType.Info
+    Type: localStore.notify.NotifyType.Info
   })
 }
 </script>

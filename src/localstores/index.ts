@@ -1,24 +1,30 @@
 import { useAuthStore } from './auth'
-import { useNotificationStore, notify, NotifyType } from './notify'
+import { useNotificationStore } from './notify'
 import { usePopupStore } from './popup'
 import { useSettingStore as useOneShotSettingStore } from './setting/oneshot'
 import { useSettingStore as usePersistentSettingStore } from './setting/persistent'
 import { useWalletStore } from './wallet'
 
-const wallet = useWalletStore()
-const notification = useNotificationStore()
-const persistentSetting = usePersistentSettingStore()
-const oneShotSetting = useOneShotSettingStore()
-const popup = usePopupStore()
-const auth = useAuthStore()
+import * as notify from './notify'
+import * as walletDef from './wallet'
+
+export const wallet = useWalletStore()
+export const notification = useNotificationStore()
+export const persistentSetting = usePersistentSettingStore()
+export const oneShotSetting = useOneShotSettingStore()
+export const popup = usePopupStore()
+export const auth = useAuthStore()
 
 export const localStore = {
   wallet,
+  walletDef,
   notification,
   notify,
-  NotifyType,
   persistentSetting,
   oneShotSetting,
   popup,
   auth
 }
+
+export * as walletDef from './wallet'
+export * as notifyDef from './notify'

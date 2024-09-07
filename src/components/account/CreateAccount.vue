@@ -30,7 +30,7 @@ import {
   useQuery
 } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { onMounted, toRef, ref } from 'vue'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
@@ -50,9 +50,6 @@ const password = toRef(props, 'password')
 const shadowPassword = ref(password.value)
 const checkExist = toRef(props, 'checkExist')
 const passwordVerifing = ref(false)
-
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string, certificateHash: string) => void) => {
   const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetPublicHost, endpoint.faucetPort)
@@ -187,14 +184,14 @@ const createAccount = async () => {
     const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
     void initMicrochainChainStore(_publicKey, signature, chainId, messageId, certificateHash, () => {
       signNewBlock(chainId, 0, keyPair, () => {
-        void _wallet.addAccount(_publicKey, privateKey, shadowPassword.value as string, () => {
-          _wallet.addChain(_publicKey, chainId, messageId, certificateHash, endpoint.rpcUrl)
+        void localStore.wallet.addAccount(_publicKey, privateKey, shadowPassword.value as string, () => {
+          localStore.wallet.addChain(_publicKey, chainId, messageId, certificateHash, endpoint.rpcUrl)
           publicKey.value = _publicKey
-          notification.pushNotification({
+          localStore.notification.pushNotification({
             Title: 'Create Account',
             Message: 'Success create new account.',
             Popup: true,
-            Type: notify.NotifyType.Info
+            Type: localStore.notify.NotifyType.Info
           })
         }, () => {
           console.log('Fail add account')
@@ -225,8 +222,8 @@ onMounted(() => {
   if (!autoRun.value) {
     return
   }
-  if (checkExist.value && _wallet.accounts.size > 0) {
-    publicKey.value = Array.from(_wallet.accounts.keys())[0]
+  if (checkExist.value && localStore.wallet.accounts.size > 0) {
+    publicKey.value = Array.from(localStore.wallet.accounts.keys())[0]
     return
   }
   void createAccount()

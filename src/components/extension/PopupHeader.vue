@@ -13,10 +13,9 @@
 </template>
 
 <script setup lang='ts'>
-import { popup } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { computed } from 'vue'
 
-const _popup = popup.usePopupStore()
-const connection = computed(() => _popup.currentConnection)
+const connection = computed(() => localStore.popup.currentConnection)
 
 </script>

@@ -41,7 +41,7 @@
                     {{ shortid.shortId(_publicKey, 6) }}
                   </div>
                   <div class='text-brown-6'>
-                    {{ _wallet.accountBalance(_publicKey, undefined) }} TLINERA
+                    {{ localStore.wallet.accountBalance(_publicKey, undefined) }} TLINERA
                   </div>
                 </div>
               </div>
@@ -105,7 +105,7 @@
                     {{ shortid.shortId(_chainId, 6) }}
                   </div>
                   <div class='text-brown-6'>
-                    {{ _wallet.chainBalance(undefined, _chainId) }} TLINERA
+                    {{ localStore.wallet.chainBalance(undefined, _chainId) }} TLINERA
                   </div>
                 </div>
               </div>
@@ -239,31 +239,28 @@
 </template>
 
 <script setup lang='ts'>
-import { wallet, popup, auth } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { computed, ref } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 
 import lineraLogo from '../../../assets/LineraLogo.png'
 
-const _wallet = wallet.useWalletStore()
-const publicKeys = computed(() => _wallet.publicKeys)
+const publicKeys = computed(() => localStore.wallet.publicKeys)
 const publicKey = ref('')
 const chainId = ref('')
-const accountChainIds = computed(() => _wallet.accountChainIds(publicKey.value))
+const accountChainIds = computed(() => localStore.wallet.accountChainIds(publicKey.value))
 const step = ref(1)
 const allowCheckAccount = ref(false)
-const _popup = popup.usePopupStore()
-const origin = computed(() => _popup.popupOrigin)
-const method = computed(() => _popup._popupRequest)
-const respond = computed(() => _popup._popupRespond)
+const origin = computed(() => localStore.popup.popupOrigin)
+const method = computed(() => localStore.popup._popupRequest)
+const respond = computed(() => localStore.popup._popupRespond)
 const processing = ref(false)
-const _auth = auth.useAuthStore()
 
 const onNextStepClick = () => {
   step.value += 1
   if (step.value === 3) {
-    _auth.addChain(_popup.popupOrigin, publicKey.value, chainId.value)
+    localStore.auth.addChain(localStore.popup.popupOrigin, publicKey.value, chainId.value)
   }
   if (step.value === 4) {
     processing.value = true
@@ -272,8 +269,8 @@ const onNextStepClick = () => {
       void respond.value?.({
         approved: true
       } as commontypes.ConfirmationPopupResponse)
-      _auth.addAuth(origin.value, method.value)
-      _popup.removeRequest(_popup.popupRequestId)
+      localStore.auth.addAuth(origin.value, method.value)
+      localStore.popup.removeRequest(localStore.popup.popupRequestId)
     }, 2000)
   }
 }
@@ -283,7 +280,7 @@ const onCancelClick = () => {
     approved: false,
     message: 'Canceled by user'
   } as commontypes.ConfirmationPopupResponse)
-  _popup.removeRequest(_popup.popupRequestId)
+  localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
 const forwadable = () => {

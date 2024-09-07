@@ -27,7 +27,7 @@
 import { useQuasar } from 'quasar'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { BexPayload } from '@quasar/app-vite'
-import { popup, wallet, auth } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import * as middlewaretypes from '../../../src-bex/middleware/types'
 import { commontypes } from 'src/types'
 
@@ -37,33 +37,30 @@ import LineraGraphqlMutationConfirmation from 'src/components/extension/popup/Li
 import EthSignConfirmation from 'src/components/extension/popup/EthSignConfirmation.vue'
 
 const quasar = useQuasar()
-const _popup = popup.usePopupStore()
-const popupCount = computed(() => _popup.popups.size)
-const popupType = computed(() => _popup._popupType)
-const popupRequest = computed(() => _popup._popupRequest)
-const _wallet = wallet.useWalletStore()
-const _auth = auth.useAuthStore()
+const popupCount = computed(() => localStore.popup.popups.size)
+const popupType = computed(() => localStore.popup._popupType)
+const popupRequest = computed(() => localStore.popup._popupRequest)
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
   switch (payload.data.type) {
     case middlewaretypes.PopupRequestType.CONFIRMATION:
       if (payload.data.type === middlewaretypes.PopupRequestType.CONFIRMATION) {
-        _popup.addConnection({
+        localStore.popup.addConnection({
           origin: payload.data.request.origin,
           favicon: payload.data.request.favicon,
           name: payload.data.request.name
         })
       }
-      return _popup.insertRequest(payload)
+      return localStore.popup.insertRequest(payload)
     default:
       return void payload.respond({})
   }
 }
 
 onMounted(() => {
-  _auth.load()
-  _popup.$reset()
-  _wallet.loadWithoutDecrypt()
+  localStore.auth.load()
+  localStore.popup.$reset()
+  localStore.wallet.loadWithoutDecrypt()
   quasar.bex.on('popup.new', handleNewRequest)
 })
 

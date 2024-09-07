@@ -19,10 +19,7 @@ import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
 import { graphqlResult, _hex, endpoint } from 'src/utils'
-import { wallet, notify } from 'src/localstores'
-
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
+import { localStore } from 'src/localstores'
 
 const openChain = async (publicKey: string, done?: (chainId: string, messageId: string, certificateHash: string) => void) => {
   const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetPublicHost, endpoint.faucetPort)
@@ -139,22 +136,22 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
 }
 
 const onOpenChainClick = () => {
-  if (!_wallet.currentAddress) {
+  if (!localStore.wallet.currentAddress) {
     return
   }
-  void openChain(_wallet.currentAddress, (chainId: string, messageId: string, certificateHash: string) => {
-    _wallet.addChain(_wallet.currentAddress, chainId, messageId, certificateHash, endpoint.rpcUrl)
+  void openChain(localStore.wallet.currentAddress, (chainId: string, messageId: string, certificateHash: string) => {
+    localStore.wallet.addChain(localStore.wallet.currentAddress, chainId, messageId, certificateHash, endpoint.rpcUrl)
     const typeNameBytes = new TextEncoder().encode('Nonce::')
     const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
-    const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string)))
+    const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(localStore.wallet.currentAccount?.privateKey as string)))
     const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
-    void initMicrochainChainStore(_wallet.currentAddress, signature, chainId, messageId, certificateHash, () => {
-      signNewBlock(chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_wallet.currentAccount?.privateKey as string))), () => {
-        notification.pushNotification({
+    void initMicrochainChainStore(localStore.wallet.currentAddress, signature, chainId, messageId, certificateHash, () => {
+      signNewBlock(chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(localStore.wallet.currentAccount?.privateKey as string))), () => {
+        localStore.notification.pushNotification({
           Title: 'Open Chain',
           Message: 'Success open microchain.',
           Popup: true,
-          Type: notify.NotifyType.Info
+          Type: localStore.notify.NotifyType.Info
         })
       })
     })

@@ -84,7 +84,7 @@
             color: "#555555",
           }'
         >
-          {{ _wallet.accountBalance(undefined, chainId).toFixed(6) }}
+          {{ localStore.wallet.accountBalance(undefined, chainId).toFixed(6) }}
           <strong>TLINERA</strong>
         </div>
         <div
@@ -93,7 +93,7 @@
             color: "#555555",
           }'
         >
-          {{ _wallet.chainBalance(undefined, chainId).toFixed(6) }}
+          {{ localStore.wallet.chainBalance(undefined, chainId).toFixed(6) }}
           <strong>TLINERA</strong>
         </div>
         <div
@@ -128,14 +128,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { wallet, notify } from '../localstores'
+import { localStore } from '../localstores'
 import { copyToClipboard } from 'quasar'
 import { useRouter } from 'vue-router'
 
-const _wallet = wallet.useWalletStore()
-const microchains = computed(() => _wallet.currentChains)
-
-const notification = notify.useNotificationStore()
+const microchains = computed(() => localStore.wallet.currentChains)
 
 const router = useRouter()
 
@@ -155,11 +152,11 @@ const onCloseClick = (chainId: string) => {
 const onCopyChainIdClick = (chainId: string) => {
   copyToClipboard(chainId)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy Chain Id',
         Message: `Success copy chain id ${chainId} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {

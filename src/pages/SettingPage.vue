@@ -8,13 +8,12 @@
 </template>
 
 <script setup lang="ts">
-import { oneshotsetting } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { computed } from 'vue'
 
 import WalletSetting from 'src/components/WalletSetting.vue'
 import ExtensionWalletSetting from 'src/components/extension/WalletSetting.vue'
 
-const setting = oneshotsetting.useSettingStore()
-const extensionMode = computed(() => setting.extensionMode)
+const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 </script>

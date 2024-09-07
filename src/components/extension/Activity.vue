@@ -51,35 +51,32 @@
 
 <script setup lang='ts'>
 import { computed } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore, walletDef } from 'src/localstores'
 import { shortid } from 'src/utils'
 import { copyToClipboard } from 'quasar'
 
-const _wallet = wallet.useWalletStore()
-const activities = computed(() => _wallet.currentAccountActivities)
+const activities = computed(() => localStore.wallet.currentAccountActivities)
 
-const notification = notify.useNotificationStore()
-
-const activitySign = (activity: wallet.Activity) => {
-  if (_wallet.moveBetweenChain(activity)) return 'Move'
-  if (_wallet.receivedByAccount(activity)) return 'Received'
-  if (_wallet.sendFromAccount(activity)) return 'Sent'
+const activitySign = (activity: walletDef.Activity) => {
+  if (localStore.wallet.moveBetweenChain(activity)) return 'Move'
+  if (localStore.wallet.receivedByAccount(activity)) return 'Received'
+  if (localStore.wallet.sendFromAccount(activity)) return 'Sent'
 }
 
-const activityIcon = (activity: wallet.Activity) => {
-  if (_wallet.moveBetweenChain(activity)) return 'balance'
-  if (_wallet.receivedByAccount(activity)) return 'input'
-  if (_wallet.sendFromAccount(activity)) return 'output'
+const activityIcon = (activity: walletDef.Activity) => {
+  if (localStore.wallet.moveBetweenChain(activity)) return 'balance'
+  if (localStore.wallet.receivedByAccount(activity)) return 'input'
+  if (localStore.wallet.sendFromAccount(activity)) return 'output'
 }
 
 const onCopyClick = (address: string) => {
   copyToClipboard(address)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy Address',
         Message: `Success copy address ${address} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {

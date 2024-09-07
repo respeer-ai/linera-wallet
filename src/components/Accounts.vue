@@ -58,7 +58,7 @@
           }'
           class='row'
         >
-          <span>{{ _wallet.displayAddress(address) }}</span>
+          <span>{{ localStore.wallet.displayAddress(address) }}</span>
           <q-icon
             name='content_copy'
             size='16px'
@@ -76,7 +76,7 @@
             color: "#555555",
           }'
         >
-          {{ _wallet.accountBalance(address, undefined).toFixed(6) }}
+          {{ localStore.wallet.accountBalance(address, undefined).toFixed(6) }}
           <strong>TLINERA</strong>
         </div>
         <div
@@ -119,16 +119,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { wallet, notify } from '../localstores'
+import { localStore } from '../localstores'
 import { copyToClipboard } from 'quasar'
 
-const _wallet = wallet.useWalletStore()
-const addresses = computed(() => _wallet.publicKeys)
-
-const notification = notify.useNotificationStore()
+const addresses = computed(() => localStore.wallet.publicKeys)
 
 const onSwitchClick = (address: string) => {
-  _wallet.selectAddress(address)
+  localStore.wallet.selectAddress(address)
 }
 
 const onExportClick = (chainId: string) => {
@@ -138,11 +135,11 @@ const onExportClick = (chainId: string) => {
 const onCopyAddressClick = (address: string) => {
   copyToClipboard(address)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy Address',
         Message: `Success copy address ${address} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {
@@ -151,6 +148,6 @@ const onCopyAddressClick = (address: string) => {
 }
 
 const onDeleteClick = (address: string) => {
-  _wallet.deleteAddress(address)
+  localStore.wallet.deleteAddress(address)
 }
 </script>

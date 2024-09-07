@@ -41,7 +41,7 @@
                     {{ shortid.shortId(_publicKey, 6) }}
                   </div>
                   <div class='text-brown-6'>
-                    {{ _wallet.accountBalance(_publicKey, undefined) }} TLINERA
+                    {{ localStore.wallet.accountBalance(_publicKey, undefined) }} TLINERA
                   </div>
                 </div>
               </div>
@@ -175,24 +175,21 @@
 </template>
 
 <script setup lang='ts'>
-import { wallet, popup, auth } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { computed, ref } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 
 import lineraLogo from '../../../assets/LineraLogo.png'
 
-const _wallet = wallet.useWalletStore()
-const publicKeys = computed(() => _wallet.publicKeys)
+const publicKeys = computed(() => localStore.wallet.publicKeys)
 const publicKey = ref('')
 const step = ref(1)
 const allowCheckAccount = ref(false)
-const _popup = popup.usePopupStore()
-const respond = computed(() => _popup._popupRespond)
-const origin = computed(() => _popup.popupOrigin)
-const method = computed(() => _popup._popupRequest)
+const respond = computed(() => localStore.popup._popupRespond)
+const origin = computed(() => localStore.popup.popupOrigin)
+const method = computed(() => localStore.popup._popupRequest)
 const processing = ref(false)
-const _auth = auth.useAuthStore()
 
 const onNextStepClick = () => {
   step.value += 1
@@ -202,8 +199,8 @@ const onNextStepClick = () => {
       processing.value = false
       const _respond = respond.value
       try {
-        _popup.removeRequest(_popup.popupRequestId)
-        _auth.addAuth(origin.value, method.value)
+        localStore.popup.removeRequest(localStore.popup.popupRequestId)
+        localStore.auth.addAuth(origin.value, method.value)
         void _respond?.({
           approved: true
         } as commontypes.ConfirmationPopupResponse)
@@ -222,7 +219,7 @@ const onCancelClick = () => {
     approved: false,
     message: 'Canceled by user'
   } as commontypes.ConfirmationPopupResponse)
-  _popup.removeRequest(_popup.popupRequestId)
+  localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
 const forwadable = () => {

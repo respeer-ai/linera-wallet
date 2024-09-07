@@ -167,24 +167,21 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { wallet, notify } from '../localstores'
+import { localStore } from '../localstores'
 import { shortid } from '../utils'
 import { copyToClipboard } from 'quasar'
 
-const _wallet = wallet.useWalletStore()
-const activities = computed(() => _wallet.currentAccountActivities)
-
-const notification = notify.useNotificationStore()
+const activities = computed(() => localStore.wallet.currentAccountActivities)
 const addressDisplayLength = ref(10)
 
 const onCopyClick = (address: string) => {
   copyToClipboard(address)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy Address',
         Message: `Success copy address ${address} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {
