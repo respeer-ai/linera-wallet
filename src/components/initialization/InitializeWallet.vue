@@ -112,6 +112,7 @@ const savePassword = () => {
 
 const saveAccount = () => {
   _wallet.addAccount(publicKey.value, privateKey.value, password.value, () => {
+    _wallet.selectAddress(publicKey.value)
     void router.push({ path: '/accounts' })
   })
 }

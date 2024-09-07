@@ -16,7 +16,7 @@
       </div>
     </div>
     <div v-if='step === 2'>
-      <ValidateAccount v-model:error='accountError' v-model:public-key='publicKey' />
+      <ValidateAccount v-if='!extensionMode' :mnemonic='mnemonic' v-model='mnemonicValid' />
       <div class='row'>
         <q-space />
         <q-btn
@@ -40,12 +40,14 @@ import { wallet, oneshotsetting } from 'src/localstores'
 
 import LoginPassword from 'src/components/LoginPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
-import ValidateAccount from 'src/components/ValidateAccount.vue'
+import ValidateAccount from 'src/components/account/ValidateAccount.vue'
 
 const password = ref('')
 const step = ref(0)
 const publicKey = ref('')
 const accountError = ref(true)
+const mnemonic = ref('')
+const mnemonicValid = ref(false)
 
 const router = useRouter()
 const _wallet = wallet.useWalletStore()

@@ -15,6 +15,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
+    meta: {
+      ShowSideMenu: true
+    },
     children: [
       { path: '', component: () => import('pages/LaunchPage.vue') },
       {
@@ -57,7 +60,7 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: '/recovery',
+        path: 'recovery',
         component: () => import('pages/RecoveryPage.vue'),
         meta: {
           ShowSideMenu: false

@@ -143,7 +143,7 @@ import { persistentsetting, notify } from 'src/localstores'
 import { endpoint } from 'src/utils'
 import * as constant from 'src/const'
 
-import CreateAccount from 'src/components/CreateAccount.vue'
+import CreateAccount from 'src/components/account/CreateAccount.vue'
 import OpenChain from 'src/components/OpenChain.vue'
 import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
