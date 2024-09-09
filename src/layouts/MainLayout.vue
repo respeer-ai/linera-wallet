@@ -2,7 +2,7 @@
   <q-layout view='hHh Lpr fFf'>
     <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
-        <HeaderMenu :style='{ width: "100%" }' />
+        <MainHeaderView :style='{ width: "100%" }' />
       </q-toolbar>
       <q-resize-observer @resize='onHeaderResize' />
     </q-header>
@@ -42,7 +42,7 @@ import initWasm from '../../src-bex/wasm/linera_wasm'
 import { Berith } from '@hazae41/berith'
 import { localStore } from 'src/localstores'
 
-import HeaderMenu from 'src/components/header/HeaderMenu.vue'
+import MainHeaderView from 'src/components/header/MainHeaderView.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
 

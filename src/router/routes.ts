@@ -22,6 +22,14 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('pages/LaunchPage.vue') },
       {
+        path: 'home',
+        component: () => import('pages/HomePage.vue'),
+        meta: {
+          AlignPageCenter: true,
+          ShowSideMenu: false
+        }
+      },
+      {
         path: 'accounts',
         component: () => import('pages/AccountsPage.vue'),
         meta: {
