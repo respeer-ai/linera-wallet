@@ -1,5 +1,5 @@
 <template>
-  <div class='full-width'>
+  <div class='fill-parent text-center onboarding-container shadow-1 onboarding-padding'>
     <LoginPassword v-if='step === 0' v-model:password='password' @unlocked='unlocked' />
     <div v-if='step === 1'>
       <InitializeAccount :password='password' />

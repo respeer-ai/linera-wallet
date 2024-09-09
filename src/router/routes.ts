@@ -51,7 +51,13 @@ const routes: RouteRecordRaw[] = [
           ShowSideMenu: false
         }
       },
-      { path: 'improvement', component: () => import('pages/ImprovementPage.vue') },
+      {
+        path: 'improvement',
+        component: () => import('pages/ImprovementPage.vue'),
+        meta: {
+          ShowSideMenu: false
+        }
+      },
       {
         path: 'initializewallet',
         component: () => import('pages/InitializeWalletPage.vue'),
