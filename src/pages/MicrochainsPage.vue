@@ -7,12 +7,11 @@
 
 <script setup lang='ts'>
 import { computed } from 'vue'
-import { oneshotsetting } from 'src/localstores'
+import { localStore } from 'src/localstores'
 
 import Microchains from 'src/components/Microchains.vue'
 import ExtensionMicrochains from 'src/components/extension/Microchains.vue'
 
-const setting = oneshotsetting.useSettingStore()
-const extensionMode = computed(() => setting.extensionMode)
+const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 </script>

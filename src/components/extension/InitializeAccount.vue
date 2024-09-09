@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { toRef, ref, computed } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { shortid } from 'src/utils'
 import { copyToClipboard } from 'quasar'
 
@@ -77,10 +77,7 @@ const props = defineProps<Props>()
 const password = toRef(props, 'password')
 const publicKey = ref('')
 
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
-
-const account = computed(() => _wallet.account(publicKey.value))
+const account = computed(() => localStore.wallet.account(publicKey.value))
 const chainId = computed(() => {
   if (!account.value?.microchains?.size) {
     return undefined
@@ -92,11 +89,11 @@ const messageId = computed(() => account.value?.microchains?.get(chainId.value a
 const onCopyClick = (content: string) => {
   copyToClipboard(content)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy',
         Message: `Success copy ${content} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {

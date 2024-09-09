@@ -36,7 +36,7 @@
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { wallet, oneshotsetting } from 'src/localstores'
+import { localStore } from 'src/localstores'
 
 import LoginPassword from 'src/components/LoginPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
@@ -50,12 +50,10 @@ const mnemonic = ref('')
 const mnemonicValid = ref(false)
 
 const router = useRouter()
-const _wallet = wallet.useWalletStore()
-const setting = oneshotsetting.useSettingStore()
-const extensionMode = computed(() => setting.extensionMode)
+const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 const unlocked = () => {
-  if (_wallet.accounts.size) {
+  if (localStore.wallet.accounts.size) {
     void router.push({ path: extensionMode.value ? '/extension/accountinfo' : '/microchains' })
   } else {
     step.value = 1

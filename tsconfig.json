@@ -13,7 +13,9 @@
           "name": "ts-lit-plugin",
           "strict": true
       }
-    ]
+    ],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
   },
   "esModuleInterop": true,
   "exclude": [

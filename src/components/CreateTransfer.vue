@@ -137,19 +137,16 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { useRoute } from 'vue-router'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import { _hex, endpoint } from 'src/utils'
 
-const _wallet = wallet.useWalletStore()
 const fromChainBalance = ref(false)
-const fromAddress = computed(() => _wallet.currentAddress)
-const fromChains = computed(() => Array.from(_wallet.currentChains.keys()))
-
-const notification = notify.useNotificationStore()
+const fromAddress = computed(() => localStore.wallet.currentAddress)
+const fromChains = computed(() => Array.from(localStore.wallet.currentChains.keys()))
 
 interface Query {
   chainId: string
@@ -160,13 +157,13 @@ const fromChainId = ref(queryChainId.value)
 const amount = ref(0)
 
 const toChainBalance = ref(false)
-const targetAddresses = computed(() => Array.from(_wallet.accounts.keys()))
+const targetAddresses = computed(() => Array.from(localStore.wallet.accounts.keys()))
 const targetAddress = ref(undefined as unknown as string)
-const targetChains = computed(() => Array.from(_wallet.accountChains(targetAddress.value).keys()))
+const targetChains = computed(() => Array.from(localStore.wallet.accountChains(targetAddress.value).keys()))
 const targetChainId = ref('')
 
 const onMaxAmountClick = () => {
-  amount.value = fromChainBalance.value ? _wallet.chainBalance(undefined, fromChainId.value) : _wallet.accountBalance(undefined, fromChainId.value)
+  amount.value = fromChainBalance.value ? localStore.wallet.chainBalance(undefined, fromChainId.value) : localStore.wallet.accountBalance(undefined, fromChainId.value)
 }
 
 const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number, userData?: string, done?: () => void) => {
@@ -183,11 +180,11 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
     done?.()
   })
   onError((error) => {
-    notification.pushNotification({
+    localStore.notification.pushNotification({
       Title: 'Transfer',
       Message: `Fail transfer ${amount} TLINERA to ${toPublicKey as string} on ${toChainId}: ${error.message}.`,
       Popup: true,
-      Type: notify.NotifyType.Error
+      Type: localStore.notify.NotifyType.Error
     })
   })
   await mutate({
@@ -209,11 +206,11 @@ const onTransferClick = () => {
     amount.value,
     undefined,
     () => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Transfer',
         Message: `Success transfer ${amount.value} TLINERA to ${targetAddress.value} on ${targetChainId.value}.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     }
   )

@@ -2,16 +2,14 @@
   <q-layout view='hHh Lpr fFf'>
     <q-header v-if='showHeaderMenu'>
       <q-toolbar class='text-white bg-white'>
-        <HeaderMenu v-if='!extensionMode' :style='{ width: "100%" }' />
-        <ExtensionHeaderMenu v-else :style='{ width: "100%" }' />
+        <HeaderMenu :style='{ width: "100%" }' />
       </q-toolbar>
       <q-resize-observer @resize='onHeaderResize' />
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
       <q-page :class='[ "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
-        <router-view v-if='!extensionMode' />
-        <router-view v-else v-slot='{ Component }'>
+        <router-view v-slot='{ Component }'>
           <transition
             enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in'
             :duration='300'
@@ -30,48 +28,34 @@
       </q-page>
     </q-page-container>
     <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>
-      <FooterMenu v-if='!extensionMode' />
-      <div v-else>
-        <q-separator />
-        <ExtensionFooterMenu />
-      </div>
+      <FooterMenu />
       <q-resize-observer @resize='onFooterResize' />
     </q-footer>
   </q-layout>
-  <ExtensionKeepAlived v-if='!extensionMode' />
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { notify, oneshotsetting } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 import wasmModuleUrl from '../../src-bex/wasm/linera_wasm_bg.wasm?url'
 import initWasm from '../../src-bex/wasm/linera_wasm'
 import { Berith } from '@hazae41/berith'
+import { localStore } from 'src/localstores'
 
 import HeaderMenu from 'src/components/header/HeaderMenu.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
-import ExtensionHeaderMenu from 'src/components/extension/HeaderMenu.vue'
 import SidebarMenu from 'src/components/SidebarMenu.vue'
-import ExtensionFooterMenu from 'src/components/extension/FooterMenu.vue'
-import ExtensionKeepAlived from 'src/components/ExtensionKeepAlived.vue'
 
-const notification = notify.useNotificationStore()
-const setting = oneshotsetting.useSettingStore()
-const showFooterMenu = computed(() => setting.showFooterMenu)
-const showHeaderMenu = computed(() => setting.showHeaderMenu)
-const showSideMenu = computed(() => setting.showSideMenu)
-const extensionMode = computed(() => setting.extensionMode)
-const alignPageCneter = computed(() => setting.alignPageCenter)
+const showFooterMenu = computed(() => localStore.oneShotSetting.showFooterMenu)
+const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)
+const showSideMenu = computed(() => localStore.oneShotSetting.showSideMenu)
+const alignPageCneter = computed(() => localStore.oneShotSetting.alignPageCenter)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
 
-onMounted(async () => {
-  await initWasm(await fetch(wasmModuleUrl))
-  await Berith.initBundledOnce()
-
-  notification.$subscribe((_, state) => {
+const handlerNotification = () => {
+  localStore.notification.$subscribe((_, state) => {
     state.Notifications.forEach((notif, index) => {
       if (notif.Popup) {
         state.Notifications.splice(index, 1)
@@ -84,10 +68,16 @@ onMounted(async () => {
         if (notif.Title) {
           notif.Title = t(notif.Title)
         }
-        notify.notify(notif)
+        localStore.notify.notify(notif)
       }
     })
   })
+}
+
+onMounted(async () => {
+  await initWasm(await fetch(wasmModuleUrl))
+  await Berith.initBundledOnce()
+  handlerNotification()
 })
 
 interface Size {
@@ -109,4 +99,5 @@ const onFooterResize = (size: Size) => {
 
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang='sass'>
+</style>

@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, toRef, watch } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import {
@@ -66,8 +66,7 @@ const showDigits = toRef(props, 'showDigits')
 const label = toRef(props, 'label')
 const display = toRef(props, 'display')
 
-const _wallet = wallet.useWalletStore()
-const addresses = computed(() => _wallet.publicKeys)
+const addresses = computed(() => localStore.wallet.publicKeys)
 
 interface SelectAddress {
   label: string
@@ -77,22 +76,20 @@ interface SelectAddress {
 
 const displayAddresses = computed(() => addresses.value.map(el => {
   return {
-    label: showDigits.value ? shortid.shortId(_wallet.displayAddress(el), showDigits.value) : _wallet.displayAddress(el),
+    label: showDigits.value ? shortid.shortId(localStore.wallet.displayAddress(el), showDigits.value) : localStore.wallet.displayAddress(el),
     originValue: el,
     value: showDigits.value ? shortid.shortId(el, showDigits.value) : el
   } as SelectAddress
 }))
 
 const addressCount = computed(() => displayAddresses.value.length)
-const currentAddress = computed(() => _wallet.currentAddress)
+const currentAddress = computed(() => localStore.wallet.currentAddress)
 const selectedAddress = ref(displayAddresses.value.find((el) => el.originValue === currentAddress.value) ||
                             displayAddresses.value.find((el) => el) ||
                             undefined as unknown as SelectAddress)
 const address = computed(() => selectedAddress.value?.originValue)
-const chains = computed(() => _wallet.chains)
+const chains = computed(() => localStore.wallet.chains)
 const subscriptions = ref(new Map<string, Array<string>>())
-
-const notification = notify.useNotificationStore()
 
 const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
 const apolloClient = new ApolloClient(options)
@@ -216,8 +213,8 @@ interface ChainAccountBalances {
 }
 
 const getChainAccountBalances = (done: (balances: Record<string, ChainAccountBalances>) => void) => {
-  const chainIds = _wallet.chainIds
-  const publicKeys = _wallet.publicKeys
+  const chainIds = localStore.wallet.chainIds
+  const publicKeys = localStore.wallet.publicKeys
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query getChainAccountBalances($chainIds: [String!]!, $publicKeys: [String!]!) {
@@ -246,8 +243,8 @@ const _getChainAccountBalances = () => {
       Object.keys(chainBalance?.account_balances).forEach((publicKey: string) => {
         const balance = chainBalance?.account_balances[publicKey]
         try {
-          _wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
-          _wallet.setAccountBalance(publicKey, chainId, balance)
+          localStore.wallet.setChainBalance(publicKey, chainId, chainBalance.chain_balance)
+          localStore.wallet.setAccountBalance(publicKey, chainId, balance)
         } catch (e) {
           // console.log('Fail get chain account balances', e)
         }
@@ -323,9 +320,9 @@ const _getBlockWithHash = (chainId: string, hash: string) => {
     try {
       incomingMessages.forEach((incomingMessage: graphqlResult.IncomingMessage) => {
         if (!incomingMessage.event?.message?.System?.Credit) return
-        _wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.source, (fromPublicKey: string | undefined) => {
-          _wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.target, (toPublicKey: string | undefined) => {
-            _wallet.addActivity(
+        localStore.wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.source, (fromPublicKey: string | undefined) => {
+          localStore.wallet.publicKeyFromOwner(incomingMessage.event?.message?.System?.Credit?.target, (toPublicKey: string | undefined) => {
+            localStore.wallet.addActivity(
               incomingMessage.origin.sender,
               fromPublicKey,
               chainId,
@@ -416,8 +413,8 @@ const constructNewBlockWithIncomingMessages = (chainId: string, keyPair: Ed25519
 
 const processChains = () => {
   addresses.value.forEach((addr) => {
-    const chains = _wallet.accountChains(addr)
-    const account = _wallet.account(addr)
+    const chains = localStore.wallet.accountChains(addr)
+    const account = localStore.wallet.account(addr)
     if (!account) {
       return
     }
@@ -450,10 +447,10 @@ const processChains = () => {
           constructNewBlockWithIncomingMessages(chainId, keyPair)
         })
         getAccountBalance(chainId, addr, (balance: number) => {
-          _wallet.setAccountBalance(addr, chainId, balance)
+          localStore.wallet.setAccountBalance(addr, chainId, balance)
         })
         getAccountBalance(chainId, undefined, (balance: number) => {
-          _wallet.setChainBalance(addr, chainId, balance)
+          localStore.wallet.setChainBalance(addr, chainId, balance)
         })
       })
     })
@@ -483,13 +480,13 @@ watch([addressCount, currentAddress], () => {
 
 watch(address, () => {
   if (!address.value || address.value === currentAddress.value) return
-  _wallet.selectAddress(address.value)
+  localStore.wallet.selectAddress(address.value)
 })
 
 onMounted(() => {
   _processChains()
   if (!currentAddress.value && selectedAddress.value) {
-    _wallet.selectAddress(selectedAddress.value.originValue)
+    localStore.wallet.selectAddress(selectedAddress.value.originValue)
   }
 })
 
@@ -497,11 +494,11 @@ const onCopyAddressClick = () => {
   if (!address.value) return
   copyToClipboard(address.value)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy Address',
         Message: `Success copy address ${address.value} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {

@@ -146,7 +146,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { persistentsetting, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { endpoint } from 'src/utils'
 import * as constant from 'src/const'
 
@@ -156,8 +156,6 @@ import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
 import ClearPassword from 'src/components/ClearPassword.vue'
 import OpenExtension from 'src/components/OpenExtension.vue'
-
-const _setting = persistentsetting.useSettingStore()
 
 const faucetSchema = ref(endpoint.faucetSchema)
 const faucetWSSchema = ref(endpoint.faucetWsSchema)
@@ -169,26 +167,24 @@ const rpcWSSchema = ref(endpoint.rpcWsSchema)
 const rpcHost = ref(endpoint.rpcHost)
 const rpcPort = ref(endpoint.rpcPort)
 
-const notification = notify.useNotificationStore()
-
 const onSaveClick = () => {
-  _setting.setFaucet(
+  localStore.persistentSetting.setFaucet(
     faucetSchema.value,
     faucetWSSchema.value,
     faucetHost.value,
     faucetPort.value
   )
-  _setting.setRPC(
+  localStore.persistentSetting.setRPC(
     rpcSchema.value,
     rpcWSSchema.value,
     rpcHost.value,
     rpcPort.value
   )
-  notification.pushNotification({
+  localStore.notification.pushNotification({
     Title: 'Save Setting',
     Message: 'Success save setting.',
     Popup: true,
-    Type: notify.NotifyType.Info
+    Type: localStore.notify.NotifyType.Info
   })
 }
 </script>

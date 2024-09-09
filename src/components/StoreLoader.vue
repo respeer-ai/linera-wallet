@@ -19,24 +19,21 @@
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { wallet, persistentsetting, oneshotsetting } from 'src/localstores'
+import { localStore } from 'src/localstores'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 
-const _wallet = wallet.useWalletStore()
-const _persistentsetting = persistentsetting.useSettingStore()
-const _oneshotsetting = oneshotsetting.useSettingStore()
 const router = useRouter()
 const loading = ref(true)
 
 onMounted(() => {
-  _persistentsetting.load(() => {
-    _wallet.loadPassword(() => {
+  localStore.persistentSetting.load(() => {
+    localStore.wallet.loadPassword(() => {
       loading.value = false
-      if (_wallet.initialized) {
-        void router.push({ path: _oneshotsetting.extensionMode ? '/extension/recovery' : '/recovery' })
+      if (localStore.wallet.initialized) {
+        void router.push({ path: localStore.oneShotSetting.extensionMode ? '/extension/recovery' : '/recovery' })
       } else {
-        void router.push({ path: _oneshotsetting.extensionMode ? '/extension/onboarding' : '/onboarding' })
+        void router.push({ path: localStore.oneShotSetting.extensionMode ? '/extension/onboarding' : '/onboarding' })
       }
     })
   })

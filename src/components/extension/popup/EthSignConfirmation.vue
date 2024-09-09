@@ -133,7 +133,7 @@
 </template>
 
 <script setup lang='ts'>
-import { wallet, popup, auth } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { computed, onMounted, ref, watch } from 'vue'
 import { _hex } from 'src/utils'
 import { commontypes } from 'src/types'
@@ -143,14 +143,12 @@ import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 
 import InputPassword from 'src/components/InputPassword.vue'
 
-const _wallet = wallet.useWalletStore()
 const step = ref(1)
 const allowCheckAccount = ref(false)
-const _popup = popup.usePopupStore()
-const origin = computed(() => _popup.popupOrigin)
-const method = computed(() => _popup._popupRequest)
-const respond = computed(() => _popup._popupRespond)
-const request = computed(() => _popup._popupPayload.data.request.request)
+const origin = computed(() => localStore.popup.popupOrigin)
+const method = computed(() => localStore.popup._popupRequest)
+const respond = computed(() => localStore.popup._popupRespond)
+const request = computed(() => localStore.popup._popupPayload.data.request.request)
 const account = computed(() => (request.value.params as Json[])?.[0]?.toString())
 const publicKey = ref(account.value || '')
 const hexContent = computed(() => (request.value.params as Json[])?.[1]?.toString())
@@ -159,14 +157,13 @@ const password = ref('')
 const passwordVerified = ref(false)
 const passwordError = ref(false)
 const processing = ref(false)
-const _auth = auth.useAuthStore()
 
 watch(passwordError, () => {
   onCancelClick()
 })
 
 const signResponse = () => {
-  const _account = _wallet.account(publicKey.value)
+  const _account = localStore.wallet.account(publicKey.value)
   if (!_account) {
     return onCancelClick()
   }
@@ -180,31 +177,31 @@ const signResponse = () => {
       approved: true,
       message: signature
     } as commontypes.ConfirmationPopupResponse)
-    _auth.addAuth(origin.value, method.value)
-    _popup.removeRequest(_popup.popupRequestId)
+    localStore.auth.addAuth(origin.value, method.value)
+    localStore.popup.removeRequest(localStore.popup.popupRequestId)
   }, 2000)
 }
 
 const onNextStepClick = () => {
   step.value += 1
   if (step.value === 2) {
-    if (!_wallet._decrypted) {
-      return _wallet.loadPassword(() => {
-        _wallet.verifyPassword(password.value, () => {
+    if (!localStore.wallet._decrypted) {
+      return localStore.wallet.loadPassword(() => {
+        localStore.wallet.verifyPassword(password.value, () => {
           passwordVerified.value = true
         }, () => {
           // TODO
         })
       })
     }
-    const _account = _wallet.account(publicKey.value)
+    const _account = localStore.wallet.account(publicKey.value)
     if (_account) step.value += 1
   }
   if (step.value === 3) {
-    if (_wallet._decrypted) {
+    if (localStore.wallet._decrypted) {
       return signResponse()
     }
-    _wallet.load(password.value, () => {
+    localStore.wallet.load(password.value, () => {
       signResponse()
     }, () => {
       onCancelClick()
@@ -213,8 +210,8 @@ const onNextStepClick = () => {
 }
 
 watch(password, () => {
-  _wallet.loadPassword(() => {
-    _wallet.verifyPassword(password.value, () => {
+  localStore.wallet.loadPassword(() => {
+    localStore.wallet.verifyPassword(password.value, () => {
       passwordVerified.value = true
     }, () => {
       // TODO
@@ -227,7 +224,7 @@ const onCancelClick = () => {
     approved: false,
     message: 'Canceled by user'
   } as commontypes.ConfirmationPopupResponse)
-  _popup.removeRequest(_popup.popupRequestId)
+  localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
 const forwardable = () => {
@@ -259,15 +256,15 @@ const onActionResize = (size: Size) => {
 }
 
 watch(account, () => {
-  _wallet.loadWithoutDecrypt(() => {
-    publicKey.value = _wallet.displayAddress(_wallet.publicKeyByPrefix(account.value as string) as string)
+  localStore.wallet.loadWithoutDecrypt(() => {
+    publicKey.value = localStore.wallet.displayAddress(localStore.wallet.publicKeyByPrefix(account.value as string) as string)
   })
 })
 
 onMounted(async () => {
   await Berith.initBundledOnce()
-  _wallet.loadWithoutDecrypt(() => {
-    publicKey.value = _wallet.displayAddress(_wallet.publicKeyByPrefix(account.value as string) as string)
+  localStore.wallet.loadWithoutDecrypt(() => {
+    publicKey.value = localStore.wallet.displayAddress(localStore.wallet.publicKeyByPrefix(account.value as string) as string)
   })
 })
 

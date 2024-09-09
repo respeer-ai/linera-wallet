@@ -12,18 +12,15 @@
 </template>
 
 <script setup lang='ts'>
-import { notify, wallet } from 'src/localstores'
-
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
+import { localStore } from 'src/localstores'
 
 const onExportAccountsClick = () => {
-  console.log(_wallet.accounts)
-  notification.pushNotification({
+  console.log(localStore.wallet.accounts)
+  localStore.notification.pushNotification({
     Title: 'Clear Accounts',
     Message: 'Success clear all accounts.',
     Popup: true,
-    Type: notify.NotifyType.Info
+    Type: localStore.notify.NotifyType.Info
   })
 }
 </script>

@@ -41,10 +41,10 @@
 
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
-import { wallet, notify, oneshotsetting } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
-import NewPassword from 'src/components/NewPassword.vue'
+import NewPassword from 'src/components/password/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
 import ImportAccount from 'src/components/ImportAccount.vue'
 import ExtensionImportAccount from 'src/components/extension/ImportAccount.vue'
@@ -55,11 +55,8 @@ const passwordError = ref(false)
 const accountError = ref(true)
 const publicKey = ref('')
 
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
 const router = useRouter()
-const setting = oneshotsetting.useSettingStore()
-const extensionMode = computed(() => setting.extensionMode)
+const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 const canGotoNext = () => {
   switch (step.value) {
@@ -83,23 +80,23 @@ const btnText = computed(() => {
 })
 
 const savePassword = () => {
-  _wallet.savePassword(password.value, () => {
+  localStore.wallet.savePassword(password.value, () => {
     step.value++
   })
 }
 
 const validateAccount = () => {
-  const account = _wallet.account(publicKey.value)
+  const account = localStore.wallet.account(publicKey.value)
   if (account) {
     // TODO: init wallet
     void router.push({ path: '/microchains' })
     return
   }
-  notification.pushNotification({
+  localStore.notification.pushNotification({
     Title: 'Validate Account',
     Message: 'Please provide correct account information, or regenerate a new one',
     Popup: true,
-    Type: notify.NotifyType.Error
+    Type: localStore.notify.NotifyType.Error
   })
 }
 

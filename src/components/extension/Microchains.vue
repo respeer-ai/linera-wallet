@@ -49,7 +49,7 @@
               fontSize: "12px"
             }'
           >
-            {{ _wallet.chainBalance(undefined, chainId).toFixed(4) }}
+            {{ localStore.wallet.chainBalance(undefined, chainId).toFixed(4) }}
             <strong>TLINERA</strong>
           </div>
         </div>
@@ -61,7 +61,7 @@
           }'
           class='text-bold'
         >
-          {{ _wallet.accountBalance(undefined, chainId).toFixed(4) }}
+          {{ localStore.wallet.accountBalance(undefined, chainId).toFixed(4) }}
         </div>
         <div
           v-if='showAction'
@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import { computed, toRef } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { copyToClipboard } from 'quasar'
 import { shortid } from 'src/utils'
 import { useRouter } from 'vue-router'
@@ -115,19 +115,16 @@ const props = withDefaults(defineProps<Props>(), {
 const showTitle = toRef(props, 'showTitle')
 const showAction = toRef(props, 'showAction')
 
-const _wallet = wallet.useWalletStore()
-const microchains = computed(() => _wallet.currentChains)
-
-const notification = notify.useNotificationStore()
+const microchains = computed(() => localStore.wallet.currentChains)
 
 const onCopyChainIdClick = (chainId: string) => {
   copyToClipboard(chainId)
     .then(() => {
-      notification.pushNotification({
+      localStore.notification.pushNotification({
         Title: 'Copy Chain Id',
         Message: `Success copy chain id ${chainId} to clipboard.`,
         Popup: true,
-        Type: notify.NotifyType.Info
+        Type: localStore.notify.NotifyType.Info
       })
     })
     .catch((e) => {

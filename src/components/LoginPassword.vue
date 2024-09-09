@@ -33,7 +33,7 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { wallet, notify } from 'src/localstores'
+import { localStore } from 'src/localstores'
 
 import InputPassword from 'src/components/InputPassword.vue'
 
@@ -42,26 +42,24 @@ import cheCkoLogo from 'src/assets/CheCko.png'
 const password = defineModel<string>('password', { default: '' })
 const emit = defineEmits(['unlocked'])
 const passwordError = ref(false)
-const _wallet = wallet.useWalletStore()
-const notification = notify.useNotificationStore()
 
 const unlock = () => {
-  _wallet.load(password.value, () => {
+  localStore.wallet.load(password.value, () => {
     emit('unlocked')
   }, () => {
-    notification.pushNotification({
+    localStore.notification.pushNotification({
       Title: 'Restore Wallet',
       Message: 'Fail to restore wallet. Please confirm you input correct password.',
       Popup: true,
-      Type: notify.NotifyType.Error
+      Type: localStore.notify.NotifyType.Error
     })
   })
 }
 
 const onUnlockClick = () => {
   if (passwordError.value) return
-  if (!_wallet.initialized) {
-    _wallet.loadPassword(() => {
+  if (!localStore.wallet.initialized) {
+    localStore.wallet.loadPassword(() => {
       unlock()
     })
   } else {
