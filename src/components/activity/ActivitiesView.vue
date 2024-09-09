@@ -2,10 +2,10 @@
   <div class='fill-parent text-center'>
     <q-space />
     <div v-if='microchains.length > 0'>
-      <MicrochainCardView v-for='microchain in microchains' :key='microchain.microchain' :microchain='microchain' />
+      <ActivityCardView v-for='microchain in microchains' :key='microchain.microchain' :microchain='microchain' />
     </div>
     <div v-else>
-      No usable microchain? <span class='cursor-pointer like-link'>Create</span> or <span class='cursor-pointer like-link'>Import</span>.
+      No activity? <span class='cursor-pointer like-link'>Transfer</span> tokens.
     </div>
     <q-space />
   </div>
@@ -19,7 +19,7 @@ import { Microchain, MicrochainOwner } from 'src/model'
 
 import MicrochainOwnerBridge from '../bridge/MicrochainOwnerBridge.vue'
 import MicrochainBridge from '../bridge/MicrochainBridge.vue'
-import MicrochainCardView from './MicrochainCardView.vue'
+import ActivityCardView from './ActivityCardView.vue'
 
 const microchainOwners = ref([] as MicrochainOwner[])
 const microchains = ref([] as Microchain[])

@@ -13,6 +13,8 @@ export interface Microchain {
   certificateHash: string
   faucetUrl: string
   name: string
+  default: boolean
+  selected: boolean
 }
 
 export interface Owner {

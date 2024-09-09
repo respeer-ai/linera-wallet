@@ -10,8 +10,13 @@
 .page-container
   background: white
 
-.page-padding
-  padding: 12px 24px
+.page-x-padding
+  padding-left: 16px
+  padding-right: 16px
+
+.page-y-padding
+  padding-top: 24px
+  padding-bottom: 24px
 
 html,
 body,
@@ -173,3 +178,16 @@ body
   .q-item
     min-height: 40px
     padding: 8px 16px
+
+.home-tabs
+  .q-tabs__content
+    width: 100%
+    .q-tab
+      width: calc(100% / 3)
+
+
+.home-token-balance
+  font-size: 28px
+  color: $grey-9
+  padding: 0 0 24px 0
+  border-bottom: 1px solid $red-2
