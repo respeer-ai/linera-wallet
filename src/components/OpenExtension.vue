@@ -37,7 +37,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const onOpenExtensionClick = () => {
-  window.linera.request({
+  window.linera?.request({
     method: 'eth_requestAccounts'
   }).then((result) => {
     console.log(result)
@@ -47,7 +47,7 @@ const onOpenExtensionClick = () => {
 }
 
 const onLineraGraphqlQueryClick = () => {
-  window.linera.request({
+  window.linera?.request({
     method: 'linera_graphqlQuery'
   }).then((result) => {
     console.log(result)
@@ -57,7 +57,7 @@ const onLineraGraphqlQueryClick = () => {
 }
 
 const onLineraGraphqlMutationClick = () => {
-  window.linera.request({
+  window.linera?.request({
     method: 'linera_graphqlMutation'
   }).then((result) => {
     console.log(result)
@@ -73,7 +73,7 @@ const subscriptionHandler = (msg: unknown) => {
 const subscriptionId = ref(undefined as unknown as string)
 
 onMounted(() => {
-  window.linera.request({
+  window.linera?.request({
     method: 'linera_subscribe'
   }).then((_subscriptionId) => {
     subscriptionId.value = _subscriptionId as string

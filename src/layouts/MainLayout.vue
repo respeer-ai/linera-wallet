@@ -8,7 +8,7 @@
     </q-header>
     <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
-      <q-page :class='[ "flex justify-center", alignPageCneter ? "items-center" : "" ]'>
+      <q-page :class='[ "flex justify-center", alignPageCenter ? "items-center" : "" ]'>
         <router-view v-slot='{ Component }'>
           <transition
             enter-active-class='animated slideInRight' leave-active-class='animated slideOutLeft' mode='out-in'
@@ -16,10 +16,10 @@
           >
             <component
               :is='Component'
-              :class='[ "popup-container flex justify-center", alignPageCneter ? "items-center" : "" ]'
+              :class='[ extensionMode ? "popup-container" : "", "flex justify-center", alignPageCenter ? "items-center" : "" ]'
               :style='{
-                height: `calc(600px - ${headerHeight}px - ${footerHeight}px - (${outerHeight}px - ${innerHeight}px))`,
-                width: "368px",
+                height: `calc(${viewHeight} - ${headerHeight}px - ${footerHeight}px - (${outerHeight}px - ${innerHeight}px))`,
+                width: `${viewWidth}`,
                 overflow: "scroll"
               }'
             />
@@ -49,7 +49,11 @@ import SidebarMenu from 'src/components/SidebarMenu.vue'
 const showFooterMenu = computed(() => localStore.oneShotSetting.showFooterMenu)
 const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)
 const showSideMenu = computed(() => localStore.oneShotSetting.showSideMenu)
-const alignPageCneter = computed(() => localStore.oneShotSetting.alignPageCenter)
+const alignPageCenter = computed(() => localStore.oneShotSetting.alignPageCenter)
+const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
+
+const viewWidth = computed(() => extensionMode.value ? '368px' : '600px')
+const viewHeight = computed(() => extensionMode.value ? '600px' : '100%')
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

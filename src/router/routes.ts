@@ -16,6 +16,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     meta: {
+      ExtensionMode: false,
       ShowSideMenu: true
     },
     children: [
@@ -43,7 +44,13 @@ const routes: RouteRecordRaw[] = [
         }
       },
       { path: 'setting', component: () => import('pages/SettingPage.vue') },
-      { path: 'onboarding', component: () => import('pages/OnBoardingPage.vue') },
+      {
+        path: 'onboarding',
+        component: () => import('pages/OnBoardingPage.vue'),
+        meta: {
+          ShowSideMenu: false
+        }
+      },
       { path: 'improvement', component: () => import('pages/ImprovementPage.vue') },
       {
         path: 'initializewallet',
