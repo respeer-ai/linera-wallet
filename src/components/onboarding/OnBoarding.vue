@@ -61,7 +61,7 @@
         />
         <q-btn
           flat
-          label='Importing an existing Wallet'
+          label='Importing an existing wallet'
           class='text-brown-8 btn btn-alt vertical-items-margin'
           @click='onImportWalletClick'
           no-caps

@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div class='row' :style='{ marginTop: "48px" }' style='overflow-x: auto;'>
+  <div class='fill-parent text-center onboarding-container shadow-1'>
     <q-space />
     <div>
       <div
@@ -124,13 +124,18 @@
     </div>
     <q-space />
   </div>
+  <MicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { localStore } from 'src/localstores'
 import { copyToClipboard } from 'quasar'
 import { useRouter } from 'vue-router'
+
+import MicrochainOwnerBridge from '../bridge/MicrochainOwnerBridge.vue'
+
+const microchainOwners = ref(undefined)
 
 const microchains = computed(() => localStore.wallet.currentChains)
 
@@ -163,4 +168,5 @@ const onCopyChainIdClick = (chainId: string) => {
       console.log('Fail copy chain id', e)
     })
 }
+
 </script>
