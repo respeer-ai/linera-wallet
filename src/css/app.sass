@@ -7,6 +7,12 @@
   width: 378px
   padding: 12px 24px
 
+.page-container
+  background: white
+
+.page-padding
+  padding: 12px 24px
+
 html,
 body,
 div
@@ -17,6 +23,7 @@ div
 
 body
   font-family: 'Noto Sans', sans-serif
+  background: $grey-2
 
 .hide
   display: none !important
@@ -28,6 +35,7 @@ body
 
 .full-width
   width: 100%
+  max-width: 800px
 
 .full-height
   height: 100%
@@ -142,11 +150,22 @@ body
   border-top: 1px solid $red-4
 
 .page-header
+  padding: 8px 12px
   .q-btn-dropdown__arrow
     font-size: 1em
   .q-btn--dense
     padding: 4px 16px
     min-height: 1.25em
+  .header-text
+    line-height: 17px
+    height: 17px
+  .header-icon
+    margin: 10px 0
+  .header-account
+    width: 128px
+  .page-header-left-right
+    width: calc( 50% - 64px )
+
 
 .page-header-selector
   line-height: 24px

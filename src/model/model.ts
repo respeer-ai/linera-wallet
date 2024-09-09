@@ -22,6 +22,7 @@ export interface Owner {
   privateKey: string
   salt: string
   name: string
+  selected: boolean
 }
 
 enum HTTPSchema {

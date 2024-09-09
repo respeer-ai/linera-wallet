@@ -1,6 +1,9 @@
 <template>
-  <div>
+  <div class='full-width'>
     <PageHeaderView />
+    <div class='page-padding'>
+      HHHHHHHHHHH
+    </div>
   </div>
 </template>
 
