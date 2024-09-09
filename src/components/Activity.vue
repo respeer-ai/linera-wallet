@@ -167,7 +167,7 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { localStore } from '../localstores'
+import { localStore } from 'src/localstores'
 import { shortid } from '../utils'
 import { copyToClipboard } from 'quasar'
 

@@ -119,7 +119,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { localStore } from '../localstores'
+import { localStore } from 'src/localstores'
 import { copyToClipboard } from 'quasar'
 
 const addresses = computed(() => localStore.wallet.publicKeys)

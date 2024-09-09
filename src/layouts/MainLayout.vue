@@ -68,7 +68,7 @@ const handlerNotification = () => {
         if (notif.Title) {
           notif.Title = t(notif.Title)
         }
-        localStore.notify(notif)
+        localStore.notify.notify(notif)
       }
     })
   })

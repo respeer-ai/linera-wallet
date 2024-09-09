@@ -26,5 +26,5 @@ export const localStore = {
   auth
 }
 
+export * as notify from './notify'
 export * as walletDef from './wallet'
-export * as notifyDef from './notify'
