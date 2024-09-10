@@ -24,13 +24,17 @@ watch(_password, () => {
 watch(password, () => {
   if (!password.value?.length) return
   const passwd = buildPassword(password.value)
-  void dbBase.passwords.add(passwd)
+  if (passwd) {
+    void dbBase.passwords.add(passwd)
+  }
 })
 
 onMounted(() => {
   if (!password.value?.length) return
   const passwd = buildPassword(password.value)
-  void dbBase.passwords.add(passwd)
+  if (passwd) {
+    void dbBase.passwords.add(passwd)
+  }
 })
 
 </script>

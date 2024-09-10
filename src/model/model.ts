@@ -1,6 +1,8 @@
 import { UAParser } from 'ua-parser-js'
-import * as crypto from 'crypto'
-import CryptoJS from 'crypto-js'
+import CryptoJS, { AES, enc } from 'crypto-js'
+import { sha3 } from 'hash-wasm'
+// TODO: replace with web3.js utils
+import { _hex } from 'src/utils'
 
 export interface MicrochainOwner {
   id?: number
@@ -21,6 +23,13 @@ export interface Microchain {
   selected: boolean
 }
 
+const ownerFromPublicKey = async (publicKey: string) => {
+  const publicKeyBytes = _hex.toBytes(publicKey)
+  const typeNameBytes = new TextEncoder().encode('PublicKey::')
+  const bytes = new Uint8Array([...typeNameBytes, ...publicKeyBytes])
+  return await sha3(bytes, 256)
+}
+
 export interface Owner {
   id?: number
   address: string
@@ -29,6 +38,28 @@ export interface Owner {
   salt: string
   name: string
   selected: boolean
+}
+
+export const DEFAULT_ACCOUNT_NAME = 'Account'
+
+export const buildOwner = async (publicKey: string, privateKey: string, password: string, name: string) => {
+  const owner = await ownerFromPublicKey(publicKey)
+  const salt = CryptoJS.lib.WordArray.random(16).toString()
+  const _password = AES.encrypt(password, salt).toString()
+  const _privateKey = AES.encrypt(privateKey, _password).toString()
+  return {
+    address: publicKey,
+    owner,
+    privateKey: _privateKey,
+    salt,
+    name,
+    selected: true
+  } as Owner
+}
+
+export const privateKey = (owner: Owner, password: string) => {
+  const _password = AES.encrypt(password, owner.salt).toString()
+  return AES.decrypt(owner.privateKey, _password).toString()
 }
 
 enum HTTPSchema {
@@ -76,13 +107,13 @@ export interface Password {
 
 const deviceFingerPrint = (): string => {
   const parser = new UAParser()
-  return `${parser.getBrowser().name || ''} +
-          ${parser.getCPU().architecture || ''} +
-          ${parser.getDevice().model || ''} +
-          ${parser.getDevice().type || ''} +
-          ${parser.getDevice().vendor || ''} +
-          ${parser.getEngine().name || ''} +
-          ${parser.getOS().name || ''} +
+  return `${parser.getBrowser().name || ''},
+          ${parser.getCPU().architecture || ''},
+          ${parser.getDevice().model || ''},
+          ${parser.getDevice().type || ''},
+          ${parser.getDevice().vendor || ''},
+          ${parser.getEngine().name || ''},
+          ${parser.getOS().name || ''},
           ${parser.getUA()}`
 }
 
@@ -90,24 +121,20 @@ export const decryptPassword = (password: Password): string => {
   const fingerPrint = deviceFingerPrint()
   const now = password.createdAt
   const salt = password.salt
-  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt.toString())
-  const decipher = crypto.createDecipheriv('aes-256-cbc', new Uint32Array(key.words), salt)
-  let decrypted = decipher.update(password.password, 'utf-8', 'hex')
-  decrypted += decipher.final('hex')
+  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt.toString()).toString()
+  const decrypted = AES.decrypt(password.password, key).toString(enc.Utf8)
   return decrypted
 }
 
-export const buildPassword = (password: string): Password => {
+export const buildPassword = (password: string): Password | undefined => {
   const fingerPrint = deviceFingerPrint()
   const now = Date.now()
-  const salt = crypto.randomBytes(16)
-  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt.toString())
-  const cipher = crypto.createCipheriv('aes-256-cbc', new Uint32Array(key.words), salt)
-  let encrypted = cipher.update(password, 'utf-8', 'hex')
-  encrypted += cipher.final('hex')
+  const salt = CryptoJS.lib.WordArray.random(16).toString()
+  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt).toString()
+  const encrypted = AES.encrypt(password, key).toString()
   return {
     password: encrypted,
-    salt: salt.toString(),
+    salt,
     createdAt: now,
     active: true
   }

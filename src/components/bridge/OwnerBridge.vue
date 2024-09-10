@@ -4,7 +4,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, toRef, watch } from 'vue'
-import { Network, type Owner } from '../../model'
+import { DEFAULT_ACCOUNT_NAME, Network, type Owner } from '../../model'
 import { dbWallet } from '../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
@@ -43,6 +43,7 @@ watch(_owners, () => {
 
 watch(create, () => {
   if (!create.value) return
+  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value.owners.count.toString()
   void _dbWallet.value.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
 })
 
@@ -58,6 +59,7 @@ watch(_delete, () => {
 
 onMounted(() => {
   if (!create.value) return
+  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value.owners.count.toString()
   void _dbWallet.value.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
 })
 

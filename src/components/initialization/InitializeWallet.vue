@@ -52,6 +52,8 @@
       </div>
       <q-space />
     </div>
+    <PasswordBridge v-model:password='persistentPassword' />
+    <OwnerBridge :create='persistentOwner' />
   </div>
 </template>
 
@@ -59,6 +61,10 @@
 import { ref, computed } from 'vue'
 import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
+import { buildOwner, DEFAULT_ACCOUNT_NAME, Owner } from 'src/model'
+
+import PasswordBridge from '../bridge/PasswordBridge.vue'
+import OwnerBridge from '../bridge/OwnerBridge.vue'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
@@ -68,7 +74,7 @@ import ValidateAccount from 'src/components/account/ValidateAccount.vue'
 import ExtensionValidateAccount from 'src/components/extension/ValidateAccount.vue'
 
 const step = ref(1)
-const password = ref('')
+const password = ref(undefined as unknown as string)
 const passwordError = ref(false)
 const publicKey = ref('')
 const privateKey = ref('')
@@ -76,13 +82,16 @@ const mnemonic = ref('')
 const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
 
+const persistentPassword = ref(undefined as unknown as string)
+const persistentOwner = ref(undefined as unknown as Owner)
+
 const router = useRouter()
 const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 const canGotoNext = () => {
   switch (step.value) {
     case 1:
-      return !passwordError.value && password.value.length
+      return !passwordError.value && password.value?.length
     case 3:
       return mnemonicValid.value
     default:
@@ -103,16 +112,13 @@ const btnText = computed(() => {
 })
 
 const savePassword = () => {
-  localStore.wallet.savePassword(password.value, () => {
-    step.value++
-  })
+  persistentPassword.value = password.value
+  step.value++
 }
 
-const saveAccount = () => {
-  localStore.wallet.addAccount(publicKey.value, privateKey.value, password.value, () => {
-    localStore.wallet.selectAddress(publicKey.value)
-    void router.push({ path: '/home' })
-  })
+const saveAccount = async () => {
+  persistentOwner.value = await buildOwner(publicKey.value, privateKey.value, password.value, DEFAULT_ACCOUNT_NAME)
+  void router.push({ path: '/home' })
 }
 
 const onNextStepClick = () => {
@@ -124,7 +130,7 @@ const onNextStepClick = () => {
       step.value++
       break
     case 3:
-      saveAccount()
+      void saveAccount()
       break
   }
 }
