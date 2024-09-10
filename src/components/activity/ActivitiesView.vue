@@ -4,8 +4,13 @@
     <div v-if='microchains.length > 0'>
       <ActivityCardView v-for='microchain in microchains' :key='microchain.microchain' :microchain='microchain' />
     </div>
-    <div v-else>
-      No activity? <span class='cursor-pointer like-link'>Transfer</span> tokens.
+    <div v-else class='page-item-placeholder'>
+      <div>
+        <q-icon name='bi-plus-circle' size='48px' color='grey-4' />
+      </div>
+      <div class='page-item-y-margin-top'>
+        New to Linera? <span class='cursor-pointer like-link'>Transfer</span> tokens.
+      </div>
     </div>
     <q-space />
   </div>

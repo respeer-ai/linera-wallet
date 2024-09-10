@@ -18,6 +18,15 @@
   padding-top: 24px
   padding-bottom: 24px
 
+.page-item-x-margin-left
+  margin-left: 6px
+
+.page-item-y-margin-top
+  margin-top: 6px
+
+.page-item-placeholder
+  margin: 48px 0
+
 html,
 body,
 div
@@ -180,6 +189,8 @@ body
     padding: 8px 16px
 
 .home-tabs
+  .q-tabs
+    border-bottom: 1px solid $grey-4
   .q-tabs__content
     width: 100%
     .q-tab
@@ -189,5 +200,9 @@ body
 .home-token-balance
   font-size: 28px
   color: $grey-9
-  padding: 0 0 24px 0
-  border-bottom: 1px solid $red-2
+  padding: 24px 0 48px 0
+  border-bottom: 1px solid $grey-2
+  .home-token-action
+    font-size: 12px
+    .home-token-action-btn
+      width: 60px

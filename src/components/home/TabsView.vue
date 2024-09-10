@@ -1,6 +1,6 @@
 <template>
   <div class='page-padding full-width text-center home-tabs'>
-    <q-tabs v-model='tab' no-caps indicator-color='grey-9'>
+    <q-tabs v-model='tab' no-caps indicator-color='grey-9' dense>
       <q-tab name='microchains'>
         Microchains
       </q-tab>
