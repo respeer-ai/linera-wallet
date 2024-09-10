@@ -35,6 +35,15 @@
           <q-icon name='bi-chevron-down' size='12px' />
         </div>
         <q-space />
+        <q-menu>
+          <q-list class='page-header-selector'>
+            <q-item v-for='owner in owners' :key='owner.id' clickable v-close-popup>
+              <div class='header-items-margin-x-left'>
+                {{ owner.name }}
+              </div>
+            </q-item>
+          </q-list>
+        </q-menu>
       </div>
       <div class='header-text text-center row'>
         <div>
