@@ -1,12 +1,14 @@
 import Dexie, { type EntityTable } from 'dexie'
-import { Microchain, MicrochainOwner, Network, Owner } from '../model'
+import { Microchain, MicrochainOwner, Network, Owner, Password } from '../model'
 
-export const dbNetwork = new Dexie('LineraNetworkDatabase') as Dexie & {
-  networks: EntityTable<Network, 'id'>
+export const dbBase = new Dexie('CheCkoBaseDatabase') as Dexie & {
+  networks: EntityTable<Network, 'id'>,
+  passwords: EntityTable<Password, 'id'>
 }
 
-dbNetwork.version(1).stores({
-  networks: '++id, icon, name, faucetUrl, rpcSchema, wsSchema, host, port, path'
+dbBase.version(1).stores({
+  networks: '++id, icon, name, faucetUrl, rpcSchema, wsSchema, host, port, path',
+  passwords: '++id, password, salt, createdAt'
 })
 
 export const dbWallet = (networkId: number) => {

@@ -1,3 +1,7 @@
+import { UAParser } from 'ua-parser-js'
+import * as crypto from 'crypto'
+import CryptoJS from 'crypto-js'
+
 export interface MicrochainOwner {
   id?: number
   microchain: string
@@ -61,3 +65,50 @@ export const defaultNetwork = {
   path: '',
   selected: true
 } as Network
+
+export interface Password {
+  id?: number
+  password: string
+  salt: string
+  createdAt: number
+  active: boolean
+}
+
+const deviceFingerPrint = (): string => {
+  const parser = new UAParser()
+  return `${parser.getBrowser().name || ''} +
+          ${parser.getCPU().architecture || ''} +
+          ${parser.getDevice().model || ''} +
+          ${parser.getDevice().type || ''} +
+          ${parser.getDevice().vendor || ''} +
+          ${parser.getEngine().name || ''} +
+          ${parser.getOS().name || ''} +
+          ${parser.getUA()}`
+}
+
+export const decryptPassword = (password: Password): string => {
+  const fingerPrint = deviceFingerPrint()
+  const now = password.createdAt
+  const salt = password.salt
+  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt.toString())
+  const decipher = crypto.createDecipheriv('aes-256-cbc', new Uint32Array(key.words), salt)
+  let decrypted = decipher.update(password.password, 'utf-8', 'hex')
+  decrypted += decipher.final('hex')
+  return decrypted
+}
+
+export const buildPassword = (password: string): Password => {
+  const fingerPrint = deviceFingerPrint()
+  const now = Date.now()
+  const salt = crypto.randomBytes(16)
+  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt.toString())
+  const cipher = crypto.createCipheriv('aes-256-cbc', new Uint32Array(key.words), salt)
+  let encrypted = cipher.update(password, 'utf-8', 'hex')
+  encrypted += cipher.final('hex')
+  return {
+    password: encrypted,
+    salt: salt.toString(),
+    createdAt: now,
+    active: true
+  }
+}
