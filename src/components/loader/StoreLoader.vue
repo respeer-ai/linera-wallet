@@ -31,6 +31,7 @@ const loading = ref(true)
 
 onMounted(() => {
   dbBase.passwords.toArray().then((passwords) => {
+    console.log(passwords)
     loading.value = false
     passwords.find((el) => el.active)
       ? void router.push({ path: '/recovery' })

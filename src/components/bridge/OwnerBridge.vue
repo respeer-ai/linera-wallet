@@ -26,12 +26,12 @@ const selectedNetwork = ref(undefined as unknown as Network)
 
 const owners = defineModel<Owner[]>('owners')
 const selectedOwner = defineModel<Owner>('selectedOwner')
-const _dbWallet = computed(() => dbWallet(selectedNetwork.value?.id as number))
+const _dbWallet = computed(() => selectedNetwork.value ? dbWallet(selectedNetwork.value?.id as number) : undefined)
 
 const _owners = useObservable<Owner[]>(
   from(
     liveQuery(async () => {
-      return await _dbWallet.value?.owners.toArray()
+      return await _dbWallet.value?.owners.toArray() || []
     })
   )
 )
@@ -43,24 +43,24 @@ watch(_owners, () => {
 
 watch(create, () => {
   if (!create.value) return
-  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value.owners.count.toString()
-  void _dbWallet.value.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
+  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value?.owners.count.toString()
+  void _dbWallet.value?.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
 })
 
 watch(update, () => {
   if (!update.value) return
-  void _dbWallet.value.owners.update(update.value.address, JSON.parse(JSON.stringify(update.value)) as Owner)
+  void _dbWallet.value?.owners.update(update.value.address, JSON.parse(JSON.stringify(update.value)) as Owner)
 })
 
 watch(_delete, () => {
   if (_delete.value === undefined) return
-  void _dbWallet.value.owners.delete(_delete.value)
+  void _dbWallet.value?.owners.delete(_delete.value)
 })
 
 onMounted(() => {
   if (!create.value) return
-  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value.owners.count.toString()
-  void _dbWallet.value.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
+  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value?.owners.count.toString()
+  void _dbWallet.value?.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
 })
 
 </script>

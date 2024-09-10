@@ -23,6 +23,7 @@ watch(_password, () => {
 
 watch(password, () => {
   if (!password.value?.length) return
+  if (password.value === _password.value) return
   const passwd = buildPassword(password.value)
   if (passwd) {
     void dbBase.passwords.add(passwd)
@@ -31,6 +32,7 @@ watch(password, () => {
 
 onMounted(() => {
   if (!password.value?.length) return
+  console.log(111, password.value)
   const passwd = buildPassword(password.value)
   if (passwd) {
     void dbBase.passwords.add(passwd)
