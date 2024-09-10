@@ -26,11 +26,23 @@
     </div>
     <q-space />
     <div class='header-account text-center'>
-      <div class='header-text text-center'>
-        {{ selectedOwner?.name }}
+      <div class='header-text text-center text-bold row cursor-pointer'>
+        <q-space />
+        <div>
+          {{ selectedOwner?.name }}
+        </div>
+        <div class='header-items-margin-x-left'>
+          <q-icon name='bi-chevron-down' size='12px' />
+        </div>
+        <q-space />
       </div>
-      <div class='header-text text-center'>
-        {{ selectedOwner?.address }}
+      <div class='header-text text-center row'>
+        <div>
+          0x{{ shortid.shortId(selectedOwner?.address, 4) }}
+        </div>
+        <div class='header-items-margin-x-left cursor-pointer'>
+          <q-icon name='bi-copy' size='12px' />
+        </div>
       </div>
     </div>
     <q-space />
@@ -49,6 +61,7 @@ import { Network, Owner } from 'src/model'
 
 import NetworkBridge from '../bridge/NetworkBridge.vue'
 import OwnerBridge from '../bridge/OwnerBridge.vue'
+import { shortid } from 'src/utils'
 
 const networks = ref([] as Network[])
 const selectedNetwork = ref(undefined as unknown as Network)
