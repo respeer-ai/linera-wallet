@@ -13,13 +13,16 @@
       </q-card>
     </div>
     <q-space />
+    <PasswordBridge />
   </div>
 </template>
 
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { localStore } from 'src/localstores'
+import { dbBase } from '../../controller'
+
+import PasswordBridge from '../bridge/PasswordBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 
@@ -27,15 +30,14 @@ const router = useRouter()
 const loading = ref(true)
 
 onMounted(() => {
-  localStore.persistentSetting.load(() => {
-    localStore.wallet.loadPassword(() => {
-      loading.value = false
-      if (localStore.wallet.initialized) {
-        void router.push({ path: localStore.oneShotSetting.extensionMode ? '/extension/recovery' : '/recovery' })
-      } else {
-        void router.push({ path: localStore.oneShotSetting.extensionMode ? '/extension/onboarding' : '/onboarding' })
-      }
-    })
+  dbBase.passwords.toArray().then((passwords) => {
+    loading.value = false
+    passwords.find((el) => el.active)
+      ? void router.push({ path: '/recovery' })
+      : void router.push({ path: '/onboarding' })
+  }).catch((e) => {
+    loading.value = false
+    console.log('Fail load password', e)
   })
 })
 </script>

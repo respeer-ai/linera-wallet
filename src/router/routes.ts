@@ -20,7 +20,14 @@ const routes: RouteRecordRaw[] = [
       ShowSideMenu: true
     },
     children: [
-      { path: '', component: () => import('pages/LaunchPage.vue') },
+      {
+        path: '',
+        component: () => import('pages/LaunchPage.vue'),
+        meta: {
+          AlignPageCenter: true,
+          ShowSideMenu: false
+        }
+      },
       {
         path: 'home',
         component: () => import('pages/HomePage.vue'),

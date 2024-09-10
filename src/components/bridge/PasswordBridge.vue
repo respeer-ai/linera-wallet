@@ -1,23 +1,18 @@
 <script setup lang='ts'>
-import { onMounted, toRef, watch } from 'vue'
-import { buildPassword, type Password } from '../../model'
+import { onMounted, watch } from 'vue'
+import { buildPassword, decryptPassword } from '../../model'
 import { dbBase } from '../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
-interface Props {
-  create?: string
-}
+const password = defineModel<string>('password')
 
-const props = defineProps<Props>()
-const create = toRef(props, 'create')
-
-const password = defineModel<Password>('password')
-
-const _password = useObservable<Password | undefined>(
+const _password = useObservable<string | undefined>(
   from(
     liveQuery(async () => {
-      return (await dbBase.passwords.toArray()).find((el) => el.active)
+      const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
+      if (!passwd) return undefined
+      return decryptPassword(passwd)
     })
   )
 )
@@ -26,16 +21,16 @@ watch(_password, () => {
   password.value = _password.value
 })
 
-watch(create, () => {
-  if (!create.value?.length) return
-  const password = buildPassword(create.value)
-  void dbBase.passwords.add(password)
+watch(password, () => {
+  if (!password.value?.length) return
+  const passwd = buildPassword(password.value)
+  void dbBase.passwords.add(passwd)
 })
 
 onMounted(() => {
-  if (!create.value) return
-  const password = buildPassword(create.value)
-  void dbBase.passwords.add(password)
+  if (!password.value?.length) return
+  const passwd = buildPassword(password.value)
+  void dbBase.passwords.add(passwd)
 })
 
 </script>

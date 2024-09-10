@@ -1,6 +1,6 @@
 <template>
   <div class='row full-width page-header shadow-1'>
-    <div class='page-header-left-right'>
+    <div class='page-header-left-right page-header-network-btn'>
       <q-btn-dropdown
         rounded flat filled class='btn-alt'
         no-caps dense
@@ -8,8 +8,8 @@
       >
         <template #label>
           <div class='row'>
-            <q-img :src='selectedNetwork?.icon' width='24px' height='24px' />
-            <div class='header-items-margin-x-left'>
+            <q-img :src='selectedNetwork?.icon' width='20px' height='20px' />
+            <div class='header-items-margin-x-left page-header-network'>
               {{ selectedNetwork?.name }}
             </div>
           </div>
