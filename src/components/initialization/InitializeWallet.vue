@@ -6,16 +6,13 @@
       done-color='green-6'
       animated
       alternative-labels
-      :header-class='extensionMode ? "hide" : ""'
-      :class='[ extensionMode ? "stepper-expand" : "" ]'
     >
       <q-step
         :name='1'
         title='Create password'
         :done='step > 1'
       >
-        <NewPassword v-if='!extensionMode' v-model:password='password' v-model:error='passwordError' />
-        <ExtensionNewPassword v-else v-model:password='password' v-model:error='passwordError' />
+        <NewPassword v-model:password='password' v-model:error='passwordError' />
       </q-step>
       <q-step
         :name='2'
@@ -23,18 +20,16 @@
         :done='step > 2'
       >
         <InitializeAccount
-          v-if='!extensionMode' :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic'
+          :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic'
           v-model:public-key='publicKey' v-model:private-key='privateKey'
         />
-        <ExtensionInitializeAccount v-else :password='password' />
       </q-step>
       <q-step
         :name='3'
         title='Validate recovery'
         :done='step > 3'
       >
-        <ValidateAccount v-if='!extensionMode' :mnemonic='mnemonic' v-model='mnemonicValid' />
-        <ExtensionValidateAccount v-else v-model:password='password' v-model:error='passwordError' />
+        <ValidateAccount :mnemonic='mnemonic' v-model='mnemonicValid' />
       </q-step>
     </q-stepper>
     <div v-if='!showInnerActionBtn' class='row'>
@@ -59,7 +54,6 @@
 
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
-import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
 import { buildOwner, DEFAULT_ACCOUNT_NAME, Owner } from 'src/model'
 
@@ -67,11 +61,8 @@ import PasswordBridge from '../bridge/PasswordBridge.vue'
 import OwnerBridge from '../bridge/OwnerBridge.vue'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
-import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
-import ExtensionInitializeAccount from 'src/components/extension/InitializeAccount.vue'
 import ValidateAccount from 'src/components/account/ValidateAccount.vue'
-import ExtensionValidateAccount from 'src/components/extension/ValidateAccount.vue'
 
 const step = ref(1)
 const password = ref(undefined as unknown as string)
@@ -86,7 +77,6 @@ const persistentPassword = ref(undefined as unknown as string)
 const persistentOwner = ref(undefined as unknown as Owner)
 
 const router = useRouter()
-const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 const canGotoNext = () => {
   switch (step.value) {
