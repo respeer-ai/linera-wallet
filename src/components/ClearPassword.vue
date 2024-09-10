@@ -19,9 +19,11 @@
 </template>
 
 <script setup lang='ts'>
+import { dbBase } from 'src/controller'
 import { localStore } from 'src/localstores'
 
 const onClearAccountsClick = () => {
+  void dbBase.passwords.clear()
   localStore.wallet.reset(true)
   localStore.persistentSetting.reset()
   localStore.notification.pushNotification({

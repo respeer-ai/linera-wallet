@@ -48,12 +48,12 @@
       <q-space />
     </div>
     <PasswordBridge v-model:password='persistentPassword' />
-    <OwnerBridge :create='persistentOwner' />
+    <OwnerBridge :create='persistentOwner' v-model:created='ownerCreated' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { buildOwner, DEFAULT_ACCOUNT_NAME, Owner } from 'src/model'
 
@@ -75,6 +75,7 @@ const showInnerActionBtn = ref(false)
 
 const persistentPassword = ref(undefined as unknown as string)
 const persistentOwner = ref(undefined as unknown as Owner)
+const ownerCreated = ref(false)
 
 const router = useRouter()
 
@@ -108,10 +109,15 @@ const savePassword = () => {
 
 const saveAccount = async () => {
   persistentOwner.value = await buildOwner(publicKey.value, privateKey.value, password.value, DEFAULT_ACCOUNT_NAME)
-  void router.push({ path: '/home' })
 }
 
-const onNextStepClick = () => {
+watch(ownerCreated, () => {
+  if (ownerCreated.value) {
+    void router.push({ path: '/home' })
+  }
+})
+
+const onNextStepClick = async () => {
   switch (step.value) {
     case 1:
       savePassword()
@@ -120,7 +126,7 @@ const onNextStepClick = () => {
       step.value++
       break
     case 3:
-      void saveAccount()
+      await saveAccount()
       break
   }
 }

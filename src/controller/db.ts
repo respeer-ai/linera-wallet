@@ -11,16 +11,14 @@ dbBase.version(1).stores({
   passwords: '++id, password, salt, createdAt'
 })
 
-export const dbWallet = (networkId: number) => {
-  const db = new Dexie(`CheCkoWalletDatabaseNetwork${networkId}`) as Dexie & {
-    microchainOwners: EntityTable<MicrochainOwner, 'id'>,
-    microchains: EntityTable<Microchain, 'microchain'>,
-    owners: EntityTable<Owner, 'address'>
-  }
-  db.version(1).stores({
-    microchainOwners: '++id, microchain, owner, balance',
-    microchains: '++id, microchain, balance, messageId, certificateHash, faucetUrl',
-    owners: '++id, address, owner, privateKey, salt'
-  })
-  return db
+export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
+  microchainOwners: EntityTable<MicrochainOwner, 'id'>,
+  microchains: EntityTable<Microchain, 'microchain'>,
+  owners: EntityTable<Owner, 'address'>
 }
+
+dbWallet.version(1).stores({
+  microchainOwners: '++id, microchain, owner, balance',
+  microchains: '++id, microchain, balance, messageId, certificateHash, faucetUrl',
+  owners: '++id, address, owner, privateKey, salt'
+})

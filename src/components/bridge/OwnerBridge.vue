@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, toRef, watch } from 'vue'
+import { onMounted, ref, toRef, watch } from 'vue'
 import { DEFAULT_ACCOUNT_NAME, Network, type Owner } from '../../model'
 import { dbWallet } from '../../controller'
 import { liveQuery } from 'dexie'
@@ -26,12 +26,14 @@ const selectedNetwork = ref(undefined as unknown as Network)
 
 const owners = defineModel<Owner[]>('owners')
 const selectedOwner = defineModel<Owner>('selectedOwner')
-const _dbWallet = computed(() => selectedNetwork.value ? dbWallet(selectedNetwork.value?.id as number) : undefined)
+const created = defineModel<boolean>('created')
+const updated = defineModel<boolean>('updated')
+const deleted = defineModel<boolean>('deleted')
 
 const _owners = useObservable<Owner[]>(
   from(
     liveQuery(async () => {
-      return await _dbWallet.value?.owners.toArray() || []
+      return await dbWallet.owners.toArray()
     })
   )
 )
@@ -41,26 +43,30 @@ watch(_owners, () => {
   selectedOwner.value = _owners.value?.find((el) => el.selected)
 })
 
-watch(create, () => {
+watch(create, async () => {
   if (!create.value) return
-  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value?.owners.count.toString()
-  void _dbWallet.value?.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
+  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += ' ' + (await dbWallet.owners.count() + 1).toString()
+  await dbWallet.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
+  created.value = true
 })
 
-watch(update, () => {
+watch(update, async () => {
   if (!update.value) return
-  void _dbWallet.value?.owners.update(update.value.address, JSON.parse(JSON.stringify(update.value)) as Owner)
+  await dbWallet.owners.update(update.value.address, JSON.parse(JSON.stringify(update.value)) as Owner)
+  updated.value = true
 })
 
-watch(_delete, () => {
+watch(_delete, async () => {
   if (_delete.value === undefined) return
-  void _dbWallet.value?.owners.delete(_delete.value)
+  await dbWallet.owners.delete(_delete.value)
+  deleted.value = true
 })
 
-onMounted(() => {
+onMounted(async () => {
   if (!create.value) return
-  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += _dbWallet.value?.owners.count.toString()
-  void _dbWallet.value?.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
+  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += dbWallet.owners.count().toString()
+  await dbWallet.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
+  created.value = true
 })
 
 </script>

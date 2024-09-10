@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, toRef, watch } from 'vue'
+import { onMounted, ref, toRef, watch } from 'vue'
 import { Network, type MicrochainOwner } from '../../model'
 import { dbWallet } from '../../controller'
 import { liveQuery } from 'dexie'
@@ -25,12 +25,11 @@ const _delete = toRef(props, 'delete')
 const selectedNetwork = ref(undefined as unknown as Network)
 
 const microchainOwners = defineModel<MicrochainOwner[]>('microchainOwners')
-const _dbWallet = computed(() => selectedNetwork.value ? dbWallet(selectedNetwork.value?.id as number) : undefined)
 
 const _microchainOwners = useObservable<MicrochainOwner[]>(
   from(
     liveQuery(async () => {
-      return await _dbWallet.value?.microchainOwners.toArray() || []
+      return await dbWallet.microchainOwners.toArray() || []
     })
   )
 )
@@ -41,22 +40,22 @@ watch(_microchainOwners, () => {
 
 watch(create, () => {
   if (!create.value) return
-  void _dbWallet.value?.microchainOwners.add(JSON.parse(JSON.stringify(create.value)) as MicrochainOwner)
+  void dbWallet.microchainOwners.add(JSON.parse(JSON.stringify(create.value)) as MicrochainOwner)
 })
 
 watch(update, () => {
   if (!update.value) return
-  void _dbWallet.value?.microchainOwners.update(update.value.id, JSON.parse(JSON.stringify(update.value)) as MicrochainOwner)
+  void dbWallet.microchainOwners.update(update.value.id, JSON.parse(JSON.stringify(update.value)) as MicrochainOwner)
 })
 
 watch(_delete, () => {
   if (_delete.value === undefined) return
-  void _dbWallet.value?.microchainOwners.delete(_delete.value)
+  void dbWallet.microchainOwners.delete(_delete.value)
 })
 
 onMounted(() => {
   if (!create.value) return
-  void _dbWallet.value?.microchainOwners.add(JSON.parse(JSON.stringify(create.value)) as MicrochainOwner)
+  void dbWallet.microchainOwners.add(JSON.parse(JSON.stringify(create.value)) as MicrochainOwner)
 })
 
 </script>

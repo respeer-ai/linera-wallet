@@ -21,6 +21,7 @@ export interface Microchain {
   name: string
   default: boolean
   selected: boolean
+  network: number
 }
 
 const ownerFromPublicKey = async (publicKey: string) => {
