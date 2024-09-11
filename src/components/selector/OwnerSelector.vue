@@ -67,7 +67,11 @@ import OwnerBridge from '../bridge/OwnerBridge.vue'
 const owners = ref([] as Owner[])
 const searchText = ref('')
 
-const displayOwners = computed(() => owners.value.filter((el) => el.name.includes(searchText.value) || el.address.includes(searchText.value)))
+const displayOwners = computed(() => owners.value.filter((el) => {
+  return el.name.includes(searchText.value) || el.address.includes(searchText.value)
+}).sort((a, b) => {
+  return b.selected as unknown as number - (a.selected as unknown as number)
+}))
 
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
 
