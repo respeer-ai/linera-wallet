@@ -28,7 +28,10 @@
     <div class='header-account text-center'>
       <div class='header-text text-center text-bold row cursor-pointer'>
         <q-space />
-        <div>
+        <div class='account-icon'>
+          <q-img v-if='selectedOwner' :src='ownerAvatar(selectedOwner)' height='14px' width='14px' />
+        </div>
+        <div class='header-items-margin-x-left'>
           {{ selectedOwner?.name }}
         </div>
         <div class='header-items-margin-x-left'>
@@ -38,6 +41,9 @@
         <q-menu>
           <q-list class='page-header-selector'>
             <q-item v-for='owner in owners' :key='owner.id' clickable v-close-popup>
+              <q-avatar>
+                <q-img :src='ownerAvatar(owner)' height='48px' width='48px' />
+              </q-avatar>
               <div class='header-items-margin-x-left'>
                 {{ owner.name }}
               </div>
@@ -45,13 +51,15 @@
           </q-list>
         </q-menu>
       </div>
-      <div class='header-text text-center row'>
+      <div class='header-text text-center row cursor-pointer'>
+        <q-space />
         <div>
           0x{{ shortid.shortId(selectedOwner?.address, 4) }}
         </div>
         <div class='header-items-margin-x-left cursor-pointer'>
           <q-icon name='bi-copy' size='12px' />
         </div>
+        <q-space />
       </div>
     </div>
     <q-space />
@@ -66,7 +74,7 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { Network, Owner } from 'src/model'
+import { Network, Owner, ownerAvatar } from 'src/model'
 
 import NetworkBridge from '../bridge/NetworkBridge.vue'
 import OwnerBridge from '../bridge/OwnerBridge.vue'

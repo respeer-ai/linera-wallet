@@ -3,6 +3,7 @@ import CryptoJS, { AES, enc } from 'crypto-js'
 import { sha3 } from 'hash-wasm'
 // TODO: replace with web3.js utils
 import { _hex } from 'src/utils'
+import Identicon from 'identicon.js'
 
 export interface MicrochainOwner {
   id?: number
@@ -56,6 +57,10 @@ export const buildOwner = async (publicKey: string, privateKey: string, password
     name,
     selected: true
   } as Owner
+}
+
+export const ownerAvatar = (owner: Owner) => {
+  return 'data:image/png;base64,' + new Identicon(owner.address, 420).toString()
 }
 
 export const privateKey = (owner: Owner, password: string) => {
