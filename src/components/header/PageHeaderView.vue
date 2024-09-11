@@ -5,6 +5,9 @@
         rounded flat filled class='btn-alt'
         no-caps dense
         dropdown-icon='bi-chevron-down'
+        menu-anchor='bottom left'
+        menu-self='top left'
+        @click='onNetworkClick'
       >
         <template #label>
           <div class='row'>
@@ -14,14 +17,6 @@
             </div>
           </div>
         </template>
-        <q-list class='page-header-selector'>
-          <q-item v-for='network in networks' :key='network.id' clickable v-close-popup>
-            <q-img :src='network.icon' width='24px' height='24px' />
-            <div class='header-items-margin-x-left'>
-              {{ network.name }}
-            </div>
-          </q-item>
-        </q-list>
       </q-btn-dropdown>
     </div>
     <q-space />
@@ -70,19 +65,29 @@
   </div>
   <NetworkBridge v-model:networks='networks' v-model:selected-network='selectedNetwork' />
   <OwnerBridge v-model:owners='owners' v-model:selected-owner='selectedOwner' />
+  <q-dialog v-model='selectingNetwork'>
+    <NetworkSelector />
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { Network, Owner, ownerAvatar } from 'src/model'
+import { shortid } from 'src/utils'
 
 import NetworkBridge from '../bridge/NetworkBridge.vue'
 import OwnerBridge from '../bridge/OwnerBridge.vue'
-import { shortid } from 'src/utils'
+import NetworkSelector from '../selector/NetworkSelector.vue'
 
 const networks = ref([] as Network[])
 const selectedNetwork = ref(undefined as unknown as Network)
 const owners = ref([] as Owner[])
 const selectedOwner = ref(undefined as unknown as Owner)
+
+const selectingNetwork = ref(false)
+
+const onNetworkClick = () => {
+  selectingNetwork.value = true
+}
 
 </script>

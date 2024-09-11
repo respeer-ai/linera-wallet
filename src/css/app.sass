@@ -135,6 +135,7 @@ body
 
 .btn-alt
   border: 1px solid $red-2
+  background: transparent
 
 .vertical-items-margin
   margin-top: 8px
@@ -218,3 +219,38 @@ body
     font-size: 12px
     .home-token-action-btn
       width: 60px
+
+.network-selector-card
+  width: 320px
+  padding: 24px 0
+  .network-selector-title
+    font-size: 18px
+  .network-selector-list
+    .network-selector-item
+      padding: 12px 24px
+  .network-selector-action
+    margin-top: 16px
+    padding: 4px 24px
+  .network-selector-item-endpoint
+    font-size: 12px
+    color: $grey-6
+
+.selector-margin-x-left
+  margin-left: 12px
+
+.selector-item
+  .selector-delete-btn
+    visibility: hidden
+
+.selector-item:hover
+  .selector-delete-btn
+    visibility: visible
+
+.selector-item-selected
+  background: $red-1
+
+.selector-indicator
+  width: 4px
+
+.selector-indicator-selected
+  background: $red-6

@@ -89,6 +89,7 @@ export interface Network {
   port: number
   path: string
   selected: boolean
+  preset: boolean
 }
 
 export const defaultNetwork = {
@@ -100,7 +101,8 @@ export const defaultNetwork = {
   host: '172.16.31.73',
   port: 30080,
   path: '',
-  selected: true
+  selected: true,
+  preset: true
 } as Network
 
 export interface Password {
