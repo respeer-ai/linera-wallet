@@ -1,23 +1,31 @@
 <template>
   <NetworkBridge v-model:selected-network='selectedNetwork' />
   <PasswordBridge v-model:password='password' />
+  <MicrochainBridge ref='microchainBridge' v-model:microchains='microchains' />
+  <MicrochainOwnerBridge v-model:microchains='microchainOwners' />
 </template>
 
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
-import { buildOwner, DEFAULT_ACCOUNT_NAME, Network, type Owner } from '../../model'
+import { buildOwner, DEFAULT_ACCOUNT_NAME, Microchain, MicrochainOwner, Network, type Owner } from '../../model'
 import { dbWallet } from '../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
 import NetworkBridge from './NetworkBridge.vue'
 import PasswordBridge from './PasswordBridge.vue'
+import MicrochainBridge from './MicrochainBridge.vue'
+import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
 const selectedNetwork = ref(undefined as unknown as Network)
 const password = ref(undefined as unknown as string)
+const microchains = ref([] as Microchain[])
+const microchainOwners = ref([] as MicrochainOwner[])
 
 const owners = defineModel<Owner[]>('owners')
 const selectedOwner = defineModel<Owner>('selectedOwner')
+
+const microchainBridge = ref<InstanceType<typeof MicrochainBridge>>()
 
 const _owners = useObservable<Owner[]>(
   from(
@@ -60,10 +68,19 @@ const deleteOwner = async (id: number) => {
   await dbWallet.owners.delete(id)
 }
 
+const ownerBalance = (owner: Owner) => {
+  const balance = microchainOwners.value.filter((el) => el.owner === owner.owner).reduce((sum, a) => sum + a.balance, 0)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const microchains = microchainBridge.value?.ownerMicrochains(owner.owner) || []
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  return balance + microchains.reduce((sum: number, a: Microchain) => sum + a.balance, 0) || 0
+}
+
 defineExpose({
   createOwner,
   updateOwner,
-  deleteOwner
+  deleteOwner,
+  ownerBalance
 })
 
 </script>

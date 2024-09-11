@@ -1,12 +1,12 @@
 <template>
-  <q-card class='network-selector-card'>
-    <p class='text-center text-bold text-grey-9 network-selector-title'>
+  <q-card class='selector-card'>
+    <p class='text-center text-bold text-grey-9 selector-title'>
       Select a network
     </p>
-    <q-list class='network-selector-list'>
+    <q-list class='selector-list'>
       <q-item
         v-for='network in networks' :key='network.id' clickable
-        :class='[ "network-selector-item selector-item", network.selected ? "selector-item-selected" : "" ]'
+        :class='[ "selector-item selector-item", network.selected ? "selector-item-selected" : "" ]'
       >
         <div :class='[ "selector-indicator", network.selected ? "selector-indicator-selected" : "" ]' />
         <q-avatar color='red-1 selector-margin-x-left'>
@@ -16,7 +16,7 @@
           <div class='text-bold text-grey-9'>
             {{ network.name }}
           </div>
-          <div class='network-selector-item-endpoint'>
+          <div class='selector-item-endpoint'>
             {{ network.faucetUrl }}
           </div>
         </div>
@@ -26,7 +26,7 @@
         </div>
       </q-item>
     </q-list>
-    <div class='network-selector-action'>
+    <div class='selector-action'>
       <q-btn flat class='btn btn-alt' label='Add network' no-caps />
     </div>
   </q-card>

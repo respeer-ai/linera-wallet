@@ -220,18 +220,21 @@ body
     .home-token-action-btn
       width: 60px
 
-.network-selector-card
+.selector-card
   width: 360px
+  max-height: 100%
   padding: 24px 0
-  .network-selector-title
+  .selector-title
     font-size: 18px
-  .network-selector-list
-    .network-selector-item
+  .selector-list
+    max-height: 560px
+    overflow: scroll
+    .selector-item
       padding: 12px 12px 12px 4px
-  .network-selector-action
+  .selector-action
     margin-top: 16px
     padding: 4px 24px
-  .network-selector-item-endpoint
+  .selector-item-endpoint
     font-size: 12px
     color: $grey-6
 
@@ -254,3 +257,9 @@ body
 
 .selector-indicator-selected
   background: $red-6
+
+.selector-item-currency-sub
+  font-size: 12px
+
+.selector-search
+  padding: 0px 16px
