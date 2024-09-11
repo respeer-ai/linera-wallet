@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 import { buildPassword, decryptPassword } from '../../model'
 import { dbBase } from '../../controller'
 import { liveQuery } from 'dexie'
@@ -21,22 +21,18 @@ watch(_password, () => {
   password.value = _password.value
 })
 
-watch(password, () => {
-  if (!password.value?.length) return
-  if (password.value === _password.value) return
-  const passwd = buildPassword(password.value)
-  if (passwd) {
-    void dbBase.passwords.add(passwd)
+const savePassword = async (passwd?: string) => {
+  if (!passwd?.length && !password.value?.length) {
+    throw Error('Invalid password')
   }
-})
+  const _passwd = buildPassword(passwd || password.value || '')
+  if (_passwd) {
+    await dbBase.passwords.add(_passwd)
+  }
+}
 
-onMounted(() => {
-  if (!password.value?.length) return
-  console.log(111, password.value)
-  const passwd = buildPassword(password.value)
-  if (passwd) {
-    void dbBase.passwords.add(passwd)
-  }
+defineExpose({
+  savePassword
 })
 
 </script>

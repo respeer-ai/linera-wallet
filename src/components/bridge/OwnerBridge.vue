@@ -1,34 +1,23 @@
 <template>
   <NetworkBridge v-model:selected-network='selectedNetwork' />
+  <PasswordBridge v-model:password='password' />
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref, toRef, watch } from 'vue'
-import { DEFAULT_ACCOUNT_NAME, Network, type Owner } from '../../model'
+import { ref, watch } from 'vue'
+import { buildOwner, DEFAULT_ACCOUNT_NAME, Network, type Owner } from '../../model'
 import { dbWallet } from '../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
 import NetworkBridge from './NetworkBridge.vue'
-
-interface Props {
-  create?: Owner
-  update?: Owner
-  delete?: string
-}
-
-const props = defineProps<Props>()
-const create = toRef(props, 'create')
-const update = toRef(props, 'update')
-const _delete = toRef(props, 'delete')
+import PasswordBridge from './PasswordBridge.vue'
 
 const selectedNetwork = ref(undefined as unknown as Network)
+const password = ref(undefined as unknown as string)
 
 const owners = defineModel<Owner[]>('owners')
 const selectedOwner = defineModel<Owner>('selectedOwner')
-const created = defineModel<boolean>('created')
-const updated = defineModel<boolean>('updated')
-const deleted = defineModel<boolean>('deleted')
 
 const _owners = useObservable<Owner[]>(
   from(
@@ -43,30 +32,30 @@ watch(_owners, () => {
   selectedOwner.value = _owners.value?.find((el) => el.selected)
 })
 
-watch(create, async () => {
-  if (!create.value) return
-  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += ' ' + (await dbWallet.owners.count() + 1).toString()
-  await dbWallet.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
-  created.value = true
-})
+const createOwner = async (publicKey: string, privateKey: string, name?: string) => {
+  if (!publicKey.length || !privateKey.length || !password.value?.length) {
+    throw Error('Invalid owner materials')
+  }
+  if (!name) {
+    // TODO: add field to store account number
+    name = DEFAULT_ACCOUNT_NAME + ' ' + (await dbWallet.owners.count()).toString()
+  }
+  const owner = await buildOwner(publicKey, privateKey, password.value, name)
+  await dbWallet.owners.add(owner)
+}
 
-watch(update, async () => {
-  if (!update.value) return
-  await dbWallet.owners.update(update.value.address, JSON.parse(JSON.stringify(update.value)) as Owner)
-  updated.value = true
-})
+const updateOwner = async (owner: Owner) => {
+  await dbWallet.owners.update(owner.address, owner)
+}
 
-watch(_delete, async () => {
-  if (_delete.value === undefined) return
-  await dbWallet.owners.delete(_delete.value)
-  deleted.value = true
-})
+const deleteOwner = async (address: string) => {
+  await dbWallet.owners.delete(address)
+}
 
-onMounted(async () => {
-  if (!create.value) return
-  if (create.value.name === DEFAULT_ACCOUNT_NAME) create.value.name += dbWallet.owners.count().toString()
-  await dbWallet.owners.add(JSON.parse(JSON.stringify(create.value)) as Owner)
-  created.value = true
+defineExpose({
+  createOwner,
+  updateOwner,
+  deleteOwner
 })
 
 </script>

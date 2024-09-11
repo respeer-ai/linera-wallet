@@ -47,15 +47,14 @@
       </div>
       <q-space />
     </div>
-    <PasswordBridge v-model:password='persistentPassword' />
-    <OwnerBridge :create='persistentOwner' v-model:created='ownerCreated' />
+    <PasswordBridge ref='passwordBridge' v-model:password='password' />
+    <OwnerBridge ref='ownerBridge' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { buildOwner, DEFAULT_ACCOUNT_NAME, Owner } from 'src/model'
 
 import PasswordBridge from '../bridge/PasswordBridge.vue'
 import OwnerBridge from '../bridge/OwnerBridge.vue'
@@ -73,9 +72,8 @@ const mnemonic = ref('')
 const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
 
-const persistentPassword = ref(undefined as unknown as string)
-const persistentOwner = ref(undefined as unknown as Owner)
-const ownerCreated = ref(false)
+const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
+const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
 
 const router = useRouter()
 
@@ -102,25 +100,22 @@ const btnText = computed(() => {
   return 'Next'
 })
 
-const savePassword = () => {
-  persistentPassword.value = password.value
+const savePassword = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  await passwordBridge.value?.savePassword(password.value)
   step.value++
 }
 
 const saveAccount = async () => {
-  persistentOwner.value = await buildOwner(publicKey.value, privateKey.value, password.value, DEFAULT_ACCOUNT_NAME)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await (ownerBridge.value)?.createOwner(publicKey.value, privateKey.value)
+  void router.push({ path: '/home' })
 }
-
-watch(ownerCreated, () => {
-  if (ownerCreated.value) {
-    void router.push({ path: '/home' })
-  }
-})
 
 const onNextStepClick = async () => {
   switch (step.value) {
     case 1:
-      savePassword()
+      await savePassword()
       break
     case 2:
       step.value++

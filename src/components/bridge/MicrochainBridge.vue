@@ -3,24 +3,13 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref, toRef, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { Network, type Microchain } from '../../model'
 import { dbWallet } from '../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
 import NetworkBridge from './NetworkBridge.vue'
-
-interface Props {
-  create?: Microchain
-  update?: Microchain
-  delete?: string
-}
-
-const props = defineProps<Props>()
-const create = toRef(props, 'create')
-const update = toRef(props, 'update')
-const _delete = toRef(props, 'delete')
 
 const selectedNetwork = ref(undefined as unknown as Network)
 
@@ -38,26 +27,6 @@ const _microchains = useObservable<Microchain[]>(
 watch(_microchains, () => {
   microchains.value = _microchains.value
   selectedMicrochain.value = _microchains.value?.find((el) => el.selected)
-})
-
-watch(create, () => {
-  if (!create.value) return
-  void dbWallet.microchains.add(JSON.parse(JSON.stringify(create.value)) as Microchain)
-})
-
-watch(update, () => {
-  if (!update.value) return
-  void dbWallet.microchains.update(update.value.microchain, JSON.parse(JSON.stringify(update.value)) as Microchain)
-})
-
-watch(_delete, () => {
-  if (_delete.value === undefined) return
-  void dbWallet.microchains.delete(_delete.value)
-})
-
-onMounted(() => {
-  if (!create.value) return
-  void dbWallet.microchains.add(JSON.parse(JSON.stringify(create.value)) as Microchain)
 })
 
 </script>
