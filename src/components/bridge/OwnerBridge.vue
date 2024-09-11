@@ -61,6 +61,7 @@ const createOwner = async (publicKey: string, privateKey: string, name?: string)
 }
 
 const updateOwner = async (owner: Owner) => {
+  if (owner.selected) await resetSelected()
   await dbWallet.owners.update(owner.id, owner)
 }
 

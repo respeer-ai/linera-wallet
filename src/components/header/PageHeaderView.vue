@@ -57,7 +57,7 @@
     <NetworkSelector />
   </q-dialog>
   <q-dialog v-model='selectingOwner'>
-    <OwnerSelector />
+    <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' />
   </q-dialog>
 </template>
 
@@ -85,6 +85,11 @@ const onNetworkClick = () => {
 
 const onAccountClick = () => {
   selectingOwner.value = true
+}
+
+const onOwnerSelected = (owner: Owner) => {
+  selectingOwner.value = false
+  selectedOwner.value = owner
 }
 
 </script>
