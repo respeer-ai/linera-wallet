@@ -54,7 +54,7 @@
   <NetworkBridge v-model:networks='networks' v-model:selected-network='selectedNetwork' />
   <OwnerBridge v-model:owners='owners' v-model:selected-owner='selectedOwner' />
   <q-dialog v-model='selectingNetwork'>
-    <NetworkSelector />
+    <NetworkSelector v-model='selectedNetwork' @selected='onNetworkSelected' />
   </q-dialog>
   <q-dialog v-model='selectingOwner'>
     <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' />
@@ -85,6 +85,11 @@ const onNetworkClick = () => {
 
 const onAccountClick = () => {
   selectingOwner.value = true
+}
+
+const onNetworkSelected = (network: Network) => {
+  selectingNetwork.value = false
+  selectedNetwork.value = network
 }
 
 const onOwnerSelected = (owner: Owner) => {

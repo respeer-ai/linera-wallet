@@ -25,12 +25,25 @@ watch(_networks, async () => {
   }
 })
 
+const resetSelected = async () => {
+  const _networks = networks.value?.filter((network) => network.selected) || []
+  for (const network of _networks) {
+    await dbBase.networks.update(network.id, { selected: false })
+  }
+}
+
+const updateNetwork = async (network: Network) => {
+  if (network.selected) await resetSelected()
+  await dbBase.networks.update(network.id, network)
+}
+
 const deleteNetwork = async (id: number) => {
   await dbBase.networks.delete(id)
 }
 
 defineExpose({
-  deleteNetwork
+  deleteNetwork,
+  updateNetwork
 })
 
 </script>
