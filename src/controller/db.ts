@@ -13,8 +13,8 @@ dbBase.version(1).stores({
 
 export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
   microchainOwners: EntityTable<MicrochainOwner, 'id'>,
-  microchains: EntityTable<Microchain, 'microchain'>,
-  owners: EntityTable<Owner, 'address'>
+  microchains: EntityTable<Microchain, 'id'>,
+  owners: EntityTable<Owner, 'id'>
 }
 
 dbWallet.version(1).stores({

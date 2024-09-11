@@ -21,7 +21,7 @@
     </div>
     <q-space />
     <div class='header-account text-center'>
-      <div class='header-text text-center text-bold row cursor-pointer'>
+      <div class='header-text text-center text-bold row cursor-pointer' @click='onAccountClick'>
         <q-space />
         <div class='account-icon'>
           <q-img v-if='selectedOwner' :src='ownerAvatar(selectedOwner)' height='14px' width='14px' />
@@ -33,18 +33,6 @@
           <q-icon name='bi-chevron-down' size='12px' />
         </div>
         <q-space />
-        <q-menu>
-          <q-list class='page-header-selector'>
-            <q-item v-for='owner in owners' :key='owner.id' clickable v-close-popup>
-              <q-avatar>
-                <q-img :src='ownerAvatar(owner)' height='48px' width='48px' />
-              </q-avatar>
-              <div class='header-items-margin-x-left'>
-                {{ owner.name }}
-              </div>
-            </q-item>
-          </q-list>
-        </q-menu>
       </div>
       <div class='header-text text-center row cursor-pointer'>
         <q-space />
@@ -68,6 +56,9 @@
   <q-dialog v-model='selectingNetwork'>
     <NetworkSelector />
   </q-dialog>
+  <q-dialog v-model='selectingOwner'>
+    <OwnerSelector />
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
@@ -78,6 +69,7 @@ import { shortid } from 'src/utils'
 import NetworkBridge from '../bridge/NetworkBridge.vue'
 import OwnerBridge from '../bridge/OwnerBridge.vue'
 import NetworkSelector from '../selector/NetworkSelector.vue'
+import OwnerSelector from '../selector/OwnerSelector.vue'
 
 const networks = ref([] as Network[])
 const selectedNetwork = ref(undefined as unknown as Network)
@@ -85,9 +77,14 @@ const owners = ref([] as Owner[])
 const selectedOwner = ref(undefined as unknown as Owner)
 
 const selectingNetwork = ref(false)
+const selectingOwner = ref(false)
 
 const onNetworkClick = () => {
   selectingNetwork.value = true
+}
+
+const onAccountClick = () => {
+  selectingOwner.value = true
 }
 
 </script>

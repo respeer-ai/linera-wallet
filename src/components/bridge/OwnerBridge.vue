@@ -32,6 +32,13 @@ watch(_owners, () => {
   selectedOwner.value = _owners.value?.find((el) => el.selected)
 })
 
+const resetSelected = async () => {
+  const _owners = owners.value?.filter((owner) => owner.selected) || []
+  for (const owner of _owners) {
+    await dbWallet.owners.update(owner.id, { selected: false })
+  }
+}
+
 const createOwner = async (publicKey: string, privateKey: string, name?: string) => {
   if (!publicKey.length || !privateKey.length || !password.value?.length) {
     throw Error('Invalid owner materials')
@@ -40,16 +47,17 @@ const createOwner = async (publicKey: string, privateKey: string, name?: string)
     // TODO: add field to store account number
     name = DEFAULT_ACCOUNT_NAME + ' ' + (await dbWallet.owners.count()).toString()
   }
+  await resetSelected()
   const owner = await buildOwner(publicKey, privateKey, password.value, name)
   await dbWallet.owners.add(owner)
 }
 
 const updateOwner = async (owner: Owner) => {
-  await dbWallet.owners.update(owner.address, owner)
+  await dbWallet.owners.update(owner.id, owner)
 }
 
-const deleteOwner = async (address: string) => {
-  await dbWallet.owners.delete(address)
+const deleteOwner = async (id: number) => {
+  await dbWallet.owners.delete(id)
 }
 
 defineExpose({
