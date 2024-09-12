@@ -34,7 +34,7 @@ import { localStore } from 'src/localstores'
 import { onMounted, toRef, ref } from 'vue'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
-import VerifyPassword from 'src/components/VerifyPassword.vue'
+import VerifyPassword from 'src/components/password/VerifyPassword.vue'
 
 interface Props {
   checkExist?: boolean

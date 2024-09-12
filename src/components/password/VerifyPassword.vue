@@ -29,7 +29,7 @@
 import { ref, toRef, watch } from 'vue'
 import { localStore } from 'src/localstores'
 
-import InputPassword from 'src/components/InputPassword.vue'
+import InputPassword from 'src/components/password/InputPassword.vue'
 
 interface Props {
   title: string

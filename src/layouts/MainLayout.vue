@@ -20,6 +20,7 @@
               :style='{
                 height: `calc(${viewHeight} - ${headerHeight}px - ${footerHeight}px - (${outerHeight}px - ${innerHeight}px))`,
                 width: `${viewWidth}`,
+                maxWidth: "600px",
                 overflow: "scroll"
               }'
             />

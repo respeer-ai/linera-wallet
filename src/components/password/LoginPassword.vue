@@ -48,6 +48,7 @@ import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/PasswordBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
+import { buildPassword, decryptPassword, Password } from 'src/model'
 
 const password = defineModel<string>('password', { default: '' })
 const decryptedPassword = ref('')
@@ -67,6 +68,8 @@ const unlock = () => {
 }
 
 const onUnlockClick = () => {
+  const p = buildPassword('aaaaaaaa')
+  decryptPassword(p as Password)
   if (passwordError.value) return
   unlock()
 }

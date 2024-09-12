@@ -154,7 +154,7 @@ import CreateAccount from 'src/components/account/CreateAccount.vue'
 import OpenChain from 'src/components/microchain/OpenChain.vue'
 import ClearAccounts from 'src/components/ClearAccounts.vue'
 import ExportAccounts from 'src/components/ExportAccounts.vue'
-import ClearPassword from 'src/components/ClearPassword.vue'
+import ClearPassword from 'src/components/password/ClearPassword.vue'
 import OpenExtension from 'src/components/OpenExtension.vue'
 
 const faucetSchema = ref(endpoint.faucetSchema)
