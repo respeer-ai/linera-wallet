@@ -1,9 +1,9 @@
 <template>
-  <div class='row q-pa-md q-gutter-md'>
+  <div class='row q-pa-md q-gutter-md onboarding-container shadow-1'>
     <q-space />
     <div class='text-center'>
       <q-img :src='cheCkoLogo' width='240px' />
-      <q-card :style='{height: "160px"}' flat>
+      <q-card :style='{height: "160px", width: "600px", maxWidth: "95%"}' flat>
         <q-inner-loading
           :showing='loading'
           class='text-red-4'
