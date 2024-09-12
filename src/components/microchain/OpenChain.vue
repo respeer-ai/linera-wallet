@@ -7,8 +7,7 @@
 <script setup lang="ts">
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
-import { localStore } from 'src/localstores'
-import { dbWallet } from 'src/controller'
+import { dbBase, dbWallet } from 'src/controller'
 import { rpc, db } from 'src/model'
 import { ref } from 'vue'
 
@@ -31,13 +30,17 @@ const openMicrochain = async (): Promise<db.Microchain> => {
 
   const typeNameBytes = new TextEncoder().encode('Nonce::')
   const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(resp.certificateHash)])
-  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(owner.privateKey)))
+  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!password) return Promise.reject(new Error('Invalid password'))
+  const _password = db.decryptPassword(password)
+  const privateKey = db.privateKey(owner, _password)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
   const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcMicrochainBridge.value?.initMicrochainChainStore(owner.address, signature, resp.chainId, resp.messageId, resp.certificateHash)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcBlockBridge.value?.signNewBlock(resp.chainId, 0, Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(localStore.wallet.currentAccount?.privateKey as string))))
+  await rpcBlockBridge.value?.signNewBlock(resp.chainId, 0, keyPair)
   return microchain
 }
 

@@ -45,9 +45,9 @@ export const DEFAULT_ACCOUNT_NAME = 'Account'
 
 export const buildOwner = async (publicKey: string, privateKey: string, password: string, name: string) => {
   const owner = await ownerFromPublicKey(publicKey)
-  const salt = CryptoJS.lib.WordArray.random(16).toString()
-  const _password = AES.encrypt(password, salt).toString()
-  const _privateKey = AES.encrypt(privateKey, _password).toString()
+  const salt = CryptoJS.lib.WordArray.random(16).toString(enc.Base64)
+  const key = CryptoJS.SHA256(salt + password + salt).toString()
+  const _privateKey = AES.encrypt(privateKey, key).toString()
   return {
     address: publicKey,
     owner,
@@ -63,8 +63,8 @@ export const ownerAvatar = (owner: Owner) => {
 }
 
 export const privateKey = (owner: Owner, password: string) => {
-  const _password = AES.encrypt(password, owner.salt).toString()
-  return AES.decrypt(owner.privateKey, _password).toString()
+  const key = CryptoJS.SHA256(owner.salt + password + owner.salt).toString()
+  return AES.decrypt(owner.privateKey, key).toString(enc.Utf8)
 }
 
 enum HTTPSchema {
@@ -128,7 +128,7 @@ export const decryptPassword = (password: Password): string => {
   const fingerPrint = deviceFingerPrint()
   const now = password.createdAt
   const salt = password.salt
-  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt.toString()).toString()
+  const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt).toString()
   const decrypted = AES.decrypt(password.password, key).toString(enc.Utf8)
   return decrypted
 }

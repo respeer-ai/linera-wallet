@@ -20,9 +20,11 @@
 </template>
 
 <script setup lang='ts'>
+import { dbWallet } from 'src/controller'
 import { localStore } from 'src/localstores'
 
-const onClearAccountsClick = () => {
+const onClearAccountsClick = async () => {
+  await dbWallet.owners.clear()
   localStore.wallet.reset()
   localStore.notification.pushNotification({
     Title: 'Clear Accounts',

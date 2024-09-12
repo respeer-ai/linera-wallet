@@ -2,7 +2,7 @@
   <NetworkBridge v-model:selected-network='selectedNetwork' />
   <PasswordBridge v-model:password='password' />
   <MicrochainBridge ref='microchainBridge' v-model:microchains='microchains' />
-  <MicrochainOwnerBridge v-model:microchains='microchainOwners' />
+  <MicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
 </template>
 
 <script setup lang='ts'>
@@ -35,9 +35,14 @@ const _owners = useObservable<db.Owner[]>(
   )
 )
 
-watch(_owners, () => {
+watch(_owners, async () => {
   owners.value = _owners.value
   selectedOwner.value = _owners.value?.find((el) => el.selected)
+
+  if (!selectedOwner.value) return
+
+  const owner1 = await db.buildOwner(selectedOwner.value?.address, '37c3859da70f8f28d1b35ebcd75be6ef142f6589123fc84c6ae5157aa819ad', password.value, 'AAA')
+  db.privateKey(owner1, password.value)
 })
 
 const resetSelected = async () => {
