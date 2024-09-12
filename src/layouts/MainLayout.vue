@@ -52,7 +52,7 @@ const showSideMenu = computed(() => localStore.oneShotSetting.showSideMenu)
 const alignPageCenter = computed(() => localStore.oneShotSetting.alignPageCenter)
 const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
-const viewWidth = computed(() => extensionMode.value ? '368px' : '600px')
+const viewWidth = computed(() => extensionMode.value ? '368px' : 'auto')
 const viewHeight = computed(() => extensionMode.value ? '600px' : '100%')
 
 // eslint-disable-next-line @typescript-eslint/unbound-method

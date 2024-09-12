@@ -1,5 +1,5 @@
 <template>
-  <div class='fill-parent text-center onboarding-container shadow-1 onboarding-padding'>
+  <div class='text-center onboarding-container shadow-1 onboarding-padding'>
     <LoginPassword v-if='step === 0' v-model:password='password' @unlocked='unlocked' />
     <div v-if='step === 1'>
       <InitializeAccount :password='password' />
@@ -38,7 +38,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
 
-import LoginPassword from 'src/components/LoginPassword.vue'
+import LoginPassword from 'src/components/password/LoginPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ValidateAccount from 'src/components/account/ValidateAccount.vue'
 

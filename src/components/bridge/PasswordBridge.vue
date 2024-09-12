@@ -21,10 +21,17 @@ watch(_password, () => {
   password.value = _password.value
 })
 
+const resetActive = async () => {
+  for (const passwd of (await dbBase.passwords.toArray()).filter((el) => el.active)) {
+    await dbBase.passwords.update(passwd.id, { active: false })
+  }
+}
+
 const savePassword = async (passwd?: string) => {
   if (!passwd?.length && !password.value?.length) {
     throw Error('Invalid password')
   }
+  await resetActive()
   const _passwd = buildPassword(passwd || password.value || '')
   if (_passwd) {
     await dbBase.passwords.add(_passwd)
