@@ -7,8 +7,8 @@
 
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
-import { buildOwner, DEFAULT_ACCOUNT_NAME, Microchain, MicrochainOwner, Network, type Owner } from '../../model'
-import { dbWallet } from '../../controller'
+import { db } from '../../../model'
+import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
@@ -17,17 +17,17 @@ import PasswordBridge from './PasswordBridge.vue'
 import MicrochainBridge from './MicrochainBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
-const selectedNetwork = ref(undefined as unknown as Network)
+const selectedNetwork = ref(undefined as unknown as db.Network)
 const password = ref(undefined as unknown as string)
-const microchains = ref([] as Microchain[])
-const microchainOwners = ref([] as MicrochainOwner[])
+const microchains = ref([] as db.Microchain[])
+const microchainOwners = ref([] as db.MicrochainOwner[])
 
-const owners = defineModel<Owner[]>('owners')
-const selectedOwner = defineModel<Owner>('selectedOwner')
+const owners = defineModel<db.Owner[]>('owners')
+const selectedOwner = defineModel<db.Owner>('selectedOwner')
 
 const microchainBridge = ref<InstanceType<typeof MicrochainBridge>>()
 
-const _owners = useObservable<Owner[]>(
+const _owners = useObservable<db.Owner[]>(
   from(
     liveQuery(async () => {
       return await dbWallet.owners.toArray()
@@ -53,14 +53,14 @@ const createOwner = async (publicKey: string, privateKey: string, name?: string)
   }
   if (!name) {
     // TODO: add field to store account number
-    name = DEFAULT_ACCOUNT_NAME + ' ' + (await dbWallet.owners.count()).toString()
+    name = db.DEFAULT_ACCOUNT_NAME + ' ' + (await dbWallet.owners.count()).toString()
   }
   await resetSelected()
-  const owner = await buildOwner(publicKey, privateKey, password.value, name)
+  const owner = await db.buildOwner(publicKey, privateKey, password.value, name)
   await dbWallet.owners.add(owner)
 }
 
-const updateOwner = async (owner: Owner) => {
+const updateOwner = async (owner: db.Owner) => {
   if (owner.selected) await resetSelected()
   await dbWallet.owners.update(owner.id, owner)
 }
@@ -69,12 +69,12 @@ const deleteOwner = async (id: number) => {
   await dbWallet.owners.delete(id)
 }
 
-const ownerBalance = (owner: Owner) => {
+const ownerBalance = (owner: db.Owner) => {
   const balance = microchainOwners.value.filter((el) => el.owner === owner.owner).reduce((sum, a) => sum + a.balance, 0)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const microchains = microchainBridge.value?.ownerMicrochains(owner.owner) || []
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  return balance + microchains.reduce((sum: number, a: Microchain) => sum + a.balance, 0) || 0
+  return balance + microchains.reduce((sum: number, a: db.Microchain) => sum + a.balance, 0) || 0
 }
 
 defineExpose({

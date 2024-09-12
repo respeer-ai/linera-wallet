@@ -24,7 +24,7 @@
       <div class='header-text text-center text-bold row cursor-pointer' @click='onAccountClick'>
         <q-space />
         <div class='account-icon'>
-          <q-img v-if='selectedOwner' :src='ownerAvatar(selectedOwner)' height='14px' width='14px' />
+          <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' height='14px' width='14px' />
         </div>
         <div class='header-items-margin-x-left'>
           {{ selectedOwner?.name }}
@@ -118,18 +118,18 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { Network, Owner, ownerAvatar } from 'src/model'
+import { db } from 'src/model'
 import { shortid } from 'src/utils'
 
-import NetworkBridge from '../bridge/NetworkBridge.vue'
-import OwnerBridge from '../bridge/OwnerBridge.vue'
+import NetworkBridge from '../bridge/db/NetworkBridge.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import NetworkSelector from '../selector/NetworkSelector.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
 
-const networks = ref([] as Network[])
-const selectedNetwork = ref(undefined as unknown as Network)
-const owners = ref([] as Owner[])
-const selectedOwner = ref(undefined as unknown as Owner)
+const networks = ref([] as db.Network[])
+const selectedNetwork = ref(undefined as unknown as db.Network)
+const owners = ref([] as db.Owner[])
+const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const selectingNetwork = ref(false)
 const selectingOwner = ref(false)
@@ -142,12 +142,12 @@ const onAccountClick = () => {
   selectingOwner.value = true
 }
 
-const onNetworkSelected = (network: Network) => {
+const onNetworkSelected = (network: db.Network) => {
   selectingNetwork.value = false
   selectedNetwork.value = network
 }
 
-const onOwnerSelected = (owner: Owner) => {
+const onOwnerSelected = (owner: db.Owner) => {
   selectingOwner.value = false
   selectedOwner.value = owner
 }

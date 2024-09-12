@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { watch } from 'vue'
-import { buildPassword, decryptPassword } from '../../model'
-import { dbBase } from '../../controller'
+import { db } from '../../../model'
+import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
@@ -12,7 +12,7 @@ const _password = useObservable<string | undefined>(
     liveQuery(async () => {
       const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
       if (!passwd) return undefined
-      return decryptPassword(passwd)
+      return db.decryptPassword(passwd)
     })
   )
 )
@@ -32,7 +32,7 @@ const savePassword = async (passwd?: string) => {
     throw Error('Invalid password')
   }
   await resetActive()
-  const _passwd = buildPassword(passwd || password.value || '')
+  const _passwd = db.buildPassword(passwd || password.value || '')
   if (_passwd) {
     await dbBase.passwords.add(_passwd)
   }

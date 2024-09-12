@@ -24,14 +24,14 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { Owner } from 'src/model'
+import { db } from 'src/model'
 
-import OwnerBridge from '../bridge/OwnerBridge.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import PageHeaderView from '../header/PageHeaderView.vue'
 import TokenBalanceView from './TokenBalanceView.vue'
 import TabsView from './TabsView.vue'
 
-const owners = ref([] as Owner[])
+const owners = ref([] as db.Owner[])
 
 const onCreateAccountClick = () => {
   // TODO

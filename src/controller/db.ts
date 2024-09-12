@@ -1,9 +1,9 @@
 import Dexie, { type EntityTable } from 'dexie'
-import { Microchain, MicrochainOwner, Network, Owner, Password } from '../model'
+import { db as dbModel } from '../model'
 
 export const dbBase = new Dexie('CheCkoBaseDatabase') as Dexie & {
-  networks: EntityTable<Network, 'id'>,
-  passwords: EntityTable<Password, 'id'>
+  networks: EntityTable<dbModel.Network, 'id'>,
+  passwords: EntityTable<dbModel.Password, 'id'>
 }
 
 dbBase.version(1).stores({
@@ -12,13 +12,13 @@ dbBase.version(1).stores({
 })
 
 export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
-  microchainOwners: EntityTable<MicrochainOwner, 'id'>,
-  microchains: EntityTable<Microchain, 'id'>,
-  owners: EntityTable<Owner, 'id'>
+  microchainOwners: EntityTable<dbModel.MicrochainOwner, 'id'>,
+  microchains: EntityTable<dbModel.Microchain, 'id'>,
+  owners: EntityTable<dbModel.Owner, 'id'>
 }
 
 dbWallet.version(1).stores({
   microchainOwners: '++id, microchain, owner, balance',
-  microchains: '++id, microchain, balance, messageId, certificateHash, faucetUrl, name, default, selected, network',
+  microchains: '++id, microchain, balance, messageId, certificateHash, networkId, name, default, selected',
   owners: '++id, address, owner, privateKey, salt, name, selected'
 })

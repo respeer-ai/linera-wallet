@@ -1,14 +1,14 @@
 <script setup lang='ts'>
 import { watch } from 'vue'
-import { defaultNetwork, type Network } from '../../model'
-import { dbBase } from '../../controller'
+import { db } from '../../../model'
+import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
-const networks = defineModel<Network[]>('networks')
-const selectedNetwork = defineModel<Network>('selectedNetwork')
+const networks = defineModel<db.Network[]>('networks')
+const selectedNetwork = defineModel<db.Network>('selectedNetwork')
 
-const _networks = useObservable<Network[]>(
+const _networks = useObservable<db.Network[]>(
   from(
     liveQuery(async () => {
       return await dbBase.networks.toArray()
@@ -21,7 +21,7 @@ watch(_networks, async () => {
   selectedNetwork.value = _networks.value?.find((el) => el.selected)
   if (networks.value === _networks.value) return
   if (_networks.value !== undefined && !_networks.value.length) {
-    await dbBase.networks.add(defaultNetwork)
+    await dbBase.networks.add(db.defaultNetwork)
   }
 })
 
@@ -32,7 +32,7 @@ const resetSelected = async () => {
   }
 }
 
-const updateNetwork = async (network: Network) => {
+const updateNetwork = async (network: db.Network) => {
   if (network.selected) await resetSelected()
   await dbBase.networks.update(network.id, network)
 }

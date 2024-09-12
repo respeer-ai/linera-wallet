@@ -36,23 +36,23 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { Network } from 'src/model'
+import { db } from 'src/model'
 
-import NetworkBridge from '../bridge/NetworkBridge.vue'
+import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 
-const networks = ref([] as Network[])
+const networks = ref([] as db.Network[])
 
 const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
 
-const network = defineModel<Network>()
-const emit = defineEmits<{(ev: 'selected', value: Network): void}>()
+const network = defineModel<db.Network>()
+const emit = defineEmits<{(ev: 'selected', value: db.Network): void}>()
 
-const onDeleteNetworkClick = async (network: Network) => {
+const onDeleteNetworkClick = async (network: db.Network) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await (networkBridge.value)?.deleteNetwork(network.id as number)
 }
 
-const onNetworkSelected = async (_network: Network) => {
+const onNetworkSelected = async (_network: db.Network) => {
   _network.selected = true
   network.value = _network
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

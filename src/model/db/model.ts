@@ -18,11 +18,10 @@ export interface Microchain {
   balance: number
   messageId: string
   certificateHash: string
-  faucetUrl: string
+  networkId: number
   name: string
   default: boolean
   selected: boolean
-  network: number
 }
 
 const ownerFromPublicKey = async (publicKey: string) => {

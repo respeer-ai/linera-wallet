@@ -56,8 +56,8 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import PasswordBridge from '../bridge/PasswordBridge.vue'
-import OwnerBridge from '../bridge/OwnerBridge.vue'
+import PasswordBridge from '../bridge/db/PasswordBridge.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'

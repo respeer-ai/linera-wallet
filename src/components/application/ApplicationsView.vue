@@ -20,13 +20,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Microchain, MicrochainOwner } from 'src/model'
+import { db } from 'src/model'
 
-import MicrochainOwnerBridge from '../bridge/MicrochainOwnerBridge.vue'
-import MicrochainBridge from '../bridge/MicrochainBridge.vue'
+import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
+import MicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import ApplicationCardView from './ApplicationCardView.vue'
 
-const microchainOwners = ref([] as MicrochainOwner[])
-const microchains = ref([] as Microchain[])
+const microchainOwners = ref([] as db.MicrochainOwner[])
+const microchains = ref([] as db.Microchain[])
 
 </script>

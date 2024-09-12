@@ -23,7 +23,7 @@
       >
         <div :class='[ "selector-indicator", _owner.selected ? "selector-indicator-selected" : "" ]' />
         <q-avatar color='red-1 selector-margin-x-left'>
-          <q-img :src='ownerAvatar(_owner)' width='48px' height='48px' />
+          <q-img :src='db.ownerAvatar(_owner)' width='48px' height='48px' />
         </q-avatar>
         <div class='selector-margin-x-left'>
           <div class='text-bold text-grey-9'>
@@ -60,16 +60,16 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { Owner, ownerAvatar } from 'src/model'
+import { db } from 'src/model'
 import { shortid } from 'src/utils'
 
-import OwnerBridge from '../bridge/OwnerBridge.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
-const owners = ref([] as Owner[])
+const owners = ref([] as db.Owner[])
 const searchText = ref('')
 
-const owner = defineModel<Owner>()
-const emit = defineEmits<{(ev: 'selected', value: Owner): void}>()
+const owner = defineModel<db.Owner>()
+const emit = defineEmits<{(ev: 'selected', value: db.Owner): void}>()
 
 const displayOwners = computed(() => owners.value.filter((el) => {
   return el.name.includes(searchText.value) || el.address.includes(searchText.value)
@@ -79,12 +79,12 @@ const displayOwners = computed(() => owners.value.filter((el) => {
 
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
 
-const onActionClick = (owner: Owner) => {
+const onActionClick = (owner: db.Owner) => {
   // TODO
   console.log(owner)
 }
 
-const onOwnerSelected = async (_owner: Owner) => {
+const onOwnerSelected = async (_owner: db.Owner) => {
   _owner.selected = true
   owner.value = _owner
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

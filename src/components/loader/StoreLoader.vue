@@ -22,7 +22,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { dbBase } from '../../controller'
 
-import PasswordBridge from '../bridge/PasswordBridge.vue'
+import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 
