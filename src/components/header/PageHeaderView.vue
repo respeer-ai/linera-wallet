@@ -48,7 +48,62 @@
     <q-space />
     <div class='page-header-left-right row'>
       <q-space />
-      <q-icon class='header-icon cursor-pointer' name='bi-three-dots-vertical' size='12x' />
+      <q-icon class='header-icon cursor-pointer' name='bi-three-dots-vertical' size='12x'>
+        <q-menu anchor='bottom end' self='top end' :offset='[0, 8]'>
+          <q-card>
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-icon name='bi-bell-fill' size='12px' />
+              </q-item-section>
+              <q-item-section>
+                <span>Notifications</span>
+              </q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-icon name='bi-person-bounding-box' size='12px' />
+              </q-item-section>
+              <q-item-section>
+                <span>Account details</span>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-icon name='bi-box-arrow-up-right' size='12px' />
+              </q-item-section>
+              <q-item-section>
+                <span>View on explorer</span>
+              </q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-icon name='bi-box-arrow-in-right' size='12px' />
+              </q-item-section>
+              <q-item-section>
+                <span>All permissions</span>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-icon name='bi-gear-fill' size='12px' />
+              </q-item-section>
+              <q-item-section>
+                <span>Settings</span>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-icon name='bi-shield-lock-fill' size='12px' />
+              </q-item-section>
+              <q-item-section>
+                <span>Lock wallet</span>
+              </q-item-section>
+            </q-item>
+          </q-card>
+        </q-menu>
+      </q-icon>
     </div>
   </div>
   <NetworkBridge v-model:networks='networks' v-model:selected-network='selectedNetwork' />
