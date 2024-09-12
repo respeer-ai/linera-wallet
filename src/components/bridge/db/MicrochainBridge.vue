@@ -50,8 +50,8 @@ const ownerMicrochains = (owner: string): db.Microchain[] => {
   }) || []
 }
 
-const addMicrochain = async (owner: string, microchainId: string, messageId: string, certificateHash: string, name?: string, _default?: boolean) => {
-  await dbWallet.microchains.add({
+const addMicrochain = async (owner: string, microchainId: string, messageId: string, certificateHash: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
+  const microchain = {
     microchain: microchainId,
     balance: 0,
     messageId,
@@ -60,9 +60,11 @@ const addMicrochain = async (owner: string, microchainId: string, messageId: str
     name,
     default: _default,
     selected: true
-  } as db.Microchain)
+  } as db.Microchain
+  await dbWallet.microchains.add(microchain)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await microchainOwnerBridge.value?.addMicrochainOwner(owner, microchainId)
+  return microchain
 }
 
 defineExpose({

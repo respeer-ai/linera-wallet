@@ -16,28 +16,51 @@
     </div>
     <q-space />
   </div>
-  <MicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
-  <MicrochainBridge v-model:microchains='microchains' />
+  <DbMicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
+  <DbMicrochainBridge v-model:microchains='microchains' />
+  <OpenChain ref='openChain' />
   <q-dialog v-model='creatingMicrochain'>
-    <q-card>HHHHHHHHHHH</q-card>
+    <q-card>{{ createdMicrochain }}</q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { db } from 'src/model'
+import { localStore } from 'src/localstores'
 
-import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
-import MicrochainBridge from '../bridge/db/MicrochainBridge.vue'
+import DbMicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
+import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
+import OpenChain from './OpenChain.vue'
 
 const microchainOwners = ref([] as db.MicrochainOwner[])
 const microchains = ref([] as db.Microchain[])
+const createdMicrochain = ref(undefined as unknown as db.Microchain)
 
 const creatingMicrochain = ref(false)
+const openChain = ref<InstanceType<typeof OpenChain>>()
 
 const onCreateMicrochainClick = () => {
   creatingMicrochain.value = true
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  openChain.value?.openMicrochain().then((microchain: db.Microchain) => {
+    createdMicrochain.value = microchain
+    localStore.notification.pushNotification({
+      Title: 'Open chain',
+      Message: 'Success open microchain.',
+      Popup: true,
+      Type: localStore.notify.NotifyType.Info
+    })
+  }).catch((error) => {
+    localStore.notification.pushNotification({
+      Title: 'Open chain',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Failed open microchain: ${error}.`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
+  })
 }
 
 const onImportMicrochainClick = () => {
