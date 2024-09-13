@@ -7,13 +7,13 @@
       {{ microchain.microchain }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      Microchain creation message
+      Creation message
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
       {{ microchain.messageId }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      Microchain creation certificate
+      Creation certificate
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
       {{ microchain.certificateHash }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>

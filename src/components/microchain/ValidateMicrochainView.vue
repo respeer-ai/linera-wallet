@@ -3,15 +3,15 @@
     <div class='text-bold vertical-sections-margin decorate-underline'>
       Microchain ID
     </div>
-    <q-input v-model='microchainId' type='textarea' :error='microchainIdError' />
+    <q-input v-model='microchainId' type='textarea' :error='microchainIdError' autogrow />
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      Microchain creation message
+      Creation message
     </div>
-    <q-input v-model='messageId' type='textarea' :error='messageIdError' />
+    <q-input v-model='messageId' type='textarea' :error='messageIdError' autogrow />
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      Microchain creation certificate
+      Creation certificate
     </div>
-    <q-input v-model='certificateHash' type='textarea' :error='certificateHashError' />
+    <q-input v-model='certificateHash' type='textarea' :error='certificateHashError' autogrow />
     <div class='vertical-sections-margin tip info'>
       <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> Paste microchain creation information to input box.
     </div>
