@@ -12,6 +12,9 @@
       Microchain creation certificate
     </div>
     <q-input v-model='certificateHash' type='textarea' :error='certificateHashError' />
+    <div class='vertical-sections-margin tip info'>
+      <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> Paste microchain creation information to input box.
+    </div>
     <q-btn
       class='btn vertical-sections-margin extra-margin-bottom' dense flat no-caps
       @click='onValidateClick' :disabled='canValidate'

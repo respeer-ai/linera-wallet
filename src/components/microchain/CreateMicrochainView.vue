@@ -2,7 +2,7 @@
   <div class='full-width'>
     <OpenChain ref='openChain' />
     <q-stepper v-model='step' animated alternative-labels>
-      <q-step :name='1' :done='step > 1' title='Creating'>
+      <q-step :name='1' :done='step > 1' title='Creating' class='flex items-center justify-center'>
         <q-card flat class='loading-card'>
           <q-inner-loading
             :showing='createdMicrochain === undefined'
@@ -16,7 +16,7 @@
         <MicrochainCreationView :microchain='createdMicrochain' @backuped='onMicrochainBackuped' />
       </q-step>
       <q-step :name='3' :done='step > 3' title='Validate'>
-        <ValidateMicrochainView :microchain='createdMicrochain' />
+        <ValidateMicrochainView :microchain='createdMicrochain' @validated='onMicrochainValidated' />
       </q-step>
     </q-stepper>
   </div>
@@ -44,14 +44,13 @@ const createMicrochain = async (): Promise<db.Microchain> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     openChain.value?.openMicrochain().then((microchain: db.Microchain) => {
-      createdMicrochain.value = microchain
-      step.value++
       localStore.notification.pushNotification({
         Title: 'Open chain',
         Message: 'Success open microchain.',
         Popup: true,
         Type: localStore.notify.NotifyType.Info
       })
+      resolve(microchain)
     }).catch((error) => {
       localStore.notification.pushNotification({
         Title: 'Open chain',
@@ -67,7 +66,8 @@ const createMicrochain = async (): Promise<db.Microchain> => {
 
 onMounted(() => {
   createMicrochain().then((microchain) => {
-    emit('created', microchain)
+    createdMicrochain.value = microchain
+    step.value++
   }).catch(() => {
     emit('failed')
   })
@@ -75,6 +75,10 @@ onMounted(() => {
 
 const onMicrochainBackuped = () => {
   step.value++
+}
+
+const onMicrochainValidated = () => {
+  emit('created', createdMicrochain.value)
 }
 
 </script>
