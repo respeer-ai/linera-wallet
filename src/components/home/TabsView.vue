@@ -16,7 +16,7 @@
     </q-tabs>
     <q-tab-panels v-model='tab' swipeable animated>
       <q-tab-panel name='tokens'>
-        <MicrochainsView />
+        <TokensView />
       </q-tab-panel>
       <q-tab-panel name='microchains'>
         <MicrochainsView />
@@ -34,10 +34,11 @@
 <script setup lang='ts'>
 import { ref } from 'vue'
 
+import TokensView from '../token/TokensView.vue'
 import MicrochainsView from '../microchain/MicrochainsView.vue'
 import ApplicationsView from '../application/ApplicationsView.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 
-const tab = ref('microchains')
+const tab = ref('tokens')
 
 </script>

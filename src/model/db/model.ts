@@ -4,18 +4,17 @@ import { sha3 } from 'hash-wasm'
 // TODO: replace with web3.js utils
 import { _hex } from 'src/utils'
 import Identicon from 'identicon.js'
+import { lineraLogo } from 'src/assets'
 
 export interface MicrochainOwner {
   id?: number
   microchain: string
   owner: string
-  balance: number
 }
 
 export interface Microchain {
   id?: number
   microchain: string
-  balance: number
   messageId: string
   certificateHash: string
   networkId: number
@@ -149,4 +148,53 @@ export const buildPassword = (password: string): Password | undefined => {
     createdAt: now,
     active: true
   }
+}
+
+enum TokenType {
+  Fungible = 'Fungible',
+  NFT = 'NFT',
+  Native = 'Native'
+}
+
+export interface Token {
+  id?: number
+  name: string
+  ticker: string
+  tokenType: TokenType
+  icon: string
+  applicationId?: string
+  native: boolean
+  usdCurrency: number
+}
+
+export const lineraToken = {
+  name: 'Linera',
+  ticker: 'TLINERA',
+  tokenType: TokenType.Native,
+  icon: lineraLogo,
+  native: true
+} as Token
+
+export interface MicrochainFungibleTokenBalance {
+  id?: number
+  microchain: string
+  tokenId: number
+  balance: number
+}
+
+export interface MicrochainOwnerFungibleTokenBalance {
+  id?: number
+  microchain: string
+  owner: string
+  tokenId: number
+  balance: number
+}
+
+export interface NFT {
+  id?: number
+  collectionId: string
+  tokenId: number
+  uri: string
+  microchain: string
+  owner: string
 }

@@ -17,9 +17,9 @@ const _networks = useObservable<db.Network[]>(
 )
 
 watch(_networks, async () => {
+  if (networks.value === _networks.value) return
   networks.value = _networks.value
   selectedNetwork.value = _networks.value?.find((el) => el.selected)
-  if (networks.value === _networks.value) return
   if (_networks.value !== undefined && !_networks.value.length) {
     await dbBase.networks.add(db.defaultNetwork)
   }

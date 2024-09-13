@@ -75,11 +75,11 @@ const deleteOwner = async (id: number) => {
 }
 
 const ownerBalance = (owner: db.Owner) => {
-  const balance = microchainOwners.value.filter((el) => el.owner === owner.owner).reduce((sum, a) => sum + a.balance, 0)
+  const balance = microchainOwners.value.filter((el) => el.owner === owner.owner).reduce((sum) => sum + 0, 0)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const microchains = microchainBridge.value?.ownerMicrochains(owner.owner) || []
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  return balance + microchains.reduce((sum: number, a: db.Microchain) => sum + a.balance, 0) || 0
+  return balance + microchains.reduce((sum) => sum + 0, 0) || 0
 }
 
 defineExpose({

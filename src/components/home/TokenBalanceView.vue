@@ -1,7 +1,7 @@
 <template>
   <div class='page-padding full-width text-center home-token-balance'>
     <div>
-      0 TLINERA
+      {{ usdBalance.toFixed(4) }} TLINERA
     </div>
     <div class='row home-token-action text-center page-y-padding'>
       <q-space />
@@ -47,5 +47,15 @@
       </div>
       <q-space />
     </div>
+    <OwnerBalanceBridge v-model:usd-balance='usdBalance' />
   </div>
 </template>
+
+<script setup lang='ts'>
+import { ref } from 'vue'
+
+import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
+
+const usdBalance = ref(0)
+
+</script>
