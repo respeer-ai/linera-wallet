@@ -26,7 +26,7 @@
       <h5 class='onboarding-page-title text-center page-title'>
         Create token
       </h5>
-      <CreateTokenView @created='onTokenCreated' @error='onCreateTokenError' />
+      <ImportTokenView @created='onTokenCreated' @error='onCreateTokenError' />
     </q-card>
   </q-dialog>
 </template>
@@ -37,7 +37,7 @@ import { db } from 'src/model'
 
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import TokenCardView from './TokenCardView.vue'
-import CreateTokenView from './CreateTokenView.vue'
+import ImportTokenView from './ImportTokenView.vue'
 
 const tokens = ref([] as db.Token[])
 
