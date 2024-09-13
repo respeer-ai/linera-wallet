@@ -1,6 +1,9 @@
 <template>
   <div class='page-padding full-width text-center home-tabs'>
     <q-tabs v-model='tab' no-caps indicator-color='grey-9' dense>
+      <q-tab name='tokens'>
+        Tokens
+      </q-tab>
       <q-tab name='microchains'>
         Microchains
       </q-tab>
@@ -12,6 +15,9 @@
       </q-tab>
     </q-tabs>
     <q-tab-panels v-model='tab' swipeable animated>
+      <q-tab-panel name='tokens'>
+        <MicrochainsView />
+      </q-tab-panel>
       <q-tab-panel name='microchains'>
         <MicrochainsView />
       </q-tab-panel>

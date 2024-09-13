@@ -24,6 +24,10 @@ export interface Microchain {
   selected: boolean
 }
 
+export const microchainAvatar = (microchain: Microchain) => {
+  return 'data:image/png;base64,' + new Identicon(microchain.microchain, 420).toString()
+}
+
 const ownerFromPublicKey = async (publicKey: string) => {
   const publicKeyBytes = _hex.toBytes(publicKey)
   const typeNameBytes = new TextEncoder().encode('PublicKey::')

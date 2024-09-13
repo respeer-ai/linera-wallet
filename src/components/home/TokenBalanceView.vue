@@ -39,10 +39,10 @@
       </div>
       <div class='home-token-action-btn cursor-pointer'>
         <q-avatar color='red-2' size='36px'>
-          <q-icon name='bi-bell' size='24px' />
+          <q-icon name='bi-clock' size='24px' />
         </q-avatar>
         <div class='page-item-y-margin-top'>
-          Notifications
+          Stake
         </div>
       </div>
       <q-space />

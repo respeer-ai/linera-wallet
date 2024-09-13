@@ -3,6 +3,18 @@
     <q-space />
     <div v-if='microchains.length > 0'>
       <MicrochainCardView v-for='microchain in microchains' :key='microchain.microchain' :microchain='microchain' />
+      <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer'>
+        <q-icon name='bi-plus' size='20px' color='blue-10' />
+        <div class='text-left text-blue-8 text-bold'>
+          Create microchain
+        </div>
+      </div>
+      <div class='row vertical-items-margin selector-margin-x-left cursor-pointer'>
+        <q-icon name='bi-plus' size='20px' color='blue-10' />
+        <div class='text-left text-blue-8 text-bold'>
+          Import microchain
+        </div>
+      </div>
     </div>
     <div v-else class='page-item-placeholder'>
       <div class='cursor-pointer' @click='onCreateMicrochainClick'>
