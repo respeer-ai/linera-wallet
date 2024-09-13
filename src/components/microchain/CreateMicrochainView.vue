@@ -1,0 +1,80 @@
+<template>
+  <div class='full-width'>
+    <OpenChain ref='openChain' />
+    <q-stepper v-model='step' animated alternative-labels>
+      <q-step :name='1' :done='step > 1' title='Creating'>
+        <q-card flat class='loading-card'>
+          <q-inner-loading
+            :showing='createdMicrochain === undefined'
+            class='text-red-4'
+          >
+            <q-spinner-facebook size='80px' />
+          </q-inner-loading>
+        </q-card>
+      </q-step>
+      <q-step :name='2' :done='step > 2' title='Backup'>
+        <MicrochainCreationView :microchain='createdMicrochain' @backuped='onMicrochainBackuped' />
+      </q-step>
+      <q-step :name='3' :done='step > 3' title='Validate'>
+        <ValidateMicrochainView :microchain='createdMicrochain' />
+      </q-step>
+    </q-stepper>
+  </div>
+</template>
+
+<script setup lang='ts'>
+import { onMounted, ref } from 'vue'
+import { db } from 'src/model'
+import { localStore } from 'src/localstores'
+
+import OpenChain from './OpenChain.vue'
+import MicrochainCreationView from './MicrochainCreationView.vue'
+import ValidateMicrochainView from './ValidateMicrochainView.vue'
+
+const openChain = ref<InstanceType<typeof OpenChain>>()
+
+const createdMicrochain = ref(undefined as unknown as db.Microchain)
+const step = ref(1)
+
+const emit = defineEmits<{(ev: 'created', value: db.Microchain): void,
+  (ev: 'failed'): void
+}>()
+
+const createMicrochain = async (): Promise<db.Microchain> => {
+  return new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    openChain.value?.openMicrochain().then((microchain: db.Microchain) => {
+      createdMicrochain.value = microchain
+      step.value++
+      localStore.notification.pushNotification({
+        Title: 'Open chain',
+        Message: 'Success open microchain.',
+        Popup: true,
+        Type: localStore.notify.NotifyType.Info
+      })
+    }).catch((error) => {
+      localStore.notification.pushNotification({
+        Title: 'Open chain',
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        Message: `Failed open microchain: ${error}.`,
+        Popup: true,
+        Type: localStore.notify.NotifyType.Error
+      })
+      reject(error)
+    })
+  })
+}
+
+onMounted(() => {
+  createMicrochain().then((microchain) => {
+    emit('created', microchain)
+  }).catch(() => {
+    emit('failed')
+  })
+})
+
+const onMicrochainBackuped = () => {
+  step.value++
+}
+
+</script>
