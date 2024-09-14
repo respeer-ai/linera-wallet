@@ -1,7 +1,10 @@
 <template>
   <div class='page-padding full-width text-center home-token-balance'>
     <div>
-      {{ usdBalance.toFixed(4) }} TLINERA
+      {{ tokenBalance.toFixed(4) }} TLINERA
+    </div>
+    <div class='item-currency-sub text-grey-8'>
+      $ {{ usdBalance.toFixed(4) }} USD
     </div>
     <div class='row home-token-action text-center page-y-padding'>
       <q-space />
@@ -47,15 +50,26 @@
       </div>
       <q-space />
     </div>
-    <OwnerBalanceBridge v-model:usd-balance='usdBalance' />
+    <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='nativeTokenId' />
+    <DbTokenBridge ref='dbTokenBridge' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
-import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
+import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
+import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 
+const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
+
+const tokenBalance = ref(0)
 const usdBalance = ref(0)
+const nativeTokenId = ref(0)
+
+onMounted(async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+})
 
 </script>

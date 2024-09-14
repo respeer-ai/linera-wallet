@@ -30,9 +30,10 @@ onMounted(async () => {
 
   tokenBalance.value = tokenId.value === undefined
     ? 0
-    : microchainOwnerFungibleTokenBalances.reduce((sum, a) => sum + a.balance, 0) + microchainFungibleTokenBalances.reduce((sum, a) => sum + a.balance, 0)
-  usdBalance.value = microchainOwnerFungibleTokenBalances.reduce((sum, a) => sum + a.balance * (tokens.find((el) => el.id === a.tokenId)?.usdCurrency || 0), 0) +
-                     microchainFungibleTokenBalances.reduce((sum, a) => sum + a.balance * (tokens.find((el) => el.id === a.tokenId)?.usdCurrency || 0), 0)
+    : microchainOwnerFungibleTokenBalances.reduce((sum, a) => sum + Number(a.balance || 0), 0) +
+      microchainFungibleTokenBalances.reduce((sum, a) => sum + Number(a.balance || 0), 0)
+  usdBalance.value = microchainOwnerFungibleTokenBalances.reduce((sum, a) => sum + Number(a.balance || 0) * (tokens.find((el) => el.id === a.tokenId)?.usdCurrency || 0), 0) +
+                     microchainFungibleTokenBalances.reduce((sum, a) => sum + Number(a.balance || 0) * (tokens.find((el) => el.id === a.tokenId)?.usdCurrency || 0), 0)
 })
 
 </script>

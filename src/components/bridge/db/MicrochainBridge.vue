@@ -40,7 +40,7 @@ const _microchains = useObservable<db.Microchain[]>(
 )
 
 watch(_microchains, () => {
-  microchains.value = _microchains.value
+  microchains.value = [..._microchains.value || []]
   selectedMicrochain.value = _microchains.value?.find((el) => el.selected)
 })
 
@@ -69,9 +69,14 @@ const addMicrochain = async (owner: string, microchainId: string, messageId?: st
   return microchain
 }
 
+const updateMicrochain = async (microchain: db.Microchain) => {
+  await dbWallet.microchains.update(microchain.id, microchain)
+}
+
 defineExpose({
   ownerMicrochains,
-  addMicrochain
+  addMicrochain,
+  updateMicrochain
 })
 
 </script>

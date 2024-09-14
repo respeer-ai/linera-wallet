@@ -31,9 +31,14 @@ const deleteToken = async (id: number) => {
   await dbBase.tokens.delete(id)
 }
 
+const nativeToken = async () => {
+  return (await dbBase.tokens.toArray()).find((el) => el.native)
+}
+
 defineExpose({
   deleteToken,
-  updateToken
+  updateToken,
+  nativeToken
 })
 
 </script>
