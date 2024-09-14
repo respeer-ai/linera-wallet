@@ -141,7 +141,7 @@ import type { Json } from '@metamask/utils'
 import { Web3 } from 'web3'
 import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
 
-import InputPassword from 'src/components/InputPassword.vue'
+import InputPassword from 'src/components/password/InputPassword.vue'
 
 const step = ref(1)
 const allowCheckAccount = ref(false)
