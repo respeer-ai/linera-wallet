@@ -2,7 +2,7 @@
   <div class='row header-inner-padding'>
     <q-img
       src='~assets/CheCko.png'
-      height='24px'
+      height='32px'
       width='140px'
       fit='contain'
       class='cursor-pointer'
