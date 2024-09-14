@@ -33,8 +33,8 @@ const _microchains = useObservable<db.Microchain[]>(
   from(
     liveQuery(async () => {
       return owner.value
-        ? await dbWallet.microchains.where('owner').equals(owner.value).toArray()
-        : await dbWallet.microchains.toArray()
+        ? (await dbWallet.microchains.where('owner').equals(owner.value).toArray())
+        : (await dbWallet.microchains.toArray())
     })
   )
 )
@@ -50,7 +50,7 @@ const ownerMicrochains = (owner: string): db.Microchain[] => {
   }) || []
 }
 
-const addMicrochain = async (owner: string, microchainId: string, messageId?: string, certificateHash?: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
+const createMicrochain = async (owner: string, microchainId: string, messageId?: string, certificateHash?: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
   const exist = microchains.value?.find((el) => el.microchain === microchainId)
   if (exist) return exist
   const microchain = {
@@ -65,7 +65,7 @@ const addMicrochain = async (owner: string, microchainId: string, messageId?: st
   } as db.Microchain
   await dbWallet.microchains.add(microchain)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await microchainOwnerBridge.value?.addMicrochainOwner(owner, microchainId)
+  await microchainOwnerBridge.value?.createMicrochainOwner(owner, microchainId)
   return microchain
 }
 
@@ -75,7 +75,7 @@ const updateMicrochain = async (microchain: db.Microchain) => {
 
 defineExpose({
   ownerMicrochains,
-  addMicrochain,
+  createMicrochain,
   updateMicrochain
 })
 

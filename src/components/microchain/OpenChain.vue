@@ -26,7 +26,7 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   const resp = await rpcMicrochainBridge.value?.openChain(owner?.address) as rpc.OpenChainResp
   if (!resp) return Promise.reject(new Error('Invalid open chain'))
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const microchain = await dbMicrochainBridge.value?.addMicrochain(owner.owner, resp.chainId, resp.messageId, resp.certificateHash) as db.Microchain
+  const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, resp.chainId, resp.messageId, resp.certificateHash) as db.Microchain
 
   const typeNameBytes = new TextEncoder().encode('Nonce::')
   const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(resp.certificateHash)])

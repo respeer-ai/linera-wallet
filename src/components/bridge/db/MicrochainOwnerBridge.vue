@@ -50,7 +50,7 @@ const getMicrochainOwners = async (microchain: string): Promise<db.Owner[]> => {
   return await dbWallet.owners.where('owner').anyOf(owners).toArray()
 }
 
-const addMicrochainOwner = async (owner: string, microchain: string) => {
+const createMicrochainOwner = async (owner: string, microchain: string) => {
   await dbWallet.microchainOwners.add({
     microchain,
     owner,
@@ -60,7 +60,7 @@ const addMicrochainOwner = async (owner: string, microchain: string) => {
 
 defineExpose({
   ownerMicrochainOwners,
-  addMicrochainOwner,
+  createMicrochainOwner,
   getMicrochainOwners
 })
 

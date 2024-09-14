@@ -92,7 +92,7 @@ const onSynchronizeMicrochainsClick = () => {
   rpcMicrochainBridge.value?.chains(selectedOwner.value?.address).then(async (resp: rpc.ChainsResp) => {
     for (const microchain of resp.list) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbMicrochainBridge.value?.addMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, resp.default === microchain)
+      await dbMicrochainBridge.value?.createMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, resp.default === microchain)
     }
     localStore.notification.pushNotification({
       Title: 'Synchronize microchains',
