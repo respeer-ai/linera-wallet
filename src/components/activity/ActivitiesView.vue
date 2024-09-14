@@ -1,8 +1,8 @@
 <template>
   <div class='fill-parent text-center'>
     <q-space />
-    <div v-if='microchains.length > 0'>
-      <ActivityCardView v-for='microchain in microchains' :key='microchain.microchain' :microchain='microchain' />
+    <div v-if='activities.length > 0'>
+      <ActivityCardView v-for='activity in activities' :key='activity.id' :activity='activity' />
     </div>
     <div v-else class='page-item-placeholder'>
       <div>
@@ -14,19 +14,16 @@
     </div>
     <q-space />
   </div>
-  <MicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
-  <MicrochainBridge v-model:microchains='microchains' />
+  <DbActivityBridge v-model:activities='activities' />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { db } from 'src/model'
 
-import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
-import MicrochainBridge from '../bridge/db/MicrochainBridge.vue'
+import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivityCardView from './ActivityCardView.vue'
 
-const microchainOwners = ref([] as db.MicrochainOwner[])
-const microchains = ref([] as db.Microchain[])
+const activities = ref([] as db.Activity[])
 
 </script>

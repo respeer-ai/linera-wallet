@@ -1,5 +1,5 @@
 <template>
-  <div>{{ microchain }}</div>
+  <div>{{ activity }}</div>
 </template>
 
 <script setup lang='ts'>
@@ -7,9 +7,9 @@ import { db } from 'src/model'
 import { toRef } from 'vue'
 
 interface Props {
-  microchain: db.Microchain
+  activity: db.Activity
 }
 const props = defineProps<Props>()
-const microchain = toRef(props, 'microchain')
+const activity = toRef(props, 'activity')
 
 </script>

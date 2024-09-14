@@ -206,3 +206,16 @@ export interface NFT {
   microchain: string
   owner: string
 }
+
+export interface Activity {
+  id?: number
+  sourceChain: string
+  sourceAddress?: string
+  targetChain: string
+  targetAddress?: string
+  amount: string
+  blockHeight: number
+  timestamp: number
+  certificateHash: string
+  grant: string
+}

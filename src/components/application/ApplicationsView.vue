@@ -54,7 +54,6 @@ const onSynchronizeApplicationsClick = () => {
     }
     localStore.notification.pushNotification({
       Title: 'Synchronize applications',
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       Message: 'Success synchronize applications.',
       Popup: true,
       Type: localStore.notify.NotifyType.Info

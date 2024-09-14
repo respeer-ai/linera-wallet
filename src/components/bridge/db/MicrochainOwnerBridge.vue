@@ -39,6 +39,10 @@ watch(_microchainOwners, () => {
   microchainOwners.value = _microchainOwners.value
 })
 
+const ownerMicrochainOwners = async (owner: string): Promise<db.MicrochainOwner[]> => {
+  return await dbWallet.microchainOwners.where('owner').equals(owner).toArray()
+}
+
 const addMicrochainOwner = async (owner: string, microchain: string) => {
   await dbWallet.microchainOwners.add({
     microchain,
@@ -48,6 +52,7 @@ const addMicrochainOwner = async (owner: string, microchain: string) => {
 }
 
 defineExpose({
+  ownerMicrochainOwners,
   addMicrochainOwner
 })
 

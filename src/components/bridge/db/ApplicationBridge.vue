@@ -1,5 +1,4 @@
 <template>
-  <NetworkBridge v-model:selected-network='selectedNetwork' />
   <MicrochainOwnerBridge ref='microchainOwnerBridge' :owner='owner' v-model:application-owners='microchainOwners' />
 </template>
 
@@ -10,7 +9,6 @@ import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
-import NetworkBridge from './NetworkBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
 interface Props {
@@ -19,8 +17,6 @@ interface Props {
 
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
-
-const selectedNetwork = ref(undefined as unknown as db.Network)
 
 const applications = defineModel<db.Application[]>('applications')
 
