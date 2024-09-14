@@ -37,7 +37,7 @@
     <q-space />
   </div>
   <DbMicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
-  <DbMicrochainBridge ref='dbMicrochainBridge' v-model:microchains='microchains' />
+  <DbMicrochainBridge ref='dbMicrochainBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
   <RpcMicrochainBridge ref='rpcMicrochainBridge' />
   <q-dialog v-model='creatingMicrochain'>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
 
@@ -110,5 +110,22 @@ const onSynchronizeMicrochainsClick = () => {
     })
   })
 }
+
+const loadMicrochainsRecursive = async (total: number, offset: number, limit: number) => {
+  if (offset >= total) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  microchains.value.push(...(await dbMicrochainBridge.value?.getMicrochains(offset, limit)) || [])
+  void loadMicrochainsRecursive(total, offset + limit, limit)
+}
+
+const loadMicrochains = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const count = (await dbMicrochainBridge.value?.microchainsCount()) as number || 0
+  await loadMicrochainsRecursive(count, 0, 10)
+}
+
+onMounted(async () => {
+  await loadMicrochains()
+})
 
 </script>

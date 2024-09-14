@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang='ts'>
-import { ref, toRef, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
@@ -12,13 +12,6 @@ import { useObservable, from } from '@vueuse/rxjs'
 
 import NetworkBridge from './NetworkBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
-
-interface Props {
-  owner?: string
-}
-
-const props = defineProps<Props>()
-const owner = toRef(props, 'owner')
 
 const selectedNetwork = ref(undefined as unknown as db.Network)
 
@@ -32,9 +25,7 @@ const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 const _microchains = useObservable<db.Microchain[]>(
   from(
     liveQuery(async () => {
-      return owner.value
-        ? (await dbWallet.microchains.where('owner').equals(owner.value).toArray())
-        : (await dbWallet.microchains.toArray())
+      return await dbWallet.microchains.toArray()
     })
   )
 )
@@ -43,6 +34,14 @@ watch(_microchains, () => {
   microchains.value = [..._microchains.value || []]
   selectedMicrochain.value = _microchains.value?.find((el) => el.selected)
 })
+
+const getMicrochains = async (offset: number, limit: number): Promise<db.Microchain[]> => {
+  return await dbWallet.microchains.offset(offset).limit(limit).toArray()
+}
+
+const microchainsCount = async (): Promise<number> => {
+  return await dbWallet.microchains.count()
+}
 
 const ownerMicrochains = (owner: string): db.Microchain[] => {
   return microchains.value?.filter((microchain) => {
@@ -76,7 +75,9 @@ const updateMicrochain = async (microchain: db.Microchain) => {
 defineExpose({
   ownerMicrochains,
   createMicrochain,
-  updateMicrochain
+  updateMicrochain,
+  getMicrochains,
+  microchainsCount
 })
 
 </script>
