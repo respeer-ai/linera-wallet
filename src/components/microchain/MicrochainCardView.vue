@@ -17,29 +17,38 @@
         </div>
       </div>
       <div class='text-left'>
-        {{ chainOwnerBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+        {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
       </div>
     </div>
     <q-space />
     <div>
       <div class='text-bold text-grey-9 text-right'>
-        0 <span class='selector-item-currency-sub'>TLINERA</span>
+        {{ ownerTokenBalance }} <span class='selector-item-currency-sub'>TLINERA</span>
       </div>
       <div class='text-right'>
-        $ 0 <span class='text-grey-6 selector-item-currency-sub'>USD</span>
+        $ {{ chainUsdBalance + ownerUsdBalance }} <span class='text-grey-6 selector-item-currency-sub'>USD</span>
       </div>
     </div>
     <div :class='[ "selector-indicator selector-margin-x-left" ]' />
   </q-item>
-  <MicrochainOwnerBridge v-model:microchain-owners='microchainOwners' :microchain='microchain.microchain' />
+  <DbMicrochainBalanceBridge v-model:token-balance='chainTokenBalance' v-model:usd-balance='chainUsdBalance' :token-id='nativeTokenId' :microchain-id='microchain.microchain' />
+  <DbOwnerBridge v-model:selected-owner='owner' />
+  <DbMicrochainOwnerBalanceBridge
+    v-model:token-balance='ownerTokenBalance' v-model:usd-balance='ownerUsdBalance' :token-id='nativeTokenId' :microchain-id='microchain.microchain'
+    :owner='owner?.owner'
+  />
+  <DbTokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { computed, ref, toRef } from 'vue'
+import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 
-import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
+import DbMicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
+import DbMicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
+import DbTokenBridge from '../bridge/db/TokenBridge.vue'
+import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 import { lineraLogo } from 'src/assets'
 
@@ -49,7 +58,19 @@ interface Props {
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
 
-const microchainOwners = ref([] as db.MicrochainOwner[])
-const chainOwnerBalance = computed(() => microchainOwners.value.reduce((sum) => sum + 0, 0))
+const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
+
+const chainTokenBalance = ref(0)
+const chainUsdBalance = ref(0)
+const ownerTokenBalance = ref(0)
+const ownerUsdBalance = ref(0)
+const owner = ref(undefined as unknown as db.Owner)
+
+const nativeTokenId = ref(0)
+
+onMounted(async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+})
 
 </script>

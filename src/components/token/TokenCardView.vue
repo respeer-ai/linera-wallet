@@ -25,7 +25,7 @@
       </div>
     </div>
     <div :class='[ "selector-indicator selector-margin-x-left" ]' />
-    <OwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' />
+    <OwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='token.id' />
   </q-item>
 </template>
 

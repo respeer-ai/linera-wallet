@@ -30,8 +30,8 @@ const _balances = useObservable<db.MicrochainOwnerFungibleTokenBalance[]>(
   from(
     liveQuery(async () => {
       return tokenId.value !== undefined
-        ? await dbWallet.microchainOwnerFungibleTokenBalances.where(['tokenId', 'microchain', 'owner']).equals([tokenId.value, microchainId.value, owner.value]).toArray()
-        : await dbWallet.microchainOwnerFungibleTokenBalances.where(['microchain', 'owner']).equals([microchainId.value, owner.value]).toArray()
+        ? await dbWallet.microchainOwnerFungibleTokenBalances.where({ tokenId: tokenId.value, microchain: microchainId.value, owner: owner.value }).toArray()
+        : await dbWallet.microchainOwnerFungibleTokenBalances.where({ microchain: microchainId.value, owner: owner.value }).toArray()
     })
   )
 )
