@@ -51,6 +51,8 @@ const ownerMicrochains = (owner: string): db.Microchain[] => {
 }
 
 const addMicrochain = async (owner: string, microchainId: string, messageId?: string, certificateHash?: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
+  const exist = microchains.value?.find((el) => el.microchain === microchainId)
+  if (exist) return exist
   const microchain = {
     microchain: microchainId,
     balance: 0,
