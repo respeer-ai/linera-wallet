@@ -11,7 +11,7 @@
         Applications
       </q-tab>
       <q-tab name='activities'>
-        Activity
+        Activities
       </q-tab>
     </q-tabs>
     <q-tab-panels v-model='tab' swipeable animated>
