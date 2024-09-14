@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { getClientOptions } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
-import { provideApolloClient, useMutation } from '@vue/apollo-composable'
+import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
 import { graphqlResult, endpoint } from 'src/utils'
 import { rpc } from 'src/model'
 
@@ -45,9 +45,41 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
+  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const apolloClient = new ApolloClient(options)
+
+  // TODO: support query with publicKey
+
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
+    query chains {
+      chains {
+        list
+        default
+      }
+    }
+  `, {}, {
+    fetchPolicy: 'network-only'
+  }))
+
+  return new Promise((resolve, reject) => {
+    onResult((res) => {
+      const chains = graphqlResult.data(res, 'chains') as rpc.ChainsResp
+      resolve(chains)
+    })
+
+    onError((error) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      reject(new Error(`Get microchains: ${error}`))
+    })
+  })
+}
+
 defineExpose({
   openChain,
-  initMicrochainChainStore
+  initMicrochainChainStore,
+  chains
 })
 
 </script>

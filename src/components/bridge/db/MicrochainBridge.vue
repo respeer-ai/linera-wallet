@@ -50,7 +50,7 @@ const ownerMicrochains = (owner: string): db.Microchain[] => {
   }) || []
 }
 
-const addMicrochain = async (owner: string, microchainId: string, messageId: string, certificateHash: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
+const addMicrochain = async (owner: string, microchainId: string, messageId?: string, certificateHash?: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
   const microchain = {
     microchain: microchainId,
     balance: 0,
