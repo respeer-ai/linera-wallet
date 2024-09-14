@@ -31,9 +31,13 @@
     </div>
     <div :class='[ "selector-indicator selector-margin-x-left" ]' />
   </q-item>
-  <DbMicrochainBalanceBridge v-model:token-balance='chainTokenBalance' v-model:usd-balance='chainUsdBalance' :token-id='nativeTokenId' :microchain-id='microchain.microchain' />
+  <DbMicrochainBalanceBridge
+    v-if='nativeTokenId !== undefined' v-model:token-balance='chainTokenBalance' v-model:usd-balance='chainUsdBalance' :token-id='nativeTokenId'
+    :microchain-id='microchain.microchain'
+  />
   <DbOwnerBridge v-model:selected-owner='owner' />
   <DbMicrochainOwnerBalanceBridge
+    v-if='nativeTokenId !== undefined'
     v-model:token-balance='ownerTokenBalance' v-model:usd-balance='ownerUsdBalance' :token-id='nativeTokenId' :microchain-id='microchain.microchain'
     :owner='owner?.owner'
   />
@@ -66,7 +70,7 @@ const ownerTokenBalance = ref(0)
 const ownerUsdBalance = ref(0)
 const owner = ref(undefined as unknown as db.Owner)
 
-const nativeTokenId = ref(0)
+const nativeTokenId = ref(undefined as unknown as number)
 
 onMounted(async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
