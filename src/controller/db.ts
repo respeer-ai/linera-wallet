@@ -19,7 +19,8 @@ export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
   owners: EntityTable<dbModel.Owner, 'id'>,
   microchainFungibleTokenBalances: EntityTable<dbModel.MicrochainFungibleTokenBalance, 'id'>,
   microchainOwnerFungibleTokenBalances: EntityTable<dbModel.MicrochainOwnerFungibleTokenBalance, 'id'>,
-  nfts: EntityTable<dbModel.NFT, 'id'>
+  nfts: EntityTable<dbModel.NFT, 'id'>,
+  applications: EntityTable<dbModel.Application, 'id'>
 }
 
 dbWallet.version(1).stores({
@@ -28,5 +29,6 @@ dbWallet.version(1).stores({
   owners: '++id, address, owner, privateKey, salt, name, selected',
   microchainFungibleTokenBalances: '++id, microchain, tokenId, balance',
   microchainOwnerFungibleTokenBalances: '++id, microchain, owner, tokenId, balance',
-  nfts: '++id, collectionId, tokenId, uri, microchain, owner'
+  nfts: '++id, collectionId, tokenId, uri, microchain, owner',
+  applications: '++id, applicationId, creationMicrochain, creationHeight, applicationIndex'
 })

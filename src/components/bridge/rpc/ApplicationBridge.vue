@@ -11,9 +11,10 @@ const microchainApplications = async (microchain: string): Promise<rpc.Applicati
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query applications($chainId: String!) {
-      chains(chainId: $chainId) {
-        list
-        default
+      applications(chainId: $chainId) {
+        id
+        link
+        description
       }
     }
   `, {

@@ -27,6 +27,14 @@ export const microchainAvatar = (microchain: Microchain) => {
   return 'data:image/png;base64,' + new Identicon(microchain.microchain, 420).toString()
 }
 
+export interface Application {
+  id?: number
+  applicationId: string
+  creationMicrochain: string
+  creationHeight: number
+  applicationIndex: number
+}
+
 const ownerFromPublicKey = async (publicKey: string) => {
   const publicKeyBytes = _hex.toBytes(publicKey)
   const typeNameBytes = new TextEncoder().encode('PublicKey::')

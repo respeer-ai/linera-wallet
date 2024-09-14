@@ -13,9 +13,11 @@ import NetworkBridge from './NetworkBridge.vue'
 
 interface Props {
   microchain?: string
+  owner?: string
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
+const owner = toRef(props, 'owner')
 
 const selectedNetwork = ref(undefined as unknown as db.Network)
 
@@ -26,7 +28,9 @@ const _microchainOwners = useObservable<db.MicrochainOwner[]>(
     liveQuery(async () => {
       return microchain.value?.length
         ? await dbWallet.microchainOwners.where('microchain').equals(microchain.value).toArray()
-        : await dbWallet.microchainOwners.toArray()
+        : owner.value?.length
+          ? await dbWallet.microchainOwners.where('owner').equals(owner.value).toArray()
+          : await dbWallet.microchainOwners.toArray()
     })
   )
 )
