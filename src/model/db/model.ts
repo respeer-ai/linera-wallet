@@ -78,12 +78,12 @@ export const privateKey = (owner: Owner, password: string) => {
   return AES.decrypt(owner.privateKey, key).toString(enc.Utf8)
 }
 
-enum HTTPSchema {
+export enum HTTPSchema {
   HTTP = 'http',
   HTTPS = 'https'
 }
 
-enum WSPSchema {
+export enum WSSchema {
   WS = 'ws',
   WSS = 'wss'
 }
@@ -94,7 +94,7 @@ export interface Network {
   name: string
   faucetUrl: string
   rpcSchema: HTTPSchema
-  wsSchema: WSPSchema
+  wsSchema: WSSchema
   host: string
   port: number
   path: string
@@ -107,7 +107,7 @@ export const defaultNetwork = {
   name: 'Linera Testnet',
   faucetUrl: 'http://172.16.31.73:8080',
   rpcSchema: HTTPSchema.HTTP,
-  wsSchema: WSPSchema.WS,
+  wsSchema: WSSchema.WS,
   host: '172.16.31.73',
   port: 30080,
   path: '',
@@ -118,6 +118,11 @@ export const defaultNetwork = {
 export const rpcUrl = (network: Network) => {
   if (!network.rpcSchema?.length || !network.host?.length || network.port === undefined) return ''
   return `${network.rpcSchema}://${network.host}:${network.port}${network.path?.length > 1 ? '/' + network.path : ''}`
+}
+
+export const wsUrl = (network: Network) => {
+  if (!network.wsSchema?.length || !network.host?.length || network.port === undefined) return ''
+  return `${network.wsSchema}://${network.host}:${network.port}${network.path?.length > 1 ? '/ws/' + network.path : '/ws'}`
 }
 
 export interface Password {

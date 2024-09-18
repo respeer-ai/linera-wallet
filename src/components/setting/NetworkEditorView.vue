@@ -18,6 +18,12 @@
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='rpcUrl' :disable='network.preset' />
     </div>
+    <div class='text-bold page-item-y-margin-top'>
+      Subscription URL
+    </div>
+    <div class='page-item-y-margin-top'>
+      <q-input dense outlined v-model='wsUrl' :disable='network.preset' />
+    </div>
     <div class='vertical-sections-margin'>
       <q-btn
         dense flat class='btn full-width' no-caps
@@ -50,9 +56,29 @@ const rpcUrl = computed({
   get: () => network.value ? db.rpcUrl(network.value) : '',
   set: (val: string) => {
     const v = new URL(val)
+    const protocol = v.protocol.replace(':', '')
     network.value = {
       ...network.value,
-      rpcSchema: v.protocol.replace(':', ''),
+      icon: db.defaultNetwork.icon,
+      rpcSchema: protocol,
+      wsSchema: protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS,
+      host: v.hostname,
+      port: parseInt(v.port),
+      path: v.pathname
+    } as db.Network
+  }
+})
+
+const wsUrl = computed({
+  get: () => network.value ? db.wsUrl(network.value) : '',
+  set: (val: string) => {
+    const v = new URL(val)
+    const protocol = v.protocol.replace(':', '')
+    network.value = {
+      ...network.value,
+      icon: db.defaultNetwork.icon,
+      wsSchema: protocol,
+      rpcSchema: protocol === db.WSSchema.WS ? db.HTTPSchema.HTTP : db.HTTPSchema.HTTPS,
       host: v.hostname,
       port: parseInt(v.port),
       path: v.pathname
