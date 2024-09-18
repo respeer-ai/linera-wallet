@@ -3,41 +3,22 @@
     <div class='row setting-header'>
       <div>Networks</div>
       <q-space />
-      <q-btn dense flat class='btn' no-caps>
-        Add network
+      <q-btn
+        dense flat class='btn' no-caps
+        @click='onAddNetworkClick'
+      >
+        {{ addingNetwork ? 'Cancel' : 'Add network' }}
       </q-btn>
     </div>
     <q-separator class='vertical-items-margin' />
     <div class='row full-width extra-large-margin-bottom'>
-      <div class='right-border network-list-left page-y-padding'>
-        <div class='text-bold'>
-          Network name
-        </div>
-        <div class='page-item-y-margin-top'>
-          <q-input dense outlined v-model='selectedNetwork.name' :disable='selectedNetwork.preset' />
-        </div>
-        <div class='text-bold page-item-y-margin-top'>
-          Faucet URL
-        </div>
-        <div class='page-item-y-margin-top'>
-          <q-input dense outlined v-model='selectedNetwork.faucetUrl' :disable='selectedNetwork.preset' />
-        </div>
-        <div class='text-bold page-item-y-margin-top'>
-          RPC URL
-        </div>
-        <div class='page-item-y-margin-top'>
-          <q-input dense outlined v-model='rpcUrl' :disable='selectedNetwork.preset' />
-        </div>
-        <div v-if='!selectedNetwork.preset' class='vertical-sections-margin'>
-          <q-btn dense flat class='btn full-width' no-caps>
-            Save
-          </q-btn>
-          <q-btn dense flat class='btn btn-alt full-width vertical-items-margin' no-caps>
-            Delete
-          </q-btn>
-        </div>
+      <div v-if='addingNetwork' class='full-width page-y-padding'>
+        <NetworkEditorView v-model='addedNetwork' @saved='onNetworkSaved' @deleted='onNetworkDeleted' />
       </div>
-      <div class='network-list-right'>
+      <div v-else class='right-border network-list-left page-y-padding'>
+        <NetworkEditorView v-model='selectedNetwork' @saved='onNetworkSaved' @deleted='onNetworkDeleted' />
+      </div>
+      <div v-if='!addingNetwork' class='network-list-right'>
         <div v-for='network in networks' :key='network.id' class='setting-item-container cursor-pointer'>
           <div class='row setting-item'>
             <div class='setting-item setting-icon'>
@@ -62,35 +43,28 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { db } from 'src/model'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
+import NetworkEditorView from './NetworkEditorView.vue'
 
 const networks = ref([] as db.Network[])
 const selectedNetwork = ref({} as db.Network)
 
-const rpcUrl = computed({
-  get: () => db.rpcUrl(selectedNetwork.value),
-  set: (v: URL) => {
-    selectedNetwork.value.host = v.host
-    selectedNetwork.value.port = parseInt(v.port)
-    selectedNetwork.value.path = v.pathname
-  }
-})
+const addingNetwork = ref(false)
+const addedNetwork = ref({} as db.Network)
 
-/*
-const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
-
-const onDeleteNetworkClick = async (network: db.Network) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await (networkBridge.value)?.deleteNetwork(network.id as number)
+const onAddNetworkClick = () => {
+  addingNetwork.value = !addingNetwork.value
 }
 
-const onNetworkSelected = async (_network: db.Network) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await networkBridge.value?.updateNetwork(_network)
+const onNetworkSaved = () => {
+  addingNetwork.value = false
 }
-  */
+
+const onNetworkDeleted = () => {
+  addingNetwork.value = false
+}
 
 </script>

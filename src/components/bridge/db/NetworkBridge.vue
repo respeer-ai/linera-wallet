@@ -32,6 +32,11 @@ const resetSelected = async () => {
   }
 }
 
+const createNetwork = async (network: db.Network) => {
+  if (network.selected) await resetSelected()
+  await dbBase.networks.add(network)
+}
+
 const updateNetwork = async (network: db.Network) => {
   if (network.selected) await resetSelected()
   await dbBase.networks.update(network.id, network)
@@ -42,6 +47,7 @@ const deleteNetwork = async (id: number) => {
 }
 
 defineExpose({
+  createNetwork,
   deleteNetwork,
   updateNetwork
 })

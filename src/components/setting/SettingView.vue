@@ -4,7 +4,7 @@
       <SidebarMenu />
       <q-resize-observer @resize='onSidebarResize' />
     </div>
-    <div class='selector-margin-x-left' :style='{width: `calc(100% - ${sidebarWidth}px - 24px)`}'>
+    <div class='selector-margin-x-left' :style='{width: `calc(100% - ${sidebarWidth}px - 32px)`}'>
       <div class='row page-actions-padding'>
         <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' />
         <q-space />
