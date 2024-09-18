@@ -48,10 +48,12 @@ const network = defineModel<db.Network>({ default: {} as db.Network })
 
 const rpcUrl = computed({
   get: () => network.value ? db.rpcUrl(network.value) : '',
-  set: (v: URL) => {
+  set: (val: string) => {
+    const v = new URL(val)
     network.value = {
       ...network.value,
-      host: v.host,
+      rpcSchema: v.protocol.replace(':', ''),
+      host: v.hostname,
       port: parseInt(v.port),
       path: v.pathname
     } as db.Network

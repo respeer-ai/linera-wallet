@@ -117,7 +117,7 @@ export const defaultNetwork = {
 
 export const rpcUrl = (network: Network) => {
   if (!network.rpcSchema?.length || !network.host?.length || network.port === undefined) return ''
-  return `${network.rpcSchema}://${network.host}:${network.port}${network.path?.length ? '/' + network.path : ''}`
+  return `${network.rpcSchema}://${network.host}:${network.port}${network.path?.length > 1 ? '/' + network.path : ''}`
 }
 
 export interface Password {
