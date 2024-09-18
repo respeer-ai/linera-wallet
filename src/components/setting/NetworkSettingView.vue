@@ -10,20 +10,22 @@
     <q-separator class='vertical-items-margin' />
     <div class='row full-width extra-large-margin-bottom'>
       <div class='right-border half-width page-y-padding'>
-        <div v-for='network in networks' :key='network.id' class='row setting-item cursor-pointer'>
-          <div class='setting-item setting-icon'>
-            <q-icon v-if='network.selected' name='bi-check' size='28px' color='green-4' />
+        <div v-for='network in networks' :key='network.id' class='setting-item-container cursor-pointer'>
+          <div class='row setting-item'>
+            <div class='setting-item setting-icon'>
+              <q-icon v-if='network.selected' name='bi-check' size='28px' color='green-4' />
+            </div>
+            <q-avatar size='28px' color='grey-4' class='page-item-x-margin-left'>
+              <q-img :src='network.icon' width='24px' height='24px' />
+            </q-avatar>
+            <div class='page-item-x-margin-left'>
+              {{ network.name }}
+            </div>
+            <q-icon
+              v-if='network.preset' name='bi-key-fill' size='28px' color='grey-4'
+              class='page-item-x-margin-left'
+            />
           </div>
-          <q-avatar size='28px' color='grey-4' class='page-item-x-margin-left'>
-            <q-img :src='network.icon' width='24px' height='24px' />
-          </q-avatar>
-          <div class='page-item-x-margin-left'>
-            {{ network.name }}
-          </div>
-          <q-icon
-            v-if='network.preset' name='bi-key-fill' size='28px' color='grey-4'
-            class='page-item-x-margin-left'
-          />
         </div>
       </div>
       <div class='half-width page-x-padding page-y-padding'>
@@ -44,6 +46,14 @@
         </div>
         <div class='page-item-y-margin-top'>
           <q-input dense outlined v-model='rpcUrl' :disable='selectedNetwork.preset' />
+        </div>
+        <div v-if='!selectedNetwork.preset' class='vertical-sections-margin'>
+          <q-btn dense flat class='btn full-width' no-caps>
+            Save
+          </q-btn>
+          <q-btn dense flat class='btn btn-alt full-width vertical-items-margin' no-caps>
+            Delete
+          </q-btn>
         </div>
       </div>
     </div>
