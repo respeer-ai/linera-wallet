@@ -115,6 +115,10 @@ export const defaultNetwork = {
   preset: true
 } as Network
 
+export const rpcUrl = (network: Network) => {
+  return `${network.rpcSchema}://${network.host}:${network.port}${network.path?.length ? '/' + network.path : ''}`
+}
+
 export interface Password {
   id?: number
   password: string

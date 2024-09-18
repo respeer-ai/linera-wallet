@@ -1,155 +1,86 @@
 <template>
-  <div
-    class='text-brown-10'
-    :style='{
-      margin: "0 0 16px 0",
-      fontSize: "20px",
-      opacity: 0.8,
-    }'
-  >
-    Faucet
+  <div class='full-width full-height'>
+    <div class='row setting-header'>
+      <div>Networks</div>
+      <q-space />
+      <q-btn dense flat class='btn' no-caps>
+        Add network
+      </q-btn>
+    </div>
+    <q-separator class='vertical-items-margin' />
+    <div class='row full-width extra-large-margin-bottom'>
+      <div class='right-border half-width page-y-padding'>
+        <div v-for='network in networks' :key='network.id' class='row setting-item cursor-pointer'>
+          <div class='setting-item setting-icon'>
+            <q-icon v-if='network.selected' name='bi-check' size='28px' color='green-4' />
+          </div>
+          <q-avatar size='28px' color='grey-4' class='page-item-x-margin-left'>
+            <q-img :src='network.icon' width='24px' height='24px' />
+          </q-avatar>
+          <div class='page-item-x-margin-left'>
+            {{ network.name }}
+          </div>
+          <q-icon
+            v-if='network.preset' name='bi-key-fill' size='28px' color='grey-4'
+            class='page-item-x-margin-left'
+          />
+        </div>
+      </div>
+      <div class='half-width page-x-padding page-y-padding'>
+        <div class='text-bold'>
+          Network name
+        </div>
+        <div class='page-item-y-margin-top'>
+          <q-input dense outlined v-model='selectedNetwork.name' :disable='selectedNetwork.preset' />
+        </div>
+        <div class='text-bold page-item-y-margin-top'>
+          Faucet URL
+        </div>
+        <div class='page-item-y-margin-top'>
+          <q-input dense outlined v-model='selectedNetwork.faucetUrl' :disable='selectedNetwork.preset' />
+        </div>
+        <div class='text-bold page-item-y-margin-top'>
+          RPC URL
+        </div>
+        <div class='page-item-y-margin-top'>
+          <q-input dense outlined v-model='rpcUrl' :disable='selectedNetwork.preset' />
+        </div>
+      </div>
+    </div>
+    <NetworkBridge ref='networkBridge' v-model:networks='networks' v-model:selected-network='selectedNetwork' />
   </div>
-  <div class='row wrap'>
-    <q-select
-      dense
-      v-model='faucetSchema'
-      :options='constant.HTTPSchemas'
-      :style='{
-        height: "48px",
-        width: "80px",
-      }'
-      label='Faucet HTTP Schema'
-    />
-    <q-select
-      dense
-      v-model='faucetWSSchema'
-      :options='constant.WSSchemas'
-      :style='{
-        height: "48px",
-        width: "80px",
-      }'
-      label='Faucet WS Schema'
-    />
-    <q-input
-      dense
-      v-model='faucetHost'
-      :style='{
-        height: "48px",
-        width: "200px",
-      }'
-      label='Faucet Host'
-    />
-    <q-input
-      dense
-      v-model='faucetPort'
-      :style='{
-        height: "48px",
-        width: "80px",
-      }'
-      label='Faucet Port'
-    />
-  </div>
-  <div :style='{ fontSize: "12px", opacity: 0.8 }'>
-    {{ constant.toUrl(faucetSchema, faucetHost, faucetPort) }}
-  </div>
-  <div
-    class='text-brown-10'
-    :style='{
-      margin: "16px 0 16px 0",
-      fontSize: "20px",
-      opacity: 0.8,
-    }'
-  >
-    RPC
-  </div>
-  <div class='row'>
-    <q-select
-      dense
-      v-model='rpcSchema'
-      :options='constant.HTTPSchemas'
-      :style='{
-        height: "48px",
-        width: "80px",
-      }'
-      label='RPC HTTP Schema'
-    />
-    <q-select
-      dense
-      v-model='rpcWSSchema'
-      :options='constant.WSSchemas'
-      :style='{
-        height: "48px",
-        width: "80px",
-      }'
-      label='RPC WS Schema'
-    />
-    <q-input
-      dense
-      v-model='rpcHost'
-      :style='{
-        height: "48px",
-        width: "200px",
-      }'
-      label='RPC Host'
-    />
-    <q-input
-      dense
-      v-model='rpcPort'
-      :style='{
-        height: "48px",
-        width: "80px",
-      }'
-      label='RPC Port'
-    />
-  </div>
-  <div :style='{ fontSize: "12px", opacity: 0.8 }'>
-    {{ constant.toUrl(rpcSchema, rpcHost, rpcPort) }}
-  </div>
-  <q-btn
-    rounded
-    label='Save'
-    class='text-brown-10 bg-red-1'
-    :style='{
-      margin: "24px 0"
-    }'
-    @click='onSaveClick'
-  />
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { localStore } from 'src/localstores'
-import { endpoint } from 'src/utils'
-import * as constant from 'src/const'
+<script setup lang='ts'>
+import { computed, ref } from 'vue'
+import { db } from 'src/model'
 
-const faucetSchema = ref(endpoint.faucetSchema)
-const faucetWSSchema = ref(endpoint.faucetWsSchema)
-const faucetHost = ref(endpoint.faucetPublicHost)
-const faucetPort = ref(endpoint.faucetPort)
+import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 
-const rpcSchema = ref(endpoint.rpcSchema)
-const rpcWSSchema = ref(endpoint.rpcWsSchema)
-const rpcHost = ref(endpoint.rpcHost)
-const rpcPort = ref(endpoint.rpcPort)
+const networks = ref([] as db.Network[])
+const selectedNetwork = ref({} as db.Network)
 
-const onSaveClick = () => {
-  localStore.persistentSetting.setFaucet(
-    faucetSchema.value,
-    faucetWSSchema.value,
-    faucetHost.value,
-    faucetPort.value
-  )
-  localStore.persistentSetting.setRPC(
-    rpcSchema.value,
-    rpcWSSchema.value,
-    rpcHost.value,
-    rpcPort.value
-  )
-  localStore.notification.pushNotification({
-    Title: 'Save Setting',
-    Message: 'Success save setting.',
-    Popup: true,
-    Type: localStore.notify.NotifyType.Info
-  })
+const rpcUrl = computed({
+  get: () => db.rpcUrl(selectedNetwork.value),
+  set: (v: URL) => {
+    selectedNetwork.value.host = v.host
+    selectedNetwork.value.port = parseInt(v.port)
+    selectedNetwork.value.path = v.pathname
+  }
+})
+
+/*
+const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
+
+const onDeleteNetworkClick = async (network: db.Network) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await (networkBridge.value)?.deleteNetwork(network.id as number)
 }
+
+const onNetworkSelected = async (_network: db.Network) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await networkBridge.value?.updateNetwork(_network)
+}
+  */
+
 </script>

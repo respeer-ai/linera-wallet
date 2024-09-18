@@ -29,7 +29,7 @@
     </q-list>
     <div class='selector-action'>
       <q-btn
-        flat class='btn btn-alt' label='Add network' no-caps
+        flat class='btn btn-alt full-width' label='Add network' no-caps
         @click='onAddNetworkClick'
       />
     </div>

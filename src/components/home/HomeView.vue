@@ -2,7 +2,9 @@
   <div class='full-width wide-page'>
     <PageHeaderView />
     <MainView v-if='!showSettingMenu' />
-    <SettingView v-else />
+    <div v-else class='full-width full-height'>
+      <SettingView />
+    </div>
   </div>
 </template>
 

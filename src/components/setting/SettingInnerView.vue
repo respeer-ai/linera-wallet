@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='full-width'>
     <NetworkSettingView v-if='localStore.oneShotSetting.selectedSettingMenu' />
   </div>
 </template>

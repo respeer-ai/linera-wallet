@@ -1,5 +1,5 @@
 <template>
-  <div class='row full-width'>
+  <div class='row full-width  full-height'>
     <div>
       <SidebarMenu />
       <q-resize-observer @resize='onSidebarResize' />

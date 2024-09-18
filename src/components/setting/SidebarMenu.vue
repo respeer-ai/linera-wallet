@@ -1,6 +1,6 @@
 <template>
   <div class='sidebar'>
-    <div class='setting-header text-grey-9 text-bold'>
+    <div class='setting-label text-grey-9 text-bold'>
       Settings
     </div>
     <q-list padding class='menu-list'>

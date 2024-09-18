@@ -52,7 +52,7 @@
       </q-item>
     </q-list>
     <div class='selector-action'>
-      <q-btn flat class='btn btn-alt' label='Create or import account' no-caps />
+      <q-btn flat class='btn btn-alt full-width' label='Create or import account' no-caps />
     </div>
   </q-card>
   <OwnerBridge ref='ownerBridge' v-model:owners='owners' />
