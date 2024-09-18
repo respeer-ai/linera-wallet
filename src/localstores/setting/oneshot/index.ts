@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
-import { OneShotSetting } from './types'
+import { Menu, OneShotSetting } from './types'
 
 export const useSettingStore = defineStore('one-shot-setting', {
   state: () => ({
-    oneShotSetting: {} as OneShotSetting
+    oneShotSetting: {
+      SelectedSettingMenu: Menu.NETWORKS
+    } as OneShotSetting
   }),
   getters: {
     showHeaderMenu (): boolean {
@@ -20,6 +22,9 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     showSettingMenu (): boolean {
       return this.oneShotSetting.ShowSettingMenu
+    },
+    selectedSettingMenu (): Menu {
+      return this.oneShotSetting.SelectedSettingMenu
     }
   },
   actions: {}

@@ -1,13 +1,15 @@
+export enum Menu {
+  NETWORKS = 'Networks',
+}
+
 export interface OneShotSetting {
   ShowHeaderMenu: boolean
   ExtensionMode: boolean
   ShowFooterMenu: boolean
   AlignPageCenter: boolean
-  ShowSettingMenu: boolean
-}
 
-export enum Menu {
-  NETWORKS = 'Networks',
+  ShowSettingMenu: boolean
+  SelectedSettingMenu: Menu
 }
 
 export interface MenuItem {

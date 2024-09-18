@@ -10,7 +10,7 @@
         :clickable='!menu.disable'
         v-ripple
         @click='onMenuClick(menu)'
-        :class='[ selectedMenu === menu.label ? "bg-red-1" : "" ]'
+        :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.label ? "bg-red-1" : "" ]'
         :disable='menu.disable'
       >
         <q-item-section avatar>
@@ -26,24 +26,22 @@
 
 <script setup lang='ts'>
 import { localStore, oneShotSettingDef } from 'src/localstores'
-import { ref, onMounted, computed, watch } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
-const selectedMenu = ref(localStore.oneShotSettingDef.Menu.NETWORKS)
 
 const route = useRoute()
 const path = computed(() => route.path)
 
 const router = useRouter()
 const onMenuClick = (menu: oneShotSettingDef.MenuItem) => {
-  selectedMenu.value = menu.label
+  localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu = menu.label
   void router.push(menu.target)
 }
 
 const updateSidebarMenu = () => {
   for (let i = 0; i < localStore.oneShotSettingDef.SettingMenus.length; i++) {
     if (localStore.oneShotSettingDef.SettingMenus[i].target === path.value) {
-      selectedMenu.value = localStore.oneShotSettingDef.SettingMenus[i].label
+      localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu = localStore.oneShotSettingDef.SettingMenus[i].label
       break
     }
   }
