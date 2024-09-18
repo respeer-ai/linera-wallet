@@ -73,9 +73,9 @@ const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
 const onSaveClick = async () => {
   network.value.id === undefined
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    ? await networkBridge.value?.createNetwork(network.value)
+    ? await networkBridge.value?.createNetwork({ ...network.value })
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    : await networkBridge.value?.updateNetwork(network.value)
+    : await networkBridge.value?.updateNetwork({ ...network.value })
   emit('saved', network.value)
 }
 
