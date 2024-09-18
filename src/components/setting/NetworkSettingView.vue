@@ -9,26 +9,7 @@
     </div>
     <q-separator class='vertical-items-margin' />
     <div class='row full-width extra-large-margin-bottom'>
-      <div class='right-border half-width page-y-padding'>
-        <div v-for='network in networks' :key='network.id' class='setting-item-container cursor-pointer'>
-          <div class='row setting-item'>
-            <div class='setting-item setting-icon'>
-              <q-icon v-if='network.selected' name='bi-check' size='28px' color='green-4' />
-            </div>
-            <q-avatar size='28px' color='grey-4' class='page-item-x-margin-left'>
-              <q-img :src='network.icon' width='24px' height='24px' />
-            </q-avatar>
-            <div class='page-item-x-margin-left'>
-              {{ network.name }}
-            </div>
-            <q-icon
-              v-if='network.preset' name='bi-key-fill' size='28px' color='grey-4'
-              class='page-item-x-margin-left'
-            />
-          </div>
-        </div>
-      </div>
-      <div class='half-width page-x-padding page-y-padding'>
+      <div class='right-border network-list-left page-y-padding'>
         <div class='text-bold'>
           Network name
         </div>
@@ -54,6 +35,25 @@
           <q-btn dense flat class='btn btn-alt full-width vertical-items-margin' no-caps>
             Delete
           </q-btn>
+        </div>
+      </div>
+      <div class='network-list-right'>
+        <div v-for='network in networks' :key='network.id' class='setting-item-container cursor-pointer'>
+          <div class='row setting-item'>
+            <div class='setting-item setting-icon'>
+              <q-icon v-if='network.selected' name='bi-check' size='28px' color='green-4' />
+            </div>
+            <q-avatar size='28px' color='grey-4' class='page-item-x-margin-left'>
+              <q-img :src='network.icon' width='24px' height='24px' />
+            </q-avatar>
+            <div :class='[ "page-item-x-margin-left text-grey-9", network.selected ? "text-bold" : "" ]'>
+              {{ network.name }}
+            </div>
+            <q-icon
+              v-if='network.preset' name='bi-key-fill' size='28px' color='grey-4'
+              class='page-item-x-margin-left'
+            />
+          </div>
         </div>
       </div>
     </div>
