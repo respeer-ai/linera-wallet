@@ -127,14 +127,6 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: 'accountinfo',
-        component: () => import('pages/AccountInfoPage.vue'),
-        meta: {
-          ShowFooterMenu: true,
-          AlignPageCenter: false
-        }
-      },
-      {
         path: 'transfer',
         component: () => import('pages/TransferPage.vue'),
         meta: {
