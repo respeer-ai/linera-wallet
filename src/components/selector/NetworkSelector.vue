@@ -28,7 +28,10 @@
       </q-item>
     </q-list>
     <div class='selector-action'>
-      <q-btn flat class='btn btn-alt' label='Add network' no-caps />
+      <q-btn
+        flat class='btn btn-alt' label='Add network' no-caps
+        @click='onAddNetworkClick'
+      />
     </div>
   </q-card>
   <NetworkBridge ref='networkBridge' v-model:networks='networks' />
@@ -37,6 +40,7 @@
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { db } from 'src/model'
+import { localStore } from 'src/localstores'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 
@@ -45,7 +49,9 @@ const networks = ref([] as db.Network[])
 const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
 
 const network = defineModel<db.Network>()
-const emit = defineEmits<{(ev: 'selected', value: db.Network): void}>()
+const emit = defineEmits<{(ev: 'selected', value: db.Network): void,
+  (ev: 'add'): void
+}>()
 
 const onDeleteNetworkClick = async (network: db.Network) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -58,6 +64,11 @@ const onNetworkSelected = async (_network: db.Network) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await networkBridge.value?.updateNetwork(_network)
   emit('selected', _network)
+}
+
+const onAddNetworkClick = () => {
+  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = true
+  emit('add')
 }
 
 </script>

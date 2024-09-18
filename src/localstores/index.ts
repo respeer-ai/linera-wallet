@@ -7,6 +7,7 @@ import { useWalletStore } from './wallet'
 
 import * as notify from './notify'
 import * as walletDef from './wallet'
+import * as oneShotSettingDef from './setting/oneshot'
 
 export const wallet = useWalletStore()
 export const notification = useNotificationStore()
@@ -22,9 +23,11 @@ export const localStore = {
   notify,
   persistentSetting,
   oneShotSetting,
+  oneShotSettingDef,
   popup,
   auth
 }
 
 export * as notify from './notify'
 export * as walletDef from './wallet'
+export * as oneShotSettingDef from './setting/oneshot'

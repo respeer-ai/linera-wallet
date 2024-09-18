@@ -12,6 +12,6 @@
 
 <script setup lang='ts'>
 
-import TestnetTip from '../TestnetTip.vue'
+import TestnetTip from '../testnet/TestnetTip.vue'
 
 </script>

@@ -2,7 +2,6 @@ import { RouteRecordRaw } from 'vue-router'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    ShowSideMenu?: boolean
     ShowHeaderMenu?: boolean
     ExtensionMode?: boolean
     ShowFooterMenu?: boolean
@@ -16,24 +15,21 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     meta: {
-      ExtensionMode: false,
-      ShowSideMenu: true
+      ExtensionMode: false
     },
     children: [
       {
         path: '',
         component: () => import('pages/LaunchPage.vue'),
         meta: {
-          AlignPageCenter: true,
-          ShowSideMenu: false
+          AlignPageCenter: true
         }
       },
       {
         path: 'home',
         component: () => import('pages/HomePage.vue'),
         meta: {
-          AlignPageCenter: true,
-          ShowSideMenu: false
+          AlignPageCenter: true
         }
       },
       { path: 'transfer', component: () => import('pages/TransferPage.vue') },
@@ -44,27 +40,21 @@ const routes: RouteRecordRaw[] = [
           AlignPageCenter: false
         }
       },
-      { path: 'setting', component: () => import('pages/SettingPage.vue') },
+      {
+        path: 'setting',
+        component: () => import('pages/SettingPage.vue')
+      },
       {
         path: 'onboarding',
-        component: () => import('pages/OnBoardingPage.vue'),
-        meta: {
-          ShowSideMenu: false
-        }
+        component: () => import('pages/OnBoardingPage.vue')
       },
       {
         path: 'improvement',
-        component: () => import('pages/ImprovementPage.vue'),
-        meta: {
-          ShowSideMenu: false
-        }
+        component: () => import('pages/ImprovementPage.vue')
       },
       {
         path: 'initializewallet',
-        component: () => import('pages/InitializeWalletPage.vue'),
-        meta: {
-          ShowSideMenu: false
-        }
+        component: () => import('pages/InitializeWalletPage.vue')
       },
       {
         path: 'importwallet',
@@ -75,10 +65,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'recovery',
-        component: () => import('pages/RecoveryPage.vue'),
-        meta: {
-          ShowSideMenu: false
-        }
+        component: () => import('pages/RecoveryPage.vue')
       }
     ]
   },

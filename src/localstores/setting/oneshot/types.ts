@@ -1,7 +1,18 @@
 export interface OneShotSetting {
   ShowHeaderMenu: boolean
-  ShowSideMenu: boolean
   ExtensionMode: boolean
   ShowFooterMenu: boolean
   AlignPageCenter: boolean
+  ShowSettingMenu: boolean
+}
+
+export enum Menu {
+  NETWORKS = 'Networks',
+}
+
+export interface MenuItem {
+  icon: string
+  label: Menu
+  target: string
+  disable: boolean
 }

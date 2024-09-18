@@ -6,7 +6,6 @@
       </q-toolbar>
       <q-resize-observer @resize='onHeaderResize' />
     </q-header>
-    <SidebarMenu v-if='showSideMenu' />
     <q-page-container>
       <q-page :class='[ "flex justify-center", alignPageCenter ? "items-center" : "" ]'>
         <router-view v-slot='{ Component }'>
@@ -46,12 +45,10 @@ import { localStore } from 'src/localstores'
 
 import MainHeaderView from 'src/components/header/MainHeaderView.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
-import SidebarMenu from 'src/components/SidebarMenu.vue'
 import BlockView from 'src/components/block/BlockView.vue'
 
 const showFooterMenu = computed(() => localStore.oneShotSetting.showFooterMenu)
 const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)
-const showSideMenu = computed(() => localStore.oneShotSetting.showSideMenu)
 const alignPageCenter = computed(() => localStore.oneShotSetting.alignPageCenter)
 const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 

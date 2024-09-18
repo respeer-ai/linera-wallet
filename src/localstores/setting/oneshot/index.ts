@@ -9,9 +9,6 @@ export const useSettingStore = defineStore('one-shot-setting', {
     showHeaderMenu (): boolean {
       return this.oneShotSetting.ShowHeaderMenu
     },
-    showSideMenu (): boolean {
-      return this.oneShotSetting.ShowSideMenu
-    },
     extensionMode (): boolean {
       return this.oneShotSetting.ExtensionMode
     },
@@ -20,7 +17,13 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     alignPageCenter (): boolean {
       return this.oneShotSetting.AlignPageCenter
+    },
+    showSettingMenu (): boolean {
+      return this.oneShotSetting.ShowSettingMenu
     }
   },
   actions: {}
 })
+
+export * from './types'
+export * from './const'

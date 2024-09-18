@@ -36,11 +36,6 @@ export default route(function (/* { store, ssrContext } */) {
 
   router.beforeEach((to) => {
     const _setting = useSettingStore()
-    if (to.meta?.ShowSideMenu !== undefined) {
-      _setting.oneShotSetting.ShowSideMenu = to.meta.ShowSideMenu
-    } else {
-      _setting.oneShotSetting.ShowSideMenu = true
-    }
     if (to.meta?.ShowHeaderMenu !== undefined) {
       _setting.oneShotSetting.ShowHeaderMenu = to.meta.ShowHeaderMenu
     } else {
