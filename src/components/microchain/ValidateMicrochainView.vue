@@ -16,7 +16,7 @@
       <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> Paste microchain creation information to input box.
     </div>
     <q-btn
-      class='btn vertical-sections-margin extra-margin-bottom' dense flat no-caps
+      class='btn vertical-sections-margin extra-margin-bottom full-width' dense flat no-caps
       @click='onValidateClick' :disabled='canValidate'
     >
       Let's go
