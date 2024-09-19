@@ -22,7 +22,6 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { db } from 'src/model'
 
 import ImportPrivateKeyMenuView from './ImportPrivateKeyMenuView.vue'
 import ImportPrivateKeyInnerView from './ImportPrivateKeyInnerView.vue'
@@ -53,7 +52,7 @@ const title = computed(() => {
 })
 
 const emit = defineEmits<{(ev: 'cancel'): void,
-  (ev: 'imported', value: db.Owner): void
+  (ev: 'imported'): void
 }>()
 
 const onCloseClick = () => {
@@ -80,8 +79,8 @@ const onAddLedger = () => {
   step.value++
 }
 
-const onAccountImported = (owner: db.Owner) => {
-  emit('imported', owner)
+const onAccountImported = () => {
+  emit('imported')
 }
 
 const onImportAccountCanceled = () => {

@@ -15,7 +15,7 @@
     </div>
     <q-btn
       flat dense class='btn full-width vertical-sections-margin' @click='onImportClick'
-      no-caps
+      no-caps :disable='privateKey.length === 0'
     >
       Import
     </q-btn>
@@ -25,22 +25,46 @@
     >
       Cancel
     </q-btn>
+    <PasswordBridge ref='passwordBridge' v-model:password='password' />
+    <OwnerBridge ref='ownerBridge' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
 import { ref } from 'vue'
+import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { _hex } from 'src/utils'
+import { localStore } from 'src/localstores'
+
+import PasswordBridge from '../bridge/db/PasswordBridge.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 const privateKey = ref('')
 const showPlainText = ref(false)
+const password = ref(undefined as unknown as string)
 
-const emit = defineEmits<{(ev: 'imported', value: db.Owner): void,
+const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
+
+const emit = defineEmits<{(ev: 'imported'): void,
   (ev: 'canceled'): void
 }>()
 
-const onImportClick = () => {
-  // TODO
+const onImportClick = async () => {
+  try {
+    const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey.value)))
+    const publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await ownerBridge.value?.createOwner(publicKey, privateKey.value)
+  } catch (error) {
+    localStore.notification.pushNotification({
+      Title: 'Import account',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Failed import account: ${error}.`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
+  }
+  emit('imported')
 }
 
 const onCancelClick = () => {

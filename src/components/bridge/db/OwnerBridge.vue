@@ -60,8 +60,9 @@ const createOwner = async (publicKey: string, privateKey: string, name?: string)
     // TODO: add field to store account number
     name = db.DEFAULT_ACCOUNT_NAME + ' ' + (await dbWallet.owners.count()).toString()
   }
-  await resetSelected()
+  if (await dbWallet.owners.where('address').equals(publicKey).first() !== undefined) return
   const owner = await db.buildOwner(publicKey, privateKey, password.value, name)
+  if (!await dbWallet.owners.count()) owner.selected = true
   await dbWallet.owners.add(owner)
 }
 
