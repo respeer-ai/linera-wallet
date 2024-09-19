@@ -115,7 +115,7 @@
     <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' />
   </q-dialog>
   <q-dialog v-model='displayingOwnerDetail'>
-    <AccountDetailView :owner='selectedOwner' />
+    <AccountDetailView :owner='selectedOwner' @canceled='onAccountDetailCanceled' @done='onAccountDetailDone' />
   </q-dialog>
 </template>
 
@@ -170,6 +170,14 @@ const onSettingsClick = () => {
 
 const onAccountDetailClick = () => {
   displayingOwnerDetail.value = true
+}
+
+const onAccountDetailCanceled = () => {
+  displayingOwnerDetail.value = false
+}
+
+const onAccountDetailDone = () => {
+  displayingOwnerDetail.value = false
 }
 
 </script>

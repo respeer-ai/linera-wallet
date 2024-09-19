@@ -4,10 +4,16 @@
       <AccountDetailInnerView v-if='owner' :owner='owner' @show-private-key='onShowPrivateKey' />
     </div>
     <div v-if='step === 2'>
-      <ShowPrivateKeyView
-        v-if='owner' :owner='owner' @canceled='onShowPrivateKeyCanceled' @back='onShowPrivateKeyBack'
+      <ShowPrivateKeyConfirmView
+        v-if='owner' :owner='owner' @canceled='onShowPrivateKeyConfirmCanceled' @back='onShowPrivateKeyConfirmBack'
         @confirmed='onShowPrivateKeyConfirmed'
       />
+    </div>
+    <div v-if='step === 3'>
+      <ShowPrivateKeySecurityConfirmView @canceled='onShowPrivateKeySecurityCanceled' @confirmed='onShowPrivateKeySecurityConfirmed' />
+    </div>
+    <div v-if='step === 4'>
+      <ShowPrivateKeyView :owner='owner' @done='onShowPrivateKeyDone' @canceled='onShowPrivateKeyCanceled' />
     </div>
   </div>
 </template>
@@ -17,6 +23,8 @@ import { db } from 'src/model'
 import { ref, toRef } from 'vue'
 
 import AccountDetailInnerView from './AccountDetailInnerView.vue'
+import ShowPrivateKeyConfirmView from './ShowPrivateKeyConfirmView.vue'
+import ShowPrivateKeySecurityConfirmView from './ShowPrivateKeySecurityConfirmView.vue'
 import ShowPrivateKeyView from './ShowPrivateKeyView.vue'
 
 interface Props {
@@ -27,20 +35,40 @@ const owner = toRef(props, 'owner')
 
 const step = ref(1)
 
+const emit = defineEmits<{(ev: 'canceled'): void,
+  (ev: 'done'): void
+}>()
+
 const onShowPrivateKey = () => {
   step.value++
 }
 
-const onShowPrivateKeyCanceled = () => {
+const onShowPrivateKeyConfirmCanceled = () => {
   step.value--
 }
 
-const onShowPrivateKeyBack = () => {
+const onShowPrivateKeyConfirmBack = () => {
   step.value--
 }
 
 const onShowPrivateKeyConfirmed = () => {
   step.value++
+}
+
+const onShowPrivateKeySecurityCanceled = () => {
+  emit('canceled')
+}
+
+const onShowPrivateKeySecurityConfirmed = () => {
+  step.value++
+}
+
+const onShowPrivateKeyDone = () => {
+  emit('done')
+}
+
+const onShowPrivateKeyCanceled = () => {
+  emit('canceled')
 }
 
 </script>
