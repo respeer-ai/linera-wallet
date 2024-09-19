@@ -42,7 +42,8 @@
             <span class='text-grey-6 header-items-margin-x-left'>USD</span>
           </div>
           <div class='row'>
-            <span class='text-grey-9 selector-item-currency-sub'>{{ ownerBridge?.ownerBalance(_owner).toFixed(4) }}</span>
+            <q-img :src='lineraLogo' width='18px' height='18px' />
+            <span class='text-grey-9 selector-item-currency-sub header-items-margin-x-left'>{{ ownerBridge?.ownerBalance(_owner).toFixed(4) }}</span>
             <span class='text-grey-6 selector-item-currency-sub header-items-margin-x-left'>TLINERA</span>
           </div>
         </div>
@@ -61,6 +62,8 @@ import { db } from 'src/model'
 import { shortid } from 'src/utils'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
+
+import { lineraLogo } from 'src/assets'
 
 const owners = ref([] as db.Owner[])
 const searchText = ref('')

@@ -1,16 +1,39 @@
 <template>
   <q-card class='selector-card'>
-    <AccountsView v-model='owner' @selected='onOwnerSelected' />
-    <div class='selector-action'>
-      <q-btn flat class='btn btn-alt full-width' label='Create or import account' no-caps />
+    <q-stepper
+      flat
+      v-model='step'
+      active-color='brown-8'
+      inactive-color='brown-4'
+      done-color='green-6'
+      animated
+      alternative-labels
+      header-class='hide'
+    >
+      <q-step :name='1' title='1' :done='step > 1'>
+        <AccountsView v-model='owner' @selected='onOwnerSelected' />
+      </q-step>
+      <q-step :name='2' title='2' :done='step > 2'>
+        <ImportPrivateKeyView @cancel='onImportCanceled' />
+      </q-step>
+    </q-stepper>
+    <div class='selector-action' v-if='step===1'>
+      <q-btn
+        flat class='btn btn-alt full-width' label='Create or import account' no-caps
+        @click='step++'
+      />
     </div>
   </q-card>
 </template>
 
 <script setup lang='ts'>
 import { db } from 'src/model'
+import { ref } from 'vue'
 
 import AccountsView from '../account/AccountsView.vue'
+import ImportPrivateKeyView from '../account/ImportPrivateKeyView.vue'
+
+const step = ref(1)
 
 const owner = defineModel<db.Owner>()
 const emit = defineEmits<{(ev: 'selected', value: db.Owner): void}>()
@@ -21,4 +44,13 @@ const onOwnerSelected = (_owner: db.Owner) => {
   emit('selected', _owner)
 }
 
+const onImportCanceled = () => {
+  step.value = 1
+}
+
 </script>
+
+<style lang='sass' scoped>
+::v-deep .q-stepper__step-inner
+  padding: 0 !important
+</style>
