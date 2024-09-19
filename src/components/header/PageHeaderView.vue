@@ -85,7 +85,7 @@
                 <span>All permissions</span>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup>
+            <q-item clickable v-close-popup @click='onSettingsClick'>
               <q-item-section avatar>
                 <q-icon name='bi-gear-fill' size='12px' />
               </q-item-section>
@@ -120,6 +120,7 @@
 import { ref } from 'vue'
 import { db } from 'src/model'
 import { shortid } from 'src/utils'
+import { localStore } from 'src/localstores'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
@@ -154,6 +155,10 @@ const onAddNetwork = () => {
 const onOwnerSelected = (owner: db.Owner) => {
   selectingOwner.value = false
   selectedOwner.value = owner
+}
+
+const onSettingsClick = () => {
+  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = true
 }
 
 </script>

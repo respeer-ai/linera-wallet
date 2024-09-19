@@ -1,7 +1,7 @@
 <template>
   <div class='text-center'>
     <div class='vertical-sections-margin text-grey-8'>
-      CheCko is dedicated to Linera microchain.
+      Dedicated Linera microchain wallet.
     </div>
     <div class='vertical-sections-margin extra-margin-bottom'>
       <q-img :src='cheCkoLogo' width='360px' />
