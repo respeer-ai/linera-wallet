@@ -65,7 +65,7 @@ export const buildOwner = async (publicKey: string, privateKey: string, password
     privateKey: _privateKey,
     salt,
     name,
-    selected: false
+    selected: true
   } as Owner
 }
 
