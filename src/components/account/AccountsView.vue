@@ -73,8 +73,6 @@ const emit = defineEmits<{(ev: 'selected', value: db.Owner): void}>()
 
 const displayOwners = computed(() => owners.value.filter((el) => {
   return el.name.includes(searchText.value) || el.address.includes(searchText.value)
-}).sort((a, b) => {
-  return b.selected as unknown as number - (a.selected as unknown as number)
 }))
 
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()

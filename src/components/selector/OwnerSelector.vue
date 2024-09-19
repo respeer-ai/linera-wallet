@@ -14,7 +14,7 @@
         <AccountsView v-model='owner' @selected='onOwnerSelected' />
       </q-step>
       <q-step :name='2' title='2' :done='step > 2'>
-        <ImportPrivateKeyView @cancel='onImportCanceled' />
+        <ImportPrivateKeyView @canceled='onImportCanceled' @created='onAccountCreated' @imported='onAccountImported' />
       </q-step>
     </q-stepper>
     <div class='selector-action' v-if='step===1'>
@@ -36,7 +36,7 @@ import ImportPrivateKeyView from '../account/ImportPrivateKeyView.vue'
 const step = ref(1)
 
 const owner = defineModel<db.Owner>()
-const emit = defineEmits<{(ev: 'selected', value: db.Owner): void}>()
+const emit = defineEmits<{(ev: 'selected', value?: db.Owner): void}>()
 
 const onOwnerSelected = (_owner: db.Owner) => {
   _owner.selected = true
@@ -46,6 +46,14 @@ const onOwnerSelected = (_owner: db.Owner) => {
 
 const onImportCanceled = () => {
   step.value = 1
+}
+
+const onAccountCreated = () => {
+  emit('selected')
+}
+
+const onAccountImported = () => {
+  emit('selected')
 }
 
 </script>

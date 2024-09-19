@@ -172,7 +172,6 @@ const signNewBlock = (chainId: string, notifiedHeight: number, keyPair: Ed25519S
 const createAccount = async () => {
   const _keyPair = await lineraWasm.generate_key_pair(shadowPassword.value as string)
 
-  // const mnemonic = (JSON.parse(_keyPair) as Record<string, string>).mnemonic
   const privateKey = (JSON.parse(_keyPair) as Record<string, string>).secret_key
 
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))

@@ -152,9 +152,11 @@ const onAddNetwork = () => {
   selectingNetwork.value = false
 }
 
-const onOwnerSelected = (owner: db.Owner) => {
+const onOwnerSelected = (owner?: db.Owner) => {
   selectingOwner.value = false
-  selectedOwner.value = owner
+  if (owner) {
+    selectedOwner.value = owner
+  }
 }
 
 const onSettingsClick = () => {

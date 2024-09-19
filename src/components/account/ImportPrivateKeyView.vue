@@ -13,6 +13,9 @@
       <ImportPrivateKeyMenuView @create='onCreateAccount' @import='onImportAccount' @add-ledger='onAddLedger' />
     </div>
     <div v-if='step === 2'>
+      <div v-if='action === Action.Create'>
+        <GenerateKeyView @created='onAccountCreated' @canceled='onCreateAccountCanceled' />
+      </div>
       <div v-if='action === Action.Import'>
         <ImportPrivateKeyInnerView @imported='onAccountImported' @canceled='onImportAccountCanceled' />
       </div>
@@ -25,6 +28,7 @@ import { computed, ref } from 'vue'
 
 import ImportPrivateKeyMenuView from './ImportPrivateKeyMenuView.vue'
 import ImportPrivateKeyInnerView from './ImportPrivateKeyInnerView.vue'
+import GenerateKeyView from './GenerateKeyView.vue'
 
 const step = ref(1)
 
@@ -51,16 +55,17 @@ const title = computed(() => {
   }
 })
 
-const emit = defineEmits<{(ev: 'cancel'): void,
-  (ev: 'imported'): void
+const emit = defineEmits<{(ev: 'canceled'): void,
+  (ev: 'imported'): void,
+  (ev: 'created'): void
 }>()
 
 const onCloseClick = () => {
-  emit('cancel')
+  emit('canceled')
 }
 
 const onBackClick = () => {
-  if (step.value === 1) return emit('cancel')
+  if (step.value === 1) return emit('canceled')
   step.value--
 }
 
@@ -84,6 +89,14 @@ const onAccountImported = () => {
 }
 
 const onImportAccountCanceled = () => {
+  step.value--
+}
+
+const onAccountCreated = () => {
+  emit('created')
+}
+
+const onCreateAccountCanceled = () => {
   step.value--
 }
 
