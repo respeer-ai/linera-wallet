@@ -8,8 +8,8 @@
           rounded flat no-caps class='full-width bg-grey-1'
           @click='onViewMoreClick'
           v-if='displayCount !== microchains.length'
-          icon='bi-chevron-double-down'
-          color='grey-5'
+          color='grey-6'
+          label='View more...'
         />
       </div>
       <div v-else class='page-item-placeholder'>
