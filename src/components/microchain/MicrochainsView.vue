@@ -3,7 +3,13 @@
     <q-space />
     <div>
       <div v-if='microchains.length > 0'>
-        <MicrochainCardView v-for='microchain in microchains' :key='microchain.microchain' :microchain='microchain' />
+        <MicrochainCardView v-for='microchain in displayMicrochains' :key='microchain.microchain' :microchain='microchain' />
+        <q-btn
+          rounded flat no-caps class='full-width bg-grey-3'
+          @click='onViewMoreClick'
+        >
+          View more...
+        </q-btn>
       </div>
       <div v-else class='page-item-placeholder'>
         <div class='cursor-pointer' @click='onCreateMicrochainClick'>
@@ -51,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
 
@@ -65,6 +71,9 @@ import RpcMicrochainBridge from '../bridge/rpc/MicrochainBridge.vue'
 const microchainOwners = ref([] as db.MicrochainOwner[])
 const microchains = ref([] as db.Microchain[])
 const selectedOwner = ref(undefined as unknown as db.Owner)
+
+const displayCount = ref(4)
+const displayMicrochains = computed(() => microchains.value.slice(0, displayCount.value))
 
 const creatingMicrochain = ref(false)
 const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
@@ -84,6 +93,11 @@ const onCreateMicrochainClick = () => {
 
 const onImportMicrochainClick = () => {
   // TODO
+}
+
+const onViewMoreClick = () => {
+  displayCount.value += 4
+  displayCount.value = Math.min(displayCount.value, microchains.value.length)
 }
 
 const onSynchronizeMicrochainsClick = () => {
