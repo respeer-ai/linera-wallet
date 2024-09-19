@@ -60,7 +60,7 @@
               </q-item-section>
             </q-item>
             <q-separator />
-            <q-item clickable v-close-popup>
+            <q-item clickable v-close-popup @click='onAccountDetailClick'>
               <q-item-section avatar>
                 <q-icon name='bi-person-bounding-box' size='12px' />
               </q-item-section>
@@ -114,6 +114,9 @@
   <q-dialog v-model='selectingOwner'>
     <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' />
   </q-dialog>
+  <q-dialog v-model='displayingOwnerDetail'>
+    <AccountDetailView :owner='selectedOwner' />
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
@@ -126,6 +129,7 @@ import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import NetworkSelector from '../selector/NetworkSelector.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
+import AccountDetailView from '../account/AccountDetailView.vue'
 
 const networks = ref([] as db.Network[])
 const selectedNetwork = ref(undefined as unknown as db.Network)
@@ -134,6 +138,7 @@ const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const selectingNetwork = ref(false)
 const selectingOwner = ref(false)
+const displayingOwnerDetail = ref(false)
 
 const onNetworkClick = () => {
   selectingNetwork.value = true
@@ -161,6 +166,10 @@ const onOwnerSelected = (owner?: db.Owner) => {
 
 const onSettingsClick = () => {
   localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = true
+}
+
+const onAccountDetailClick = () => {
+  displayingOwnerDetail.value = true
 }
 
 </script>
