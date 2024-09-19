@@ -5,11 +5,12 @@
       <div v-if='microchains.length > 0'>
         <MicrochainCardView v-for='microchain in displayMicrochains' :key='microchain.microchain' :microchain='microchain' />
         <q-btn
-          rounded flat no-caps class='full-width bg-grey-3'
+          rounded flat no-caps class='full-width bg-grey-1'
           @click='onViewMoreClick'
-        >
-          View more...
-        </q-btn>
+          v-if='displayCount !== microchains.length'
+          icon='bi-chevron-double-down'
+          color='grey-5'
+        />
       </div>
       <div v-else class='page-item-placeholder'>
         <div class='cursor-pointer' @click='onCreateMicrochainClick'>
