@@ -39,6 +39,6 @@ import MicrochainsView from '../microchain/MicrochainsView.vue'
 import ApplicationsView from '../application/ApplicationsView.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 
-const tab = ref('tokens')
+const tab = ref('microchains')
 
 </script>
