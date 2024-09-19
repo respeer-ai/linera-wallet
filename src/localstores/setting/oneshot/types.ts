@@ -1,5 +1,6 @@
 export enum Menu {
   NETWORKS = 'Networks',
+  ABOUT_US = 'AboutUs'
 }
 
 export interface OneShotSetting {
@@ -14,7 +15,7 @@ export interface OneShotSetting {
 
 export interface MenuItem {
   icon: string
-  label: Menu
-  target: string
+  menu: Menu
+  label: string
   disable: boolean
 }

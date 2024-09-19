@@ -3,14 +3,17 @@
     <div class='setting-label text-grey-9 text-bold'>
       Settings
     </div>
-    <q-list padding class='menu-list'>
-      <q-item
+    <q-tabs
+      vertical no-caps inline-label v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu'
+      indicator-color='red-6'
+    >
+      <q-tab
         v-for='menu in localStore.oneShotSettingDef.SettingMenus'
-        :key='menu.label'
+        :name='menu.menu'
+        :key='menu.menu'
         :clickable='!menu.disable'
         v-ripple
-        @click='onMenuClick(menu)'
-        :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.label ? "bg-red-1" : "" ]'
+        :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.menu ? "bg-red-1" : "" ]'
         :disable='menu.disable'
       >
         <q-item-section avatar>
@@ -19,47 +22,20 @@
         <q-item-section>
           {{ menu.label }}
         </q-item-section>
-      </q-item>
-    </q-list>
+      </q-tab>
+    </q-tabs>
   </div>
 </template>
 
 <script setup lang='ts'>
-import { localStore, oneShotSettingDef } from 'src/localstores'
-import { onMounted, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
-const route = useRoute()
-const path = computed(() => route.path)
-
-const router = useRouter()
-const onMenuClick = (menu: oneShotSettingDef.MenuItem) => {
-  localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu = menu.label
-  void router.push(menu.target)
-}
-
-const updateSidebarMenu = () => {
-  for (let i = 0; i < localStore.oneShotSettingDef.SettingMenus.length; i++) {
-    if (localStore.oneShotSettingDef.SettingMenus[i].target === path.value) {
-      localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu = localStore.oneShotSettingDef.SettingMenus[i].label
-      break
-    }
-  }
-}
-
-onMounted(() => {
-  updateSidebarMenu()
-})
-
-watch(path, () => {
-  updateSidebarMenu()
-})
+import { localStore } from 'src/localstores'
 
 </script>
 
 <style scoped lang='sass'>
-.q-item
-  .q-item__section--avatar
-    padding-right: 0
-    min-width: 32px
+::v-deep .q-tab__content
+  width: 100% !important
+  padding-left: 4px
+  .q-item__section
+    text-align: left
 </style>
