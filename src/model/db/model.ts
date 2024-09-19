@@ -74,7 +74,6 @@ export const ownerAvatar = (owner: Owner) => {
 }
 
 export const privateKey = (owner: Owner, password: string) => {
-  console.log(password, password?.length)
   const key = CryptoJS.SHA256(owner.salt + password + owner.salt).toString()
   return AES.decrypt(owner.privateKey, key).toString(enc.Utf8)
 }
