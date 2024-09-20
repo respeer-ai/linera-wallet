@@ -1,10 +1,10 @@
 <template>
   <NetworkBridge v-model:selected-network='selectedNetwork' />
-  <MicrochainOwnerBridge ref='microchainOwnerBridge' :owner='owner' v-model:microchain-owners='microchainOwners' />
+  <MicrochainOwnerBridge ref='microchainOwnerBridge' />
 </template>
 
 <script setup lang='ts'>
-import { computed, ref, toRef, watch } from 'vue'
+import { ref, toRef, watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
@@ -25,16 +25,18 @@ const microchains = defineModel<db.Microchain[]>('microchains')
 const defaultMicrochain = defineModel<db.Microchain>('defaultMicrochain')
 
 const microchainOwners = ref([] as db.MicrochainOwner[])
-const microchainIds = computed(() => microchainOwners.value.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, []))
 
 const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const _microchains = useObservable<db.Microchain[]>(
   from(
     liveQuery(async () => {
-      return owner.value !== undefined
-        ? await dbWallet.microchains.where('microchain').anyOf(microchainIds.value).toArray()
-        : await dbWallet.microchains.toArray()
+      if (owner.value !== undefined) {
+        const microchainOwners = await dbWallet.microchainOwners.where('owner').equals(owner.value).toArray()
+        const microchainIds = microchainOwners.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, [])
+        return await dbWallet.microchains.where('microchain').anyOf(microchainIds).toArray()
+      }
+      return await dbWallet.microchains.toArray()
     })
   )
 )
@@ -43,6 +45,9 @@ watch(_microchains, () => {
   microchains.value = [..._microchains.value || []]
   if (owner.value !== undefined) {
     defaultMicrochain.value = _microchains.value?.find((el) => el.default)
+  }
+  if (defaultMicrochain.value === undefined && _microchains.value?.length) {
+    defaultMicrochain.value = _microchains.value[0]
   }
 })
 

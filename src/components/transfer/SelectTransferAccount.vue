@@ -29,12 +29,12 @@
         <q-avatar>
           <q-img v-if='selectedFromOwner' :src='db.ownerAvatar(selectedFromOwner)' width='36px' height='36px' />
         </q-avatar>
-        <div class='header-items-margin-x-left text-left'>
+        <div v-if='selectedFromOwner' class='header-items-margin-x-left text-left'>
           <div>
-            {{ selectedFromOwner?.name }}
+            {{ selectedFromOwner.name }}
           </div>
           <div class='text-grey-6 page-header-network'>
-            0x{{ shortid.shortId(selectedFromOwner?.owner, 6) }}
+            0x{{ shortid.shortId(selectedFromOwner.owner, 6) }}
           </div>
         </div>
       </div>
@@ -54,12 +54,12 @@
         <q-avatar>
           <q-img v-if='selectedFromMicrochain' :src='db.microchainAvatar(selectedFromMicrochain)' width='36px' height='36px' />
         </q-avatar>
-        <div class='header-items-margin-x-left text-left'>
+        <div v-if='selectedFromMicrochain' class='header-items-margin-x-left text-left'>
           <div>
-            {{ selectedFromMicrochain?.name || 'Microchain' }}
+            {{ selectedFromMicrochain.name || 'Microchain' }}
           </div>
           <div class='text-grey-6 page-header-network'>
-            0x{{ shortid.shortId(selectedFromMicrochain?.microchain, 6) }}
+            0x{{ shortid.shortId(selectedFromMicrochain.microchain, 6) }}
           </div>
         </div>
       </div>
@@ -78,9 +78,7 @@
   </div>
 
   <div class='vertical-sections-margin decorate-underline row'>
-    <div>
-      To
-    </div>
+    To
   </div>
   <div class='vertical-menus-margin'>
     <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input owner (not public key)'>
@@ -92,7 +90,7 @@
     </q-input>
     <q-btn-dropdown
       v-else
-      flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
+      flat filled class='btn-alt full-width btn-radius btn-grey-border'
       no-caps dense
       dropdown-icon='bi-chevron-down'
       menu-anchor='bottom left'
@@ -130,7 +128,7 @@
     </q-input>
     <q-btn-dropdown
       v-else
-      flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
+      flat filled class='btn-alt full-width btn-radius btn-grey-border'
       no-caps dense
       dropdown-icon='bi-chevron-down'
       menu-anchor='bottom left'
@@ -158,7 +156,7 @@
       </template>
     </q-btn-dropdown>
   </div>
-  <div class='vertical-items-margin' v-if='toMicrochain.length > 0'>
+  <div class='vertical-items-margin' v-if='toMicrochain && toMicrochain.length > 0'>
     <q-toggle
       dense
       rounded
@@ -167,15 +165,18 @@
     />
   </div>
 
-  <q-btn
-    flat
-    rounded
-    label='Continue'
-    class='btn full-width extra-large-margin-bottom vertical-sections-margin'
-    @click='onTransferClick'
-    no-caps
-    :disable='!canGotoNext'
-  />
+  <div class='page-y-padding'>
+    <q-btn
+      dense
+      flat
+      rounded
+      label='Continue'
+      class='btn full-width extra-margin-bottom'
+      @click='onTransferClick'
+      no-caps
+      :disable='!canGotoNext'
+    />
+  </div>
   <DbOwnerBridge v-model:selected-owner='selectedFromOwner' />
   <DbMicrochainBridge v-if='selectedFromOwner' :owner='selectedFromOwner?.owner' v-model:default-microchain='selectedFromMicrochain' v-model:microchains='fromMicrochains' />
   <DbMicrochainBridge v-if='selectedToOwner' :owner='selectedToOwner?.owner' v-model:default-microchain='selectedToMicrochain' />
@@ -198,14 +199,14 @@ import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import RpcTransferBridge from '../bridge/rpc/TransferBridge.vue'
 
-const selectedFromOwner = ref(undefined as unknown as db.Owner)
-const selectedFromMicrochain = ref(undefined as unknown as db.Microchain)
+const selectedFromOwner = defineModel<db.Owner>('selectedFromOwner')
+const selectedFromMicrochain = defineModel<db.Microchain>('selectedFromMicrochain')
 const fromMicrochains = ref([] as db.Microchain[])
 
-const selectedToOwner = ref(undefined as unknown as db.Owner | undefined)
-const selectedToMicrochain = ref(undefined as unknown as db.Microchain)
-const toAddress = ref('')
-const toMicrochain = ref('')
+const selectedToOwner = defineModel<db.Owner>('selectedToOwner')
+const selectedToMicrochain = defineModel<db.Microchain>('selectedToMicrochain')
+const toAddress = defineModel<string>('toAddress')
+const toMicrochain = defineModel<string>('toMicrochain')
 
 const selectingFromOwner = ref(false)
 const selectingToOwner = ref(false)
@@ -245,7 +246,8 @@ const onClearToMicrochainClick = () => {
 }
 
 const onClearToAccountClick = () => {
-  selectedToOwner.value = undefined as unknown as db.Owner
+  selectedToOwner.value = undefined
+  selectedToMicrochain.value = undefined
   toAddress.value = ''
   toMicrochain.value = ''
 }
@@ -258,7 +260,9 @@ const onToOwnerSelected = (owner?: db.Owner) => {
 const canGotoNext = computed(() => {
   return selectedFromOwner.value !== undefined &&
          selectedFromMicrochain.value !== undefined &&
+         toAddress.value &&
          toAddress.value.length > 0 &&
+         toMicrochain.value &&
          toMicrochain.value.length > 0
 })
 
