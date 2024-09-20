@@ -16,7 +16,7 @@
           Exchange
         </div>
       </div>
-      <div class='home-token-action-btn cursor-pointer'>
+      <div class='home-token-action-btn cursor-pointer' @click='onTransferClick'>
         <q-avatar color='red-2' size='36px'>
           <q-icon name='bi-arrow-up-right' size='24px' />
         </q-avatar>
@@ -57,6 +57,7 @@
 
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
@@ -67,9 +68,15 @@ const tokenBalance = ref(0)
 const usdBalance = ref(0)
 const nativeTokenId = ref(0)
 
+const router = useRouter()
+
 onMounted(async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
 })
+
+const onTransferClick = () => {
+  void router.push({ path: '/transfer' })
+}
 
 </script>

@@ -17,7 +17,7 @@
         <ImportPrivateKeyView @canceled='onImportCanceled' @created='onAccountCreated' @imported='onAccountImported' />
       </q-step>
     </q-stepper>
-    <div class='selector-action' v-if='step===1'>
+    <div class='selector-action' v-if='step===1 && creatable'>
       <q-btn
         flat class='btn btn-alt full-width' label='Create or import account' no-caps
         @click='step++'
@@ -28,10 +28,18 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { ref } from 'vue'
+import { ref, toRef } from 'vue'
 
 import AccountsView from '../account/AccountsView.vue'
 import ImportPrivateKeyView from '../account/ImportPrivateKeyView.vue'
+
+interface Props {
+  creatable?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  creatable: true
+})
+const creatable = toRef(props, 'creatable')
 
 const step = ref(1)
 

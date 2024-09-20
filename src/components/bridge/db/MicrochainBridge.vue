@@ -1,10 +1,10 @@
 <template>
   <NetworkBridge v-model:selected-network='selectedNetwork' />
-  <MicrochainOwnerBridge ref='microchainOwnerBridge' v-model:microchain-owners='microchainOwners' />
+  <MicrochainOwnerBridge ref='microchainOwnerBridge' :owner='owner' v-model:microchain-owners='microchainOwners' />
 </template>
 
 <script setup lang='ts'>
-import { ref, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
@@ -13,26 +13,37 @@ import { useObservable, from } from '@vueuse/rxjs'
 import NetworkBridge from './NetworkBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
+interface Props {
+  owner?: string
+}
+const props = defineProps<Props>()
+const owner = toRef(props, 'owner')
+
 const selectedNetwork = ref(undefined as unknown as db.Network)
 
 const microchains = defineModel<db.Microchain[]>('microchains')
-const selectedMicrochain = defineModel<db.Microchain>('selectedMicrochain')
+const defaultMicrochain = defineModel<db.Microchain>('defaultMicrochain')
 
 const microchainOwners = ref([] as db.MicrochainOwner[])
+const microchainIds = computed(() => microchainOwners.value.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, []))
 
 const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const _microchains = useObservable<db.Microchain[]>(
   from(
     liveQuery(async () => {
-      return await dbWallet.microchains.toArray()
+      return owner.value !== undefined
+        ? await dbWallet.microchains.where('microchain').anyOf(microchainIds.value).toArray()
+        : await dbWallet.microchains.toArray()
     })
   )
 )
 
 watch(_microchains, () => {
   microchains.value = [..._microchains.value || []]
-  selectedMicrochain.value = _microchains.value?.find((el) => el.selected)
+  if (owner.value !== undefined) {
+    defaultMicrochain.value = _microchains.value?.find((el) => el.default)
+  }
 })
 
 const getMicrochains = async (offset: number, limit: number): Promise<db.Microchain[]> => {

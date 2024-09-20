@@ -1,0 +1,176 @@
+<template>
+  <div class='row'>
+    <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
+    <q-space />
+    <p class='text-center text-bold text-grey-9 selector-title'>
+      Transfer tokens
+    </p>
+    <q-space />
+    <div v-show='false'>
+      <q-icon
+        name='bi-x' size='24px' class='cursor-pointer'
+        @click='onBackClick'
+      />
+    </div>
+  </div>
+  <div class='vertical-menus-margin decorate-underline'>
+    From
+  </div>
+  <q-btn-dropdown
+    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-menus-margin'
+    no-caps dense
+    dropdown-icon='bi-chevron-down'
+    menu-anchor='bottom left'
+    menu-self='top left'
+    @click='onFromAccountClick'
+  >
+    <template #label>
+      <div class='row full-width'>
+        <q-avatar>
+          <q-img v-if='selectedFromOwner' :src='db.ownerAvatar(selectedFromOwner)' width='36px' height='36px' />
+        </q-avatar>
+        <div class='header-items-margin-x-left text-left'>
+          <div>
+            {{ selectedFromOwner?.name }}
+          </div>
+          <div class='text-grey-6 page-header-network'>
+            0x{{ shortid.shortId(selectedFromOwner?.owner, 6) }}
+          </div>
+        </div>
+      </div>
+    </template>
+  </q-btn-dropdown>
+  <q-btn-dropdown
+    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
+    no-caps dense
+    dropdown-icon='bi-chevron-down'
+    menu-anchor='bottom left'
+    menu-self='top left'
+    @click='onFromMicrochainClick'
+    v-if='fromMicrochains.length > 0'
+  >
+    <template #label>
+      <div class='row full-width'>
+        <q-avatar>
+          <q-img v-if='selectedFromMicrochain' :src='db.microchainAvatar(selectedFromMicrochain)' width='36px' height='36px' />
+        </q-avatar>
+        <div class='header-items-margin-x-left text-left'>
+          <div>
+            {{ selectedFromMicrochain?.name || 'Microchain' }}
+          </div>
+          <div class='text-grey-6 page-header-network'>
+            0x{{ shortid.shortId(selectedFromMicrochain?.microchain, 6) }}
+          </div>
+        </div>
+      </div>
+    </template>
+  </q-btn-dropdown>
+  <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
+    No usable microchain? <span class='like-link'>Create</span>
+  </div>
+  <div class='vertical-items-margin' v-if='fromMicrochains.length > 0'>
+    <q-toggle
+      dense
+      rounded
+      label='Send from microchain balance'
+      v-model='fromChainBalance'
+    />
+  </div>
+
+  <div class='vertical-sections-margin decorate-underline row'>
+    <div>
+      To
+    </div>
+    <q-space />
+    <div class='text-right text-blue-8 cursor-pointer'>
+      Select
+    </div>
+  </div>
+  <div class='vertical-menus-margin'>
+    <q-input outlined v-model='toAddress' placeholder='Input owner (not public key)' />
+  </div>
+  <div class='vertical-items-margin'>
+    <q-input outlined v-model='toMicrochain' placeholder='Input microchain ID' />
+  </div>
+  <div class='vertical-items-margin' v-if='toMicrochain.length > 0'>
+    <q-toggle
+      dense
+      rounded
+      label='Send to microchain balance'
+      v-model='toChainBalance'
+    />
+  </div>
+
+  <q-btn
+    flat
+    rounded
+    label='Continue'
+    class='btn full-width extra-large-margin-bottom vertical-sections-margin'
+    @click='onTransferClick'
+    no-caps
+    :disable='!canGotoNext'
+  />
+  <DbOwnerBridge v-model:selected-owner='selectedFromOwner' />
+  <DbMicrochainBridge v-if='selectedFromOwner' :owner='selectedFromOwner?.owner' v-model:default-microchain='selectedFromMicrochain' v-model:microchains='fromMicrochains' />
+  <RpcTransferBridge ref='rpcTransferBridge' />
+  <q-dialog v-model='selectingFromOwner'>
+    <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' />
+  </q-dialog>
+</template>
+
+<script setup lang='ts'>
+import { computed, ref } from 'vue'
+import { shortid } from 'src/utils'
+import { db } from 'src/model'
+
+import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
+import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
+import OwnerSelector from '../selector/OwnerSelector.vue'
+import RpcTransferBridge from '../bridge/rpc/TransferBridge.vue'
+
+const selectedFromOwner = ref(undefined as unknown as db.Owner)
+const selectedFromMicrochain = ref(undefined as unknown as db.Microchain)
+const fromMicrochains = ref([] as db.Microchain[])
+
+const toAddress = ref('')
+const toMicrochain = ref('')
+
+const selectingFromOwner = ref(false)
+
+const rpcTransferBridge = ref<InstanceType<typeof RpcTransferBridge>>()
+
+const onFromAccountClick = () => {
+  selectingFromOwner.value = true
+}
+
+const onFromOwnerSelected = () => {
+  selectingFromOwner.value = false
+}
+
+const onFromMicrochainClick = () => {
+  // TODO
+}
+
+const canGotoNext = computed(() => {
+  return selectedFromOwner.value !== undefined &&
+         selectedFromMicrochain.value !== undefined &&
+         toAddress.value.length > 0 &&
+         toMicrochain.value.length > 0
+})
+
+const emit = defineEmits<{(ev: 'next'): void,
+  (ev: 'back'): void
+}>()
+
+const fromChainBalance = ref(false)
+const toChainBalance = ref(false)
+
+const onTransferClick = () => {
+  emit('next')
+}
+
+const onBackClick = () => {
+  emit('back')
+}
+
+</script>

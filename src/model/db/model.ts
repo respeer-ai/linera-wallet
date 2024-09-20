@@ -20,7 +20,6 @@ export interface Microchain {
   networkId: number
   name: string
   default: boolean
-  selected: boolean
 }
 
 export const microchainAvatar = (microchain: Microchain) => {

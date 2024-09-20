@@ -1,17 +1,11 @@
 <template>
-  <div class='fill-parent'>
-    <CreateTransfer v-if='!extensionMode' />
-    <ExtensionCreateTransfer v-else :style='{marginTop: "-12px"}' />
+  <div class='full-width'>
+    <CreateTransfer />
   </div>
 </template>
 
-<script setup lang="ts">
-import { localStore } from 'src/localstores'
-import { computed } from 'vue'
+<script setup lang='ts'>
 
-import CreateTransfer from 'src/components/CreateTransfer.vue'
-import ExtensionCreateTransfer from 'src/components/extension/CreateTransfer.vue'
-
-const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
+import CreateTransfer from 'src/components/transfer/CreateTransfer.vue'
 
 </script>

@@ -56,7 +56,6 @@ const emit = defineEmits(['unlocked'])
 const passwordError = ref(false)
 
 const unlock = () => {
-  console.log(password.value, 1, decryptedPassword.value)
   if (password.value === decryptedPassword.value) return emit('unlocked')
   localStore.notification.pushNotification({
     Title: 'Restore Wallet',

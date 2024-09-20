@@ -32,7 +32,10 @@ const routes: RouteRecordRaw[] = [
           AlignPageCenter: false
         }
       },
-      { path: 'transfer', component: () => import('pages/TransferPage.vue') },
+      {
+        path: 'transfer',
+        component: () => import('pages/TransferPage.vue')
+      },
       {
         path: 'activity',
         component: () => import('pages/ActivityPage.vue'),
