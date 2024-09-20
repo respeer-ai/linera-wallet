@@ -29,7 +29,10 @@
     </div>
     <div v-if='step === 2'>
       <SetTranserAmount
-        :from-owner='selectedFromOwner' :from-microchain='selectedFromMicrochain' :from-chain-balance='fromChainBalance' @next='onSetTransferAmountNext'
+        :from-owner='selectedFromOwner'
+        :from-microchain='selectedFromMicrochain'
+        v-model:from-chain-balance='fromChainBalance'
+        @next='onSetTransferAmountNext'
         v-model='amount'
       />
     </div>
@@ -101,6 +104,7 @@ const onBackClick = () => {
 }
 
 const onTransferConfirmed = () => {
+  console.log(fromChainBalance.value, toChainBalance.value)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   rpcTransferBridge.value?.transfer(
     fromChainBalance.value ? undefined : selectedFromOwner.value?.address,

@@ -78,7 +78,6 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
   })
 
   onResult((res) => {
-    console.log(111, res)
     const notifications = graphqlResult.data(res, 'notifications')
     const reason = graphqlResult.keyValue(notifications, 'reason')
     const newRawBlock = graphqlResult.keyValue(reason, 'NewRawBlock')
@@ -110,7 +109,7 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
             block {
               chainId
               epoch
-              incomingMessages {
+              incomingBundles {
                 origin
                 action
                 event
