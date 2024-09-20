@@ -87,8 +87,9 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
 
 const subscribeMicrochains = async () => {
   for (const microchain of microchains.value) {
-    if (subscribed.value.get(microchain.microchain)) return
+    if (subscribed.value.get(microchain.microchain)) continue
     await subscribeMicrochain(microchain)
+    subscribed.value.set(microchain.microchain, true)
   }
 }
 
