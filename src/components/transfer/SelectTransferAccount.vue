@@ -1,18 +1,4 @@
 <template>
-  <div class='row'>
-    <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
-    <q-space />
-    <p class='text-center text-bold text-grey-9 selector-title'>
-      Transfer tokens
-    </p>
-    <q-space />
-    <div v-show='false'>
-      <q-icon
-        name='bi-x' size='24px' class='cursor-pointer'
-        @click='onBackClick'
-      />
-    </div>
-  </div>
   <div class='vertical-menus-margin decorate-underline'>
     From
   </div>
@@ -211,6 +197,9 @@ const selectedToMicrochain = defineModel<db.Microchain>('selectedToMicrochain')
 const toAddress = defineModel<string>('toAddress')
 const toMicrochain = defineModel<string>('toMicrochain')
 
+const fromChainBalance = defineModel<boolean>('fromChainBalance')
+const toChainBalance = defineModel<boolean>('toChainBalance')
+
 const selectingFromOwner = ref(false)
 const selectingToOwner = ref(false)
 
@@ -273,19 +262,10 @@ const canGotoNext = computed(() => {
          toMicrochain.value.length > 0
 })
 
-const emit = defineEmits<{(ev: 'next'): void,
-  (ev: 'back'): void
-}>()
-
-const fromChainBalance = ref(false)
-const toChainBalance = ref(false)
+const emit = defineEmits<{(ev: 'next'): void}>()
 
 const onTransferClick = () => {
   emit('next')
-}
-
-const onBackClick = () => {
-  emit('back')
 }
 
 </script>
