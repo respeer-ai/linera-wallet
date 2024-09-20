@@ -33,16 +33,34 @@
         v-model='amount'
       />
     </div>
+    <div v-if='step === 3'>
+      <ConfirmTransfer
+        :from-owner='selectedFromOwner'
+        :from-microchain='selectedFromMicrochain'
+        :to-owner='selectedToOwner'
+        :to-microchain='selectedToMicrochain'
+        :to-address='toAddress'
+        :to-microchain-id='toMicrochain'
+        :from-chain-balance='fromChainBalance'
+        :to-chain-balance='toChainBalance'
+        :amount='amount'
+        @confirmed='onTransferConfirmed'
+      />
+    </div>
   </q-card>
+  <RpcTransferBridge ref='rpcTransferBridge' />
 </template>
 
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from 'src/model'
+import { localStore } from 'src/localstores'
 
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
+import ConfirmTransfer from './ConfirmTransfer.vue'
+import RpcTransferBridge from '../bridge/rpc/TransferBridge.vue'
 
 const step = ref(1)
 
@@ -57,6 +75,7 @@ const toChainBalance = ref(false)
 const amount = ref(0)
 
 const router = useRouter()
+const rpcTransferBridge = ref<InstanceType<typeof RpcTransferBridge>>()
 
 const onSelectTransferAccountNext = () => {
   step.value++
@@ -69,6 +88,35 @@ const onSetTransferAmountNext = () => {
 const onBackClick = () => {
   if (step.value > 1) return step.value--
   void router.back()
+}
+
+const onTransferConfirmed = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  rpcTransferBridge.value?.transfer(
+    fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
+    selectedFromMicrochain.value?.microchain,
+    toChainBalance.value ? undefined : selectedToOwner.value?.address,
+    selectedToMicrochain.value?.microchain,
+    amount.value,
+    undefined
+  ).then(() => {
+    localStore.notification.pushNotification({
+      Title: 'Transfer',
+      Message: 'Transaction is successful',
+      Popup: true,
+      Type: localStore.notify.NotifyType.Info
+    })
+    void router.back()
+  }).catch((error) => {
+    localStore.notification.pushNotification({
+      Title: 'Transfer',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Transaction is failed: ${error}`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
+    void router.back()
+  })
 }
 
 </script>

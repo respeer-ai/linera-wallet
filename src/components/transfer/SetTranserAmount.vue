@@ -4,7 +4,7 @@
       <q-space />
       <q-input
         class='label-text-extra-large' dense v-model='amount' :style='{ width: inputWidth }'
-        autofocus
+        autofocus type='number'
       />
       <div class='label-text-extra-large page-item-x-margin-left'>
         TLINERA
@@ -121,4 +121,17 @@ const onContinueClick = () => {
 ::v-deep .q-field__native
   min-width: 28px
   max-width: 128px
+
+/* Chrome, Safari, Edge, Opera */
+::v-deep input::-webkit-outer-spin-button
+  -webkit-appearance: none
+  margin: 0
+
+::v-deep input::-webkit-inner-spin-button
+  -webkit-appearance: none
+  margin: 0
+
+/* Firefox */
+::v-deep input[type=number]
+  -moz-appearance: textfield
 </style>

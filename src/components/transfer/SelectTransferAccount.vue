@@ -169,7 +169,6 @@
   <DbOwnerBridge v-model:selected-owner='selectedFromOwner' />
   <DbMicrochainBridge v-if='selectedFromOwner' :owner='selectedFromOwner?.owner' v-model:default-microchain='selectedFromMicrochain' v-model:microchains='fromMicrochains' />
   <DbMicrochainBridge v-if='selectedToOwner' :owner='selectedToOwner?.owner' v-model:default-microchain='selectedToMicrochain' />
-  <RpcTransferBridge ref='rpcTransferBridge' />
   <q-dialog v-model='selectingFromOwner'>
     <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='true' />
   </q-dialog>
@@ -186,7 +185,6 @@ import { db } from 'src/model'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
-import RpcTransferBridge from '../bridge/rpc/TransferBridge.vue'
 
 const selectedFromOwner = defineModel<db.Owner>('selectedFromOwner')
 const selectedFromMicrochain = defineModel<db.Microchain>('selectedFromMicrochain')
@@ -202,8 +200,6 @@ const toChainBalance = defineModel<boolean>('toChainBalance')
 
 const selectingFromOwner = ref(false)
 const selectingToOwner = ref(false)
-
-const rpcTransferBridge = ref<InstanceType<typeof RpcTransferBridge>>()
 
 const onFromAccountClick = () => {
   selectingFromOwner.value = true

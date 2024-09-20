@@ -20,7 +20,7 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
     fromChainId,
     toPublicKey,
     toChainId,
-    amount,
+    amount: amount.toString(),
     userData: userDataBytes
   })
 }
