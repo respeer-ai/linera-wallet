@@ -51,7 +51,7 @@
       <q-icon class='header-icon cursor-pointer' name='bi-three-dots-vertical' size='12x'>
         <q-menu anchor='bottom end' self='top end' :offset='[0, 8]'>
           <q-card>
-            <q-item clickable v-close-popup>
+            <q-item clickable v-close-popup disabled>
               <q-item-section avatar>
                 <q-icon name='bi-bell-fill' size='12px' />
               </q-item-section>
@@ -68,7 +68,7 @@
                 <span>Account details</span>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup>
+            <q-item clickable v-close-popup disabled>
               <q-item-section avatar>
                 <q-icon name='bi-box-arrow-up-right' size='12px' />
               </q-item-section>
@@ -77,7 +77,7 @@
               </q-item-section>
             </q-item>
             <q-separator />
-            <q-item clickable v-close-popup>
+            <q-item clickable v-close-popup disabled>
               <q-item-section avatar>
                 <q-icon name='bi-box-arrow-in-right' size='12px' />
               </q-item-section>
@@ -93,7 +93,7 @@
                 <span>Settings</span>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup>
+            <q-item clickable v-close-popup disabled>
               <q-item-section avatar>
                 <q-icon name='bi-shield-lock-fill' size='12px' />
               </q-item-section>

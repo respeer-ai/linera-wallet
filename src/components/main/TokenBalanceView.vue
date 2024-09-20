@@ -8,7 +8,7 @@
     </div>
     <div class='row home-token-action text-center page-y-padding'>
       <q-space />
-      <div class='home-token-action-btn cursor-pointer'>
+      <div class='home-token-action-btn cursor-pointer' disabled>
         <q-avatar color='red-2' size='36px'>
           <q-icon name='bi-currency-exchange' size='24px' />
         </q-avatar>
@@ -24,7 +24,7 @@
           Transfer
         </div>
       </div>
-      <div class='home-token-action-btn cursor-pointer'>
+      <div class='home-token-action-btn cursor-pointer' disabled>
         <q-avatar color='red-2' size='36px'>
           <q-icon name='bi-arrow-repeat' size='24px' />
         </q-avatar>
@@ -32,7 +32,7 @@
           Swap
         </div>
       </div>
-      <div class='home-token-action-btn cursor-pointer'>
+      <div class='home-token-action-btn cursor-pointer' disabled>
         <q-avatar color='red-2' size='36px'>
           <q-icon name='bi-arrow-left-right' size='24px' />
         </q-avatar>
@@ -40,7 +40,7 @@
           Bridge
         </div>
       </div>
-      <div class='home-token-action-btn cursor-pointer'>
+      <div class='home-token-action-btn cursor-pointer' disabled>
         <q-avatar color='red-2' size='36px'>
           <q-icon name='bi-clock' size='24px' />
         </q-avatar>
