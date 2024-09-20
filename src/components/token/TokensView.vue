@@ -6,13 +6,13 @@
         <TokenCardView v-for='token in tokens' :key='token.id' :token='token' />
       </div>
       <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer' @click='onCreateTokenClick'>
-        <q-icon name='bi-plus' size='20px' color='blue-10' />
+        <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
           Receive tokens
         </div>
       </div>
       <div class='row vertical-items-margin selector-margin-x-left cursor-pointer' @click='onImportTokenClick'>
-        <q-icon name='bi-plus' size='20px' color='blue-10' />
+        <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
           Import token
         </div>

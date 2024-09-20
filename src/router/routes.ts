@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
         path: 'home',
         component: () => import('pages/HomePage.vue'),
         meta: {
-          AlignPageCenter: true
+          AlignPageCenter: false
         }
       },
       { path: 'transfer', component: () => import('pages/TransferPage.vue') },
