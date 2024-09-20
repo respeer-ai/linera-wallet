@@ -7,22 +7,23 @@
       vertical no-caps inline-label v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu'
       indicator-color='red-6'
     >
-      <q-tab
-        v-for='menu in localStore.oneShotSettingDef.SettingMenus'
-        :name='menu.menu'
-        :key='menu.menu'
-        :clickable='!menu.disable'
-        v-ripple
-        :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.menu ? "bg-red-1" : "" ]'
-        :disable='menu.disable'
-      >
-        <q-item-section avatar>
-          <q-icon :name='menu.icon' />
-        </q-item-section>
-        <q-item-section>
-          {{ menu.label }}
-        </q-item-section>
-      </q-tab>
+      <div v-for='menu in localStore.oneShotSettingDef.SettingMenus' :key='menu.menu'>
+        <q-tab
+          :name='menu.menu'
+          :clickable='!menu.disable'
+          v-ripple
+          :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.menu ? "bg-red-1" : "" ]'
+          :disable='menu.disable'
+        >
+          <q-item-section avatar>
+            <q-icon :name='menu.icon' :color='menu.iconColor || ""' />
+          </q-item-section>
+          <q-item-section>
+            {{ menu.label }}
+          </q-item-section>
+        </q-tab>
+        <q-separator v-if='menu.separator' />
+      </div>
     </q-tabs>
   </div>
 </template>

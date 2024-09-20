@@ -1,6 +1,7 @@
 export enum Menu {
   NETWORKS = 'Networks',
-  ABOUT_US = 'AboutUs'
+  ABOUT_US = 'AboutUs',
+  STORAGE = 'Storage'
 }
 
 export enum HomeAction {
@@ -23,7 +24,9 @@ export interface OneShotSetting {
 
 export interface MenuItem {
   icon: string
+  iconColor?: string
   menu: Menu
   label: string
   disable: boolean
+  separator?: boolean
 }
