@@ -92,7 +92,7 @@
         <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
       </div>
     </div>
-    <div class='row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line'>
+    <div class='row decorate-underline-dashed vertical-items-margin cursor-pointer microchain-detail-line'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Creation message ID
       </div>
@@ -104,7 +104,7 @@
         <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
       </div>
     </div>
-    <div class='row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line'>
+    <div class='row decorate-underline-dashed vertical-items-margin cursor-pointer microchain-detail-line'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Creation certificate hash
       </div>
@@ -116,13 +116,13 @@
         <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
       </div>
     </div>
-    <div class='row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line'>
+    <div class='row decorate-underline-dashed vertical-items-margin cursor-pointer microchain-detail-line'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Default chain
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value'>
-        <div class='microchain-detail-value-text text-right'>
+        <div class='full-width text-right'>
           {{ microchain.default ? 'YES' : 'NO' }}
         </div>
       </div>
