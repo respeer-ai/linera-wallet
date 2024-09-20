@@ -32,6 +32,9 @@ const onConfirmClick = async () => {
   confirmedSeconds.value++
   if (confirmSeconds.value === confirmedSeconds.value) {
     await dbWallet.microchains.clear()
+    await dbWallet.microchainFungibleTokenBalances.clear()
+    await dbWallet.microchainOwnerFungibleTokenBalances.clear()
+    await dbWallet.microchainOwners.clear()
   }
 }
 

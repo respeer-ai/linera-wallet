@@ -2,12 +2,14 @@
   <div class='full-width'>
     <div class='row text-center vertical-sections-margin'>
       <q-space />
-      <q-input
-        class='label-text-extra-large' dense v-model='amount' :style='{ width: inputWidth }'
-        autofocus type='number'
-      />
-      <div class='label-text-extra-large page-item-x-margin-left'>
-        TLINERA
+      <div class='row vertical-sections-margin'>
+        <q-input
+          class='label-text-extra-large' dense v-model='amount' :style='{ width: inputWidth }'
+          autofocus type='number'
+        />
+        <div class='label-text-extra-large page-item-x-margin-left'>
+          TLINERA
+        </div>
       </div>
       <q-space />
     </div>
