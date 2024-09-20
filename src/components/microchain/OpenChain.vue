@@ -44,8 +44,31 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   return microchain
 }
 
+const importMicrochain = async (chainId: string, messageId: string, certificateHash: string): Promise<db.Microchain> => {
+  const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
+  if (!owner) return Promise.reject(new Error('Invalid owner'))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+  const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, chainId, messageId, certificateHash) as db.Microchain
+
+  const typeNameBytes = new TextEncoder().encode('Nonce::')
+  const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
+  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!password) return Promise.reject(new Error('Invalid password'))
+  const _password = db.decryptPassword(password)
+  const privateKey = db.privateKey(owner, _password)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+  const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await rpcMicrochainBridge.value?.initMicrochainChainStore(owner.address, signature, chainId, messageId, certificateHash)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await rpcBlockBridge.value?.signNewBlock(chainId, 0, keyPair)
+  return microchain
+}
+
 defineExpose({
-  openMicrochain
+  openMicrochain,
+  importMicrochain
 })
 
 </script>

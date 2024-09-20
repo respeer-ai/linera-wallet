@@ -17,7 +17,7 @@
     </div>
     <q-btn
       class='btn vertical-sections-margin extra-margin-bottom full-width' dense flat no-caps
-      @click='onValidateClick' :disabled='canValidate'
+      @click='onValidateClick' :disabled='!canValidate'
     >
       Let's go
     </q-btn>
@@ -45,9 +45,9 @@ const certificateHashError = ref(false)
 const emit = defineEmits<{(ev: 'validated'): void}>()
 
 const canValidate = computed(() => {
-  return microchainId.value !== microchain.value.microchain ||
-         messageId.value !== microchain.value.messageId ||
-         certificateHash.value !== microchain.value.certificateHash
+  return microchainId.value === microchain.value.microchain ||
+         messageId.value === microchain.value.messageId ||
+         certificateHash.value === microchain.value.certificateHash
 })
 
 const onValidateClick = () => {

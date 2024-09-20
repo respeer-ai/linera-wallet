@@ -57,6 +57,14 @@
       <CreateMicrochainView @created='onMicrochainCreated' @error='onCreateMicrochainError' />
     </q-card>
   </q-dialog>
+  <q-dialog v-model='importingMicrochain'>
+    <q-card class='dialog page-x-padding page-y-padding'>
+      <h5 class='onboarding-page-title text-center page-title'>
+        Import microchain
+      </h5>
+      <ImportMicrochainView @imported='onMicrochainImported' @error='onImportMicrochainError' @canceled='onImportMicrochainCanceled' />
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
@@ -70,6 +78,7 @@ import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
 import CreateMicrochainView from './CreateMicrochainView.vue'
 import RpcMicrochainBridge from '../bridge/rpc/MicrochainBridge.vue'
+import ImportMicrochainView from './ImportMicrochainView.vue'
 
 const microchainOwners = ref([] as db.MicrochainOwner[])
 const microchains = ref([] as db.Microchain[])
@@ -79,6 +88,7 @@ const displayCount = ref(4)
 const displayMicrochains = computed(() => microchains.value.slice(0, displayCount.value))
 
 const creatingMicrochain = ref(false)
+const importingMicrochain = ref(false)
 const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
@@ -95,7 +105,19 @@ const onCreateMicrochainClick = () => {
 }
 
 const onImportMicrochainClick = () => {
-  // TODO
+  importingMicrochain.value = true
+}
+
+const onMicrochainImported = () => {
+  importingMicrochain.value = false
+}
+
+const onImportMicrochainError = () => {
+  importingMicrochain.value = false
+}
+
+const onImportMicrochainCanceled = () => {
+  importingMicrochain.value = false
 }
 
 const onViewMoreClick = () => {
