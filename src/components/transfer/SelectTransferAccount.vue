@@ -119,7 +119,10 @@
     </q-btn-dropdown>
   </div>
   <div class='vertical-items-margin'>
-    <q-input v-if='selectedToMicrochain === undefined' outlined v-model='toMicrochain' placeholder='Input microchain ID'>
+    <q-input
+      v-if='selectedToMicrochain === undefined' outlined v-model='toMicrochain' placeholder='Input microchain ID'
+      :disable='!selectedToOwner'
+    >
       <template #append>
         <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToMicrochainClick'>
           Select
@@ -190,7 +193,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { db } from 'src/model'
 
@@ -256,6 +259,10 @@ const onToOwnerSelected = (owner?: db.Owner) => {
   selectingToOwner.value = false
   toAddress.value = owner?.owner || ''
 }
+
+watch(selectedToMicrochain, () => {
+  toMicrochain.value = selectedToMicrochain.value?.microchain
+})
 
 const canGotoNext = computed(() => {
   return selectedFromOwner.value !== undefined &&
