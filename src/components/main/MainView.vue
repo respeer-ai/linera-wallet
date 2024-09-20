@@ -1,36 +1,27 @@
 <template>
   <div class='full-width page-x-padding page-y-padding'>
-    <div v-if='owners.length'>
-      <TokenBalanceView />
+    <div v-if='localStore.oneShotSetting.homeAction === localStore.oneShotSettingDef.HomeAction.SHOW_MAIN'>
+      <MainInnerView />
     </div>
-    <div v-else class='home-create-account'>
-      <div class='page-item-placeholder text-center'>
-        <div class='cursor-pointer' @click='onCreateAccountClick'>
-          <q-icon name='bi-plus-circle' size='48px' color='grey-4' />
-        </div>
-        <div class='page-item-y-margin-top'>
-          No account? <span class='cursor-pointer like-link'>Create</span> or <span class='cursor-pointer like-link'>Import</span>.
-        </div>
-      </div>
-      <div :style='{height: "24px"}' />
+    <div v-if='localStore.oneShotSetting.homeAction === localStore.oneShotSettingDef.HomeAction.SHOW_MICROCHAIN'>
+      <MicrochainDetailView v-if='localStore.oneShotSetting.homeAction' :microchain='(localStore.oneShotSetting.homeActionParams as db.Microchain)' @back='onMicrochainDetailBack' @close='onMicrochainDetailClosed' />
     </div>
-    <TabsView />
-    <OwnerBridge v-model:owners='owners' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue'
+import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 
-import OwnerBridge from '../bridge/db/OwnerBridge.vue'
-import TokenBalanceView from './TokenBalanceView.vue'
-import TabsView from './TabsView.vue'
+import MainInnerView from './MainInnerView.vue'
+import MicrochainDetailView from '../microchain/MicrochainDetailView.vue'
 
-const owners = ref([] as db.Owner[])
+const onMicrochainDetailBack = () => {
+  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MAIN
+}
 
-const onCreateAccountClick = () => {
-  // TODO
+const onMicrochainDetailClosed = () => {
+  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MAIN
 }
 
 </script>

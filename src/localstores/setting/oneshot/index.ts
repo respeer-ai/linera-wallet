@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import { Menu, OneShotSetting } from './types'
+import { HomeAction, Menu, OneShotSetting } from './types'
 
 export const useSettingStore = defineStore('one-shot-setting', {
   state: () => ({
     oneShotSetting: {
-      SelectedSettingMenu: Menu.NETWORKS
+      SelectedSettingMenu: Menu.NETWORKS,
+      HomeAction: HomeAction.SHOW_MAIN
     } as OneShotSetting
   }),
   getters: {
@@ -25,6 +26,12 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     selectedSettingMenu (): Menu {
       return this.oneShotSetting.SelectedSettingMenu
+    },
+    homeAction (): HomeAction {
+      return this.oneShotSetting.HomeAction
+    },
+    homeActionParams (): unknown {
+      return this.oneShotSetting.HomeActionParams
     }
   },
   actions: {}

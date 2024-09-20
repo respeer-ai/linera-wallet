@@ -3,7 +3,9 @@
     <q-space />
     <div>
       <div v-if='microchains.length > 0'>
-        <MicrochainCardView v-for='microchain in displayMicrochains' :key='microchain.microchain' :microchain='microchain' />
+        <div v-for='microchain in displayMicrochains' :key='microchain.microchain'>
+          <MicrochainCardView :microchain='microchain' />
+        </div>
         <q-btn
           rounded flat no-caps class='full-width bg-grey-1'
           @click='onViewMoreClick'

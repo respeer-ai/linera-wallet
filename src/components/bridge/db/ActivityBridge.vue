@@ -12,10 +12,12 @@ import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
 interface Props {
   publicKey?: string
+  microchain?: string
 }
 
 const props = defineProps<Props>()
 const publicKey = toRef(props, 'publicKey')
+const microchain = toRef(props, 'microchain')
 
 const activities = defineModel<db.Activity[]>('activities')
 
@@ -28,6 +30,9 @@ const _activities = useObservable<db.Activity[]>(
       if (publicKey.value) {
         acts.push(...await dbWallet.activities.where('targetAddress').equalsIgnoreCase(publicKey.value).toArray())
         acts.push(...await dbWallet.activities.where('sourceAddress').equalsIgnoreCase(publicKey.value).toArray())
+      } else if (microchain.value) {
+        acts.push(...await dbWallet.activities.where('targetChain').equalsIgnoreCase(microchain.value).toArray())
+        acts.push(...await dbWallet.activities.where('sourceChain').equalsIgnoreCase(microchain.value).toArray())
       } else {
         acts.push(...await dbWallet.activities.toArray())
       }

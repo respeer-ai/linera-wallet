@@ -3,6 +3,11 @@ export enum Menu {
   ABOUT_US = 'AboutUs'
 }
 
+export enum HomeAction {
+  SHOW_MAIN = 'ShowMain',
+  SHOW_MICROCHAIN = 'ShowMicrochain'
+}
+
 export interface OneShotSetting {
   ShowHeaderMenu: boolean
   ExtensionMode: boolean
@@ -11,6 +16,9 @@ export interface OneShotSetting {
 
   ShowSettingMenu: boolean
   SelectedSettingMenu: Menu
+
+  HomeAction: HomeAction
+  HomeActionParams: unknown
 }
 
 export interface MenuItem {

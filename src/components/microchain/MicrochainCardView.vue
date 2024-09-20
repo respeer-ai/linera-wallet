@@ -1,7 +1,7 @@
 <template>
-  <q-item class='row full-width tab-panel-item' clickable>
-    <div :class='[ "selector-indicator", microchain.default ? "selector-indicator-selected" : "" ]' />
-    <q-avatar class='selector-margin-x-left'>
+  <q-item class='row full-width tab-panel-item' :clickable='clickable' @click='onMicrochainClick'>
+    <div v-if='showIndicator' :class='[ "selector-indicator", microchain.default ? "selector-indicator-selected" : "" ]' />
+    <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='db.microchainAvatar(microchain)' />
       <q-badge color='transparent' rounded transparent floating>
         <q-img :src='lineraLogo' width='14px' height='14px' />
@@ -16,17 +16,36 @@
           <q-icon name='bi-copy' size='12px' />
         </div>
       </div>
-      <div class='text-left'>
+      <div class='text-left' v-if='integratedMode'>
         {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+      </div>
+      <div class='text-left' v-else>
+        <span class='text-grey-6 selector-item-currency-sub'>LINERA</span>
       </div>
     </div>
     <q-space />
-    <div>
+    <div v-if='integratedMode'>
       <div class='text-bold text-grey-9 text-right'>
         {{ ownerTokenBalance }} <span class='selector-item-currency-sub'>TLINERA</span>
       </div>
       <div class='text-right'>
         $ {{ chainUsdBalance + ownerUsdBalance }} <span class='text-grey-6 selector-item-currency-sub'>USD</span>
+      </div>
+    </div>
+    <div v-else-if='showAccountBalance'>
+      <div class='text-right text-bold'>
+        $ {{ ownerUsdBalance }} <span class='selector-item-currency-sub'>USD</span>
+      </div>
+      <div class='text-grey-9 text-right'>
+        {{ ownerTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+      </div>
+    </div>
+    <div v-else>
+      <div class='text-right text-bold'>
+        $ {{ chainUsdBalance }} <span class='selector-item-currency-sub'>USD</span>
+      </div>
+      <div class='text-grey-9 text-right'>
+        {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
       </div>
     </div>
     <div :class='[ "selector-indicator selector-margin-x-left" ]' />
@@ -48,6 +67,7 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
+import { localStore } from 'src/localstores'
 
 import DbMicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import DbMicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -58,9 +78,23 @@ import { lineraLogo } from 'src/assets'
 
 interface Props {
   microchain: db.Microchain
+  showAccountBalance?: boolean
+  integratedMode?: boolean
+  clickable?: boolean,
+  showIndicator?: boolean
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  microchain: undefined,
+  showAccountBalance: false,
+  integratedMode: true,
+  clickable: true,
+  showIndicator: true
+})
 const microchain = toRef(props, 'microchain')
+const showAccountBalance = toRef(props, 'showAccountBalance')
+const integratedMode = toRef(props, 'integratedMode')
+const clickable = toRef(props, 'clickable')
+const showIndicator = toRef(props, 'showIndicator')
 
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
@@ -76,5 +110,10 @@ onMounted(async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
 })
+
+const onMicrochainClick = () => {
+  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MICROCHAIN
+  localStore.oneShotSetting.oneShotSetting.HomeActionParams = microchain.value
+}
 
 </script>

@@ -9,7 +9,7 @@
     <div class='text-left row'>
       <q-space />
       <div class='extra-large-margin-bottom software-info'>
-        <div class='row line'>
+        <div class='row line decorate-underline-dashed'>
           <div class='label'>
             Version
           </div>
@@ -48,7 +48,6 @@ import { cheCkoLogo } from 'src/assets'
   min-width: 280px
   .line
     line-height: 28px
-    border-bottom: 1px dashed $grey-4
     .label
       color: $grey-8
 
