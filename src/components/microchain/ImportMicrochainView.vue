@@ -65,7 +65,7 @@ const onImportClick = () => {
   if (microchainIdError.value || messageIdError.value || certificateHashError.value) return
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  openChain.value?.openMicrochain().then(() => {
+  openChain.value?.importMicrochain(microchainId.value, messageId.value, certificateHash.value).then(() => {
     localStore.notification.pushNotification({
       Title: 'Import chain',
       Message: 'Success import microchain.',

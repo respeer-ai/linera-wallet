@@ -25,8 +25,6 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
   const resp = await rpcMicrochainBridge.value?.openChain(owner?.address) as rpc.OpenChainResp
   if (!resp) return Promise.reject(new Error('Invalid open chain'))
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, resp.chainId, resp.messageId, resp.certificateHash) as db.Microchain
 
   const typeNameBytes = new TextEncoder().encode('Nonce::')
   const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(resp.certificateHash)])
@@ -41,14 +39,16 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   await rpcMicrochainBridge.value?.initMicrochainChainStore(owner.address, signature, resp.chainId, resp.messageId, resp.certificateHash)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcBlockBridge.value?.signNewBlock(resp.chainId, 0, keyPair)
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+  const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, resp.chainId, resp.messageId, resp.certificateHash) as db.Microchain
+
   return microchain
 }
 
 const importMicrochain = async (chainId: string, messageId: string, certificateHash: string): Promise<db.Microchain> => {
   const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
   if (!owner) return Promise.reject(new Error('Invalid owner'))
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, chainId, messageId, certificateHash) as db.Microchain
 
   const typeNameBytes = new TextEncoder().encode('Nonce::')
   const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
@@ -63,6 +63,10 @@ const importMicrochain = async (chainId: string, messageId: string, certificateH
   await rpcMicrochainBridge.value?.initMicrochainChainStore(owner.address, signature, chainId, messageId, certificateHash)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcBlockBridge.value?.signNewBlock(chainId, 0, keyPair)
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+  const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, chainId, messageId, certificateHash) as db.Microchain
+
   return microchain
 }
 
