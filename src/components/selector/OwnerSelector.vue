@@ -11,7 +11,7 @@
       header-class='hide'
     >
       <q-step :name='1' title='1' :done='step > 1'>
-        <AccountsView v-model='owner' @selected='onOwnerSelected' />
+        <AccountsView v-model='owner' @selected='onOwnerSelected' :persistent='persistent' />
       </q-step>
       <q-step :name='2' title='2' :done='step > 2'>
         <ImportPrivateKeyView @canceled='onImportCanceled' @created='onAccountCreated' @imported='onAccountImported' />
@@ -35,11 +35,13 @@ import ImportPrivateKeyView from '../account/ImportPrivateKeyView.vue'
 
 interface Props {
   creatable?: boolean
+  persistent?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   creatable: true
 })
 const creatable = toRef(props, 'creatable')
+const persistent = toRef(props, 'persistent')
 
 const step = ref(1)
 
@@ -47,7 +49,6 @@ const owner = defineModel<db.Owner>()
 const emit = defineEmits<{(ev: 'selected', value?: db.Owner): void}>()
 
 const onOwnerSelected = (_owner: db.Owner) => {
-  _owner.selected = true
   owner.value = _owner
   emit('selected', _owner)
 }

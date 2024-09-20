@@ -81,16 +81,82 @@
     <div>
       To
     </div>
-    <q-space />
-    <div class='text-right text-blue-8 cursor-pointer'>
-      Select
-    </div>
   </div>
   <div class='vertical-menus-margin'>
-    <q-input outlined v-model='toAddress' placeholder='Input owner (not public key)' />
+    <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input owner (not public key)'>
+      <template #append>
+        <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToAccountClick'>
+          Select
+        </div>
+      </template>
+    </q-input>
+    <q-btn-dropdown
+      v-else
+      flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
+      no-caps dense
+      dropdown-icon='bi-chevron-down'
+      menu-anchor='bottom left'
+      menu-self='top left'
+      @click='onToAccountClick'
+    >
+      <template #label>
+        <div class='row full-width'>
+          <q-avatar>
+            <q-img v-if='selectedToOwner' :src='db.ownerAvatar(selectedToOwner)' width='36px' height='36px' />
+          </q-avatar>
+          <div class='header-items-margin-x-left text-left'>
+            <div>
+              {{ selectedToOwner?.name || 'Microchain' }}
+            </div>
+            <div class='text-grey-6 page-header-network'>
+              0x{{ shortid.shortId(selectedToOwner?.owner, 6) }}
+            </div>
+          </div>
+          <q-space />
+          <div class='flex justify-center items-center cursor-pointer' @click='onClearToAccountClick'>
+            <q-icon name='bi-x' size='20px' />
+          </div>
+        </div>
+      </template>
+    </q-btn-dropdown>
   </div>
   <div class='vertical-items-margin'>
-    <q-input outlined v-model='toMicrochain' placeholder='Input microchain ID' />
+    <q-input v-if='selectedToMicrochain === undefined' outlined v-model='toMicrochain' placeholder='Input microchain ID'>
+      <template #append>
+        <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToMicrochainClick'>
+          Select
+        </div>
+      </template>
+    </q-input>
+    <q-btn-dropdown
+      v-else
+      flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
+      no-caps dense
+      dropdown-icon='bi-chevron-down'
+      menu-anchor='bottom left'
+      menu-self='top left'
+      @click='onToMicrochainClick'
+    >
+      <template #label>
+        <div class='row full-width'>
+          <q-avatar>
+            <q-img v-if='selectedToMicrochain' :src='db.microchainAvatar(selectedToMicrochain)' width='36px' height='36px' />
+          </q-avatar>
+          <div class='header-items-margin-x-left text-left'>
+            <div>
+              {{ selectedToMicrochain?.name || 'Microchain' }}
+            </div>
+            <div class='text-grey-6 page-header-network'>
+              0x{{ shortid.shortId(selectedToMicrochain?.microchain, 6) }}
+            </div>
+          </div>
+          <q-space />
+          <div class='flex justify-center items-center cursor-pointer' @click='onClearToMicrochainClick'>
+            <q-icon name='bi-x' size='20px' />
+          </div>
+        </div>
+      </template>
+    </q-btn-dropdown>
   </div>
   <div class='vertical-items-margin' v-if='toMicrochain.length > 0'>
     <q-toggle
@@ -112,9 +178,13 @@
   />
   <DbOwnerBridge v-model:selected-owner='selectedFromOwner' />
   <DbMicrochainBridge v-if='selectedFromOwner' :owner='selectedFromOwner?.owner' v-model:default-microchain='selectedFromMicrochain' v-model:microchains='fromMicrochains' />
+  <DbMicrochainBridge v-if='selectedToOwner' :owner='selectedToOwner?.owner' v-model:default-microchain='selectedToMicrochain' />
   <RpcTransferBridge ref='rpcTransferBridge' />
   <q-dialog v-model='selectingFromOwner'>
-    <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' />
+    <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='true' />
+  </q-dialog>
+  <q-dialog v-model='selectingToOwner'>
+    <OwnerSelector v-model='selectedToOwner' @selected='onToOwnerSelected' :creatable='false' :persistent='false' />
   </q-dialog>
 </template>
 
@@ -132,10 +202,13 @@ const selectedFromOwner = ref(undefined as unknown as db.Owner)
 const selectedFromMicrochain = ref(undefined as unknown as db.Microchain)
 const fromMicrochains = ref([] as db.Microchain[])
 
+const selectedToOwner = ref(undefined as unknown as db.Owner | undefined)
+const selectedToMicrochain = ref(undefined as unknown as db.Microchain)
 const toAddress = ref('')
 const toMicrochain = ref('')
 
 const selectingFromOwner = ref(false)
+const selectingToOwner = ref(false)
 
 const rpcTransferBridge = ref<InstanceType<typeof RpcTransferBridge>>()
 
@@ -149,6 +222,37 @@ const onFromOwnerSelected = () => {
 
 const onFromMicrochainClick = () => {
   // TODO
+}
+
+const onSelectToAccountClick = () => {
+  selectingToOwner.value = true
+}
+
+const onToAccountClick = () => {
+  selectingToOwner.value = true
+}
+
+const onSelectToMicrochainClick = () => {
+  // TODO
+}
+
+const onToMicrochainClick = () => {
+  // TODO
+}
+
+const onClearToMicrochainClick = () => {
+  // TODO
+}
+
+const onClearToAccountClick = () => {
+  selectedToOwner.value = undefined as unknown as db.Owner
+  toAddress.value = ''
+  toMicrochain.value = ''
+}
+
+const onToOwnerSelected = (owner?: db.Owner) => {
+  selectingToOwner.value = false
+  toAddress.value = owner?.owner || ''
 }
 
 const canGotoNext = computed(() => {

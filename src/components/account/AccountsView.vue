@@ -57,13 +57,21 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { db } from 'src/model'
 import { shortid } from 'src/utils'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 import { lineraLogo } from 'src/assets'
+
+interface Props {
+  persistent?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  persistent: true
+})
+const persistent = toRef(props, 'persistent')
 
 const owners = ref([] as db.Owner[])
 const searchText = ref('')
@@ -83,10 +91,12 @@ const onActionClick = (owner: db.Owner) => {
 }
 
 const onOwnerSelected = async (_owner: db.Owner) => {
-  _owner.selected = true
   owner.value = _owner
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await ownerBridge.value?.updateOwner(_owner)
+  if (persistent.value) {
+    _owner.selected = true
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await ownerBridge.value?.updateOwner(_owner)
+  }
   emit('selected', _owner)
 }
 
