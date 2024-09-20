@@ -64,7 +64,7 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
   const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult /*, onError */ } = provideApolloClient(apolloClient)(() => useSubscription(gql`
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
     }
@@ -72,7 +72,13 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
     chainId
   }))
 
+  onError((error) => {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Fail subscribe to ${chainId}: ${error}`)
+  })
+
   onResult((res) => {
+    console.log(111, res)
     const notifications = graphqlResult.data(res, 'notifications')
     const reason = graphqlResult.keyValue(notifications, 'reason')
     const newRawBlock = graphqlResult.keyValue(reason, 'NewRawBlock')

@@ -49,18 +49,27 @@
     </div>
   </q-card>
   <RpcTransferBridge ref='rpcTransferBridge' />
+  <DbMicrochainBridge ref='dbMicrochainBridge' />
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 
+import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
 import ConfirmTransfer from './ConfirmTransfer.vue'
 import RpcTransferBridge from '../bridge/rpc/TransferBridge.vue'
+
+interface Query {
+  fromMicrochainId: string
+}
+
+const route = useRoute()
+const fromMicrochainId = ref((route.query as unknown as Query).fromMicrochainId)
 
 const step = ref(1)
 
@@ -76,6 +85,7 @@ const amount = ref(0)
 
 const router = useRouter()
 const rpcTransferBridge = ref<InstanceType<typeof RpcTransferBridge>>()
+const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
 const onSelectTransferAccountNext = () => {
   step.value++
@@ -118,5 +128,12 @@ const onTransferConfirmed = () => {
     void router.back()
   })
 }
+
+onMounted(async () => {
+  if (fromMicrochainId.value) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    selectedFromMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(fromMicrochainId.value) as db.Microchain
+  }
+})
 
 </script>

@@ -24,7 +24,7 @@
       $ {{ (chainUsdBalance + accountUsdBalance).toFixed(4) }}
       <div class='row home-token-action text-center page-y-padding'>
         <q-space />
-        <div class='home-token-action-btn cursor-pointer'>
+        <div class='home-token-action-btn cursor-pointer' @click='onTransferClick'>
           <q-avatar color='red-2' size='36px'>
             <q-icon name='bi-arrow-up-right' size='24px' />
           </q-avatar>
@@ -32,7 +32,7 @@
             Transfer
           </div>
         </div>
-        <div class='home-token-action-btn cursor-pointer'>
+        <div class='home-token-action-btn cursor-pointer' disabled>
           <q-avatar color='red-2' size='36px'>
             <q-icon name='bi-arrow-repeat' size='24px' />
           </q-avatar>
@@ -40,7 +40,7 @@
             Swap
           </div>
         </div>
-        <div class='home-token-action-btn cursor-pointer'>
+        <div class='home-token-action-btn cursor-pointer' disabled>
           <q-avatar color='red-2' size='36px'>
             <q-icon name='bi-arrow-left-right' size='24px' />
           </q-avatar>
@@ -48,7 +48,7 @@
             Bridge
           </div>
         </div>
-        <div class='home-token-action-btn cursor-pointer'>
+        <div class='home-token-action-btn cursor-pointer' disabled>
           <q-avatar color='red-2' size='36px'>
             <q-icon name='bi-clock' size='24px' />
           </q-avatar>
@@ -157,6 +157,7 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
+import { useRouter } from 'vue-router'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -199,5 +200,16 @@ onMounted(async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
 })
+
+const router = useRouter()
+
+const onTransferClick = () => {
+  void router.push({
+    path: '/transfer',
+    query: {
+      fromMicrochainId: microchain.value.microchain
+    }
+  })
+}
 
 </script>

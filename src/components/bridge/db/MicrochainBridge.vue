@@ -43,6 +43,7 @@ const _microchains = useObservable<db.Microchain[]>(
 
 watch(_microchains, () => {
   microchains.value = [..._microchains.value || []]
+  if (defaultMicrochain.value) return
   if (owner.value !== undefined) {
     defaultMicrochain.value = _microchains.value?.find((el) => el.default)
   }
@@ -53,6 +54,10 @@ watch(_microchains, () => {
 
 const getMicrochains = async (offset: number, limit: number): Promise<db.Microchain[]> => {
   return await dbWallet.microchains.offset(offset).limit(limit).toArray()
+}
+
+const getMicrochain = async (microchain: string): Promise<db.Microchain | undefined> => {
+  return await dbWallet.microchains.where('microchain').equals(microchain).first()
 }
 
 const microchainsCount = async (): Promise<number> => {
@@ -93,7 +98,8 @@ defineExpose({
   createMicrochain,
   updateMicrochain,
   getMicrochains,
-  microchainsCount
+  microchainsCount,
+  getMicrochain
 })
 
 </script>

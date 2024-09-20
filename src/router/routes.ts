@@ -34,7 +34,10 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'transfer',
-        component: () => import('pages/TransferPage.vue')
+        component: () => import('pages/TransferPage.vue'),
+        meta: {
+          AlignPageCenter: false
+        }
       },
       {
         path: 'activity',
