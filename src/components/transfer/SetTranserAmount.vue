@@ -1,15 +1,14 @@
 <template>
   <div class='full-width'>
-    <div class='row text-center vertical-sections-margin'>
+    <div class='transfer-amount-space' />
+    <div class='row text-center'>
       <q-space />
-      <div class='row vertical-sections-margin'>
-        <q-input
-          class='label-text-extra-large' dense v-model='amount' :style='{ width: inputWidth }'
-          autofocus type='number'
-        />
-        <div class='label-text-extra-large page-item-x-margin-left'>
-          TLINERA
-        </div>
+      <q-input
+        class='label-text-extra-large' dense v-model='amount' :style='{ width: inputWidth }'
+        autofocus type='number'
+      />
+      <div class='label-text-extra-large page-item-x-margin-left'>
+        TLINERA
       </div>
       <q-space />
     </div>
