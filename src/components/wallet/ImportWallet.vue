@@ -22,7 +22,7 @@
         title='Import Account'
         :done='step > 2'
       >
-        <ImportMnemonicView />
+        <ImportMnemonicView v-model='mnemonic' />
       </q-step>
     </q-stepper>
     <q-btn
@@ -49,6 +49,10 @@ const password = ref('')
 const passwordError = ref(false)
 const accountError = ref(true)
 const publicKey = ref('')
+const mnemonic = ref([
+  '', '', '', '', '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '', '', '', '', ''
+] as string[])
 
 const router = useRouter()
 

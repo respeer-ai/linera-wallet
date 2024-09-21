@@ -1,103 +1,48 @@
 <template>
-  <div class='page-x-padding'>
-    <div class='row'>
-      <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
-      <q-space />
-      <p class='text-center text-bold text-grey-9 selector-title'>
-        {{ title }}
-      </p>
-      <q-space />
-      <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
-    </div>
-    <div v-if='step === 1'>
-      <ImportPrivateKeyMenuView @create='onCreateAccount' @import='onImportAccount' @add-ledger='onAddLedger' />
-    </div>
-    <div v-if='step === 2'>
-      <div v-if='action === Action.Create'>
-        <GenerateKeyView @created='onAccountCreated' @canceled='onCreateAccountCanceled' />
-      </div>
-      <div v-if='action === Action.Import'>
-        <ImportPrivateKeyInnerView @imported='onAccountImported' @canceled='onImportAccountCanceled' />
+  <div class='fill-parent text-center'>
+    <h5 class='onboarding-page-title'>
+      Access your wallet with secret recovery phrase
+    </h5>
+    <div class='text-left full-width tip info info-bg text-grey-8 row'>
+      <q-icon name='bi-info-circle-fill' color='green-4' size='20px' />
+      <div class='page-item-x-margin-left' :style='{width: "calc(100% - 26px)"}'>
+        You can paste your secret recovery phrase into any field.
       </div>
     </div>
+    <q-card
+      flat bordered :style='{height: "160px", marginTop: "24px", padding: "24px"}'
+      class='flex items-center justify-center'
+    >
+      <div class='row'>
+        <div v-for='(word, i) in mnemonic' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
+          <q-input
+            borderless dense
+            hide-bottom-space input-class='blank-text'
+            v-model='mnemonic[i]'
+            :autofocus='i === 0'
+            @paste='onPaste'
+          />
+        </div>
+      </div>
+    </q-card>
   </div>
 </template>
 
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
 
-import ImportPrivateKeyMenuView from './ImportPrivateKeyMenuView.vue'
-import ImportPrivateKeyInnerView from './ImportPrivateKeyInnerView.vue'
-import GenerateKeyView from './GenerateKeyView.vue'
-
-const step = ref(1)
-
-enum Action {
-  Create,
-  Import,
-  AddLedger
-}
-
-const action = ref(Action.Import)
-
-const title = computed(() => {
-  switch (step.value) {
-    case 2:
-      switch (action.value) {
-        case Action.Create: return 'Create account'
-        case Action.Import: return 'Import account'
-        case Action.AddLedger: return 'Add ledger'
-      }
-    // eslint-disable-next-line no-fallthrough
-    case 1:
-    default:
-      return 'Add account'
-  }
+const mnemonic = defineModel<string[]>({
+  default: [
+    '', '', '', '', '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '', '', '', '', ''
+  ] as string[]
 })
 
-const emit = defineEmits<{(ev: 'canceled'): void,
-  (ev: 'imported'): void,
-  (ev: 'created'): void
-}>()
-
-const onCloseClick = () => {
-  emit('canceled')
-}
-
-const onBackClick = () => {
-  if (step.value === 1) return emit('canceled')
-  step.value--
-}
-
-const onCreateAccount = () => {
-  action.value = Action.Create
-  step.value++
-}
-
-const onImportAccount = () => {
-  action.value = Action.Import
-  step.value++
-}
-
-const onAddLedger = () => {
-  action.value = Action.AddLedger
-  step.value++
-}
-
-const onAccountImported = () => {
-  emit('imported')
-}
-
-const onImportAccountCanceled = () => {
-  step.value--
-}
-
-const onAccountCreated = () => {
-  emit('created')
-}
-
-const onCreateAccountCanceled = () => {
-  step.value--
+const onPaste = (evt: { clipboardData: { getData: (arg0: string) => string; }; }) => {
+  const _mnemonic = [...mnemonic.value]
+  evt.clipboardData.getData('text').split(' ').forEach((v, i) => {
+    if (i < _mnemonic.length) _mnemonic[i] = v
+  })
+  mnemonic.value = [..._mnemonic]
 }
 
 </script>
