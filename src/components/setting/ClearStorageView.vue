@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang='ts'>
-import { dbWallet } from 'src/controller'
+import { dbBase, dbWallet } from 'src/controller'
 import { ref } from 'vue'
 
 const confirmSeconds = ref(10)
@@ -31,10 +31,8 @@ const confirmedSeconds = ref(0)
 const onConfirmClick = async () => {
   confirmedSeconds.value++
   if (confirmSeconds.value === confirmedSeconds.value) {
-    await dbWallet.microchains.clear()
-    await dbWallet.microchainFungibleTokenBalances.clear()
-    await dbWallet.microchainOwnerFungibleTokenBalances.clear()
-    await dbWallet.microchainOwners.clear()
+    await dbWallet.delete()
+    await dbBase.delete()
   }
 }
 
