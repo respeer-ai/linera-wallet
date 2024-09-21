@@ -172,8 +172,14 @@
   <q-dialog v-model='selectingFromOwner'>
     <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='true' />
   </q-dialog>
+  <q-dialog v-model='selectingFromMicrochain'>
+    <MicrochainSelector v-model='selectedFromMicrochain' @selected='onFromMicrochainSelected' />
+  </q-dialog>
   <q-dialog v-model='selectingToOwner'>
     <OwnerSelector v-model='selectedToOwner' @selected='onToOwnerSelected' :creatable='false' :persistent='false' />
+  </q-dialog>
+  <q-dialog v-model='selectingToMicrochain'>
+    <MicrochainSelector v-model='selectedToMicrochain' @selected='onToMicrochainSelected' />
   </q-dialog>
 </template>
 
@@ -185,6 +191,7 @@ import { db } from 'src/model'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
+import MicrochainSelector from '../selector/MicrochainSelector.vue'
 
 const selectedFromOwner = defineModel<db.Owner>('selectedFromOwner')
 const selectedFromMicrochain = defineModel<db.Microchain>('selectedFromMicrochain')
@@ -199,7 +206,9 @@ const fromChainBalance = defineModel<boolean>('fromChainBalance')
 const toChainBalance = defineModel<boolean>('toChainBalance')
 
 const selectingFromOwner = ref(false)
+const selectingFromMicrochain = ref(false)
 const selectingToOwner = ref(false)
+const selectingToMicrochain = ref(false)
 
 const onFromAccountClick = () => {
   selectingFromOwner.value = true
@@ -210,7 +219,11 @@ const onFromOwnerSelected = () => {
 }
 
 const onFromMicrochainClick = () => {
-  // TODO
+  selectingFromMicrochain.value = true
+}
+
+const onFromMicrochainSelected = () => {
+  selectingFromMicrochain.value = false
 }
 
 const onSelectToAccountClick = () => {
@@ -222,15 +235,20 @@ const onToAccountClick = () => {
 }
 
 const onSelectToMicrochainClick = () => {
-  // TODO
+  selectingToMicrochain.value = true
+}
+
+const onToMicrochainSelected = () => {
+  selectingToMicrochain.value = false
 }
 
 const onToMicrochainClick = () => {
-  // TODO
+  selectingToMicrochain.value = true
 }
 
 const onClearToMicrochainClick = () => {
-  // TODO
+  selectedToMicrochain.value = undefined
+  toMicrochain.value = ''
 }
 
 const onClearToAccountClick = () => {

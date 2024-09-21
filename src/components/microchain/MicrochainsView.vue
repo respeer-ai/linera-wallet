@@ -3,7 +3,7 @@
     <q-space />
     <div>
       <div v-if='microchains.length > 0'>
-        <div v-for='microchain in displayMicrochains' :key='microchain.microchain'>
+        <div v-for='microchain in displayMicrochains' :key='microchain.microchain' @click='onMicrochainClick(microchain)' class='cursor-pointer'>
           <MicrochainCardView :microchain='microchain' />
         </div>
         <q-btn
@@ -166,5 +166,10 @@ const loadMicrochains = async () => {
 onMounted(async () => {
   await loadMicrochains()
 })
+
+const onMicrochainClick = (microchain: db.Microchain) => {
+  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MICROCHAIN
+  localStore.oneShotSetting.oneShotSetting.HomeActionParams = microchain
+}
 
 </script>

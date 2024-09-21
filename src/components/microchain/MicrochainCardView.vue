@@ -1,5 +1,5 @@
 <template>
-  <q-item class='row full-width tab-panel-item' :clickable='clickable' @click='onMicrochainClick'>
+  <q-item class='row full-width tab-panel-item' :clickable='clickable'>
     <div v-if='showIndicator' :class='[ "selector-indicator", microchain.default ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='db.microchainAvatar(microchain)' />
@@ -67,7 +67,6 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
-import { localStore } from 'src/localstores'
 
 import DbMicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import DbMicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -80,21 +79,21 @@ interface Props {
   microchain: db.Microchain
   showAccountBalance?: boolean
   integratedMode?: boolean
-  clickable?: boolean,
   showIndicator?: boolean
+  clickable?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   microchain: undefined,
   showAccountBalance: false,
   integratedMode: true,
-  clickable: true,
-  showIndicator: true
+  showIndicator: true,
+  clickable: true
 })
 const microchain = toRef(props, 'microchain')
 const showAccountBalance = toRef(props, 'showAccountBalance')
 const integratedMode = toRef(props, 'integratedMode')
-const clickable = toRef(props, 'clickable')
 const showIndicator = toRef(props, 'showIndicator')
+const clickable = toRef(props, 'clickable')
 
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
@@ -110,10 +109,5 @@ onMounted(async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
 })
-
-const onMicrochainClick = () => {
-  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MICROCHAIN
-  localStore.oneShotSetting.oneShotSetting.HomeActionParams = microchain.value
-}
 
 </script>
