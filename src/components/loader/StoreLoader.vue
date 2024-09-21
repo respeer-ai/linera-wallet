@@ -33,9 +33,9 @@ onMounted(() => {
     passwords.find((el) => el.active)
       ? void router.push({ path: '/recovery' })
       : void router.push({ path: '/onboarding' })
-  }).catch((e) => {
+  }).catch(() => {
     loading.value = false
-    console.log('Fail load password', e)
+    void router.push({ path: '/onboarding' })
   })
 })
 </script>
