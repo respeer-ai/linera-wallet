@@ -1,5 +1,5 @@
 <template>
-  <div class='full-width text-center onboarding-container'>
+  <div class='full-width text-center onboarding-container onboarding-stepper-padding'>
     <q-stepper
       flat
       v-model='step'
