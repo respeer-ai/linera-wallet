@@ -1,5 +1,5 @@
 <template>
-  <div class='fill-parent'>
+  <div class='full-width text-center flex items-center justify-center'>
     <h5 class='onboarding-page-title'>
       Create password
     </h5>

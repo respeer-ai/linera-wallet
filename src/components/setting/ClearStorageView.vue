@@ -24,15 +24,20 @@
 <script setup lang='ts'>
 import { dbBase, dbWallet } from 'src/controller'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const confirmSeconds = ref(10)
 const confirmedSeconds = ref(0)
+
+const router = useRouter()
 
 const onConfirmClick = async () => {
   confirmedSeconds.value++
   if (confirmSeconds.value === confirmedSeconds.value) {
     await dbWallet.delete()
     await dbBase.delete()
+    // TODO: verify password and backup database here
+    void router.push({ path: '/' })
   }
 }
 

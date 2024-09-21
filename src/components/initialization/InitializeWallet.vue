@@ -1,11 +1,12 @@
 <template>
-  <div class='fill-parent text-center onboarding-container shadow-1 onboarding-padding'>
+  <div class='full-width text-center onboarding-container'>
     <q-stepper
       flat
       v-model='step'
       done-color='green-6'
       animated
       alternative-labels
+      header-class='hide'
     >
       <q-step
         :name='1'
@@ -37,8 +38,7 @@
       <div class='onboarding-btns row'>
         <q-btn
           flat
-          class='text-brown-10 bg-red-2'
-          :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "32px 0 0 0"}'
+          class='btn full-width vertical-menus-margin'
           :label='btnText'
           :disable='!canGotoNext()'
           @click='onNextStepClick'

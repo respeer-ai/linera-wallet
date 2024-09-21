@@ -16,7 +16,7 @@
     </ul>
     <q-card
       flat bordered :dark='!showMnemonic' :style='{height: "160px", marginTop: "24px", padding: "24px"}'
-      class='flex items-center justify-center'
+      class='flex items-center justify-center extra-margin-bottom'
     >
       <div v-if='showMnemonic' class='row'>
         <div v-for='(word, i) in mnemonicWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
@@ -30,11 +30,11 @@
         </div>
       </div>
     </q-card>
-    <div class='onboarding-padding' :style='{marginTop: "32px"}' v-if='showInnerActionBtn'>
+    <div class='full-width vertical-sections-margin' v-if='showInnerActionBtn'>
       <q-btn
         flat
         label='Reveal Secret Recovery Phrase'
-        class='btn'
+        class='btn full-width vertical-menus-margin'
         no-caps
         @click='showMnemonic = !showMnemonic'
       />

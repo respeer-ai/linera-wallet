@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center full-width'>
+  <div class='text-center onboarding-container onboarding-stepper-padding'>
     <q-stepper
       flat
       v-model='step'
@@ -8,33 +8,30 @@
       done-color='green-6'
       animated
       alternative-labels
-      :header-class='extensionMode ? "hide" : ""'
-      :class='[ extensionMode ? "stepper-expand" : "" ]'
+      header-class='hide'
     >
       <q-step
         :name='1'
         title='Create Password'
         :done='step > 1'
       >
-        <NewPassword v-if='!extensionMode' v-model:password='password' v-model:error='passwordError' />
-        <ExtensionNewPassword v-else v-model:password='password' v-model:error='passwordError' />
+        <NewPassword v-model:password='password' v-model:error='passwordError' />
       </q-step>
       <q-step
         :name='2'
         title='Import Account'
         :done='step > 2'
       >
-        <ImportAccount v-if='!extensionMode' v-model:error='accountError' v-model:public-key='publicKey' />
-        <ExtensionImportAccount v-else v-model:password='password' v-model:error='passwordError' />
+        <ImportMnemonicView />
       </q-step>
     </q-stepper>
     <q-btn
       flat
-      class='text-brown-10 bg-red-2'
-      :style='{borderRadius: "16px", width: "100%", maxWidth: "400px", margin: "32px 0 0 0"}'
+      class='btn full-width'
       :label='btnText'
       :disable='!canGotoNext()'
       @click='onNextStepClick'
+      no-caps
     />
   </div>
 </template>
@@ -45,9 +42,7 @@ import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
-import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
-import ImportAccount from 'src/components/ImportAccount.vue'
-import ExtensionImportAccount from 'src/components/extension/ImportAccount.vue'
+import ImportMnemonicView from '../account/ImportMnemonicView.vue'
 
 const step = ref(1)
 const password = ref('')
@@ -56,7 +51,6 @@ const accountError = ref(true)
 const publicKey = ref('')
 
 const router = useRouter()
-const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
 const canGotoNext = () => {
   switch (step.value) {
@@ -72,9 +66,9 @@ const canGotoNext = () => {
 const btnText = computed(() => {
   switch (step.value) {
     case 1:
-      return 'Save Password'
+      return 'Save password'
     case 2:
-      return 'Import Account'
+      return 'Import account'
   }
   return 'Next'
 })

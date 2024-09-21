@@ -1,7 +1,6 @@
 <template>
-  <div class='row q-pa-md q-gutter-md onboarding-container shadow-1'>
-    <q-space />
-    <div class='text-center'>
+  <div class='row q-pa-md q-gutter-md'>
+    <div class='text-center full-width onboarding-container'>
       <q-img :src='cheCkoLogo' width='240px' />
       <q-card class='loading-card' flat>
         <q-inner-loading
@@ -12,7 +11,6 @@
         </q-inner-loading>
       </q-card>
     </div>
-    <q-space />
     <PasswordBridge />
   </div>
 </template>

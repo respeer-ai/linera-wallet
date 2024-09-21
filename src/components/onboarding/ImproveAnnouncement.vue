@@ -1,12 +1,12 @@
 <template>
-  <div class='fill-parent onboarding-container shadow-1 onboarding-padding'>
+  <div class='onboarding-container'>
     <h5 class='onboarding-page-title text-center'>
       Help us improve CheCko
     </h5>
     <p class='text-left'>
       We'd like to gather user feed back to improve metamask. But we won't submit any user data to any centralized server. If you find any issue when you're using CheCko, you can create issue to our github repository, of contact CheCko team through discord or telegram.
     </p>
-    <p>
+    <p class='text-left full-width'>
       <a href='https://github.com/respeer-ai/linera-wallet/README.md'>Learn how to create an issue while using CheCko.</a>
     </p>
     <p>
@@ -18,7 +18,7 @@
         <q-btn
           flat
           label='I understand'
-          class='text-brown-8 bg-red-2 btn vertical-items-margin'
+          class='btn vertical-items-margin full-width'
           @click='onAnyBtnClick'
           no-caps
         />

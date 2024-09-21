@@ -49,20 +49,20 @@
     <p>
       By continue you agree to CheCko's <a href='#'>Terms of use</a>
     </p>
-    <div class='row'>
+    <div class='row full-width'>
       <q-space />
       <div class='onboarding-btns'>
         <q-btn
           flat
           label='Create a new wallet'
-          class='text-brown-8 bg-red-2 btn vertical-items-margin'
+          class='btn vertical-items-margin full-width'
           @click='onCreateWalletClick'
           no-caps
         />
         <q-btn
           flat
           label='Importing an existing wallet'
-          class='text-brown-8 btn btn-alt vertical-items-margin'
+          class='btn btn-alt vertical-items-margin full-width'
           @click='onImportWalletClick'
           no-caps
         />
