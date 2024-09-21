@@ -20,7 +20,7 @@ watch(_networks, async () => {
   if (networks.value === _networks.value) return
   networks.value = _networks.value
   selectedNetwork.value = _networks.value?.find((el) => el.selected)
-  if (_networks.value !== undefined && !_networks.value.length) {
+  if (_networks.value !== undefined && !await dbBase.networks.count()) {
     await dbBase.networks.add(db.defaultNetwork)
   }
 })
