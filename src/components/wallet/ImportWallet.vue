@@ -36,6 +36,7 @@
   </div>
   <GenerateKey ref='generateKey' />
   <OwnerBridge ref='ownerBridge' />
+  <PasswordBridge ref='passwordBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -47,6 +48,7 @@ import NewPassword from 'src/components/password/NewPassword.vue'
 import ImportMnemonicView from '../account/ImportMnemonicView.vue'
 import GenerateKey from '../account/GenerateKey.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
+import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 const step = ref(1)
 const password = ref('')
@@ -57,8 +59,10 @@ const mnemonic = ref([
 ] as string[])
 
 const router = useRouter()
+
 const generateKey = ref<InstanceType<typeof GenerateKey>>()
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
+const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
 
 const canGotoNext = () => {
   switch (step.value) {
@@ -82,8 +86,17 @@ const btnText = computed(() => {
 })
 
 const savePassword = () => {
-  localStore.wallet.savePassword(password.value, () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  passwordBridge.value?.savePassword(password.value).then(() => {
     step.value++
+  }).catch((error) => {
+    localStore.notification.pushNotification({
+      Title: 'Save password',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Save password failed: ${error}`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
   })
 }
 
