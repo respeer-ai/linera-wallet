@@ -1,5 +1,5 @@
 <template>
-  <div class='sidebar'>
+  <div class='sidebar extra-large-margin-bottom'>
     <div class='setting-label text-grey-9 text-bold'>
       Settings
     </div>

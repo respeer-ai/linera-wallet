@@ -48,7 +48,7 @@
         {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
       </div>
     </div>
-    <div :class='[ "selector-indicator selector-margin-x-left" ]' />
+    <div v-if='showIndicator' :class='[ "selector-indicator selector-margin-x-left" ]' />
   </q-item>
   <DbMicrochainBalanceBridge
     v-if='nativeTokenId !== undefined' v-model:token-balance='chainTokenBalance' v-model:usd-balance='chainUsdBalance' :token-id='nativeTokenId'

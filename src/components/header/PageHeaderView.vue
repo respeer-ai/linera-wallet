@@ -37,7 +37,7 @@
       <div class='header-text text-center row cursor-pointer'>
         <q-space />
         <div>
-          0x{{ shortid.shortId(selectedOwner?.address, 4) }}
+          0x{{ shortid.shortId(selectedOwner?.address, 6) }}
         </div>
         <div class='header-items-margin-x-left cursor-pointer'>
           <q-icon name='bi-copy' size='12px' />

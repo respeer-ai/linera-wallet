@@ -1,32 +1,30 @@
 <template>
-  <div class='page-x-padding'>
-    <div class='row'>
-      <q-space />
-      <q-avatar>
-        <q-img :src='db.ownerAvatar(owner)' />
-      </q-avatar>
-      <div class='selector-margin-x-left account-avatar'>
-        <div v-if='editing' class='row'>
-          <q-input outlined dense v-model='owner.name' />
-          <q-icon
-            name='bi-check2' class='page-item-x-margin-left cursor-pointer' size='18px' :style='{marginTop: "3px"}'
-            @click='onSaveClick'
-          />
-        </div>
-        <div v-else class='row'>
-          <span class='text-bold text-grey-9'>{{ owner.name }}</span>
-          <q-icon
-            v-if='editable'
-            name='bi-pencil-square' class='page-item-x-margin-left cursor-pointer' size='15px' :style='{marginTop: "3px"}'
-            @click='onEditClick'
-          />
-        </div>
-        <div class='text-grey-8 selector-item-currency-sub'>
-          $ {{ usdBalance.toFixed(4) }} USD
-        </div>
+  <div class='row'>
+    <q-space />
+    <q-avatar>
+      <q-img :src='db.ownerAvatar(owner)' />
+    </q-avatar>
+    <div class='selector-margin-x-left account-avatar'>
+      <div v-if='editing' class='row'>
+        <q-input outlined dense v-model='owner.name' />
+        <q-icon
+          name='bi-check2' class='page-item-x-margin-left cursor-pointer' size='18px' :style='{marginTop: "3px"}'
+          @click='onSaveClick'
+        />
       </div>
-      <q-space />
+      <div v-else class='row'>
+        <span class='text-bold text-grey-9'>{{ owner.name }}</span>
+        <q-icon
+          v-if='editable'
+          name='bi-pencil-square' class='page-item-x-margin-left cursor-pointer' size='15px' :style='{marginTop: "3px"}'
+          @click='onEditClick'
+        />
+      </div>
+      <div class='text-grey-8 selector-item-currency-sub'>
+        $ {{ usdBalance.toFixed(4) }} USD
+      </div>
     </div>
+    <q-space />
   </div>
   <OwnerBridge ref='ownerBridge' />
   <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='nativeTokenId' />

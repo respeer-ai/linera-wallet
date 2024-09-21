@@ -7,6 +7,17 @@ export const SettingMenus = [
     menu: Menu.NETWORKS,
     disable: false
   }, {
+    icon: 'bi-view-list',
+    label: 'Accounts',
+    menu: Menu.ACCOUNTS,
+    disable: false
+  }, {
+    icon: 'bi-card-list',
+    label: 'Addresses book',
+    menu: Menu.ADDRESSES_BOOK,
+    disable: false,
+    separator: true
+  }, {
     icon: 'bi-info-circle',
     label: 'About us',
     menu: Menu.ABOUT_US,

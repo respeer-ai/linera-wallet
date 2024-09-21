@@ -4,13 +4,13 @@
       <SidebarMenu />
       <q-resize-observer @resize='onSidebarResize' />
     </div>
-    <div class='selector-margin-x-left' :style='{width: `calc(100% - ${sidebarWidth}px - 32px)`}'>
+    <div :style='{width: `calc(100% - ${sidebarWidth}px - 32px)`, marginLeft: "16px"}'>
       <div class='row page-actions-padding'>
-        <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' />
+        <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
         <q-space />
         <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
       </div>
-      <SettingInnerView />
+      <SettingInnerView ref='settingInnerView' @back='onInnerBack' />
     </div>
   </div>
 </template>
@@ -28,12 +28,22 @@ interface Size {
 }
 
 const sidebarWidth = ref(0)
+const settingInnerView = ref<InstanceType<typeof SettingInnerView>>()
 
 const onSidebarResize = (size: Size) => {
   sidebarWidth.value = size.width
 }
 
+const onBackClick = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  settingInnerView.value?.back()
+}
+
 const onCloseClick = () => {
+  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+}
+
+const onInnerBack = () => {
   localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
 }
 

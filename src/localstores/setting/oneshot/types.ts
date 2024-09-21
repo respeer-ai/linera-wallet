@@ -1,7 +1,9 @@
 export enum Menu {
   NETWORKS = 'Networks',
   ABOUT_US = 'AboutUs',
-  STORAGE = 'Storage'
+  STORAGE = 'Storage',
+  ACCOUNTS = 'Accounts',
+  ADDRESSES_BOOK = 'AddressesBook'
 }
 
 export enum HomeAction {
