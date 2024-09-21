@@ -17,6 +17,12 @@
           Create microchain
         </div>
       </div>
+      <div class='row vertical-items-margin selector-margin-left cursor-pointer' @click='onAddMicrochainClick'>
+        <q-icon name='bi-save' size='20px' color='blue-10' />
+        <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
+          Export account
+        </div>
+      </div>
     </div>
   </div>
 </template>
