@@ -15,7 +15,7 @@ export const SettingMenus = [
     icon: 'bi-card-list',
     label: 'Addresses book',
     menu: Menu.ADDRESSES_BOOK,
-    disable: false,
+    disable: true,
     separator: true
   }, {
     icon: 'bi-info-circle',
