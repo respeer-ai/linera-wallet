@@ -17,7 +17,7 @@
         <div v-for='(word, i) in mnemonic' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
           <q-input
             borderless dense
-            hide-bottom-space input-class='blank-text'
+            hide-bottom-space
             v-model='mnemonic[i]'
             :autofocus='i === 0'
             @paste='onPaste'
@@ -37,9 +37,15 @@ const mnemonic = defineModel<string[]>({
   ] as string[]
 })
 
-const onPaste = (evt: { clipboardData: { getData: (arg0: string) => string; }; }) => {
-  const _mnemonic = [...mnemonic.value]
-  evt.clipboardData.getData('text').split(' ').forEach((v, i) => {
+const onPaste = (evt: {
+  preventDefault(): unknown; clipboardData: { getData: (arg0: string) => string; };
+}) => {
+  evt.preventDefault()
+  const _mnemonic = [
+    '', '', '', '', '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '', '', '', '', ''
+  ] as string[]
+  evt.clipboardData.getData('text').split(/(\s+)/).filter((v) => v.trim().length > 0).forEach((v, i) => {
     if (i < _mnemonic.length) _mnemonic[i] = v
   })
   mnemonic.value = [..._mnemonic]

@@ -34,6 +34,8 @@
       no-caps
     />
   </div>
+  <GenerateKey ref='generateKey' />
+  <OwnerBridge ref='ownerBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -43,25 +45,27 @@ import { useRouter } from 'vue-router'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
 import ImportMnemonicView from '../account/ImportMnemonicView.vue'
+import GenerateKey from '../account/GenerateKey.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 const step = ref(1)
 const password = ref('')
 const passwordError = ref(false)
-const accountError = ref(true)
-const publicKey = ref('')
 const mnemonic = ref([
   '', '', '', '', '', '', '', '', '', '', '', '',
   '', '', '', '', '', '', '', '', '', '', '', ''
 ] as string[])
 
 const router = useRouter()
+const generateKey = ref<InstanceType<typeof GenerateKey>>()
+const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
 
 const canGotoNext = () => {
   switch (step.value) {
     case 1:
       return !passwordError.value && password.value.length
     case 2:
-      return !accountError.value
+      return mnemonic.value.findIndex((v) => v.length === 0) < 0
     default:
       return true
   }
@@ -84,17 +88,20 @@ const savePassword = () => {
 }
 
 const validateAccount = () => {
-  const account = localStore.wallet.account(publicKey.value)
-  if (account) {
-    // TODO: init wallet
-    void router.push({ path: '/microchains' })
-    return
-  }
-  localStore.notification.pushNotification({
-    Title: 'Validate Account',
-    Message: 'Please provide correct account information, or regenerate a new one',
-    Popup: true,
-    Type: localStore.notify.NotifyType.Error
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  generateKey.value?.createAccountWithMnemonic(mnemonic.value, password.value).then(async (val: unknown) => {
+    const v = val as Record<string, string>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await ownerBridge.value?.createOwner(v.publicKey, v.privateKey, undefined, password.value)
+    void router.push({ path: '/home' })
+  }).catch((error) => {
+    localStore.notification.pushNotification({
+      Title: 'Import account',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Import account failed: ${error}`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
   })
 }
 

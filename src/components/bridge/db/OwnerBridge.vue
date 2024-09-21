@@ -8,7 +8,7 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
 import { db } from '../../../model'
-import { dbWallet } from '../../../controller'
+import { dbBase, dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
 
@@ -52,8 +52,12 @@ const resetSelected = async () => {
   }
 }
 
-const createOwner = async (publicKey: string, privateKey: string, name?: string) => {
-  if (!publicKey.length || !privateKey.length || !password.value?.length) {
+const createOwner = async (publicKey: string, privateKey: string, name?: string, _password?: string) => {
+  if (!_password) {
+    const passwd = (await dbBase.passwords.toArray()).find((el) => el.active) as db.Password
+    if (passwd) _password = db.decryptPassword(passwd)
+  }
+  if (!publicKey.length || !privateKey.length || !_password?.length) {
     throw Error('Invalid owner materials')
   }
   if (!name) {
