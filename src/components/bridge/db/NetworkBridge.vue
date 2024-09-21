@@ -4,6 +4,7 @@ import { db } from '../../../model'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
+import { localStore } from 'src/localstores'
 
 const networks = defineModel<db.Network[]>('networks')
 const selectedNetwork = defineModel<db.Network>('selectedNetwork')
@@ -17,10 +18,13 @@ const _networks = useObservable<db.Network[]>(
 )
 
 watch(_networks, async () => {
-  if (networks.value === _networks.value) return
-  networks.value = _networks.value
   selectedNetwork.value = _networks.value?.find((el) => el.selected)
-  if (_networks.value !== undefined && !await dbBase.networks.count()) {
+  networks.value = _networks.value
+  if (localStore.oneShotSetting.creatingDefaultNetwork) {
+    return
+  }
+  localStore.oneShotSetting.oneShotSetting.CreatingDefaultNetwork = true
+  if (!_networks.value?.length && !await dbBase.networks.count()) {
     await dbBase.networks.add(db.defaultNetwork)
   }
 })

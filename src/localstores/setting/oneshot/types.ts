@@ -22,6 +22,8 @@ export interface OneShotSetting {
 
   HomeAction: HomeAction
   HomeActionParams: unknown
+
+  CreatingDefaultNetwork: boolean
 }
 
 export interface MenuItem {

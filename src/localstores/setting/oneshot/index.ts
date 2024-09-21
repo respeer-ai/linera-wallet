@@ -32,6 +32,9 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     homeActionParams (): unknown {
       return this.oneShotSetting.HomeActionParams
+    },
+    creatingDefaultNetwork (): boolean {
+      return this.oneShotSetting.CreatingDefaultNetwork
     }
   },
   actions: {}
