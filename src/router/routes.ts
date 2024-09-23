@@ -127,7 +127,6 @@ const routes: RouteRecordRaw[] = [
         path: 'transfer',
         component: () => import('pages/TransferPage.vue'),
         meta: {
-          ShowFooterMenu: true,
           AlignPageCenter: false
         }
       },
