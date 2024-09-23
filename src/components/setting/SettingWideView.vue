@@ -10,7 +10,9 @@
         <q-space />
         <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
       </div>
-      <SettingInnerWideView ref='settingInnerView' @back='onInnerBack' />
+      <div class='vertical-menus-margin'>
+        <SettingInnerWideView ref='settingInnerView' @back='onInnerBack' />
+      </div>
     </div>
   </div>
 </template>
