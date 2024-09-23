@@ -7,6 +7,11 @@
       <div class='text-left vertical-sections-margin'>
         We'd like to gather user feed back to improve metamask. But we won't submit any user data to any centralized server. If you find any issue when you're using CheCko, you can create issue to our github repository, of contact CheCko team through discord or telegram.
       </div>
+      <div class='row full-width vertical-sections-margin'>
+        <q-space />
+        <q-img :src='onboardingImproveBanner' width='100%' />
+        <q-space />
+      </div>
       <div class='text-left full-width vertical-sections-margin'>
         <a href='https://github.com/respeer-ai/linera-wallet/README.md'>Learn how to create an issue while using CheCko.</a>
       </div>
@@ -31,6 +36,7 @@
 </template>
 
 <script setup lang='ts'>
+import { onboardingImproveBanner } from 'src/assets'
 import { localStore } from 'src/localstores'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

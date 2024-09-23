@@ -22,19 +22,19 @@
         <p v-else>
           CheCko is a secure wallet making the world of<br>real time & reactive dApps on Linera accessible to all.<br>
         </p>
-        <div :style='{margin: "64px 0"}'>
+        <div :style='{margin: "80px 0"}'>
           <q-img :src='cheCkoLogo' width='240px' />
         </div>
       </q-carousel-slide>
       <q-carousel-slide name='second' class='column no-wrap flex-center'>
         <h5 class='onboarding-page-title'>
-          Explorer real time & reactive dApps
+          Explorer real time &<br>reactive dApps
         </h5>
         <p>
           Interact with web3 dApps like web2 with expectable<br>responsiveness and highly availability.
         </p>
-        <div :style='{margin: "64px 0"}'>
-          <q-img :src='cheCkoLogo' width='240px' />
+        <div :style='{margin: "16px 0"}'>
+          <q-img :src='onboardingExplorerBanner' width='320px' />
         </div>
       </q-carousel-slide>
       <q-carousel-slide name='third' class='column no-wrap flex-center'>
@@ -44,8 +44,8 @@
         <p>
           Use your CheCko to login to real time & reactive dApps, just like what you do with Metamask.
         </p>
-        <div :style='{margin: "64px 0"}'>
-          <q-img :src='cheCkoLogo' width='240px' />
+        <div :style='{margin: "16px 0"}'>
+          <q-img :src='onboardingLoginBanner' width='320px' />
         </div>
       </q-carousel-slide>
     </q-carousel>
@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang='ts'>
-import { cheCkoLogo } from 'src/assets'
+import { cheCkoLogo, onboardingExplorerBanner, onboardingLoginBanner } from 'src/assets'
 import { localStore } from 'src/localstores'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
