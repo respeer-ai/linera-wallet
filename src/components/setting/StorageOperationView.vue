@@ -2,13 +2,14 @@
   <div class='row text-center vertical-sections-margin extra-large-margin-bottom'>
     <div v-if='!confirmed' class='row'>
       <div :style='{width: "calc(100% - 132px)"}' class='text-left'>
-        <div class='vertical-items-margin text-grey-8 private-key-warn'>
-          <div>
+        <div class='vertical-items-margin tip warn-bg warn row'>
+          <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
+          <div class='tip-text page-item-x-margin-left'>
             I suggest you don't access this menu unless you know what you will do.
           </div>
         </div>
         <q-btn
-          flat dense class='btn btn-alt vertical-menus-margin text-black' no-caps
+          flat class='btn btn-alt vertical-menus-margin text-black' no-caps
           @click='confirmed = true'
         >
           I understand

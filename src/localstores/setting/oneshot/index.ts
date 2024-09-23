@@ -35,6 +35,9 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     creatingDefaultNetwork (): boolean {
       return this.oneShotSetting.CreatingDefaultNetwork
+    },
+    creatingDefaultToken (): boolean {
+      return this.oneShotSetting.CreatingDefaultToken
     }
   },
   actions: {}

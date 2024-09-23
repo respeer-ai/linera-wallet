@@ -24,6 +24,7 @@ export interface OneShotSetting {
   HomeActionParams: unknown
 
   CreatingDefaultNetwork: boolean
+  CreatingDefaultToken: boolean
 }
 
 export interface MenuItem {

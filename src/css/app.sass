@@ -333,14 +333,24 @@ body
 
 .tip
   border-radius: 4px
-  padding: 4px 8px
+  padding: 8px
+
+.tip-text
+  width: calc(100% - 30px)
 
 .warn
   border: 1px solid $red-2
+  border-left: 4px solid $red-4
+
+.warn-bg
+  background: $red-1
 
 .info
-  border: 1px solid $green-2
-  border-left: 4px solid $green-4
+  border: 1px solid $blue-2
+  border-left: 4px solid $blue-4
+
+.info-bg
+  background: $grey-2
 
 .decorate-underline
   border-bottom: 2px solid $grey-2
@@ -438,9 +448,6 @@ body
   padding: 16px
   border: 1px solid $grey-4 !important
   border-radius: 8px !important
-
-.info-bg
-  background: $grey-2
 
 .transfer-amount-space
   height: 100px

@@ -1,14 +1,15 @@
 <template>
   <div>
-    <div class='tip info-bg text-left'>
-      <div class='page-x-padding'>
+    <div class='tip warn warn-bg text-left row'>
+      <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
+      <div class='tip-text page-item-x-margin-left'>
         You should understand when you click this button, it will clear all of the data in your storage including the wallet configuration and accounts data!
       </div>
     </div>
     <q-btn
       :loading='confirmedSeconds > 0 && confirmedSeconds < confirmSeconds'
       :percentage='confirmedSeconds * 100 / confirmSeconds'
-      flat dense class='btn btn-alt vertical-menus-margin full-width' label='Clear storage'
+      flat class='btn btn-alt vertical-menus-margin full-width' label='Long press to clear storage'
       no-caps
       v-touch-repeat.mouse='onConfirmClick'
       @mouseup='onConfirmCanceled'

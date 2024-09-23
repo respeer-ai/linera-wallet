@@ -4,6 +4,7 @@ import { db } from '../../../model'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable, from } from '@vueuse/rxjs'
+import { localStore } from 'src/localstores'
 
 const tokens = defineModel<db.Token[]>('tokens')
 
@@ -18,9 +19,11 @@ const _tokens = useObservable<db.Token[]>(
 watch(_tokens, async () => {
   if (tokens.value === _tokens.value) return
   tokens.value = _tokens.value
-  if (_tokens.value !== undefined && !_tokens.value.length) {
+  localStore.oneShotSetting.oneShotSetting.CreatingDefaultToken = true
+  if (_tokens.value !== undefined && !await dbBase.tokens.count() && !localStore.oneShotSetting.creatingDefaultToken) {
     await dbBase.tokens.add(db.lineraToken)
   }
+  localStore.oneShotSetting.oneShotSetting.CreatingDefaultToken = false
 })
 
 const updateToken = async (token: db.Token) => {
