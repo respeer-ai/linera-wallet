@@ -45,7 +45,7 @@
           hide-bottom-space
           :type='display ? "text" : "password"'
         />
-        <p class='text-brown-10 text-center' :style='{margin: "24px 0 0 0"}'>
+        <p class='text-center' :style='{margin: "24px 0 0 0"}'>
           By continue you understand CheCko cannot recover this password. <a href='#'>Learn more</a>
         </p>
       </div>

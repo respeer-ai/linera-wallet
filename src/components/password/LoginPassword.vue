@@ -1,5 +1,5 @@
 <template>
-  <q-card flat>
+  <q-card flat class='full-width page-x-padding'>
     <h5 class='onboarding-page-title'>
       Welcome back
     </h5>
@@ -11,14 +11,13 @@
     </div>
     <div class='row'>
       <q-space />
-      <div :style='{width: "320px"}'>
+      <div class='full-width'>
         <div :style='{margin: "80px 0 0 0"}'>
           <InputPassword v-model:password='password' v-model:error='passwordError' />
         </div>
         <q-btn
           flat
-          class='text-brown-10 bg-red-2'
-          :style='{borderRadius: "16px", width: "100%", margin: "16px 0 0 0"}'
+          class='btn full-width  vertical-sections-margin'
           label='Unlock'
           @click='onUnlockClick'
           :disable='password.length < 8 || passwordError'
@@ -27,8 +26,7 @@
         <q-btn
           flat
           dense
-          class='text-blue-6'
-          :style='{borderRadius: "16px", width: "100%"}'
+          class='text-blue-6 full-width'
           label='Forget password?'
           @click='onForgetPasswordClick'
           no-caps
