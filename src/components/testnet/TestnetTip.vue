@@ -2,7 +2,7 @@
   <div class='cursor-pointer like-link'>
     Testnet must read
     <q-popup-proxy>
-      <div
+      <q-card
         class='text-brown-10'
         :style='{ padding: "24px", maxWidth: "640px" }'
       >
@@ -17,7 +17,7 @@
         members should not think of CheCko is official Linera wallet. Official
         team will release browser wallet which integrates microchain to
         browser extension soon.
-      </div>
+      </q-card>
     </q-popup-proxy>
   </div>
 </template>
