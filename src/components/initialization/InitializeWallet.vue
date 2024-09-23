@@ -103,7 +103,6 @@ const btnText = computed(() => {
 const savePassword = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   await passwordBridge.value?.savePassword(password.value)
-  step.value++
 }
 
 const saveAccount = async () => {
@@ -115,12 +114,13 @@ const saveAccount = async () => {
 const onNextStepClick = async () => {
   switch (step.value) {
     case 1:
-      await savePassword()
+      step.value++
       break
     case 2:
       step.value++
       break
     case 3:
+      await savePassword()
       await saveAccount()
       break
   }

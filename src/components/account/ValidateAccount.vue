@@ -3,23 +3,27 @@
     <h5 class='onboarding-page-title'>
       Validate secret recovery phrase
     </h5>
-    <q-card
-      flat bordered :style='{height: "160px", marginTop: "24px", padding: "24px"}'
-      class='flex items-center justify-center'
-    >
-      <div class='row'>
-        <div v-for='(word, i) in mnemonicPartialWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
-          <div v-if='!blankIndexes.includes(i)'>
-            {{ word }}
-          </div>
-          <q-input
-            v-else borderless dense
-            hide-bottom-space input-class='blank-text'
-            v-model='shadowMnemonicWords[i]'
-          />
+    <div>
+      Fill right mnemonic into empty fields to confirm you already properly backup mnemonic.
+    </div>
+    <div class='text-left text-bold vertical-sections-margin' :style='{paddingLeft: "20px"}'>
+      Tips:
+    </div>
+    <ul class='text-left' :style='{marginTop: "8px"}'>
+      <li>If you don't save mnemonic properly, it's safe to create a new one and discard the this one at this step.</li>
+    </ul>
+    <div class='row vertical-sections-margin'>
+      <div v-for='(word, i) in mnemonicPartialWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
+        <div v-if='!blankIndexes.includes(i)'>
+          {{ word }}
         </div>
+        <q-input
+          v-else borderless dense
+          hide-bottom-space input-class='blank-text'
+          v-model='shadowMnemonicWords[i]'
+        />
       </div>
-    </q-card>
+    </div>
   </div>
 </template>
 

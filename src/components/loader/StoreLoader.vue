@@ -41,7 +41,7 @@ onMounted(() => {
       if (timeout) {
         return void router.push({ path: '/recovery' })
       }
-      return void router.push({ path: '/home' })
+      return
     }
     void router.push({ path: '/onboarding' })
   }).catch(() => {

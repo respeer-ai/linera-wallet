@@ -17,7 +17,7 @@
           Let's get started
         </h5>
         <p>
-          CheCko is a secure wallet making the world of real time & reactive <br>dApps on <q-img :src='lineraLogo' width='20px' /> Linera accessible to all.<br>
+          CheCko is a secure wallet making the world of<br>real time & reactive dApps on Linera accessible to all.<br>
         </p>
         <div :style='{margin: "64px 0"}'>
           <q-img :src='cheCkoLogo' width='240px' />
@@ -39,7 +39,7 @@
           Login with your wallet
         </h5>
         <p>
-          Use your CheCko to login to real time & reactive dApps,<br>just like what you do with Metamask.
+          Use your CheCko to login to real time & reactive dApps, just like what you do with Metamask.
         </p>
         <div :style='{margin: "64px 0"}'>
           <q-img :src='cheCkoLogo' width='240px' />
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang='ts'>
-import { cheCkoLogo, lineraLogo } from 'src/assets'
+import { cheCkoLogo } from 'src/assets'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 

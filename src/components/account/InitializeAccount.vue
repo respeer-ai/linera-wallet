@@ -6,7 +6,7 @@
     <p>
       Write donw this 24-words Secret Recovery Phrase and save it in a place that you trust and only you can access.
     </p>
-    <div class='text-left text-bold' :style='{paddingLeft: "20px"}'>
+    <div class='text-left text-bold vertical-sections-margin' :style='{paddingLeft: "20px"}'>
       Tips:
     </div>
     <ul class='text-left' :style='{marginTop: "8px"}'>
@@ -14,26 +14,32 @@
       <li>Store in a safe deposit box</li>
       <li>Write down and store in multiple secret places</li>
     </ul>
-    <q-card
-      flat bordered :dark='!showMnemonic' :style='{height: "160px", marginTop: "24px", padding: "24px"}'
-      class='flex items-center justify-center extra-margin-bottom'
-    >
-      <div v-if='showMnemonic' class='row'>
+    <div v-if='showMnemonic' class='vertical-sections-margin'>
+      <div class='row'>
+        <div class='text-bold'>
+          Mnemonic
+        </div>
+        <q-space />
+        <div class='text-blue-6 cursor-pointer label-text-small' @click='showMnemonic = false'>
+          Hide
+        </div>
+      </div>
+      <div class='row vertical-items-margin'>
         <div v-for='(word, i) in mnemonicWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>
           {{ word }}
         </div>
       </div>
-      <div v-else>
-        <q-icon name='bi-eye' size='20px' />
-        <div :style='{marginTop: "16px", fontSize: "12px"}'>
-          Make sure nobody is looking.
-        </div>
+    </div>
+    <q-card bordered flat v-else class='page-y-padding vertical-sections-margin bg-grey-9'>
+      <q-icon name='bi-eye' size='20px' color='white' class='vertical-sections-margin' />
+      <div class='text-white vertical-items-margin label-text-small extra-margin-bottom'>
+        Make sure nobody is looking.
       </div>
     </q-card>
     <div class='full-width vertical-sections-margin' v-if='showInnerActionBtn'>
       <q-btn
         flat
-        label='Reveal Secret Recovery Phrase'
+        label='Reveal secret recovery phrase'
         class='btn full-width vertical-menus-margin'
         no-caps
         @click='showMnemonic = !showMnemonic'

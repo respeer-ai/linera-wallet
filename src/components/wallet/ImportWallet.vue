@@ -25,14 +25,20 @@
         <ImportMnemonicView v-model='mnemonic' />
       </q-step>
     </q-stepper>
-    <q-btn
-      flat
-      class='btn full-width'
-      :label='btnText'
-      :disable='!canGotoNext()'
-      @click='onNextStepClick'
-      no-caps
-    />
+    <div class='full-width row'>
+      <q-space />
+      <div class='onboarding-btns'>
+        <q-btn
+          flat
+          class='btn full-width'
+          :label='btnText'
+          :disable='!canGotoNext()'
+          @click='onNextStepClick'
+          no-caps
+        />
+      </div>
+      <q-space />
+    </div>
   </div>
   <GenerateKey ref='generateKey' />
   <OwnerBridge ref='ownerBridge' />
@@ -88,7 +94,7 @@ const btnText = computed(() => {
 const savePassword = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   passwordBridge.value?.savePassword(password.value).then(() => {
-    step.value++
+    // DO NOTHING
   }).catch((error) => {
     localStore.notification.pushNotification({
       Title: 'Save password',
@@ -121,9 +127,10 @@ const validateAccount = () => {
 const onNextStepClick = () => {
   switch (step.value) {
     case 1:
-      savePassword()
+      step.value++
       break
     case 2:
+      savePassword()
       validateAccount()
       break
   }
