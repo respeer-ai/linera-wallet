@@ -11,10 +11,10 @@ export interface LangOption {
 
 export const langOptions = [
   {
-    label: '汉语',
+    label: '中文简体',
     value: 'zh-CN'
   }, {
-    label: 'EN',
+    label: 'English',
     value: 'en-US'
   }
 ]
