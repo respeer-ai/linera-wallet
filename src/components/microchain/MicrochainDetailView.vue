@@ -10,7 +10,7 @@
     </div>
     <div class='row vertical-sections-margin'>
       <q-space />
-      <div class='row bg-red-1 tip cursor-pointer'>
+      <div class='row bg-red-1 tip cursor-pointer label-radius'>
         <div>
           0x{{ shortid.shortId(microchain.microchain, 10) }}
         </div>

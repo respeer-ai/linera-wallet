@@ -13,7 +13,7 @@
       <AccountDetailAvatarView v-if='owner' :owner='owner' :editable='false' />
       <div class='row vertical-menus-margin'>
         <q-space />
-        <div class='row bg-red-1 tip cursor-pointer'>
+        <div class='row bg-red-1 tip cursor-pointer label-radius'>
           <div>
             0x{{ shortid.shortId(owner.owner, 10) }}
           </div>
