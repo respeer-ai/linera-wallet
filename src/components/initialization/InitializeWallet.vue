@@ -49,6 +49,7 @@
     </div>
     <PasswordBridge ref='passwordBridge' v-model:password='password' />
     <OwnerBridge ref='ownerBridge' />
+    <LoginTimestampBridge ref='loginTimestampBridge' />
   </div>
 </template>
 
@@ -62,6 +63,7 @@ import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import NewPassword from 'src/components/password/NewPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ValidateAccount from 'src/components/account/ValidateAccount.vue'
+import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
 
 const step = ref(1)
 const password = ref(undefined as unknown as string)
@@ -74,6 +76,7 @@ const showInnerActionBtn = ref(false)
 
 const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
+const loginTimestampBridge = ref<InstanceType<typeof LoginTimestampBridge>>()
 
 const router = useRouter()
 
@@ -103,6 +106,8 @@ const btnText = computed(() => {
 const savePassword = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   await passwordBridge.value?.savePassword(password.value)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await loginTimestampBridge.value?.saveLoginTimestamp()
 }
 
 const saveAccount = async () => {

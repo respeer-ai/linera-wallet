@@ -35,8 +35,8 @@ const saveLoginTimestamp = async () => {
 }
 
 const loginTimeout = async (): Promise<boolean> => {
-  const timestamp = (await dbBase.lastLogin.toArray()).find(() => true)?.timestamp || 0
-  return timestamp < Date.now() - 4 * 60 * 60 * 1000
+  const timestamp = (await dbBase.lastLogin.toArray()).find(() => true)?.timestamp
+  return timestamp === undefined || timestamp < Date.now() - 4 * 60 * 60 * 1000
 }
 
 defineExpose({

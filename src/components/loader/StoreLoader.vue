@@ -18,7 +18,7 @@
 
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { dbBase } from '../../controller'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
@@ -27,6 +27,8 @@ import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
 import cheCkoLogo from 'src/assets/CheCko.png'
 
 const router = useRouter()
+const route = useRoute()
+
 const loading = ref(true)
 
 const loginTimestampBridge = ref<InstanceType<typeof LoginTimestampBridge>>()
@@ -41,7 +43,7 @@ onMounted(() => {
       if (timeout) {
         return void router.push({ path: '/recovery' })
       }
-      return
+      return void router.push({ path: route.path === '/' ? '/home' : route.path })
     }
     void router.push({ path: '/onboarding' })
   }).catch(() => {
