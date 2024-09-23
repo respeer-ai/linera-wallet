@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center onboarding-container shadow-1 onboarding-padding'>
+  <div :class='[ "text-center onboarding-container shadow-1 onboarding-padding", localStore.oneShotSetting.extensionMode ? "" : "onboarding-padding" ]'>
     <LoginPassword v-model:password='password' @unlocked='unlocked' />
     <LoginTimestampBridge ref='loginTimestampBridge' />
   </div>

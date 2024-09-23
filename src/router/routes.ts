@@ -70,7 +70,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       ShowHeaderMenu: false,
       ExtensionMode: true,
-      ShowFooterMenu: true,
+      ShowFooterMenu: false,
       ShowTestTip: false
     },
     children: [
@@ -93,6 +93,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/OnBoardingPage.vue'),
         meta: {
           ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'improvement',
+        component: () => import('pages/ImprovementPage.vue'),
+        meta: {
+          AlignPageCenter: true
         }
       },
       {

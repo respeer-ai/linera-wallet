@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center onboarding-container onboarding-stepper-padding'>
+  <div :class='[ "text-center onboarding-container", localStore.oneShotSetting.extensionMode ? "onboarding-stepper-narrow-padding" : "onboarding-stepper-padding" ]'>
     <q-stepper
       flat
       v-model='step'

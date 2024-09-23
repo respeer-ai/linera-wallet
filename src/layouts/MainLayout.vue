@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import wasmModuleUrl from '../../src-bex/wasm/linera_wasm_bg.wasm?url'
 import initWasm from '../../src-bex/wasm/linera_wasm'
@@ -52,6 +52,11 @@ const showFooterMenu = computed(() => localStore.oneShotSetting.showFooterMenu)
 const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)
 const alignPageCenter = computed(() => localStore.oneShotSetting.alignPageCenter)
 const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
+const showSettingMenu = computed(() => localStore.oneShotSetting.showSettingMenu)
+
+watch(showSettingMenu, () => {
+  localStore.oneShotSetting.oneShotSetting.ShowFooterMenu = showSettingMenu.value
+})
 
 const viewWidth = computed(() => extensionMode.value ? '368px' : '800px')
 const viewHeight = computed(() => extensionMode.value ? '600px' : '100%')

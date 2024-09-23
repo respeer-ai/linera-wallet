@@ -1,6 +1,6 @@
 <template>
   <div v-if='loading' class='row q-pa-md q-gutter-md'>
-    <div class='text-center full-width onboarding-container'>
+    <div :class='[ "text-center full-width onboarding-container", localStore.oneShotSetting.extensionMode ? "" : "onboarding-padding" ]'>
       <q-img :src='cheCkoLogo' width='240px' />
       <q-card class='loading-card' flat>
         <q-inner-loading

@@ -1,5 +1,5 @@
 <template>
-  <div class='fill-parent text-center onboarding-container shadow-1'>
+  <div :class='[ "fill-parent text-center onboarding-container shadow-1", localStore.oneShotSetting.extensionMode ? "" : "onboarding-padding" ]'>
     <q-carousel
       v-model='slide'
       transition-prev='scale'
@@ -10,13 +10,16 @@
       navigation
       padding
       arrows
-      class='text-black rounded-borders'
+      :class='[ "text-black rounded-borders", localStore.oneShotSetting.extensionMode ? "carousel-dense-slides" : "" ]'
     >
       <q-carousel-slide name='first' class='column no-wrap flex-center'>
         <h5 class='onboarding-page-title'>
           Let's get started
         </h5>
-        <p>
+        <p v-if='localStore.oneShotSetting.extensionMode'>
+          CheCko is a secure wallet making the world of real time & reactive dApps on Linera accessible to all.
+        </p>
+        <p v-else>
           CheCko is a secure wallet making the world of<br>real time & reactive dApps on Linera accessible to all.<br>
         </p>
         <div :style='{margin: "64px 0"}'>
@@ -49,7 +52,7 @@
     <p>
       By continue you agree to CheCko's <a href='#'>Terms of use</a>
     </p>
-    <div class='row full-width'>
+    <div class='row full-width page-x-padding'>
       <q-space />
       <div class='onboarding-btns'>
         <q-btn
