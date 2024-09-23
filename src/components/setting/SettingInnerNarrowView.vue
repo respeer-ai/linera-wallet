@@ -1,7 +1,7 @@
 <template>
   <q-tab-panels v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu' animated>
     <q-tab-panel :name='localStore.oneShotSettingDef.Menu.NETWORKS'>
-      <NetworkSettingNarrowView ref='networkSettingView' />
+      <NetworkSettingNarrowView ref='networkSettingView' @back='onBack' />
     </q-tab-panel>
     <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ABOUT_US'>
       <AboutUsView />

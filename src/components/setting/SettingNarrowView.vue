@@ -13,7 +13,7 @@
     <div class='vertical-menus-margin' v-if='step === 1'>
       <SidebarMenu @clicked='onMenuClicked' />
     </div>
-    <div class='full-width' v-if='step === 2'>
+    <div class='full-width vertical-menus-margin' v-if='step === 2'>
       <SettingInnerNarrowView ref='settingInnerView' @back='onInnerBack' />
     </div>
   </div>
