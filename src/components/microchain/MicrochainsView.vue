@@ -9,7 +9,7 @@
         <q-btn
           rounded flat no-caps class='full-width bg-grey-1'
           @click='onViewMoreClick'
-          v-if='displayCount <= microchains.length'
+          v-if='displayCount < microchains.length'
           color='grey-6'
           label='View more...'
         />
@@ -92,8 +92,9 @@ const importingMicrochain = ref(false)
 const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
-const onMicrochainCreated = () => {
+const onMicrochainCreated = async () => {
   creatingMicrochain.value = false
+  await loadMicrochains()
 }
 
 const onCreateMicrochainError = () => {
@@ -108,8 +109,9 @@ const onImportMicrochainClick = () => {
   importingMicrochain.value = true
 }
 
-const onMicrochainImported = () => {
+const onMicrochainImported = async () => {
   importingMicrochain.value = false
+  await loadMicrochains()
 }
 
 const onImportMicrochainError = () => {
@@ -158,6 +160,7 @@ const loadMicrochainsRecursive = async (total: number, offset: number, limit: nu
 }
 
 const loadMicrochains = async () => {
+  microchains.value = []
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const count = (await dbMicrochainBridge.value?.microchainsCount()) as number || 0
   await loadMicrochainsRecursive(count, 0, 10)
