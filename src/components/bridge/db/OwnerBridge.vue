@@ -65,7 +65,7 @@ const createOwner = async (publicKey: string, privateKey: string, name?: string,
     name = db.DEFAULT_ACCOUNT_NAME + ' ' + (await dbWallet.owners.count()).toString()
   }
   if (await dbWallet.owners.where('address').equals(publicKey).first() !== undefined) return
-  const owner = await db.buildOwner(publicKey, privateKey, password.value, name)
+  const owner = await db.buildOwner(publicKey, privateKey, _password, name)
   await resetSelected()
   await dbWallet.owners.add(owner)
 }
