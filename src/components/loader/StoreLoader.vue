@@ -12,6 +12,7 @@
       </q-card>
     </div>
     <PasswordBridge />
+    <LoginTimestampBridge ref='loginTimestampBridge' />
   </div>
 </template>
 
@@ -21,18 +22,28 @@ import { useRouter } from 'vue-router'
 import { dbBase } from '../../controller'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
+import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 
 const router = useRouter()
 const loading = ref(true)
 
+const loginTimestampBridge = ref<InstanceType<typeof LoginTimestampBridge>>()
+
 onMounted(() => {
-  dbBase.passwords.toArray().then((passwords) => {
+  dbBase.passwords.toArray().then(async (passwords) => {
     loading.value = false
-    passwords.find((el) => el.active)
-      ? void router.push({ path: '/recovery' })
-      : void router.push({ path: '/onboarding' })
+    const password = passwords.find((el) => el.active)
+    if (password) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const timeout = await loginTimestampBridge.value?.loginTimeout()
+      if (timeout) {
+        return void router.push({ path: '/recovery' })
+      }
+      return void router.push({ path: '/home' })
+    }
+    void router.push({ path: '/onboarding' })
   }).catch(() => {
     loading.value = false
     void router.push({ path: '/onboarding' })

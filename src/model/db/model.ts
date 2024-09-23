@@ -228,3 +228,8 @@ export interface Activity {
   certificateHash: string
   grant: string
 }
+
+export interface LoginTimestamp {
+  id?: number
+  timestamp: number
+}

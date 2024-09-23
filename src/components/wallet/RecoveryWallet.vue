@@ -1,6 +1,6 @@
 <template>
   <div class='text-center onboarding-container shadow-1 onboarding-padding'>
-    <LoginPassword v-if='step === 0' v-model:password='password' @unlocked='unlocked' />
+    <LoginPassword v-model:password='password' @unlocked='unlocked' />
   </div>
 </template>
 
@@ -11,7 +11,6 @@ import { useRouter } from 'vue-router'
 import LoginPassword from 'src/components/password/LoginPassword.vue'
 
 const password = ref('')
-const step = ref(0)
 
 const router = useRouter()
 

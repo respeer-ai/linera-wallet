@@ -32,6 +32,7 @@
       <q-resize-observer @resize='onFooterResize' />
     </q-footer>
     <BlockView />
+    <StoreLoader />
   </q-layout>
 </template>
 
@@ -46,6 +47,7 @@ import { localStore } from 'src/localstores'
 import MainHeaderView from 'src/components/header/MainHeaderView.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
 import BlockView from 'src/components/block/BlockView.vue'
+import StoreLoader from 'src/components/loader/StoreLoader.vue'
 
 const showFooterMenu = computed(() => localStore.oneShotSetting.showFooterMenu)
 const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)

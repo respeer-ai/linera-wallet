@@ -4,13 +4,15 @@ import { db as dbModel } from '../model'
 export const dbBase = new Dexie('CheCkoBaseDatabase') as Dexie & {
   networks: EntityTable<dbModel.Network, 'id'>,
   passwords: EntityTable<dbModel.Password, 'id'>,
-  tokens: EntityTable<dbModel.Token, 'id'>
+  tokens: EntityTable<dbModel.Token, 'id'>,
+  lastLogin: EntityTable<dbModel.LoginTimestamp, 'id'>
 }
 
 dbBase.version(1).stores({
   networks: '++id, icon, name, faucetUrl, rpcSchema, wsSchema, host, port, path, selected, preset',
   passwords: '++id, password, salt, createdAt',
-  tokens: '++id, name, ticker, tokenType, icon, applicationId, native, usdCurrency'
+  tokens: '++id, name, ticker, tokenType, icon, applicationId, native, usdCurrency',
+  lastLogin: '++id, timestamp'
 })
 
 export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
