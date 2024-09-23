@@ -5,13 +5,13 @@
       <q-input dense outlined v-model='accountName' />
     </div>
     <q-btn
-      flat dense class='btn full-width vertical-sections-margin' @click='onCreateClick'
+      flat class='btn full-width vertical-sections-margin' @click='onCreateClick'
       no-caps :disable='accountName.length === 0'
     >
       Create
     </q-btn>
     <q-btn
-      flat dense class='btn btn-alt full-width vertical-items-margin' @click='onCancelClick'
+      flat class='btn btn-alt full-width vertical-items-margin' @click='onCancelClick'
       no-caps
     >
       Cancel

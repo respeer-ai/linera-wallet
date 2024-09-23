@@ -15,7 +15,7 @@
           >
             <component
               :is='Component'
-              :class='[ extensionMode ? "popup-container" : "page-container shadow-1", "flex justify-center", alignPageCenter ? "items-center" : "" ]'
+              :class='[ extensionMode ? "popup-container" : "page-container shadow-1 flex justify-center", alignPageCenter ? "items-center" : "" ]'
               :style='{
                 height: bodyHeight,
                 width: `${viewWidth} !important`,

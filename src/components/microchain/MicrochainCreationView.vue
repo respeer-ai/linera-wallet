@@ -26,7 +26,7 @@
       <span class='text-blue-8 cursor-pointer' @click='onBackupClick'>Backup</span>
     </div>
     <q-btn
-      class='btn vertical-sections-margin extra-margin-bottom full-width' dense flat no-caps
+      class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
       @click='onValidateClick'
     >
       Validate microchain

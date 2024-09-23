@@ -20,13 +20,13 @@
       </q-input>
     </div>
     <q-btn
-      flat dense class='btn full-width vertical-items-margin' @click='onImportClick'
+      flat class='btn full-width vertical-items-margin' @click='onImportClick'
       no-caps :disable='privateKey.length === 0'
     >
       Import
     </q-btn>
     <q-btn
-      flat dense class='btn btn-alt full-width vertical-items-margin' @click='onCancelClick'
+      flat class='btn btn-alt full-width vertical-items-margin' @click='onCancelClick'
       no-caps
     >
       Cancel
