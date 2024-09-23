@@ -33,13 +33,11 @@ const settingInnerView = ref<InstanceType<typeof SettingInnerView>>()
 
 const onBackClick = () => {
   if (step.value === 1) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-    return settingInnerView.value?.back()
+    localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+    return
   }
-  step.value--
-  if (step.value === 1) {
-    title.value = 'Settings'
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+  settingInnerView.value?.back()
 }
 
 const onCloseClick = () => {
@@ -47,7 +45,10 @@ const onCloseClick = () => {
 }
 
 const onInnerBack = () => {
-  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+  step.value--
+  if (step.value === 1) {
+    title.value = 'Settings'
+  }
 }
 
 const onMenuClicked = (menu: oneShotSettingDef.MenuItem) => {
