@@ -1,5 +1,5 @@
 <template>
-  <div class='row q-pa-md q-gutter-md'>
+  <div v-if='loading' class='row q-pa-md q-gutter-md'>
     <div class='text-center full-width onboarding-container'>
       <q-img :src='cheCkoLogo' width='240px' />
       <q-card class='loading-card' flat>
