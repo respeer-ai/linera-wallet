@@ -13,7 +13,7 @@
           v-ripple
           :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.menu ? "bg-red-1" : "" ]'
           :disable='menu.disable'
-          @click='onTabClick(menu.menu)'
+          @click='onTabClick(menu)'
         >
           <q-item-section avatar>
             <q-icon :name='menu.icon' :color='menu.iconColor || ""' />
@@ -37,9 +37,9 @@
 <script setup lang='ts'>
 import { localStore, oneShotSettingDef } from 'src/localstores'
 
-const emit = defineEmits<{(ev: 'clicked', value: oneShotSettingDef.Menu): void}>()
+const emit = defineEmits<{(ev: 'clicked', value: oneShotSettingDef.MenuItem): void}>()
 
-const onTabClick = (menu: oneShotSettingDef.Menu) => {
+const onTabClick = (menu: oneShotSettingDef.MenuItem) => {
   emit('clicked', menu)
 }
 

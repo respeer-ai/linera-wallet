@@ -4,7 +4,7 @@
       <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer page-item-x-margin-left' @click='onBackClick' />
       <q-space />
       <div class='setting-label setting-label-dense text-grey-9 text-bold'>
-        Settings
+        {{ title }}
       </div>
       <q-space />
       <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
@@ -21,12 +21,13 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { localStore } from 'src/localstores'
+import { localStore, oneShotSettingDef } from 'src/localstores'
 
 import SidebarMenu from './SidebarMenu.vue'
 import SettingInnerView from './SettingInnerView.vue'
 
 const step = ref(1)
+const title = ref('Settings')
 
 const settingInnerView = ref<InstanceType<typeof SettingInnerView>>()
 
@@ -36,6 +37,9 @@ const onBackClick = () => {
     return settingInnerView.value?.back()
   }
   step.value--
+  if (step.value === 1) {
+    title.value = 'Settings'
+  }
 }
 
 const onCloseClick = () => {
@@ -46,7 +50,8 @@ const onInnerBack = () => {
   localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
 }
 
-const onMenuClicked = () => {
+const onMenuClicked = (menu: oneShotSettingDef.MenuItem) => {
+  title.value = menu.label
   step.value++
 }
 
