@@ -17,9 +17,8 @@
               :is='Component'
               :class='[ extensionMode ? "popup-container" : "page-container shadow-1", "flex justify-center", alignPageCenter ? "items-center" : "" ]'
               :style='{
-                height: `calc(${viewHeight} - ${headerHeight}px - ${footerHeight}px - (${outerHeight}px - ${innerHeight}px))`,
+                height: bodyHeight,
                 width: `${viewWidth}`,
-                maxWidth: "800px",
                 overflow: "scroll"
               }'
             />
@@ -54,8 +53,9 @@ const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)
 const alignPageCenter = computed(() => localStore.oneShotSetting.alignPageCenter)
 const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
 
-const viewWidth = computed(() => extensionMode.value ? '368px' : 'auto')
+const viewWidth = computed(() => extensionMode.value ? '368px' : '800px')
 const viewHeight = computed(() => extensionMode.value ? '600px' : '100%')
+const bodyHeight = computed(() => extensionMode.value ? '600px' : `calc(${viewHeight.value} - ${headerHeight.value}px - ${footerHeight.value}px - (${outerHeight.value}px - ${innerHeight.value}px))`)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

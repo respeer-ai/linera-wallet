@@ -74,6 +74,7 @@
 
 <script setup lang='ts'>
 import { cheCkoLogo } from 'src/assets'
+import { localStore } from 'src/localstores'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -82,7 +83,7 @@ const slide = ref('first')
 
 const onCreateWalletClick = () => {
   void router.push({
-    path: '/improvement',
+    path: localStore.oneShotSetting.formalizePath('/improvement'),
     query: {
       target: '/initializewallet'
     }
@@ -91,7 +92,7 @@ const onCreateWalletClick = () => {
 
 const onImportWalletClick = () => {
   void router.push({
-    path: '/improvement',
+    path: localStore.oneShotSetting.formalizePath('/improvement'),
     query: {
       target: '/importwallet'
     }

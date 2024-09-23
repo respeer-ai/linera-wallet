@@ -76,6 +76,7 @@ import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { useRouter } from 'vue-router'
+import { localStore } from 'src/localstores'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -123,7 +124,7 @@ const router = useRouter()
 
 const onTransferClick = () => {
   void router.push({
-    path: '/transfer',
+    path: localStore.oneShotSetting.formalizePath('/transfer'),
     query: {
       fromMicrochainId: microchain.value.microchain
     }

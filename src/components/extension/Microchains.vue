@@ -136,7 +136,7 @@ const router = useRouter()
 
 const onTransferClick = (chainId: string) => {
   void router.push({
-    path: '/transfer',
+    path: localStore.oneShotSetting.formalizePath('/transfer'),
     query: {
       chainId
     }

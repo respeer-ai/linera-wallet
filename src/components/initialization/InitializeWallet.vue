@@ -56,6 +56,7 @@
 <script setup lang='ts'>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { localStore } from 'src/localstores'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
@@ -113,7 +114,7 @@ const savePassword = async () => {
 const saveAccount = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await ownerBridge.value?.createOwner(publicKey.value, privateKey.value)
-  void router.push({ path: '/home' })
+  void router.push({ path: localStore.oneShotSetting.formalizePath('/home') })
 }
 
 const onNextStepClick = async () => {

@@ -156,7 +156,6 @@
 
   <div class='page-y-padding'>
     <q-btn
-      dense
       flat
       rounded
       label='Continue'

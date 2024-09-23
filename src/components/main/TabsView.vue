@@ -1,16 +1,18 @@
 <template>
   <div class='page-padding full-width text-center home-tabs'>
-    <q-tabs v-model='tab' no-caps indicator-color='red-6' dense>
-      <q-tab name='microchains'>
+    <q-tabs
+      v-model='tab' no-caps indicator-color='red-6' dense
+    >
+      <q-tab name='microchains' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
         Microchains
       </q-tab>
-      <q-tab name='tokens'>
+      <q-tab name='tokens' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
         Tokens
       </q-tab>
-      <q-tab name='applications'>
+      <q-tab name='applications' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
         Applications
       </q-tab>
-      <q-tab name='activities'>
+      <q-tab name='activities' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
         Activities
       </q-tab>
     </q-tabs>
@@ -33,6 +35,7 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
+import { localStore } from 'src/localstores'
 
 import TokensView from '../token/TokensView.vue'
 import MicrochainsView from '../microchain/MicrochainsView.vue'
@@ -42,3 +45,8 @@ import ActivitiesView from '../activity/ActivitiesView.vue'
 const tab = ref('microchains')
 
 </script>
+
+<stype scope lang='sass'>
+.extension-tab
+  padding: 0 4px
+</stype>

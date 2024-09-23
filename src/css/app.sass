@@ -4,12 +4,16 @@
 
 // app global css in SCSS form
 .popup-container
+  background: white
   width: 378px
-  padding: 12px 24px
+  max-width: 378px
+  height: 600px
 
 .page-container
   background: white
   margin: 16px 0 0 0
+  max-width: 800px
+  height: 100%
 
 .page-x-padding
   padding-left: 16px
@@ -53,7 +57,6 @@ body
 
 .full-width
   width: 100%
-  max-width: 800px
 
 .full-height
   height: 100%
@@ -194,8 +197,9 @@ body
   padding: 4px 12px
   .q-btn-dropdown__arrow
     font-size: 1em
+    margin-right: 0px
   .q-btn--dense
-    padding: 4px 16px
+    padding: 4px 8px
     min-height: 1.25em
   .header-text
     line-height: 22px
@@ -297,15 +301,6 @@ body
 
 .selector-search
   padding: 0px 16px 12px 16px
-
-.widest-page
-  min-width: 1280px
-
-.wider-page
-  min-width: 960px
-
-.wide-page
-  min-width: 800px !important
 
 .q-item__section--avatar
   min-width: 16px

@@ -112,7 +112,7 @@ const validateAccount = () => {
     const v = val as Record<string, string>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await ownerBridge.value?.createOwner(v.publicKey, v.privateKey, undefined, password.value)
-    void router.push({ path: '/home' })
+    void router.push({ path: localStore.oneShotSetting.formalizePath('/home') })
   }).catch((error) => {
     localStore.notification.pushNotification({
       Title: 'Import account',

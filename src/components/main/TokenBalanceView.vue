@@ -58,6 +58,7 @@
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { localStore } from 'src/localstores'
 
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
@@ -76,7 +77,7 @@ onMounted(async () => {
 })
 
 const onTransferClick = () => {
-  void router.push({ path: '/transfer' })
+  void router.push({ path: localStore.oneShotSetting.formalizePath('/transfer') })
 }
 
 </script>

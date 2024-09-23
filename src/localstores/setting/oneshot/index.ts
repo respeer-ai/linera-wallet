@@ -38,6 +38,16 @@ export const useSettingStore = defineStore('one-shot-setting', {
     },
     creatingDefaultToken (): boolean {
       return this.oneShotSetting.CreatingDefaultToken
+    },
+    basePath (): string {
+      return this.oneShotSetting.ExtensionMode ? '/extension' : '/'
+    },
+    formalizePath (): (path: string) => string {
+      return (path: string) => {
+        path = path.slice(path.indexOf('/extension') + path.indexOf('/extension') >= 0 ? '/extension'.length : 0)
+        path = path.slice(path.indexOf('/') + path.indexOf('/') >= 0 ? '/'.length : 0)
+        return this.oneShotSetting.ExtensionMode ? '/extension/' + path : '/' + path
+      }
     }
   },
   actions: {}

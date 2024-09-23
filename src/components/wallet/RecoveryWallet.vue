@@ -8,6 +8,7 @@
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { localStore } from 'src/localstores'
 
 import LoginPassword from '../password/LoginPassword.vue'
 import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
@@ -21,7 +22,7 @@ const router = useRouter()
 const unlocked = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await loginTimestampBridge.value?.saveLoginTimestamp()
-  void router.push({ path: '/home' })
+  void router.push({ path: localStore.oneShotSetting.formalizePath('/home') })
 }
 
 </script>

@@ -40,17 +40,6 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: 'activity',
-        component: () => import('pages/ActivityPage.vue'),
-        meta: {
-          AlignPageCenter: false
-        }
-      },
-      {
-        path: 'setting',
-        component: () => import('pages/SettingPage.vue')
-      },
-      {
         path: 'onboarding',
         component: () => import('pages/OnBoardingPage.vue')
       },
@@ -79,8 +68,9 @@ const routes: RouteRecordRaw[] = [
     path: '/extension',
     component: () => import('layouts/MainLayout.vue'),
     meta: {
+      ShowHeaderMenu: false,
       ExtensionMode: true,
-      ShowFooterMenu: false,
+      ShowFooterMenu: true,
       ShowTestTip: false
     },
     children: [
@@ -89,6 +79,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/LaunchPage.vue'),
         meta: {
           ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'home',
+        component: () => import('pages/HomePage.vue'),
+        meta: {
+          AlignPageCenter: false
         }
       },
       {
@@ -128,26 +125,10 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: 'setting',
-        component: () => import('pages/SettingPage.vue'),
-        meta: {
-          ShowFooterMenu: true,
-          AlignPageCenter: false
-        }
-      },
-      {
         path: 'popup',
         component: () => import('pages/extension/PopupPage.vue'),
         meta: {
           ShowHeaderMenu: false,
-          AlignPageCenter: false
-        }
-      },
-      {
-        path: 'activity',
-        component: () => import('pages/ActivityPage.vue'),
-        meta: {
-          ShowFooterMenu: true,
           AlignPageCenter: false
         }
       }

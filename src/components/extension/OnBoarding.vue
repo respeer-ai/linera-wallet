@@ -38,20 +38,17 @@
 <script setup lang='ts'>
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
-import { computed } from 'vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 import lineraLogo from 'src/assets/LineraLogo.png'
 
-const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
-
 const router = useRouter()
 
 const onCreateWalletClick = () => {
-  void router.push({ path: extensionMode.value ? '/extension/initializewallet' : '/initializewallet' })
+  void router.push({ path: localStore.oneShotSetting.formalizePath('/initializewallet') })
 }
 
 const onImportWaletClick = () => {
-  void router.push({ path: extensionMode.value ? '/extension/importwallet' : '/importwallet' })
+  void router.push({ path: localStore.oneShotSetting.formalizePath('/importwallet') })
 }
 </script>

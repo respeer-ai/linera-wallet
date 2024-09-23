@@ -1,5 +1,5 @@
 <template>
-  <div class='full-width wide-page'>
+  <div class='full-width'>
     <PageHeaderView />
     <MainView v-if='!showSettingMenu' />
     <div v-else class='full-width full-height'>

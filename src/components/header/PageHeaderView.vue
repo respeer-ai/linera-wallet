@@ -12,7 +12,7 @@
         <template #label>
           <div class='row'>
             <q-img :src='selectedNetwork?.icon' width='20px' height='20px' />
-            <div class='header-items-margin-x-left page-header-network'>
+            <div v-if='!localStore.oneShotSetting.extensionMode' class='header-items-margin-x-left page-header-network'>
               {{ selectedNetwork?.name }}
             </div>
           </div>

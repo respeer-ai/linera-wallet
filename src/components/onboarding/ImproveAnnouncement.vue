@@ -29,6 +29,7 @@
 </template>
 
 <script setup lang='ts'>
+import { localStore } from 'src/localstores'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -42,7 +43,7 @@ const target = ref((route.query as unknown as Query).target)
 const router = useRouter()
 
 const onAnyBtnClick = () => {
-  void router.push({ path: target.value })
+  void router.push({ path: localStore.oneShotSetting.formalizePath(target.value) })
 }
 
 </script>
