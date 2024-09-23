@@ -9,7 +9,7 @@
         <q-btn
           rounded flat no-caps class='full-width bg-grey-1'
           @click='onViewMoreClick'
-          v-if='displayCount !== microchains.length'
+          v-if='displayCount <= microchains.length'
           color='grey-6'
           label='View more...'
         />
