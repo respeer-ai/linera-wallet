@@ -1,24 +1,24 @@
 <template>
-  <div class='full-width'>
+  <div :class='[ "full-width", localStore.oneShotSetting.extensionMode ? "page-x-padding" : "" ]'>
     <div class='text-bold'>
       Network name
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='network.name' :disable='network.preset' />
     </div>
-    <div class='text-bold page-item-y-margin-top'>
+    <div class='text-bold vertical-menus-margin'>
       Faucet URL
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='network.faucetUrl' :disable='network.preset' />
     </div>
-    <div class='text-bold page-item-y-margin-top'>
+    <div class='text-bold vertical-menus-margin'>
       RPC URL
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='rpcUrl' :disable='network.preset' />
     </div>
-    <div class='text-bold page-item-y-margin-top'>
+    <div class='text-bold vertical-menus-margin'>
       Subscription URL
     </div>
     <div class='page-item-y-margin-top'>
@@ -26,14 +26,14 @@
     </div>
     <div class='vertical-sections-margin'>
       <q-btn
-        dense flat class='btn full-width' no-caps
+        flat class='btn full-width vertical-menus-margin' no-caps
         @click='onSaveClick'
         v-if='!network.preset'
       >
         Save
       </q-btn>
       <q-btn
-        dense flat class='btn btn-alt full-width vertical-items-margin' no-caps
+        flat class='btn btn-alt full-width vertical-items-margin' no-caps
         @click='onDeleteClick'
         v-if='!network.preset && network.id !== undefined'
       >
@@ -49,6 +49,7 @@ import { db } from 'src/model'
 import { computed, ref, watch } from 'vue'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
+import { localStore } from 'src/localstores'
 
 const network = defineModel<db.Network>({ default: {} as db.Network })
 

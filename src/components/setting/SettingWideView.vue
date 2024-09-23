@@ -10,7 +10,7 @@
         <q-space />
         <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
       </div>
-      <SettingInnerView ref='settingInnerView' @back='onInnerBack' />
+      <SettingInnerWideView ref='settingInnerView' @back='onInnerBack' />
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@ import { ref } from 'vue'
 import { localStore } from 'src/localstores'
 
 import SidebarMenu from './SidebarMenu.vue'
-import SettingInnerView from './SettingInnerView.vue'
+import SettingInnerWideView from './SettingInnerWideView.vue'
 
 interface Size {
   width: number
@@ -28,7 +28,7 @@ interface Size {
 }
 
 const sidebarWidth = ref(0)
-const settingInnerView = ref<InstanceType<typeof SettingInnerView>>()
+const settingInnerView = ref<InstanceType<typeof SettingInnerWideView>>()
 
 const onSidebarResize = (size: Size) => {
   sidebarWidth.value = size.width

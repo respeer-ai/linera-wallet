@@ -1,5 +1,5 @@
 <template>
-  <q-item class='row full-width tab-panel-item' :clickable='clickable'>
+  <q-item class='row full-width tab-panel-item' :clickable='clickable' :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <div v-if='showIndicator' :class='[ "selector-indicator", microchain.default ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='db.microchainAvatar(microchain)' />
@@ -81,13 +81,15 @@ interface Props {
   integratedMode?: boolean
   showIndicator?: boolean
   clickable?: boolean
+  xPadding?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   microchain: undefined,
   showAccountBalance: false,
   integratedMode: true,
   showIndicator: true,
-  clickable: true
+  clickable: true,
+  xPadding: '0'
 })
 const microchain = toRef(props, 'microchain')
 const showAccountBalance = toRef(props, 'showAccountBalance')

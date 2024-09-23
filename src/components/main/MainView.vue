@@ -1,5 +1,5 @@
 <template>
-  <div class='full-width page-x-padding page-y-padding'>
+  <div :class='[ "full-width page-y-padding", localStore.oneShotSetting.extensionMode ? "" : "page-x-padding" ]'>
     <div v-if='localStore.oneShotSetting.homeAction === localStore.oneShotSettingDef.HomeAction.SHOW_MAIN'>
       <MainInnerView />
     </div>

@@ -1,6 +1,6 @@
 <template>
   <div class='extra-margin-bottom'>
-    <div class='row'>
+    <div :class='[ "row", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='flex items-center justify-center'>
         <q-icon name='bi-view-list' size='16px' />
       </div>
@@ -57,6 +57,7 @@ import { shortid } from 'src/utils'
 import AccountsInnerView from '../account/AccountsInnerView.vue'
 import AccountMicrochainsView from './AccountMicrochainsView.vue'
 import MicrochainDetailView from './MicrochainDetailView.vue'
+import { localStore } from 'src/localstores'
 
 const step = ref(1)
 const selectedOwner = ref(undefined as unknown as db.Owner)

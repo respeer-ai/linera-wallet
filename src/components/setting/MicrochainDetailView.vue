@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class='[ localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
     <div class='row vertical-sections-margin'>
       <q-avatar>
         <q-img :src='db.microchainAvatar(microchain)' />
@@ -28,6 +28,7 @@
 <script setup lang='ts'>
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
+import { localStore } from 'src/localstores'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'

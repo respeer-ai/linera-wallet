@@ -14,7 +14,7 @@
       <SidebarMenu @clicked='onMenuClicked' />
     </div>
     <div class='full-width' v-if='step === 2'>
-      <SettingInnerView ref='settingInnerView' @back='onInnerBack' />
+      <SettingInnerNarrowView ref='settingInnerView' @back='onInnerBack' />
     </div>
   </div>
 </template>
@@ -24,12 +24,12 @@ import { ref } from 'vue'
 import { localStore, oneShotSettingDef } from 'src/localstores'
 
 import SidebarMenu from './SidebarMenu.vue'
-import SettingInnerView from './SettingInnerView.vue'
+import SettingInnerNarrowView from './SettingInnerNarrowView.vue'
 
 const step = ref(1)
 const title = ref('Settings')
 
-const settingInnerView = ref<InstanceType<typeof SettingInnerView>>()
+const settingInnerView = ref<InstanceType<typeof SettingInnerNarrowView>>()
 
 const onBackClick = () => {
   if (step.value === 1) {

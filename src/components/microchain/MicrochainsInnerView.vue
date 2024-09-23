@@ -14,7 +14,7 @@
     </div>
     <div v-for='_microchain in displayMicrochains' :key='_microchain.microchain'>
       <div class='cursor-pointer' @click='onMicrochainSelected(_microchain)'>
-        <MicrochainCardView :microchain='_microchain' :show-indicator='showIndicator' />
+        <MicrochainCardView :microchain='_microchain' :show-indicator='showIndicator' :x-padding='xPadding' />
       </div>
     </div>
   </div>
@@ -31,10 +31,12 @@ import MicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 interface Props {
   searchable: boolean
   showIndicator?: boolean
+  xPadding?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   searchable: true,
-  showIndicator: true
+  showIndicator: true,
+  xPadding: '0'
 })
 const searchable = toRef(props, 'searchable')
 const showIndicator = toRef(props, 'showIndicator')

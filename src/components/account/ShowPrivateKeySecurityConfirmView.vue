@@ -18,7 +18,7 @@
         <q-btn
           :loading='confirmedSeconds > 0 && confirmedSeconds < confirmSeconds'
           :percentage='confirmedSeconds * 100 / confirmSeconds'
-          flat dense class='btn full-width' label='Long press to show private key'
+          flat class='btn full-width' label='Long press to show private key'
           no-caps
           v-touch-repeat.mouse='onConfirmClick'
           @mouseup='onConfirmCanceled'

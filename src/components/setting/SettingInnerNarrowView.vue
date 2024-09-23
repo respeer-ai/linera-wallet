@@ -1,7 +1,7 @@
 <template>
   <q-tab-panels v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu' animated>
     <q-tab-panel :name='localStore.oneShotSettingDef.Menu.NETWORKS'>
-      <NetworkSettingView />
+      <NetworkSettingNarrowView ref='networkSettingView' />
     </q-tab-panel>
     <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ABOUT_US'>
       <AboutUsView />
@@ -22,20 +22,26 @@
 import { localStore } from 'src/localstores'
 import { ref } from 'vue'
 
-import NetworkSettingView from './NetworkSettingView.vue'
+import NetworkSettingNarrowView from './NetworkSettingNarrowView.vue'
 import AboutUsView from './AboutUsView.vue'
 import StorageOperationView from './StorageOperationView.vue'
 import AccountsView from './AccountsView.vue'
 import AddressesBook from './AddressesBook.vue'
 
 const accountsView = ref<InstanceType<typeof AccountsView>>()
+const networkSettingView = ref<InstanceType<typeof NetworkSettingNarrowView>>()
 
 const back = () => {
-  if (localStore.oneShotSettingDef.Menu.ACCOUNTS !== localStore.oneShotSetting.selectedSettingMenu) {
-    return emit('back')
+  switch (localStore.oneShotSetting.selectedSettingMenu) {
+    case localStore.oneShotSettingDef.Menu.ACCOUNTS:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+      return accountsView.value?.back()
+    case localStore.oneShotSettingDef.Menu.NETWORKS:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return networkSettingView.value?.back()
+    default:
+      return emit('back')
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  accountsView.value?.back()
 }
 
 defineExpose({

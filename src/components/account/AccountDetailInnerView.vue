@@ -12,7 +12,7 @@
         <q-icon name='bi-copy' size='16px' />
       </div>
       <q-btn
-        flat dense no-caps class='btn btn-alt full-width vertical-sections-margin'
+        flat no-caps class='btn btn-alt full-width vertical-sections-margin'
         label='Show private key'
         @click='onShowPrivateKeyClick'
       />

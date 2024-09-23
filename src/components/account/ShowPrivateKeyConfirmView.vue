@@ -38,13 +38,13 @@
         </div>
       </div>
       <q-btn
-        flat dense no-caps class='btn full-width vertical-sections-margin'
+        flat no-caps class='btn full-width vertical-sections-margin'
         label='Confirm'
         @click='onConfirmClick'
         :disable='_password.length === 0 || !password?.length || _password !== password '
       />
       <q-btn
-        flat dense no-caps class='btn btn-alt full-width vertical-items-margin'
+        flat no-caps class='btn btn-alt full-width vertical-items-margin'
         label='Cancel'
         @click='onCancelClick'
       />

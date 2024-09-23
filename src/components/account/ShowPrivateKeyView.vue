@@ -26,7 +26,7 @@
         <q-btn
           :loading='confirmedSeconds > 0 && confirmedSeconds < confirmSeconds'
           :percentage='confirmedSeconds * 100 / confirmSeconds'
-          flat dense class='btn full-width' label='Done'
+          flat class='btn full-width' label='Done'
           no-caps
           @click='onDoneClick'
         />
