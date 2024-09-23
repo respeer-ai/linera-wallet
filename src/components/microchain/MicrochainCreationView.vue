@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div>
+      Please backup microchain ID, the message used to create microchain and certificate hash which contains the microchain creation message properly. You can import microchain with those data in future.
+    </div>
     <div class='text-bold vertical-sections-margin decorate-underline'>
       Microchain ID
     </div>
@@ -19,7 +22,7 @@
       {{ microchain.certificateHash }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
     </div>
     <div class='vertical-sections-margin tip warn'>
-      <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginBottom: "4px"}' /> You <strong>must backup</strong> microchain creation message for late recovery.
+      <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginBottom: "4px"}' /> You <strong>must backup</strong> microchain creation materials for late recovery.
       <span class='text-blue-8 cursor-pointer' @click='onBackupClick'>Backup</span>
     </div>
     <q-btn

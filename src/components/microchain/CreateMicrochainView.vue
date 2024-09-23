@@ -1,7 +1,11 @@
 <template>
   <div class='full-width'>
-    <OpenChain ref='openChain' />
-    <q-stepper v-model='step' animated alternative-labels>
+    <q-stepper
+      flat v-model='step' animated
+      alternative-labels
+      header-class='hide'
+      :style='{marginTop: "-16px"}'
+    >
       <q-step :name='1' :done='step > 1' title='Creating' class='flex items-center justify-center'>
         <q-card flat class='loading-card'>
           <q-inner-loading
@@ -19,6 +23,7 @@
         <ValidateMicrochainView :microchain='createdMicrochain' @validated='onMicrochainValidated' />
       </q-step>
     </q-stepper>
+    <OpenChain ref='openChain' />
   </div>
 </template>
 

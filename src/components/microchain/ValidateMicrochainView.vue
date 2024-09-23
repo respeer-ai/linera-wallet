@@ -1,22 +1,34 @@
 <template>
   <div class='full-width'>
-    <div class='text-bold vertical-sections-margin decorate-underline'>
+    <div>
+      CheCko need to know the microchain ID, the message used to create microchain and the certificate hash in which the creation message is packed to rebuild microchain store on MaaS cluster.
+    </div>
+    <div class='vertical-sections-margin tip info'>
+      <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> Paste microchain creation information to input box to verify.
+    </div>
+    <div class='text-bold vertical-sections-margin'>
       Microchain ID
     </div>
-    <q-input v-model='microchainId' type='textarea' :error='microchainIdError' autogrow />
-    <div class='text-bold vertical-sections-margin  decorate-underline'>
+    <q-input
+      outlined v-model='microchainId' type='textarea' :error='microchainIdError'
+      autogrow hide-bottom-space class='vertical-items-margin'
+    />
+    <div class='text-bold vertical-menus-margin'>
       Creation message
     </div>
-    <q-input v-model='messageId' type='textarea' :error='messageIdError' autogrow />
-    <div class='text-bold vertical-sections-margin  decorate-underline'>
+    <q-input
+      outlined v-model='messageId' type='textarea' :error='messageIdError'
+      autogrow hide-bottom-space class='vertical-items-margin'
+    />
+    <div class='text-bold vertical-menus-margin'>
       Creation certificate
     </div>
-    <q-input v-model='certificateHash' type='textarea' :error='certificateHashError' autogrow />
-    <div class='vertical-sections-margin tip info'>
-      <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> Paste microchain creation information to input box.
-    </div>
+    <q-input
+      outlined v-model='certificateHash' type='textarea' :error='certificateHashError'
+      autogrow hide-bottom-space class='vertical-items-margin'
+    />
     <q-btn
-      class='btn vertical-sections-margin extra-margin-bottom full-width' dense flat no-caps
+      class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
       @click='onValidateClick' :disabled='!canValidate'
     >
       Let's go
