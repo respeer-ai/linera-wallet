@@ -1,6 +1,6 @@
 <template>
-  <div :class='[ localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-    <div class='row vertical-sections-margin'>
+  <div>
+    <div :class='[ "row vertical-sections-margin", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <q-avatar>
         <q-img :src='db.microchainAvatar(microchain)' />
       </q-avatar>
