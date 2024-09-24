@@ -24,6 +24,13 @@ chrono = "0.4.38"
 serde_json = "1.0.116"
 tokio = "1.38.0"
 local-encoding = "0.2.0"
+rand_chacha = "0.3.1"
+
+[dependencies.bip39]
+git = "https://github.com/rust-bitcoin/rust-bip39.git"
+# branch = "release-2.1.0"
+rev = "125abebde658184e622f21b48678b0453d3a2022"
+features = [ "rand" ]
 
 [features]
 default = ["no-storage"]

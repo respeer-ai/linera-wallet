@@ -1,3 +1,4 @@
+use bip39::Mnemonic;
 /**
 This module defines the client API for the Web extension.
 
@@ -21,6 +22,7 @@ use linera_execution::Operation;
 use log::info;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
+use serde::Serialize;
 
 use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions, wallet::{Wallet, FakeWallet}};
 
@@ -183,7 +185,7 @@ pub async fn dapp_query(n: u32) -> u32 {
 
 // Execute operation to get
 #[wasm_bindgen]
-pub async fn execute_operation_with_messages_no_storage(chain_id: &str, operation: &str, messages: &str, public_key: &str, nextBlockHeight: &str, blockHash: &str, adminId: &str, timestamp: u64) -> Result<Option<String>, JsError> {
+pub async fn execute_operation_with_messages_no_storage(chain_id: &str, operation: &str, messages: &str, public_key: &str, nextBlockHeight: &str, blockHash: &str, adminId: &str, timestamp: &str) -> Result<Option<String>, JsError> {
   log::info!("----execute_operation_with_messages");
   let chain_id: ChainId = ChainId::from_str(chain_id)?;
   log::info!("--chain_id: {:?}", chain_id);
@@ -201,7 +203,13 @@ pub async fn execute_operation_with_messages_no_storage(chain_id: &str, operatio
   let key_pair: Option<KeyPair> = Some(KeyPair::from_public_key(PublicKey::from_str(public_key)?));
   let admin_id: ChainId = ChainId::from_str(adminId)?;
   let block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(blockHash)?);
-  let timestamp: Timestamp = Timestamp::from(timestamp);
+  let number = match timestamp.parse::<u64>() {
+    Ok(num) => num,
+    Err(_) => {
+      Err(JsError::new("invalid timestamp"))?
+    }
+  };
+  let timestamp: Timestamp = Timestamp::from(number);
   let next_block_height: BlockHeight = BlockHeight::from_str(nextBlockHeight)?;
 
   let chain_client = client_context.make_chain_client_without_wallet_state(chain_id, key_pair, admin_id, block_hash, timestamp, next_block_height);
@@ -290,6 +298,39 @@ pub async fn execute_operation_with_messages_no_storage(chain_id: &str, operatio
 //   }
 //     Ok(None)
 // }
+
+
+#[derive(Serialize)]
+struct MnemonicKeyPair {
+    mnemonic: Mnemonic,
+    secret_key: String
+}
+
+#[wasm_bindgen]
+pub async fn generate_key_pair(passphrase: &str) -> Result<String, JsError> {
+    let mut rng = bip39::rand::thread_rng();
+    let mnemonic = bip39::Mnemonic::generate_in_with(&mut rng, bip39::Language::English, 24)?;
+    let secret_key = generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?;
+    let secret_key = secret_key.replace("\"", "");
+    Ok(serde_json::to_string(&MnemonicKeyPair {
+        mnemonic: mnemonic.clone(),
+        secret_key
+    })?)
+}
+
+#[wasm_bindgen]
+pub async fn generate_key_pair_from_mnemonic(mnemonic: &str, passphrase: &str) -> Result<String, JsError> {
+    let mnemonic = bip39::Mnemonic::parse_normalized(mnemonic)?;
+    let seed = mnemonic.to_seed(passphrase);
+    use rand_chacha::rand_core::SeedableRng;
+    let mut _seed = [0u8; 32];
+    _seed.copy_from_slice(&seed[0..32]);
+    let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
+    let key_pair = KeyPair::generate_from(&mut rng);
+    let key_str = format!("{}", serde_json::to_string(&key_pair)?);
+    let key_str = key_str.replace("\"", "");
+    Ok(key_str[..64].to_string())
+}
 
 #[wasm_bindgen(start)]
 pub async fn main() {
