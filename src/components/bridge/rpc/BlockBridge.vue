@@ -112,7 +112,7 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
               incomingBundles {
                 origin
                 action
-                event
+                bundle
               }
               operations
               height
@@ -130,8 +130,14 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
                 message
               }
               stateHash
-              oracleResponses {
-                responses
+              oracleResponses
+              events {
+                streamId {
+                  applicationId
+                  streamName
+                }
+                key
+                value
               }
             }
           }

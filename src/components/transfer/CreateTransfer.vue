@@ -1,55 +1,59 @@
 <template>
-  <q-card flat class='full-width page-x-padding vertical-menus-margin transfer-card'>
-    <div class='row'>
-      <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
-      <q-space />
-      <p class='text-center text-bold text-grey-9 selector-title'>
-        Transfer tokens
-      </p>
-      <q-space />
-      <div v-show='false'>
-        <q-icon
-          name='bi-x' size='24px' class='cursor-pointer'
-          @click='onBackClick'
+  <q-card flat class='full-width page-x-padding vertical-menus-margin row'>
+    <q-space />
+    <div class='transfer-card'>
+      <div class='row'>
+        <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
+        <q-space />
+        <p class='text-center text-bold text-grey-9 selector-title'>
+          Transfer tokens
+        </p>
+        <q-space />
+        <div v-show='false'>
+          <q-icon
+            name='bi-x' size='24px' class='cursor-pointer'
+            @click='onBackClick'
+          />
+        </div>
+      </div>
+      <div v-if='step === 1' class='full-width'>
+        <SelectTransferAccount
+          @next='onSelectTransferAccountNext'
+          v-model:selected-from-owner='selectedFromOwner'
+          v-model:selected-from-microchain='selectedFromMicrochain'
+          v-model:selected-to-owner='selectedToOwner'
+          v-model:selected-to-microchain='selectedToMicrochain'
+          v-model:to-address='toAddress'
+          v-model:to-microchain='toMicrochain'
+          v-model:from-chain-balance='fromChainBalance'
+          v-model:to-chain-balance='toChainBalance'
+        />
+      </div>
+      <div v-if='step === 2' class='full-width'>
+        <SetTranserAmount
+          :from-owner='selectedFromOwner'
+          :from-microchain='selectedFromMicrochain'
+          v-model:from-chain-balance='fromChainBalance'
+          @next='onSetTransferAmountNext'
+          v-model='amount'
+        />
+      </div>
+      <div v-if='step === 3' class='full-width'>
+        <ConfirmTransfer
+          :from-owner='selectedFromOwner'
+          :from-microchain='selectedFromMicrochain'
+          :to-owner='selectedToOwner'
+          :to-microchain='selectedToMicrochain'
+          :to-address='toAddress'
+          :to-microchain-id='toMicrochain'
+          :from-chain-balance='fromChainBalance'
+          :to-chain-balance='toChainBalance'
+          :amount='amount'
+          @confirmed='onTransferConfirmed'
         />
       </div>
     </div>
-    <div v-if='step === 1'>
-      <SelectTransferAccount
-        @next='onSelectTransferAccountNext'
-        v-model:selected-from-owner='selectedFromOwner'
-        v-model:selected-from-microchain='selectedFromMicrochain'
-        v-model:selected-to-owner='selectedToOwner'
-        v-model:selected-to-microchain='selectedToMicrochain'
-        v-model:to-address='toAddress'
-        v-model:to-microchain='toMicrochain'
-        v-model:from-chain-balance='fromChainBalance'
-        v-model:to-chain-balance='toChainBalance'
-      />
-    </div>
-    <div v-if='step === 2'>
-      <SetTranserAmount
-        :from-owner='selectedFromOwner'
-        :from-microchain='selectedFromMicrochain'
-        v-model:from-chain-balance='fromChainBalance'
-        @next='onSetTransferAmountNext'
-        v-model='amount'
-      />
-    </div>
-    <div v-if='step === 3'>
-      <ConfirmTransfer
-        :from-owner='selectedFromOwner'
-        :from-microchain='selectedFromMicrochain'
-        :to-owner='selectedToOwner'
-        :to-microchain='selectedToMicrochain'
-        :to-address='toAddress'
-        :to-microchain-id='toMicrochain'
-        :from-chain-balance='fromChainBalance'
-        :to-chain-balance='toChainBalance'
-        :amount='amount'
-        @confirmed='onTransferConfirmed'
-      />
-    </div>
+    <q-space />
   </q-card>
   <RpcTransferBridge ref='rpcTransferBridge' />
   <DbMicrochainBridge ref='dbMicrochainBridge' />
@@ -104,7 +108,6 @@ const onBackClick = () => {
 }
 
 const onTransferConfirmed = () => {
-  console.log(fromChainBalance.value, toChainBalance.value)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   rpcTransferBridge.value?.transfer(
     fromChainBalance.value ? undefined : selectedFromOwner.value?.address,

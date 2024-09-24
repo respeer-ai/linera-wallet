@@ -23,7 +23,7 @@
             {{ fromChainBalance ? 'Chain balance' : 'Account balance' }}
           </div>
           <div class='page-item-x-margin-left cursor-pointer' @click='onChangeFromBalanceClick'>
-            <q-icon name='bi-arrow-down-up' size='16px' />
+            <q-icon name='bi-arrow-down-up' size='12px' />
           </div>
         </div>
         <div>
@@ -81,7 +81,7 @@ watch(amount, () => {
   amount.value = Math.min(fromChainBalance.value ? chainTokenBalance.value : accountTokenBalance.value, Number(amount.value))
 })
 
-const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().length, 8), 1)) * 16).toString() + 'px')
+const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().length, 8), 1)) * 14).toString() + 'px')
 
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)

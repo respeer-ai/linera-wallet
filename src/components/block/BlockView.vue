@@ -78,7 +78,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
     }, async (hash: string) => {
       await updateChainAccountBalances(microchain, publicKeys)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      const blockResp = rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash)
+      const blockResp = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash)
       console.log(blockResp)
     }, () => {
       // DO NOTHING
