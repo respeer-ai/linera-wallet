@@ -16,8 +16,8 @@
         title='Create Password'
         :done='step > 1'
       >
-        <NewPassword v-if='!extensionMode' v-model:password='password' v-model:error='passwordError' />
-        <ExtensionNewPassword v-else v-model:password='password' v-model:error='passwordError' />
+        <!-- <NewPassword v-if='!extensionMode' v-model:password='password' v-model:error='passwordError' /> -->
+        <ExtensionNewPassword v-model:password='password' v-model:error='passwordError' />
       </q-step>
       <q-step
         :name='2'
@@ -44,7 +44,6 @@ import { ref, computed } from 'vue'
 import { wallet, notify, oneshotsetting } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
-import NewPassword from 'src/components/NewPassword.vue'
 import ExtensionNewPassword from 'src/components/extension/NewPassword.vue'
 import ImportAccount from 'src/components/ImportAccount.vue'
 import ExtensionImportAccount from 'src/components/extension/ImportAccount.vue'

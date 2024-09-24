@@ -53,3 +53,43 @@ export interface IncomingBundle {
   action: string
   event: Event
 }
+
+export interface Owner {
+  [key: string]: string
+}
+
+export interface TimeoutConfig {
+  fast_round_duration?: number
+  base_timeout: number
+  timeout_increment: number
+  fallback_duration: number
+}
+
+export interface NodeChainOwnership {
+  super_owners: Owner
+  owners: Owner
+  multi_leader_rounds: number
+  timeout_config: TimeoutConfig
+}
+
+export interface NodeChainManagerInfo {
+  ownership: NodeChainOwnership
+  leader?: Owner
+  current_round: string
+}
+
+export interface Child {
+  chain_id: string
+  height: number
+  index: number
+}
+
+export interface NodeChainInfo {
+  chain_id: string
+  epoch: number
+  manager: NodeChainManagerInfo
+  chain_balance: string
+  block_hash: string
+  timestamp: string
+  next_block_height: number
+}

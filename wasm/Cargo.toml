@@ -28,8 +28,7 @@ rand_chacha = "0.3.1"
 
 [dependencies.bip39]
 git = "https://github.com/rust-bitcoin/rust-bip39.git"
-# branch = "release-2.1.0"
-rev = "125abebde658184e622f21b48678b0453d3a2022"
+branch = "master"
 features = [ "rand" ]
 
 [features]

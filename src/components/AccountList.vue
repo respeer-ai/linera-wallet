@@ -117,7 +117,6 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
     if (newBlock) {
       onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)
     }
-    console.log('-------- reason: ', reason)
     const newIncomingBundle = graphqlResult.keyValue(reason, 'NewIncomingBundle')
     if (newIncomingBundle) {
       onNewIncomingBundle?.()
@@ -395,7 +394,7 @@ const getPendingMessages = (chainId: string, done?: (messages: Array<graphqlResu
   })
 }
 
-const getChainInfos = (chainId: string, done?: (nextBlockHeight: number, blockHash: string, adminId: string, timestamp: number) => void) => {
+const getChain = (chainId: string, done?: (nextBlockHeight: number, blockHash: string, adminId: string, timestamp: number, executionStateHash: string) => void) => {
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query chain($chainId: String!) {
       chain(chainId: $chainId) {
@@ -447,7 +446,8 @@ const getChainInfos = (chainId: string, done?: (nextBlockHeight: number, blockHa
     const system = graphqlResult.keyValue(executionState, 'system')
     const adminId = graphqlResult.keyValue(system, 'adminId') as string
     const timestamp = graphqlResult.keyValue(system, 'timestamp') as number
-    done?.(nextBlockHeight, blockHash, adminId, timestamp)
+    const executionStateHash = graphqlResult.keyValue(chain, 'executionStateHash') as string
+    done?.(nextBlockHeight, blockHash, adminId, timestamp, executionStateHash)
   })
 
   onError((error) => {
@@ -455,57 +455,111 @@ const getChainInfos = (chainId: string, done?: (nextBlockHeight: number, blockHa
   })
 }
 
-const constructSetWallet = (state: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  fetch(wasmModuleUrl).then((buffer) => {
-    initWasm(buffer).then(() => {
-      console.log('set dev wallet')
-      console.log('set state: ', state)
-      const wallet = '{"chains":{"1db1936dad0717597a7743a8353c9c0191c14c3a129b258e9743aec2b4f05d03":{"chain_id":"1db1936dad0717597a7743a8353c9c0191c14c3a129b258e9743aec2b4f05d03","key_pair":null,"block_hash":null,"timestamp":1725413452996529,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"256e1dbc00482ddd619c293cc0df94d366afe7980022bb22d99e33036fd465dd":{"chain_id":"256e1dbc00482ddd619c293cc0df94d366afe7980022bb22d99e33036fd465dd","key_pair":"712603f0eb50793fd43181a6cb249cc8e7f648c929ab0907f29bbc180fdaf3c7ca7da3cf5c7e150f3e673551c21e8b071dbc7c681bc3f2a51ccf341651238849","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"36137b1ddac30eb9d0d4821a1560e66795dbdad6dbf4b708a8d81ca3df866e1b":{"chain_id":"36137b1ddac30eb9d0d4821a1560e66795dbdad6dbf4b708a8d81ca3df866e1b","key_pair":null,"block_hash":null,"timestamp":1725413453530077,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"434021b6e50e9ee255c40a66e65ba6ac41d8aacde231a263243d123714dbf67f":{"chain_id":"434021b6e50e9ee255c40a66e65ba6ac41d8aacde231a263243d123714dbf67f","key_pair":"ecac842b16b187cf11cba5ae3737d9d84b991cf422512eba70507b3a29c188bca5f82d50e46b685536a8fcbf859c835965ea7d746582ffd7250f8f17e4e06bd9","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"59ca93bbbf08be7d469596847511a4d066a2c9298ce29624357baa198cc23a0b":{"chain_id":"59ca93bbbf08be7d469596847511a4d066a2c9298ce29624357baa198cc23a0b","key_pair":"f47b0377d800489a5f31b81727621c6d75c4a125387fd17fb844ad7d3995b7ef091daa2f91c78e7cd3f91f6c0ab8b97b66fbf7d8dd7497e16259b7d9556810e9","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"673ce04da4b8ed773ee7cd5828a2083775bea4130498b847c5b34b2ed913b07f":{"chain_id":"673ce04da4b8ed773ee7cd5828a2083775bea4130498b847c5b34b2ed913b07f","key_pair":"93773f2611784e955f625105b8933c10ccb0bf23206e80f74c5e7577c6954e80917a91edf8602b13ec88fb7c04c34e032c10df931542c064645aa9061e23a4ac","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"69705f85ac4c9fef6c02b4d83426aaaf05154c645ec1c61665f8e450f0468bc0":{"chain_id":"69705f85ac4c9fef6c02b4d83426aaaf05154c645ec1c61665f8e450f0468bc0","key_pair":"791a37f0d230e90888c00c64c83215c67e5d8fdbcdbe1e99cc98ef85775c0051f1ef4cfb0fe3517f7854f8b3cb4036e39a9540475a1591a2a61b8bebfdf5fd0b","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"82c880daad4d0c3a6acfa0c29a79f4dafc53ce8e4624156b0f6164f3d3cb9d04":{"chain_id":"82c880daad4d0c3a6acfa0c29a79f4dafc53ce8e4624156b0f6164f3d3cb9d04","key_pair":"fcd3f3c993fcd970e599af72ad6a65cbb8890c7131660c9139dce26e9a385832a32f90464b1846ca87b0867928e2effd1b4768b349b51dd9f30ec02510ea9b06","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"af5ce56be024e99c2db8cde475b75ff1ddd8e7aa4dc95ae5db1061ed652e264a":{"chain_id":"af5ce56be024e99c2db8cde475b75ff1ddd8e7aa4dc95ae5db1061ed652e264a","key_pair":"f512d210f35c958b08abebc6c1596cd5e12964b74b8d4ab2e7269874a6fb103df760f6c166b0bed0d801b8681bb40dad78f794af51cde87346b05642efec2f86","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"be20093606a7296fbda537060becfecc62b5441fa784b3d26d6742152a80a1f9":{"chain_id":"be20093606a7296fbda537060becfecc62b5441fa784b3d26d6742152a80a1f9","key_pair":null,"block_hash":null,"timestamp":1725413453785624,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"dad01517c7a3c428ea903253a9e59964e8db06d323a9bd3f4c74d6366832bdbf":{"chain_id":"dad01517c7a3c428ea903253a9e59964e8db06d323a9bd3f4c74d6366832bdbf","key_pair":"edacc30eb072011e7eb0ff24ab71b1449f706379acb66987030b035efdf4378ab9261a9c5776cf34974af545f1a0119f1b50cf83b505afddd7c56323e77bddf9","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"e476187f6ddfeb9d588c7b45d3df334d5501d6499b3f9ad5595cae86cce16a65":{"chain_id":"e476187f6ddfeb9d588c7b45d3df334d5501d6499b3f9ad5595cae86cce16a65","key_pair":"bf9109c12cbbaa3fc57a3d529a4f68eee5b9bc5997e31f39a803711de02e3e7c4aebf3ab685ef21e883d196db59fcec23c6076e8a75df25bd69c3d2be4f1e5fb","block_hash":"4400a534eafc375a47241db36f49ab0c3b51dc379c7809ba5ee755f9dfd8a631","timestamp":1725434011540298,"next_block_height":12,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"e54bdb17d41d5dbe16418f96b70e44546ccd63e6f3733ae3c192043548998ff3":{"chain_id":"e54bdb17d41d5dbe16418f96b70e44546ccd63e6f3733ae3c192043548998ff3","key_pair":"790765595ec7c7f5eb5cd74ea2fc4c7feef9b3de778a9838308a229ce6260aeeda2c435c4069751f5f3c8bfd5d51ba6ea7866f48e5ef7802721ae9b6bddb8424","block_hash":null,"timestamp":1725413451420684,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]},"fc9384defb0bcd8f6e206ffda32599e24ba715f45ec88d4ac81ec47eb84fa111":{"chain_id":"fc9384defb0bcd8f6e206ffda32599e24ba715f45ec88d4ac81ec47eb84fa111","key_pair":null,"block_hash":null,"timestamp":1725413453260022,"next_block_height":0,"pending_block":null,"pending_blobs":{},"pending_raw_block":null,"pending_operations":[]}},"unassigned_key_pairs":{},"default":"e476187f6ddfeb9d588c7b45d3df334d5501d6499b3f9ad5595cae86cce16a65","genesis_config":{"committee":{"validators":[{"name":"c6eb4def23f489e52855c9f77226cfdb2c20e0ea7b4faa24e050642e7712fe7c","network":{"protocol":{"Grpc":"ClearText"},"host":"127.0.0.1","port":9000}}]},"admin_id":"e476187f6ddfeb9d588c7b45d3df334d5501d6499b3f9ad5595cae86cce16a65","timestamp":1725413451420684,"chains":[["4aebf3ab685ef21e883d196db59fcec23c6076e8a75df25bd69c3d2be4f1e5fb","1000000."],["917a91edf8602b13ec88fb7c04c34e032c10df931542c064645aa9061e23a4ac","1000000."],["f1ef4cfb0fe3517f7854f8b3cb4036e39a9540475a1591a2a61b8bebfdf5fd0b","1000000."],["da2c435c4069751f5f3c8bfd5d51ba6ea7866f48e5ef7802721ae9b6bddb8424","1000000."],["f760f6c166b0bed0d801b8681bb40dad78f794af51cde87346b05642efec2f86","1000000."],["091daa2f91c78e7cd3f91f6c0ab8b97b66fbf7d8dd7497e16259b7d9556810e9","1000000."],["a5f82d50e46b685536a8fcbf859c835965ea7d746582ffd7250f8f17e4e06bd9","1000000."],["a32f90464b1846ca87b0867928e2effd1b4768b349b51dd9f30ec02510ea9b06","1000000."],["b9261a9c5776cf34974af545f1a0119f1b50cf83b505afddd7c56323e77bddf9","1000000."],["ca7da3cf5c7e150f3e673551c21e8b071dbc7c681bc3f2a51ccf341651238849","1000000."]],"policy":{"block":"0.","fuel_unit":"0.","read_operation":"0.","write_operation":"0.","byte_read":"0.","byte_written":"0.","byte_stored":"0.","operation":"0.","operation_byte":"0.","message":"0.","message_byte":"0.","maximum_bytes_read_per_block":18446744073709551615,"maximum_bytes_written_per_block":18446744073709551615},"network_name":"linera-2024-09-04T01:30:51"},"testing_prng_seed":null}'
-      console.log('set wallet: ', wallet)
-      // lineraWasm.set_wallet(wallet).then(() => {
-      //   console.log('set successful')
-      // }).catch((error) => {
-      //   console.log('set_dev_wallet error: ', error)
-      // })
-    }).catch(() => {
-      // TODO
-    })
-  }).catch(() => {
-    // TODO
+const getChainInfo = (chainId: string, done?: (nodeChainInfo: graphqlResult.NodeChainInfo) => void) => {
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
+    query nodeChainInfo($chainId: String!) {
+      nodeChainInfo(chainId: $chainId) {
+        chainId
+        epoch
+        manager {
+          ownership {
+            superOwners
+            owners
+            multiLeaderRounds
+            timeoutConfig {
+              fallbackDuration
+              baseTimeout
+              timeoutIncrement
+              fallbackDuration
+            }
+          }
+          leader
+          currentRound
+        }
+        chainBalance
+        blockHash
+        timestamp
+        nextBlockHeight
+      }
+    }
+  `, {
+    chainId
+  }, {
+    fetchPolicy: 'network-only'
+  }))
+
+  onResult((res) => {
+    console.log('Get chain info: ', res)
+    const nodeChainInfo = graphqlResult.data(res, 'nodeChainInfo')
+    const chainId = graphqlResult.keyValue(nodeChainInfo, 'chainId')
+    const epoch = graphqlResult.keyValue(nodeChainInfo, 'epoch')
+    const chainBalance = graphqlResult.keyValue(nodeChainInfo, 'chainBalance')
+    const blockHash = graphqlResult.keyValue(nodeChainInfo, 'blockHash')
+    const timestamp = graphqlResult.keyValue(nodeChainInfo, 'timestamp')
+    const nextBlockHeight = graphqlResult.keyValue(nodeChainInfo, 'nextBlockHeight') as number
+    const manager = graphqlResult.keyValue(nodeChainInfo, 'manager')
+    const ownership = graphqlResult.keyValue(manager, 'ownership')
+    const leader = graphqlResult.keyValue(manager, 'leader') as graphqlResult.Owner
+    const currentRound = graphqlResult.keyValue(manager, 'currentRound')
+    const superOwners = graphqlResult.keyValue(ownership, 'superOwners') as graphqlResult.Owner
+    const owners = graphqlResult.keyValue(ownership, 'owners') as graphqlResult.Owner
+    const multiLeaderRounds = graphqlResult.keyValue(ownership, 'multiLeaderRounds') as number
+    const timeoutConfig = graphqlResult.keyValue(ownership, 'timeoutConfig')
+    const fastRoundDuration = graphqlResult.keyValue(timeoutConfig, 'fastRoundDuration') as number
+    const baseTimeout = graphqlResult.keyValue(timeoutConfig, 'baseTimeout') as number
+    const timeoutIncrement = graphqlResult.keyValue(timeoutConfig, 'timeoutIncrement') as number
+    const fallbackDuration = graphqlResult.keyValue(timeoutConfig, 'fallbackDuration') as number
+
+    const resultTimeoutConfig = {
+      fast_round_duration: fastRoundDuration,
+      base_timeout: baseTimeout,
+      timeout_increment: timeoutIncrement,
+      fallback_duration: fallbackDuration
+    } as graphqlResult.TimeoutConfig
+
+    const resultOwnership = {
+      super_owners: superOwners,
+      owners: owners,
+      multi_leader_rounds: multiLeaderRounds,
+      timeout_config: resultTimeoutConfig
+    } as graphqlResult.NodeChainOwnership
+
+    const resultManager = {
+      ownership: resultOwnership,
+      leader: leader,
+      current_round: currentRound
+    } as graphqlResult.NodeChainManagerInfo
+
+    const result = {
+      chain_id: chainId,
+      epoch: epoch,
+      manager: resultManager,
+      chain_balance: chainBalance,
+      block_hash: blockHash,
+      timestamp: timestamp,
+      next_block_height: nextBlockHeight
+    } as graphqlResult.NodeChainInfo
+    done?.(result)
+  })
+
+  onError((error) => {
+    console.log('Get chain messages', error)
   })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const constructNewBlockWithIncomingBundles = (chainId: string, keyPair: Ed25519SigningKey) => {
-  getChainInfos(chainId, (nextBlockHeight: number, blockHash: string, adminId: string, timestamp: number) => {
-    console.log('---nextBlockHeight: ', nextBlockHeight)
-    console.log('---blockHash: ', blockHash)
-    console.log('---adminId: ', adminId)
-    console.log('---timestamp: ', timestamp)
-    console.log('---keyPair: ', keyPair)
-    console.log('---keyPair str: ', JSON.stringify(keyPair))
+  getChainInfo(chainId, (nodeChainInfo: graphqlResult.NodeChainInfo) => {
     getPendingMessages(chainId, (messages: Array<graphqlResult.IncomingBundle>) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       fetch(wasmModuleUrl).then((buffer) => {
         initWasm(buffer).then(() => {
-          // console.log('set dev wallet')
-          // lineraWasm.set_dev_wallet(1).then(() => {
-          //   console.log('successful')
-          // }).catch((error) => {
-          //   console.log('set_dev_wallet error: ', error)
-          // })
-          console.log('Signing', chainId, messages)
-          // lineraWasm.execute_operation_with_messages(chainId, '', JSON.stringify(messages)).then((signedMsg) => {
-          //   console.log(signedMsg)
-          // }).catch((error) => {
-          //   console.log('execute_operation_with_messages', error)
-          // })
-          console.log('---_wallet.publicKeys[0]: ', _wallet.publicKeys[0])
-          lineraWasm.execute_operation_with_messages_no_storage(chainId, '', JSON.stringify(messages), _wallet.publicKeys[0], nextBlockHeight.toString(), blockHash, adminId, timestamp.toString()).then((signedMsg) => {
-            console.log(signedMsg)
-          }).catch((error) => {
-            console.log('execute_operation_with_messages', error)
+          getChain(chainId, (nextBlockHeight: number, blockHash: string, adminId: string, timestamp: number, executionStateHash: string) => {
+            lineraWasm.execute_operation_with_messages_no_storage(chainId, '', JSON.stringify(messages), JSON.stringify(nodeChainInfo), executionStateHash, _wallet.publicKeys[0], nextBlockHeight.toString(), blockHash, adminId, timestamp.toString()).then((signedMsg) => {
+              console.log('signedMsg: ', signedMsg)
+            }).catch((error) => {
+              console.log('execute_operation_with_messages', error)
+            })
           })
         }).catch(() => {
           // TODO
@@ -518,18 +572,13 @@ const constructNewBlockWithIncomingBundles = (chainId: string, keyPair: Ed25519S
 }
 
 const processChains = () => {
-  console.log('----- processChains')
   addresses.value.forEach((addr) => {
     const chains = _wallet.accountChains(addr)
     const account = _wallet.account(addr)
-    console.log('----- chains: ', chains)
-    console.log('----- account: ', account)
-    console.log('----- _wallet.publicKeys: ', _wallet.publicKeys)
     if (!account) {
       return
     }
     let subscribedChains = subscriptions.value.get(addr)
-    console.log('----- subscribedChains: ', subscribedChains)
     if (!subscribedChains) {
       subscribedChains = []
     }
@@ -541,47 +590,26 @@ const processChains = () => {
       const typeNameBytes = new TextEncoder().encode('Nonce::')
       const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(microchain.certificate_hash)])
       const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
-      console.log('----- account.privateKey: ', account.privateKey)
-      console.log('----- keyPair: ', keyPair)
-      console.log('----- typeNameBytes: ', typeNameBytes)
-      console.log('----- bytes: ', bytes)
-      console.log('----- signature: ', signature)
       void initMicrochainChainStore(addr, signature, chainId, microchain.message_id, microchain.certificate_hash, () => {
         const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
-        console.log('----- keyPair: ', keyPair)
         signNewBlock(chainId, undefined, keyPair, true, () => {
-          console.log('exec signNewBlock')
           _getChainAccountBalances()
         })
         subscribe(chainId, (height: number) => {
-          console.log('exec subscribe')
           // We must reinitialize key here due to the last one may be disposed
           const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
           signNewBlock(chainId, height, keyPair, false)
         }, (hash: string) => {
-          console.log('to exec _getChainAccountBalances')
           _getChainAccountBalances()
-          console.log('to exec _getBlockWithHash')
           _getBlockWithHash(chainId, hash)
         }, () => {
-          console.log('Final Set wallet', chainId)
-          console.log('--_wallet: ', _wallet)
-          const state = JSON.stringify(_wallet.$state)
-          console.log('------ wallet state json: ', state)
-          constructSetWallet(state)
           const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(account.privateKey)))
-          console.log('----- chainId: ', chainId)
-          console.log('----- exec constructNewBlockWithIncomingBundles')
           constructNewBlockWithIncomingBundles(chainId, keyPair)
         })
         getAccountBalance(chainId, addr, (balance: number) => {
-          console.log('exec getAccountBalance')
-          console.log('to exec setAccountBalance')
           _wallet.setAccountBalance(addr, chainId, balance)
         })
         getAccountBalance(chainId, undefined, (balance: number) => {
-          console.log('exec getAccountBalance')
-          console.log('to exec setChainBalance')
           _wallet.setChainBalance(addr, chainId, balance)
         })
       })

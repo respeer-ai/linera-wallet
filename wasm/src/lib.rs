@@ -13,10 +13,10 @@ arguments to these functions cannot be trusted and _must_ be verified!
 use std::str::FromStr;
 use linera_base::{crypto::{CryptoHash, KeyPair, PublicKey}, data_types::{BlockHeight, Timestamp}, identifiers::ChainId};
 use linera_chain::data_types::IncomingBundle;
-use linera_core::node::{
+use linera_core::{data_types::NodeChainInfo, node::{
     LocalValidatorNode as _,
     LocalValidatorNodeProvider as _,
-};
+}};
 use linera_execution::Operation;
 
 use log::info;
@@ -103,12 +103,7 @@ pub const OPTIONS: ClientOptions = ClientOptions {
 };
 
 pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
-    info!(">>get_sign_client_context");
-    // let wallet = linera_client::config::WalletState::read_from_local_storage("checko-wallet")?;
     let wallet = linera_client::config::WalletState::new_no_storage(FakeWallet::new());
-    info!(">>get wallet successful");
-    let mut storage = get_storage().await?;
-    info!(">>get storage successful");
     Ok(SignClientContext::new_no_storage(get_fake_storage().await?, OPTIONS, wallet))
 }
 
@@ -165,17 +160,8 @@ pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
 #[wasm_bindgen]
 #[cfg(not(feature = "no-storage"))]
 pub async fn set_wallet(wallet: &str) -> Result<(), wasm_bindgen::JsError> {
-    log::info!("--set_wallet");
-    log::info!("-- wallet: {:?}", wallet);
     linera_client::config::WalletState::create_from_local_storage("checko-wallet", serde_json::from_str(wallet)?)?;
     Ok(())
-}
-
-#[wasm_bindgen]
-pub async fn set_dev_wallet(wallet: &str) -> u32 {
-    log::info!("--set_dev_wallet");
-    log::info!("-- wallet: {:?}", wallet);
-    2
 }
 
 #[wasm_bindgen]
@@ -185,41 +171,34 @@ pub async fn dapp_query(n: u32) -> u32 {
 
 // Execute operation to get
 #[wasm_bindgen]
-pub async fn execute_operation_with_messages_no_storage(chain_id: &str, operation: &str, messages: &str, public_key: &str, nextBlockHeight: &str, blockHash: &str, adminId: &str, timestamp: &str) -> Result<Option<String>, JsError> {
-  log::info!("----execute_operation_with_messages");
-  let chain_id: ChainId = ChainId::from_str(chain_id)?;
-  log::info!("--chain_id: {:?}", chain_id);
+pub async fn execute_operation_with_messages_no_storage(chain_id: &str, operation: &str, messages: &str, chain_info: &str, execution_state_hash: &str, public_key: &str, next_block_height: &str, block_hash: &str, admin_id: &str, timestamp: &str) -> Result<Option<String>, JsError> {
+  let _chain_id: ChainId = ChainId::from_str(chain_id)?;
   let operations: Vec<Operation> = match serde_json::from_str(operation) {
     Ok(operation) => [operation].to_vec(),
     Err(_) => Vec::new(),
   };
-  log::info!("--operations: {:?}", operations);
-  log::info!("--messages: {:?}", messages);
-  let messages: Vec<IncomingBundle> = serde_json::from_str(messages)?;
-  log::info!("--get client_context");
-  let client_context: SignClientContext = get_fake_client_context().await?;
-  //   let chain_client = client_context.make_chain_client(chain_id);
-//   let key_pair = KeyPair::try_from(keyPair);
+  let _messages: Vec<IncomingBundle> = serde_json::from_str(messages)?;
   let key_pair: Option<KeyPair> = Some(KeyPair::from_public_key(PublicKey::from_str(public_key)?));
-  let admin_id: ChainId = ChainId::from_str(adminId)?;
-  let block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(blockHash)?);
+  let _admin_id: ChainId = ChainId::from_str(admin_id)?;
+  let _block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(block_hash)?);
   let number = match timestamp.parse::<u64>() {
     Ok(num) => num,
     Err(_) => {
       Err(JsError::new("invalid timestamp"))?
     }
   };
-  let timestamp: Timestamp = Timestamp::from(number);
-  let next_block_height: BlockHeight = BlockHeight::from_str(nextBlockHeight)?;
-
-  let chain_client = client_context.make_chain_client_without_wallet_state(chain_id, key_pair, admin_id, block_hash, timestamp, next_block_height);
-  log::info!("--chain_client {:?}", chain_client);
-
-  chain_client.execute_block_without_block_proposal(messages, operations).await?;
+  let _timestamp: Timestamp = Timestamp::from(number);
+  let _next_block_height: BlockHeight = BlockHeight::from_str(next_block_height)?;
+  let client_context: SignClientContext = get_fake_client_context().await?;
+  let chain_client = client_context.make_chain_client_without_wallet_state(_chain_id, key_pair, _admin_id, _block_hash, _timestamp, _next_block_height);
+  
+  let _chain_info: Box<NodeChainInfo> = serde_json::from_str(chain_info)?;
+  let _execution_state_hash: CryptoHash = CryptoHash::from_str(execution_state_hash)?;
+  chain_client.execute_block_without_block_proposal_no_storage(_messages, operations, _chain_info, _execution_state_hash).await?;
   match chain_client.peek_candidate_block_proposal().await {
     Some(block_proposal) => {
       let json = serde_json::to_string(&block_proposal)?;
-      log::info!("--json {:?}", json);
+      log::info!("json {:?}", json);
     }
     None => {},
   }
