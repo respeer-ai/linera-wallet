@@ -87,11 +87,16 @@ const ownerBalance = (owner: db.Owner) => {
   return balance + microchains.reduce((sum) => sum + 0, 0) || 0
 }
 
+const publicKey2Owner = async (publicKey: string): Promise<string | undefined> => {
+  return (await dbWallet.owners.toArray()).find((el) => el.address === publicKey)?.owner
+}
+
 defineExpose({
   createOwner,
   updateOwner,
   deleteOwner,
-  ownerBalance
+  ownerBalance,
+  publicKey2Owner
 })
 
 </script>
