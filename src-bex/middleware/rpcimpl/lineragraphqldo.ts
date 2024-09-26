@@ -13,6 +13,7 @@ interface GraphqlQuery {
 }
 
 interface RpcGraphqlQuery {
+  publicKey: string
   applicationId?: string
   query: GraphqlQuery
 }
@@ -33,13 +34,13 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!request) {
     return await Promise.reject('Invalid request')
   }
-  const microchain = await sharedStore.getRpcMicrochain(request.origin, '')
-  if (!microchain) {
-    return Promise.reject(new Error('Invalid microchain'))
-  }
   const query = request.request.params as unknown as RpcGraphqlQuery
   if (!query || !query.query) {
     return await Promise.reject('Invalid query')
+  }
+  const microchain = await sharedStore.getRpcMicrochain(request.origin, query.publicKey)
+  if (!microchain) {
+    return Promise.reject(new Error('Invalid microchain'))
   }
   if (!query.query.variables) {
     query.query.variables = {}
@@ -64,7 +65,7 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
     axios({
       method: 'post',
       url: graphqlUrl,
-      data: (request.request.params as unknown as RpcGraphqlQuery)?.query
+      data: query.query
     }).then((res) => {
       if (!res.data) {
         return reject('Invalid response')

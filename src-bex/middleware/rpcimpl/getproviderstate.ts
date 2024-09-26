@@ -6,14 +6,14 @@ export const getProviderStateHandler = async (request?: RpcRequest) => {
     return Promise.reject(new Error('Invalid request'))
   }
   try {
-    // TODO: get account from request
-    const microchain = await sharedStore.getRpcMicrochain(request.origin, '')
+    const accounts = await sharedStore.getOriginPublicKeys(request.origin)
+    const microchain = await sharedStore.getRpcMicrochain(request.origin, accounts[0])
     if (!microchain) {
       return Promise.reject(new Error('Invalid microchain'))
     }
     return Promise.resolve({
       isUnlocked: true,
-      accounts: [],
+      accounts,
       chainId: '0x' + microchain,
       networkVersion: '1'
     })
