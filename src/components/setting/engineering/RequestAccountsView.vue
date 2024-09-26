@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-btn
-      label='Open popup' no-caps class='btn full-width' flat
+      label='Request accounts' no-caps class='btn full-width' flat
       @click='onOpenPopupClick'
     />
   </div>

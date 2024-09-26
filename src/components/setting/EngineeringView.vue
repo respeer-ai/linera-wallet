@@ -1,11 +1,11 @@
 <template>
   <div>
-    <OpenPopupView />
+    <RequestAccountsView />
   </div>
 </template>
 
 <script setup lang='ts'>
 
-import OpenPopupView from './engineering/OpenPopupView.vue'
+import RequestAccountsView from './engineering/RequestAccountsView.vue'
 
 </script>
