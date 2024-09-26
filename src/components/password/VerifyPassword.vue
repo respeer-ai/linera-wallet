@@ -1,27 +1,32 @@
 <template>
-  <q-card flat class='text-center fill-parent' :style='{padding: "24px", maxWidth: "400px", height: "340px"}'>
-    <h5 :style='{fontWeight: 600, margin: "8px 0"}' class='text-brown-8'>
+  <q-card flat class='text-center fill-parent'>
+    <h5 class='vertical-items-margin text-bold' v-if='showTitle'>
       {{ title }}
     </h5>
-    <div :style='{margin: "40px 0 0 0"}'>
+    <div
+      :class='[ showTitle ? "vertical-sections-margin" : "flex items-center justify-center" ]'
+      :style='{ height: "calc(100% - " + (showTitle ? "80px - " : "") + actionHeight + "px" + ")" }'
+    >
       <InputPassword v-model:password='shadowPassword' v-model:error='passwordError' />
     </div>
-    <q-btn
-      flat
-      dense
-      class='text-blue-6 bg-red-2'
-      :style='{borderRadius: "16px", width: "100%", margin: "48px 0 0 0"}'
-      label='Verify'
-      @click='onVerifyClick'
-      :disable='passwordError'
-    />
-    <q-btn
-      flat
-      class='text-brown-10'
-      :style='{borderRadius: "16px", width: "100%"}'
-      label='Cancel'
-      @click='onCancelClick'
-    />
+    <div>
+      <q-btn
+        flat
+        class='btn full-width vertical-sections-margin'
+        label='Verify'
+        @click='onVerifyClick'
+        :disable='passwordError'
+        no-caps
+      />
+      <q-btn
+        flat
+        class='btn btn-alt full-width vertical-items-margin'
+        label='Cancel'
+        @click='onCancelClick'
+        no-caps
+      />
+      <q-resize-observer @resize='onActionResize' />
+    </div>
   </q-card>
   <PasswordBridge ref='passwordBridge' />
 </template>
@@ -34,11 +39,16 @@ import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 interface Props {
-  title: string
+  title?: string
+  showTitle?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  showTitle: true
+})
 const title = toRef(props, 'title')
+const showTitle = toRef(props, 'showTitle')
 
 const password = defineModel<string>('password', { default: '' })
 const shadowPassword = ref('')
@@ -69,6 +79,17 @@ const onVerifyClick = async () => {
 
 const onCancelClick = () => {
   emit('cancel')
+}
+
+interface Size {
+  width: number
+  height: number
+}
+
+const actionHeight = ref(0)
+
+const onActionResize = (size: Size) => {
+  actionHeight.value = size.height
 }
 
 </script>

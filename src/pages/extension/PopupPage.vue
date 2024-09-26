@@ -7,22 +7,22 @@
       {{ title }}
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS && false'
       class='popup-body full-width'
     >
       <EthRequestAccountsConfirmation v-model:title='title' />
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION && false'
       class='popup-body full-width'
     >
-      <LineraGraphqlMutationConfirmation />
+      <LineraGraphqlMutationConfirmation v-model:title='title' />
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_SIGN'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_SIGN || true'
       class='popup-body full-width'
     >
-      <EthSignConfirmation />
+      <EthSignConfirmation v-model:title='title' />
     </div>
     <div class='label-text-small text-center like-link bg-white popup-tip'>
       Only approve trusted application

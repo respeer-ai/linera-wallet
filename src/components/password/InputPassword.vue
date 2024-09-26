@@ -1,34 +1,28 @@
 <template>
-  <div class='fill-parent'>
+  <div class='text-left full-width'>
     <div class='row'>
+      <span>Password</span>
       <q-space />
-      <div :style='{width: "100%"}' class='text-left'>
-        <div :style='{margin: "4px 0", lineHeight: "32px"}' class='text-brown-10 row'>
-          <span :style='{fontWeight: 500, marginRight: "4px"}'>Password</span>
-          <q-space />
-          <q-btn
-            flat
-            dense
-            size='0.8rem'
-            :label='displayHideText'
-            @click='display = !display'
-            color='blue-6'
-            no-caps
-          />
-        </div>
-        <q-input
-          outlined
-          dense
-          v-model='password'
-          @blur='onPasswordBlur'
-          @focus='onPasswordFocus'
-          :error='error'
-          hide-bottom-space
-          :type='display ? "text" : "password"'
-        />
-      </div>
-      <q-space />
+      <q-btn
+        flat
+        dense
+        size='0.8rem'
+        :label='displayHideText'
+        @click='display = !display'
+        color='blue-6'
+        no-caps
+      />
     </div>
+    <q-input
+      outlined
+      dense
+      v-model='password'
+      @blur='onPasswordBlur'
+      @focus='onPasswordFocus'
+      :error='error'
+      hide-bottom-space
+      :type='display ? "text" : "password"'
+    />
   </div>
 </template>
 

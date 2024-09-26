@@ -27,7 +27,7 @@
         label='Continue'
         class='btn full-width vertical-items-margin'
         @click='onNextStepClick'
-        :disable='!forwadable()'
+        :disable='!forwardable()'
         no-caps
       />
       <q-btn
@@ -109,7 +109,7 @@ const onCancelClick = () => {
   localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
-const forwadable = () => {
+const forwardable = () => {
   if (step.value === 1) {
     return owner.value !== undefined
   }
