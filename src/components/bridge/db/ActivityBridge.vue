@@ -6,7 +6,7 @@ import { ref, toRef, watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
@@ -24,21 +24,19 @@ const activities = defineModel<db.Activity[]>('activities')
 const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const _activities = useObservable<db.Activity[]>(
-  from(
-    liveQuery(async () => {
-      const acts = [] as db.Activity[]
-      if (publicKey.value) {
-        acts.push(...await dbWallet.activities.where('targetAddress').equalsIgnoreCase(publicKey.value).toArray())
-        acts.push(...await dbWallet.activities.where('sourceAddress').equalsIgnoreCase(publicKey.value).toArray())
-      } else if (microchain.value) {
-        acts.push(...await dbWallet.activities.where('targetChain').equalsIgnoreCase(microchain.value).toArray())
-        acts.push(...await dbWallet.activities.where('sourceChain').equalsIgnoreCase(microchain.value).toArray())
-      } else {
-        acts.push(...await dbWallet.activities.toArray())
-      }
-      return acts
-    })
-  )
+  liveQuery(async () => {
+    const acts = [] as db.Activity[]
+    if (publicKey.value) {
+      acts.push(...await dbWallet.activities.where('targetAddress').equalsIgnoreCase(publicKey.value).toArray())
+      acts.push(...await dbWallet.activities.where('sourceAddress').equalsIgnoreCase(publicKey.value).toArray())
+    } else if (microchain.value) {
+      acts.push(...await dbWallet.activities.where('targetChain').equalsIgnoreCase(microchain.value).toArray())
+      acts.push(...await dbWallet.activities.where('sourceChain').equalsIgnoreCase(microchain.value).toArray())
+    } else {
+      acts.push(...await dbWallet.activities.toArray())
+    }
+    return acts
+  }) as never
 )
 
 watch(_activities, () => {

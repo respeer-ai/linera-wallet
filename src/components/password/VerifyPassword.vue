@@ -23,13 +23,15 @@
       @click='onCancelClick'
     />
   </q-card>
+  <PasswordBridge ref='passwordBridge' />
 </template>
 
 <script setup lang='ts'>
 import { ref, toRef, watch } from 'vue'
 import { localStore } from 'src/localstores'
 
-import InputPassword from 'src/components/password/InputPassword.vue'
+import InputPassword from '../password/InputPassword.vue'
+import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 interface Props {
   title: string
@@ -41,24 +43,28 @@ const title = toRef(props, 'title')
 const password = defineModel<string>('password', { default: '' })
 const shadowPassword = ref('')
 const emit = defineEmits(['verified', 'error', 'cancel'])
+
 const passwordError = ref(false)
+
+const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
 
 watch(shadowPassword, () => {
   password.value = shadowPassword.value
 })
 
-const onVerifyClick = () => {
-  localStore.wallet.verifyPassword(password.value, () => {
+const onVerifyClick = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (await passwordBridge.value?.verifyPassword(password.value)) {
     emit('verified')
-  }, () => {
+  } else {
     emit('error')
     localStore.notification.pushNotification({
-      Title: 'Verify Password',
-      Message: 'Fail to verify password. Please confirm you input correct password.',
+      Title: 'Verify assword',
+      Message: 'Fail to verify password',
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })
-  })
+  }
 }
 
 const onCancelClick = () => {

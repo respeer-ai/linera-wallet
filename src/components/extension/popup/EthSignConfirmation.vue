@@ -48,24 +48,7 @@
         height: "calc(100% - " + actionHeight + "px" + ")"
       }'
     >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Confirm password
-        </div>
-        <q-resize-observer @resize='onHeaderResize' />
-      </div>
-      <div
-        :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
-        }'
-        class='flex justify-center items-center'
-      >
-        <q-card :style='{width: "100%", padding: "16px"}'>
-          <InputPassword v-model:password='password' v-model:error='passwordError' />
-        </q-card>
-      </div>
+      <VerifyPassword title='Confirm password' @verified='onPasswordVerified' />
     </div>
     <div
       v-if='step === 3'
@@ -129,19 +112,22 @@
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
+    <OwnerBridge ref='ownerBridge' />
   </div>
 </template>
 
 <script setup lang='ts'>
 import { localStore } from 'src/localstores'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { _hex } from 'src/utils'
 import { commontypes } from 'src/types'
 import type { Json } from '@metamask/utils'
 import { Web3 } from 'web3'
-import { Berith, Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { db } from 'src/model'
 
-import InputPassword from 'src/components/password/InputPassword.vue'
+import OwnerBridge from 'src/components/bridge/db/OwnerBridge.vue'
+import VerifyPassword from 'src/components/password/VerifyPassword.vue'
 
 const step = ref(1)
 const allowCheckAccount = ref(false)
@@ -158,16 +144,20 @@ const passwordVerified = ref(false)
 const passwordError = ref(false)
 const processing = ref(false)
 
+const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
+
 watch(passwordError, () => {
   onCancelClick()
 })
 
-const signResponse = () => {
-  const _account = localStore.wallet.account(publicKey.value)
+const signResponse = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const _account = await ownerBridge.value?.getOwnerWithPublicKey(publicKey.value) as db.Owner
   if (!_account) {
     return onCancelClick()
   }
-  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(_account.privateKey)))
+  const privateKey = db.privateKey(_account, password.value)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
   const bytes = Web3.utils.hexToBytes(hexContent.value as string)
   const signature = Web3.utils.bytesToHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
   processing.value = true
@@ -182,42 +172,17 @@ const signResponse = () => {
   }, 2000)
 }
 
-const onNextStepClick = () => {
+const onPasswordVerified = () => {
+  passwordVerified.value = true
   step.value += 1
-  if (step.value === 2) {
-    if (!localStore.wallet._decrypted) {
-      return localStore.wallet.loadPassword(() => {
-        localStore.wallet.verifyPassword(password.value, () => {
-          passwordVerified.value = true
-        }, () => {
-          // TODO
-        })
-      })
-    }
-    const _account = localStore.wallet.account(publicKey.value)
-    if (_account) step.value += 1
-  }
-  if (step.value === 3) {
-    if (localStore.wallet._decrypted) {
-      return signResponse()
-    }
-    localStore.wallet.load(password.value, () => {
-      signResponse()
-    }, () => {
-      onCancelClick()
-    })
-  }
 }
 
-watch(password, () => {
-  localStore.wallet.loadPassword(() => {
-    localStore.wallet.verifyPassword(password.value, () => {
-      passwordVerified.value = true
-    }, () => {
-      // TODO
-    })
-  })
-})
+const onNextStepClick = async () => {
+  step.value += 1
+  if (step.value === 3) {
+    await signResponse()
+  }
+}
 
 const onCancelClick = () => {
   void respond.value?.({
@@ -254,18 +219,5 @@ const onHeaderResize = (size: Size) => {
 const onActionResize = (size: Size) => {
   actionHeight.value = size.height
 }
-
-watch(account, () => {
-  localStore.wallet.loadWithoutDecrypt(() => {
-    publicKey.value = localStore.wallet.displayAddress(localStore.wallet.publicKeyByPrefix(account.value as string) as string)
-  })
-})
-
-onMounted(async () => {
-  await Berith.initBundledOnce()
-  localStore.wallet.loadWithoutDecrypt(() => {
-    publicKey.value = localStore.wallet.displayAddress(localStore.wallet.publicKeyByPrefix(account.value as string) as string)
-  })
-})
 
 </script>

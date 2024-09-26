@@ -6,63 +6,7 @@
         height: "calc(100% - " + actionHeight + "px" + ")"
       }'
     >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Select Linera account
-        </div>
-        <q-resize-observer @resize='onHeaderResize' />
-      </div>
-      <div
-        :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
-        }'
-        class='flex justify-center items-center'
-      >
-        <q-card :style='{width: "100%", padding: publicKeys.length ? "" : "48px 24px"}'>
-          <div v-if='publicKeys.length' :style='{width: "100%"}'>
-            <q-radio
-              v-model='publicKey'
-              v-for='(_publicKey, index) in publicKeys'
-              :key='_publicKey'
-              :val='_publicKey'
-              :style='{
-                padding: "24px",
-                borderBottom: index < publicKeys.length - 1 ? "1px solid grey" : "",
-                width: "100%"
-              }'
-              class='cursor-pointer'
-            >
-              <div class='row'>
-                <q-img :src='lineraLogo' width='36px' height='36px' />
-                <div :style='{margin: "0 0 0 16px"}' class='text-left'>
-                  <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                    {{ shortid.shortId(_publicKey, 6) }}
-                  </div>
-                  <div class='text-brown-6'>
-                    {{ localStore.wallet.accountBalance(_publicKey, undefined) }} TLINERA
-                  </div>
-                </div>
-              </div>
-            </q-radio>
-          </div>
-          <div v-else :style='{width: "100%"}' class='row'>
-            <q-space />
-            <div :style='{lineHeight: "36px"}'>
-              No account available.
-            </div>
-            <q-btn
-              dense
-              flat
-              class='text-blue-6'
-            >
-              Create
-            </q-btn>
-            <q-space />
-          </div>
-        </q-card>
-      </div>
+      <OwnerSelector />
     </div>
     <div
       v-if='step === 2'
@@ -105,7 +49,7 @@
                     {{ shortid.shortId(_chainId, 6) }}
                   </div>
                   <div class='text-brown-6'>
-                    {{ localStore.wallet.chainBalance(undefined, _chainId) }} TLINERA
+                    {{ 0.00 }} TLINERA
                   </div>
                 </div>
               </div>
@@ -244,12 +188,14 @@ import { computed, ref } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 
+import OwnerSelector from '../selector/OwnerSelector.vue'
+
 import lineraLogo from '../../../assets/LineraLogo.png'
 
-const publicKeys = computed(() => localStore.wallet.publicKeys)
+const publicKeys = ref([])
 const publicKey = ref('')
 const chainId = ref('')
-const accountChainIds = computed(() => localStore.wallet.accountChainIds(publicKey.value))
+const accountChainIds = ref([])
 const step = ref(1)
 const allowCheckAccount = ref(false)
 const origin = computed(() => localStore.popup.popupOrigin)

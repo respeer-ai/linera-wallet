@@ -3,17 +3,15 @@ import { watch } from 'vue'
 import { db } from '../../../model'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 import { localStore } from 'src/localstores'
 
 const tokens = defineModel<db.Token[]>('tokens')
 
 const _tokens = useObservable<db.Token[]>(
-  from(
-    liveQuery(async () => {
-      return await dbBase.tokens.toArray()
-    })
-  )
+  liveQuery(async () => {
+    return await dbBase.tokens.toArray()
+  }) as never
 )
 
 watch(_tokens, async () => {

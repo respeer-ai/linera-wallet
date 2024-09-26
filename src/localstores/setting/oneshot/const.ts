@@ -27,6 +27,13 @@ export const SettingMenus = [
     icon: 'bi-exclamation-triangle',
     iconColor: 'red-6',
     label: 'Storage',
-    menu: Menu.STORAGE
+    menu: Menu.STORAGE,
+    separator: true
+  }, {
+    icon: 'bi-code',
+    iconColor: 'blue',
+    label: 'Engineer',
+    menu: Menu.ENGINEERING,
+    hide: false
   }
 ] as Array<MenuItem>

@@ -10,7 +10,7 @@ import { ref, watch } from 'vue'
 import { db } from '../../../model'
 import { dbBase, dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 
 import NetworkBridge from './NetworkBridge.vue'
 import PasswordBridge from './PasswordBridge.vue'
@@ -28,11 +28,9 @@ const selectedOwner = defineModel<db.Owner>('selectedOwner')
 const microchainBridge = ref<InstanceType<typeof MicrochainBridge>>()
 
 const _owners = useObservable<db.Owner[]>(
-  from(
-    liveQuery(async () => {
-      return await dbWallet.owners.toArray()
-    })
-  )
+  liveQuery(async () => {
+    return await dbWallet.owners.toArray()
+  }) as never
 )
 
 watch(_owners, async () => {
@@ -87,6 +85,10 @@ const ownerBalance = (owner: db.Owner) => {
   return balance + microchains.reduce((sum) => sum + 0, 0) || 0
 }
 
+const getOwnerWithPublicKey = async (publicKey: string) => {
+  return (await dbWallet.owners.toArray()).find((el) => el.address === publicKey)
+}
+
 const publicKey2Owner = async (publicKey: string): Promise<string | undefined> => {
   return (await dbWallet.owners.toArray()).find((el) => el.address === publicKey)?.owner
 }
@@ -96,7 +98,8 @@ defineExpose({
   updateOwner,
   deleteOwner,
   ownerBalance,
-  publicKey2Owner
+  publicKey2Owner,
+  getOwnerWithPublicKey
 })
 
 </script>

@@ -3,18 +3,16 @@ import { watch } from 'vue'
 import { db } from '../../../model'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 
 const password = defineModel<string>('password')
 
 const _password = useObservable<string | undefined>(
-  from(
-    liveQuery(async () => {
-      const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
-      if (!passwd) return undefined
-      return db.decryptPassword(passwd)
-    })
-  )
+  liveQuery(async () => {
+    const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
+    if (!passwd) return undefined
+    return db.decryptPassword(passwd)
+  }) as never
 )
 
 watch(_password, () => {
@@ -38,8 +36,15 @@ const savePassword = async (passwd?: string) => {
   }
 }
 
+const verifyPassword = async (passwd: string) => {
+  const pwd = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!pwd) return false
+  return db.decryptPassword(pwd) === passwd
+}
+
 defineExpose({
-  savePassword
+  savePassword,
+  verifyPassword
 })
 
 </script>

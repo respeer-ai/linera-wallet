@@ -6,7 +6,7 @@
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 import { computed, ref, toRef, watch } from 'vue'
 
 import TokenBridge from './TokenBridge.vue'
@@ -27,13 +27,11 @@ const tokenBalance = defineModel<number>('tokenBalance')
 const usdBalance = defineModel<number>('usdBalance')
 
 const _balances = useObservable<db.MicrochainOwnerFungibleTokenBalance[]>(
-  from(
-    liveQuery(async () => {
-      return tokenId.value !== undefined
-        ? (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.tokenId === tokenId.value && el.microchain === microchainId.value && el.owner === owner.value)
-        : (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.microchain === microchainId.value && el.owner === owner.value)
-    })
-  )
+  liveQuery(async () => {
+    return tokenId.value !== undefined
+      ? (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.tokenId === tokenId.value && el.microchain === microchainId.value && el.owner === owner.value)
+      : (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.microchain === microchainId.value && el.owner === owner.value)
+  }) as never
 )
 
 const _tokenBalance = computed(() => {

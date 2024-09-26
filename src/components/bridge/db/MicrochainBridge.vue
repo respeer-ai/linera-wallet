@@ -8,7 +8,7 @@ import { ref, toRef, watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 
 import NetworkBridge from './NetworkBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
@@ -29,16 +29,14 @@ const microchainOwners = ref([] as db.MicrochainOwner[])
 const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const _microchains = useObservable<db.Microchain[]>(
-  from(
-    liveQuery(async () => {
-      if (owner.value !== undefined) {
-        const microchainOwners = await dbWallet.microchainOwners.where('owner').equals(owner.value).toArray()
-        const microchainIds = microchainOwners.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, [])
-        return await dbWallet.microchains.where('microchain').anyOf(microchainIds).toArray()
-      }
-      return await dbWallet.microchains.toArray()
-    })
-  )
+  liveQuery(async () => {
+    if (owner.value !== undefined) {
+      const microchainOwners = await dbWallet.microchainOwners.where('owner').equals(owner.value).toArray()
+      const microchainIds = microchainOwners.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, [])
+      return await dbWallet.microchains.where('microchain').anyOf(microchainIds).toArray()
+    }
+    return await dbWallet.microchains.toArray()
+  }) as never
 )
 
 watch(_microchains, () => {

@@ -3,7 +3,8 @@ export enum Menu {
   ABOUT_US = 'AboutUs',
   STORAGE = 'Storage',
   ACCOUNTS = 'Accounts',
-  ADDRESSES_BOOK = 'AddressesBook'
+  ADDRESSES_BOOK = 'AddressesBook',
+  ENGINEERING = 'Engineering'
 }
 
 export enum HomeAction {
@@ -34,4 +35,5 @@ export interface MenuItem {
   label: string
   disable: boolean
   separator?: boolean
+  hide?: boolean
 }

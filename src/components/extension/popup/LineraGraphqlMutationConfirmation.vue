@@ -41,7 +41,7 @@
                     {{ shortid.shortId(_publicKey, 6) }}
                   </div>
                   <div class='text-brown-6'>
-                    {{ localStore.wallet.accountBalance(_publicKey, undefined) }} TLINERA
+                    {{ 0.00 }} TLINERA
                   </div>
                 </div>
               </div>
@@ -182,7 +182,7 @@ import { commontypes } from 'src/types'
 
 import lineraLogo from '../../../assets/LineraLogo.png'
 
-const publicKeys = computed(() => localStore.wallet.publicKeys)
+const publicKeys = ref([])
 const publicKey = ref('')
 const step = ref(1)
 const allowCheckAccount = ref(false)

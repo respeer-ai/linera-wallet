@@ -7,7 +7,7 @@
       vertical no-caps inline-label v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu'
       indicator-color='red-6'
     >
-      <div v-for='menu in localStore.oneShotSettingDef.SettingMenus' :key='menu.menu'>
+      <div v-for='(menu, i) in menus' :key='menu.menu'>
         <q-tab
           :name='menu.menu'
           v-ripple
@@ -28,7 +28,7 @@
             </div>
           </q-item-section>
         </q-tab>
-        <q-separator v-if='menu.separator' />
+        <q-separator v-if='menu.separator && i < menus.length - 1' />
       </div>
     </q-tabs>
   </div>
@@ -36,12 +36,15 @@
 
 <script setup lang='ts'>
 import { localStore, oneShotSettingDef } from 'src/localstores'
+import { computed } from 'vue'
 
 const emit = defineEmits<{(ev: 'clicked', value: oneShotSettingDef.MenuItem): void}>()
 
 const onTabClick = (menu: oneShotSettingDef.MenuItem) => {
   emit('clicked', menu)
 }
+
+const menus = computed(() => localStore.oneShotSettingDef.SettingMenus.filter((el) => !el.hide))
 
 </script>
 

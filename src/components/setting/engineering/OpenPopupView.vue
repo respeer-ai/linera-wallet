@@ -1,0 +1,22 @@
+<template>
+  <div>
+    <q-btn
+      label='Open popup' no-caps class='btn full-width' flat
+      @click='onOpenPopupClick'
+    />
+  </div>
+</template>
+
+<script setup lang='ts'>
+import Web3 from 'web3'
+
+const onOpenPopupClick = () => {
+  const web3 = new Web3(window.linera)
+  web3.eth.requestAccounts().then((accounts) => {
+    console.log(accounts)
+  }).catch((error) => {
+    console.log(error)
+  })
+}
+
+</script>

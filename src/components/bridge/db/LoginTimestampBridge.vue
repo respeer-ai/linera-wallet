@@ -2,16 +2,14 @@
 import { watch } from 'vue'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
-import { useObservable, from } from '@vueuse/rxjs'
+import { useObservable } from '@vueuse/rxjs'
 
 const timestamp = defineModel<number>()
 
 const _timestamp = useObservable<number>(
-  from(
-    liveQuery(async () => {
-      return (await dbBase.lastLogin.toArray()).find(() => true)?.timestamp || 0
-    })
-  )
+  liveQuery(async () => {
+    return (await dbBase.lastLogin.toArray()).find(() => true)?.timestamp || 0
+  }) as never
 )
 
 watch(_timestamp, () => {

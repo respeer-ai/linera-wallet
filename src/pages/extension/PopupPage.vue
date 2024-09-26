@@ -60,7 +60,6 @@ const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>
 onMounted(() => {
   localStore.auth.load()
   localStore.popup.$reset()
-  localStore.wallet.loadWithoutDecrypt()
   quasar.bex.on('popup.new', handleNewRequest)
 })
 
