@@ -27,6 +27,10 @@ export const getRpcMicrochain = async (origin: string, publicKey: string): Promi
   return (await dbBase.rpcMicrochains.toArray()).find((el) => el.origin === origin && el.publicKey === publicKey)?.microchain
 }
 
+export const getRpcMicrochains = async (origin: string): Promise<string[]> => {
+  return (await dbBase.rpcMicrochains.toArray()).filter((el) => el.origin === origin).map((el) => el.microchain)
+}
+
 export const getOriginPublicKeys = async (origin: string): Promise<string[]> => {
   return (await dbBase.rpcMicrochains.toArray()).filter((el) => el.origin === origin).map((el) => el.publicKey).reduce((ids: string[], el): string[] => {
     if (!ids.includes(el)) ids.push(el)
