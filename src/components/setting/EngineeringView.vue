@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='full-height setting-item-inner-padding'>
     <RequestAccountsView />
     <GetProviderStateView class='vertical-items-margin' />
   </div>

@@ -24,6 +24,7 @@
 
 <script setup lang='ts'>
 import { dbBase, dbWallet } from 'src/controller'
+import { localStore } from 'src/localstores'
 import { ref } from 'vue'
 
 const confirmSeconds = ref(10)
@@ -35,7 +36,7 @@ const onConfirmClick = async () => {
     await dbWallet.delete()
     await dbBase.delete()
     // TODO: verify password and backup database here
-    window.location.pathname = '/'
+    window.location.pathname = localStore.oneShotSetting.formalizePath('/')
   }
 }
 

@@ -15,6 +15,9 @@
     <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ADDRESSES_BOOK'>
       <AddressesBook />
     </q-tab-panel>
+    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ENGINEERING'>
+      <EngineeringView />
+    </q-tab-panel>
   </q-tab-panels>
 </template>
 
@@ -27,6 +30,7 @@ import AboutUsView from './AboutUsView.vue'
 import StorageOperationView from './StorageOperationView.vue'
 import AccountsView from './AccountsView.vue'
 import AddressesBook from './AddressesBook.vue'
+import EngineeringView from './EngineeringView.vue'
 
 const accountsView = ref<InstanceType<typeof AccountsView>>()
 const networkSettingView = ref<InstanceType<typeof NetworkSettingNarrowView>>()

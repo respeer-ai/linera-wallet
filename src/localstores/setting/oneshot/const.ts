@@ -32,7 +32,7 @@ export const SettingMenus = [
   }, {
     icon: 'bi-code',
     iconColor: 'blue',
-    label: 'Engineer',
+    label: 'Engineering',
     menu: Menu.ENGINEERING,
     hide: false
   }
