@@ -11,7 +11,7 @@
         <div class='selector-y-padding'>
           <CheckboxView
             text='Access allowed account information'
-            :caption='`Requested now for ${shortid.shortId(publicKey, 4)}`'
+            :caption='`Requested now for ${shortid.shortId(owner?.address, 4)}`'
             v-model='allowCheckAccount'
           />
         </div>
@@ -60,9 +60,8 @@ import ProcessingView from '../../processing/ProcessingView.vue'
 import OriginRpcMicrochainBridge from '../../bridge/db/OriginRpcMicrochainBridge.vue'
 import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 
-const publicKey = ref('')
-const chainId = ref('')
 const step = ref(1)
+
 const allowCheckAccount = ref(false)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
@@ -83,8 +82,8 @@ const onNextStepClick = async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await originRpcMicrochainBridge.value?.createOriginRpcMicrochain(
       localStore.popup.popupOrigin,
-      publicKey.value,
-      chainId.value
+      owner.value?.address,
+      microchain.value?.microchain
     )
   }
   if (step.value === 4) {
@@ -95,7 +94,7 @@ const onNextStepClick = async () => {
         approved: true
       } as commontypes.ConfirmationPopupResponse)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
+      void rpcAuthBridge.value?.createRpcAuth(origin.value, owner.value?.address, method.value)
       localStore.popup.removeRequest(localStore.popup.popupRequestId)
     }, 2000)
   }
