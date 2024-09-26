@@ -33,9 +33,9 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!request) {
     return await Promise.reject('Invalid request')
   }
-  const auth = await sharedStore.getRpcAuth(request.origin)
-  if (!auth) {
-    return await Promise.reject('Mutation not authenticated')
+  const microchain = await sharedStore.getRpcMicrochain(request.origin, '')
+  if (!microchain) {
+    return Promise.reject(new Error('Invalid microchain'))
   }
   const query = request.request.params as unknown as RpcGraphqlQuery
   if (!query || !query.query) {
@@ -46,7 +46,7 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   }
   const attr = RpcRequestAttrs.get(request.request.method as RpcMethod)
   if (!attr || attr.needChainId) {
-    query.query.variables.chainId = auth.chainId
+    query.query.variables.chainId = microchain
   }
   let graphqlUrl: string
   try {
@@ -58,7 +58,7 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
     return await Promise.reject('Invalid graphql endpoint')
   }
   if (query.applicationId) {
-    graphqlUrl += '/checko/chains/' + auth.chainId + '/applications/' + query.applicationId
+    graphqlUrl += '/checko/chains/' + microchain + '/applications/' + query.applicationId
   }
   return new Promise((resolve, reject) => {
     axios({
@@ -94,13 +94,15 @@ export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
   if (!request) {
     return await Promise.reject('Invalid request')
   }
-  const origin = request.origin
   const subscriptionId = subscription.Subscription.subscribe(
     request.request.params as string[],
     async (subscriptionId: string, data: unknown) => {
-      const auth = await sharedStore.getRpcAuth(origin)
+      const microchain = await sharedStore.getRpcMicrochain(request.origin, '')
+      if (!microchain) {
+        return Promise.reject(new Error('Invalid microchain'))
+      }
       const _data = data as Record<string, Record<string, Record<string, string>>>
-      if (auth?.chainId !== _data.data.notifications.chain_id) {
+      if (microchain !== _data.data.notifications.chain_id) {
         return
       }
       void basebridge.EventBus.bridge?.send(

@@ -22,7 +22,7 @@ const confirmations = new Map<RpcMethod, boolean>([
 export const needConfirm = (req: RpcRequest) => {
   let shouldConfirm = confirmations.get(req.request.method as RpcMethod)
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  console.log(`Method ${req.request.method} should confirm ${shouldConfirm}`)
+  console.log(`Method ${req} should confirm ${shouldConfirm}`)
   if (shouldConfirm) {
     shouldConfirm = !sharedStore.authenticated(req.origin, req.request.method as RpcMethod)
   }
