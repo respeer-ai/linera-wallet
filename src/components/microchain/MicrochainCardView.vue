@@ -1,6 +1,6 @@
 <template>
   <q-item class='row full-width tab-panel-item' :clickable='clickable' :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
-    <div v-if='showIndicator' :class='[ "selector-indicator", microchain.default ? "selector-indicator-selected" : "" ]' />
+    <div v-if='showIndicator' :class='[ "selector-indicator", (showSelected ? selected : microchain.default) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='db.microchainAvatar(microchain)' />
       <q-badge color='transparent' rounded transparent floating>
@@ -82,6 +82,8 @@ interface Props {
   showIndicator?: boolean
   clickable?: boolean
   xPadding?: string
+  showSelected?: boolean
+  selected?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   microchain: undefined,
@@ -89,13 +91,18 @@ const props = withDefaults(defineProps<Props>(), {
   integratedMode: true,
   showIndicator: true,
   clickable: true,
-  xPadding: '0'
+  xPadding: '0',
+  showSelected: false,
+  selected: false
 })
 const microchain = toRef(props, 'microchain')
 const showAccountBalance = toRef(props, 'showAccountBalance')
 const integratedMode = toRef(props, 'integratedMode')
 const showIndicator = toRef(props, 'showIndicator')
 const clickable = toRef(props, 'clickable')
+const xPadding = toRef(props, 'xPadding')
+const showSelected = toRef(props, 'showSelected')
+const selected = toRef(props, 'selected')
 
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 

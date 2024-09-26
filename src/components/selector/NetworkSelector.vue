@@ -6,7 +6,7 @@
     <q-list class='selector-list'>
       <q-item
         v-for='_network in networks' :key='_network.id' clickable
-        :class='[ "selector-item selector-item", _network.selected ? "selector-item-selected" : "" ]'
+        :class='[ "selector-item-padding-right tab-panel-item", _network.selected ? "selector-item-selected" : "" ]'
         @click='onNetworkSelected(_network)'
       >
         <div :class='[ "selector-indicator", _network.selected ? "selector-indicator-selected" : "" ]' />

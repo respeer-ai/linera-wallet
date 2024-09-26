@@ -43,7 +43,7 @@ export default class NotificationManager {
             const left = (width || 1280) - NOTIFICATION_WIDTH - 48
             const top = 48
             browser.windows.create({
-              url: browser.runtime.getURL('www/index.html#/extension/popup'),
+              url: browser.runtime.getURL('www/index.html#extension/popup'),
               type: 'popup',
               width: NOTIFICATION_WIDTH,
               height: NOTIFICATION_HEIGHT,

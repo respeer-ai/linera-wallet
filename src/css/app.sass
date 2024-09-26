@@ -268,8 +268,6 @@ body
   .selector-list
     max-height: 560px
     overflow: scroll
-    .selector-item
-      padding: 12px 12px 12px 4px
   .selector-action
     margin-top: 16px
     padding: 4px 24px
@@ -290,6 +288,9 @@ body
 
 .selector-item-selected
   background: $red-1
+
+.selector-item-padding-right
+  padding-right: 8px !important
 
 .selector-indicator
   width: 4px
@@ -477,3 +478,16 @@ body
 .carousel-dense-slides
   .q-carousel__slide
     padding: 8px !important
+
+.popup-title
+  line-height: 56px
+
+.popup-body
+  background: white
+  height: calc(100% - 84px - 56px - 20px)
+
+.popup-tip
+  line-height: 28px
+
+.overflow-scroll
+  overflow: scroll

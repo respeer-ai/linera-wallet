@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='full-height overflow-scroll'>
     <div class='selector-search' v-if='searchable'>
       <q-input
         dense
@@ -15,14 +15,14 @@
     <q-list class='selector-list'>
       <q-item
         v-for='_owner in displayOwners' :key='_owner.id' clickable
-        :class='[ "selector-item selector-item", _owner.selected ? "selector-item-selected" : "" ]'
+        :class='[ "tab-panel-item selector-item-padding-right", (owner ? _owner.id === owner?.id : _owner.selected) ? "selector-item-selected" : "" ]'
         @click='onOwnerSelected(_owner)'
       >
-        <div :class='[ "selector-indicator", _owner.selected ? "selector-indicator-selected" : "" ]' />
+        <div :class='[ "selector-indicator", (owner ? _owner.id === owner?.id : _owner.selected) ? "selector-indicator-selected" : "" ]' />
         <q-avatar color='red-1 selector-margin-x-left'>
           <q-img :src='db.ownerAvatar(_owner)' width='48px' height='48px' />
         </q-avatar>
-        <div class='selector-margin-x-left'>
+        <div class='selector-margin-x-left text-left'>
           <div class='text-bold text-grey-9'>
             {{ _owner.name }}
           </div>
@@ -44,13 +44,13 @@
             <span class='text-grey-6 selector-item-currency-sub header-items-margin-x-left'>TLINERA</span>
           </div>
         </div>
-        <div class='selector-margin-x-left'>
+        <div class='selector-margin-x-left' v-if='showAction'>
           <q-icon name='bi-three-dots-vertical' size='16px' @click='onActionClick(_owner)' />
         </div>
       </q-item>
     </q-list>
   </div>
-  <OwnerBridge ref='ownerBridge' v-model:owners='owners' />
+  <OwnerBridge ref='ownerBridge' v-model:owners='owners' v-model:selected-owner='owner' />
 </template>
 
 <script setup lang='ts'>
@@ -65,13 +65,16 @@ import { lineraLogo } from 'src/assets'
 interface Props {
   persistent?: boolean
   searchable?: boolean
+  showAction?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   persistent: true,
-  searchable: true
+  searchable: true,
+  showAction: true
 })
 const persistent = toRef(props, 'persistent')
 const searchable = toRef(props, 'searchable')
+const showAction = toRef(props, 'showAction')
 
 const owners = ref([] as db.Owner[])
 const searchText = ref('')

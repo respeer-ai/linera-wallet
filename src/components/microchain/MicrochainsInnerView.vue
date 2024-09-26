@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='full-height overflow-scroll'>
     <div class='selector-search' v-if='searchable'>
       <q-input
         dense
@@ -13,8 +13,14 @@
       </q-input>
     </div>
     <div v-for='_microchain in displayMicrochains' :key='_microchain.microchain'>
-      <div class='cursor-pointer' @click='onMicrochainSelected(_microchain)'>
-        <MicrochainCardView :microchain='_microchain' :show-indicator='showIndicator' :x-padding='xPadding' />
+      <div
+        :class='[ showSelected && microchain?.microchain === _microchain.microchain ? "selector-item-selected" : "" ]'
+        @click='onMicrochainSelected(_microchain)'
+      >
+        <MicrochainCardView
+          :microchain='_microchain' :show-indicator='showIndicator' :x-padding='xPadding' :show-selected='showSelected'
+          :selected='microchain?.microchain === _microchain.microchain'
+        />
       </div>
     </div>
   </div>
@@ -32,14 +38,18 @@ interface Props {
   searchable: boolean
   showIndicator?: boolean
   xPadding?: string
+  showSelected?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   searchable: true,
   showIndicator: true,
-  xPadding: '0'
+  xPadding: '0',
+  showSelected: false
 })
 const searchable = toRef(props, 'searchable')
 const showIndicator = toRef(props, 'showIndicator')
+const xPadding = toRef(props, 'xPadding')
+const showSelected = toRef(props, 'showSelected')
 
 const microchains = ref([] as db.Microchain[])
 const searchText = ref('')

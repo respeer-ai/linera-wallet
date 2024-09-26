@@ -17,7 +17,7 @@
               :is='Component'
               :class='[ extensionMode ? "popup-container" : "page-container shadow-1", alignPageCenter ? "flex justify-center items-center" : "" ]'
               :style='{
-                height: bodyHeight,
+                height: `${bodyHeight} !important`,
                 width: `${viewWidth} !important`,
                 overflow: "scroll"
               }'

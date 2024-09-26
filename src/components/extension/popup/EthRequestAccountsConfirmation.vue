@@ -1,181 +1,106 @@
 <template>
-  <div class='text-center' :style='{height: "100%"}'>
-    <div
-      v-if='step === 1'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <OwnerSelector />
-    </div>
-    <div
-      v-if='step === 2'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Select microchain
-        </div>
-        <q-resize-observer @resize='onHeaderResize' />
+  <div class='text-center full-height'>
+    <div :style='{ height: "calc(100% - " + actionHeight + "px" + ")" }'>
+      <div v-if='step === 1' class='full-height'>
+        <OwnerSelector v-model='owner' />
+      </div>
+      <div v-if='step === 2' class='full-height'>
+        <MicrochainSelector v-model='microchain' />
       </div>
       <div
+        v-if='step === 3'
         :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
+          height: "calc(100% - " + actionHeight + "px" + ")"
         }'
-        class='flex justify-center items-center'
       >
-        <q-card :style='{width: "100%"}'>
-          <div v-if='accountChainIds.length' :style='{width: "100%"}'>
-            <q-radio
-              v-model='chainId'
-              v-for='(_chainId, index) in accountChainIds'
-              :key='_chainId'
-              :val='_chainId'
-              :style='{
-                padding: "24px",
-                borderBottom: index < accountChainIds.length - 1 ? "1px solid grey" : "",
-                width: "100%"
-              }'
-              class='cursor-pointer'
-            >
-              <div class='row'>
-                <q-img :src='lineraLogo' width='36px' height='36px' />
+        <div>
+          <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
+            Permissions
+          </div>
+          <q-resize-observer @resize='onHeaderResize' />
+        </div>
+        <div
+          :style='{
+            padding: "24px 0 36px 0",
+            borderRadius: "16px",
+            height: "calc(100% - " + headerHeight + "px" + ")"
+          }'
+          class='flex justify-center items-center'
+        >
+          <q-card :style='{width: "100%", padding: publicKeys.length ? "" : "48px 24px"}'>
+            <div :style='{width: "100%"}'>
+              <q-checkbox
+                v-model='allowCheckAccount'
+                :style='{
+                  padding: "24px",
+                  width: "100%"
+                }'
+                class='cursor-pointer'
+                checked-icon='task_alt'
+                unchecked-icon='highlight_off'
+              >
                 <div :style='{margin: "0 0 0 16px"}' class='text-left'>
                   <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                    {{ shortid.shortId(_chainId, 6) }}
+                    Access allowed account information
                   </div>
                   <div class='text-brown-6'>
-                    {{ 0.00 }} TLINERA
+                    Requested now for {{ shortid.shortId(publicKey, 4) }}
                   </div>
                 </div>
-              </div>
-            </q-radio>
-          </div>
-          <div v-else :style='{width: "100%"}' class='row'>
-            <q-space />
-            <div :style='{lineHeight: "36px"}'>
-              No account available.
+              </q-checkbox>
             </div>
-            <q-btn
-              dense
-              flat
-              class='text-blue-6'
-            >
-              Create
-            </q-btn>
-            <q-space />
-          </div>
-        </q-card>
-      </div>
-    </div>
-    <div
-      v-if='step === 3'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Permissions
+          </q-card>
         </div>
-        <q-resize-observer @resize='onHeaderResize' />
       </div>
       <div
+        v-if='step === 4'
         :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
+          height: "calc(100% - " + actionHeight + "px" + ")"
         }'
-        class='flex justify-center items-center'
       >
-        <q-card :style='{width: "100%", padding: publicKeys.length ? "" : "48px 24px"}'>
-          <div :style='{width: "100%"}'>
-            <q-checkbox
-              v-model='allowCheckAccount'
-              :style='{
-                padding: "24px",
-                width: "100%"
-              }'
-              class='cursor-pointer'
-              checked-icon='task_alt'
-              unchecked-icon='highlight_off'
-            >
-              <div :style='{margin: "0 0 0 16px"}' class='text-left'>
-                <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                  Access allowed account information
-                </div>
-                <div class='text-brown-6'>
-                  Requested now for {{ shortid.shortId(publicKey, 4) }}
-                </div>
-              </div>
-            </q-checkbox>
+        <div>
+          <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
+            Authenticating
           </div>
-        </q-card>
-      </div>
-    </div>
-    <div
-      v-if='step === 4'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Authenticating
+          <q-resize-observer @resize='onHeaderResize' />
         </div>
-        <q-resize-observer @resize='onHeaderResize' />
-      </div>
-      <div
-        :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
-        }'
-        class='flex justify-center items-center'
-      >
-        <q-card :style='{height: "160px", width: "100%"}' flat>
-          <q-inner-loading
-            :showing='processing'
-            class='text-red-4'
-          >
-            <q-spinner-facebook size='80px' />
-          </q-inner-loading>
-        </q-card>
+        <div
+          :style='{
+            padding: "24px 0 36px 0",
+            borderRadius: "16px",
+            height: "calc(100% - " + headerHeight + "px" + ")"
+          }'
+          class='flex justify-center items-center'
+        >
+          <q-card :style='{height: "160px", width: "100%"}' flat>
+            <q-inner-loading
+              :showing='processing'
+              class='text-red-4'
+            >
+              <q-spinner-facebook size='80px' />
+            </q-inner-loading>
+          </q-card>
+        </div>
       </div>
     </div>
-    <div v-if='step < 4'>
-      <div class='text-brown-6' :style='{fontSize: "16px"}'>
-        Only approve trusted application
-      </div>
+    <div v-if='step < 4' class='extra-bottom-margin page-x-padding'>
       <q-btn
         flat
-        dense
         rounded
         label='Continue'
-        class='text-brown-10 bg-red-2'
-        :style='{
-          margin: "16px 0 4px 0",
-          width: "100%"
-        }'
+        class='btn full-width vertical-items-margin'
         @click='onNextStepClick'
         :disable='!forwadable()'
+        no-caps
       />
       <q-btn
         flat
-        dense
         rounded
         outlined
         label='Cancel'
-        class='text-brown-10'
-        :style='{
-          margin: "4px 0 16px 0",
-          width: "100%"
-        }'
+        class='btn btn-alt full-width vertical-items-margin'
         @click='onCancelClick'
+        no-caps
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
@@ -184,24 +109,28 @@
 
 <script setup lang='ts'>
 import { localStore } from 'src/localstores'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
+import { db } from 'src/model'
 
 import OwnerSelector from '../selector/OwnerSelector.vue'
-
-import lineraLogo from '../../../assets/LineraLogo.png'
+import MicrochainSelector from '../selector/MicrochainSelector.vue'
 
 const publicKeys = ref([])
 const publicKey = ref('')
 const chainId = ref('')
-const accountChainIds = ref([])
 const step = ref(1)
 const allowCheckAccount = ref(false)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
 const respond = computed(() => localStore.popup._popupRespond)
 const processing = ref(false)
+
+const title = defineModel<string>('title')
+
+const owner = ref(undefined as unknown as db.Owner)
+const microchain = ref(undefined as unknown as db.Microchain)
 
 const onNextStepClick = () => {
   step.value += 1
@@ -231,10 +160,10 @@ const onCancelClick = () => {
 
 const forwadable = () => {
   if (step.value === 1) {
-    return publicKey.value.length > 0
+    return owner.value !== undefined
   }
   if (step.value === 2) {
-    return chainId.value.length > 0
+    return microchain.value !== undefined
   }
   if (step.value === 3) {
     return allowCheckAccount.value
@@ -256,5 +185,18 @@ const onHeaderResize = (size: Size) => {
 const onActionResize = (size: Size) => {
   actionHeight.value = size.height
 }
+
+onMounted(() => {
+  title.value = 'Select Linera account'
+})
+
+watch(step, () => {
+  switch (step.value) {
+    case 1: title.value = 'Select account'; return
+    case 2: title.value = 'Select microchain'; return
+    case 3: title.value = 'Permissions'; return
+    case 4: title.value = 'Authenticating'
+  }
+})
 
 </script>
