@@ -7,80 +7,17 @@
       <div v-if='step === 2' class='full-height'>
         <MicrochainSelector v-model='microchain' />
       </div>
-      <div
-        v-if='step === 3'
-        :style='{
-          height: "calc(100% - " + actionHeight + "px" + ")"
-        }'
-      >
-        <div>
-          <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-            Permissions
-          </div>
-          <q-resize-observer @resize='onHeaderResize' />
-        </div>
-        <div
-          :style='{
-            padding: "24px 0 36px 0",
-            borderRadius: "16px",
-            height: "calc(100% - " + headerHeight + "px" + ")"
-          }'
-          class='flex justify-center items-center'
-        >
-          <q-card :style='{width: "100%", padding: publicKeys.length ? "" : "48px 24px"}'>
-            <div :style='{width: "100%"}'>
-              <q-checkbox
-                v-model='allowCheckAccount'
-                :style='{
-                  padding: "24px",
-                  width: "100%"
-                }'
-                class='cursor-pointer'
-                checked-icon='task_alt'
-                unchecked-icon='highlight_off'
-              >
-                <div :style='{margin: "0 0 0 16px"}' class='text-left'>
-                  <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                    Access allowed account information
-                  </div>
-                  <div class='text-brown-6'>
-                    Requested now for {{ shortid.shortId(publicKey, 4) }}
-                  </div>
-                </div>
-              </q-checkbox>
-            </div>
-          </q-card>
+      <div v-if='step === 3' class='full-height page-x-padding'>
+        <div class='selector-y-padding'>
+          <CheckboxView
+            text='Access allowed account information'
+            :caption='`Requested now for ${shortid.shortId(publicKey, 4)}`'
+            v-model='allowCheckAccount'
+          />
         </div>
       </div>
-      <div
-        v-if='step === 4'
-        :style='{
-          height: "calc(100% - " + actionHeight + "px" + ")"
-        }'
-      >
-        <div>
-          <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-            Authenticating
-          </div>
-          <q-resize-observer @resize='onHeaderResize' />
-        </div>
-        <div
-          :style='{
-            padding: "24px 0 36px 0",
-            borderRadius: "16px",
-            height: "calc(100% - " + headerHeight + "px" + ")"
-          }'
-          class='flex justify-center items-center'
-        >
-          <q-card :style='{height: "160px", width: "100%"}' flat>
-            <q-inner-loading
-              :showing='processing'
-              class='text-red-4'
-            >
-              <q-spinner-facebook size='80px' />
-            </q-inner-loading>
-          </q-card>
-        </div>
+      <div v-if='step === 4' class='full-height'>
+        <ProcessingView :processing='processing' />
       </div>
     </div>
     <div v-if='step < 4' class='extra-bottom-margin page-x-padding'>
@@ -105,6 +42,8 @@
       <q-resize-observer @resize='onActionResize' />
     </div>
   </div>
+  <OriginRpcMicrochainBridge ref='originRpcMicrochainBridge' />
+  <RpcAuthBridge ref='rpcAuthBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -116,8 +55,11 @@ import { db } from 'src/model'
 
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import MicrochainSelector from '../selector/MicrochainSelector.vue'
+import CheckboxView from '../CheckboxView.vue'
+import ProcessingView from '../../processing/ProcessingView.vue'
+import OriginRpcMicrochainBridge from '../../bridge/db/OriginRpcMicrochainBridge.vue'
+import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 
-const publicKeys = ref([])
 const publicKey = ref('')
 const chainId = ref('')
 const step = ref(1)
@@ -132,10 +74,18 @@ const title = defineModel<string>('title')
 const owner = ref(undefined as unknown as db.Owner)
 const microchain = ref(undefined as unknown as db.Microchain)
 
-const onNextStepClick = () => {
+const originRpcMicrochainBridge = ref<InstanceType<typeof OriginRpcMicrochainBridge>>()
+const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
+
+const onNextStepClick = async () => {
   step.value += 1
   if (step.value === 3) {
-    localStore.auth.addChain(localStore.popup.popupOrigin, publicKey.value, chainId.value)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await originRpcMicrochainBridge.value?.createOriginRpcMicrochain(
+      localStore.popup.popupOrigin,
+      publicKey.value,
+      chainId.value
+    )
   }
   if (step.value === 4) {
     processing.value = true
@@ -144,7 +94,8 @@ const onNextStepClick = () => {
       void respond.value?.({
         approved: true
       } as commontypes.ConfirmationPopupResponse)
-      localStore.auth.addAuth(origin.value, method.value)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
       localStore.popup.removeRequest(localStore.popup.popupRequestId)
     }, 2000)
   }
@@ -176,12 +127,8 @@ interface Size {
   height: number
 }
 
-const headerHeight = ref(0)
 const actionHeight = ref(0)
 
-const onHeaderResize = (size: Size) => {
-  headerHeight.value = size.height
-}
 const onActionResize = (size: Size) => {
   actionHeight.value = size.height
 }

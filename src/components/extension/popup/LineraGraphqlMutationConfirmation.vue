@@ -171,6 +171,7 @@
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
+    <RpcAuthBridge ref='rpcAuthBridge' />
   </div>
 </template>
 
@@ -179,6 +180,8 @@ import { localStore } from 'src/localstores'
 import { computed, ref } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
+
+import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 
 import lineraLogo from '../../../assets/LineraLogo.png'
 
@@ -191,6 +194,8 @@ const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
 const processing = ref(false)
 
+const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
+
 const onNextStepClick = () => {
   step.value += 1
   if (step.value === 3) {
@@ -200,7 +205,8 @@ const onNextStepClick = () => {
       const _respond = respond.value
       try {
         localStore.popup.removeRequest(localStore.popup.popupRequestId)
-        localStore.auth.addAuth(origin.value, method.value)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
         void _respond?.({
           approved: true
         } as commontypes.ConfirmationPopupResponse)

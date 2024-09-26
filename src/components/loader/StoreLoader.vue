@@ -2,14 +2,7 @@
   <div v-if='loading' class='row q-pa-md q-gutter-md'>
     <div :class='[ "text-center full-width onboarding-container", localStore.oneShotSetting.extensionMode ? "" : "onboarding-padding" ]'>
       <q-img :src='cheCkoLogo' width='240px' />
-      <q-card class='loading-card' flat>
-        <q-inner-loading
-          :showing='loading'
-          class='text-red-4'
-        >
-          <q-spinner-facebook size='80px' />
-        </q-inner-loading>
-      </q-card>
+      <ProcessingView :processing='loading' />
     </div>
     <PasswordBridge />
     <LoginTimestampBridge ref='loginTimestampBridge' />
@@ -24,6 +17,7 @@ import { localStore } from 'src/localstores'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
+import ProcessingView from '../processing/ProcessingView.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 

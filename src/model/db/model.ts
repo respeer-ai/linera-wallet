@@ -5,6 +5,7 @@ import { sha3 } from 'hash-wasm'
 import { _hex } from 'src/utils'
 import Identicon from 'identicon.js'
 import { lineraLogo } from 'src/assets'
+import { OriginRpcAuth } from 'app/src-bex/middleware/types'
 
 export interface MicrochainOwner {
   id?: number
@@ -232,4 +233,15 @@ export interface Activity {
 export interface LoginTimestamp {
   id?: number
   timestamp: number
+}
+
+export interface RpcAuth extends OriginRpcAuth {
+  id?: number
+}
+
+export interface OriginRpcMicrochain {
+  id?: number
+  origin: string
+  publicKey: string
+  microchain: string
 }

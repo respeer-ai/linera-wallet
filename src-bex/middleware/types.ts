@@ -47,7 +47,8 @@ export enum PopupRequestType {
 }
 
 export interface OriginRpcAuth {
+  origin: string
   publicKey: string
   chainId: string
-  methods: RpcMethod[]
+  method: RpcMethod
 }

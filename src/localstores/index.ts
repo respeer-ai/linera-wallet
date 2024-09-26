@@ -1,4 +1,3 @@
-import { useAuthStore } from './auth'
 import { useNotificationStore } from './notify'
 import { usePopupStore } from './popup'
 import { useSettingStore as useOneShotSettingStore } from './setting/oneshot'
@@ -11,7 +10,6 @@ export const notification = useNotificationStore()
 export const persistentSetting = usePersistentSettingStore()
 export const oneShotSetting = useOneShotSettingStore()
 export const popup = usePopupStore()
-export const auth = useAuthStore()
 
 export const localStore = {
   notification,
@@ -19,8 +17,7 @@ export const localStore = {
   persistentSetting,
   oneShotSetting,
   oneShotSettingDef,
-  popup,
-  auth
+  popup
 }
 
 export * as notify from './notify'

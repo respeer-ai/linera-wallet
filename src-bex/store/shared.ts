@@ -50,14 +50,12 @@ export const getMicrochains = async (account?: string) => {
   return microchains
 }
 
-export const authenticated = async (origin: string, method: RpcMethod) => {
-  const authenticates = await permissionStore.getItem('authenticates')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const authenticated = (origin: string, method: RpcMethod) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const _authenticates = JSON.parse(authenticates as string) || {}
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const auth = _authenticates[origin] as OriginRpcAuth
-  if (!auth || !auth.methods) return false
-  return auth.methods.includes(method)
+  // TODO: get from dexie database
+  return false
 }
 
 export const getRpcAuth = async (origin: string): Promise<OriginRpcAuth | undefined> => {

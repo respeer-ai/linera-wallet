@@ -113,6 +113,7 @@
       <q-resize-observer @resize='onActionResize' />
     </div>
     <OwnerBridge ref='ownerBridge' />
+    <RpcAuthBridge ref='rpcAuthBridge' />
   </div>
 </template>
 
@@ -126,8 +127,9 @@ import { Web3 } from 'web3'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { db } from 'src/model'
 
-import OwnerBridge from 'src/components/bridge/db/OwnerBridge.vue'
-import VerifyPassword from 'src/components/password/VerifyPassword.vue'
+import OwnerBridge from '../..//bridge/db/OwnerBridge.vue'
+import VerifyPassword from '../..//password/VerifyPassword.vue'
+import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 
 const step = ref(1)
 const allowCheckAccount = ref(false)
@@ -145,6 +147,7 @@ const passwordError = ref(false)
 const processing = ref(false)
 
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
+const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
 
 watch(passwordError, () => {
   onCancelClick()
@@ -167,7 +170,8 @@ const signResponse = async () => {
       approved: true,
       message: signature
     } as commontypes.ConfirmationPopupResponse)
-    localStore.auth.addAuth(origin.value, method.value)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
     localStore.popup.removeRequest(localStore.popup.popupRequestId)
   }, 2000)
 }
