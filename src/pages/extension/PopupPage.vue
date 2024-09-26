@@ -1,25 +1,25 @@
 <template>
   <div class='bg-grey-2 full-height'>
-    <div class='bg-white' :style='{width: "calc(100% + 48px)", height: "84px", margin: "-12px -24px 0 -24px"}'>
+    <div class='bg-white full-width page-x-padding popup-header'>
       <PopupHeader />
     </div>
     <div class='text-bold label-text-large popup-title text-center'>
       {{ title }}
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS && false'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS'
       class='popup-body full-width'
     >
       <EthRequestAccountsConfirmation v-model:title='title' />
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION && false'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION'
       class='popup-body full-width'
     >
       <LineraGraphqlMutationConfirmation v-model:title='title' />
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_SIGN || true'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && popupRequest === middlewaretypes.RpcMethod.ETH_SIGN'
       class='popup-body full-width'
     >
       <EthSignConfirmation v-model:title='title' />

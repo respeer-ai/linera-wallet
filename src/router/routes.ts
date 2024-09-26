@@ -7,6 +7,7 @@ declare module 'vue-router' {
     ShowFooterMenu?: boolean
     ShowTestTip?: boolean
     AlignPageCenter?: boolean
+    InPopupContext?: boolean
   }
 }
 
@@ -135,7 +136,8 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/extension/PopupPage.vue'),
         meta: {
           ShowHeaderMenu: false,
-          AlignPageCenter: false
+          AlignPageCenter: false,
+          InPopupContext: true
         }
       }
 

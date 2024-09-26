@@ -54,6 +54,11 @@ export default route(function (/* { store, ssrContext } */) {
     } else {
       _setting.oneShotSetting.AlignPageCenter = true
     }
+    if (to.meta?.InPopupContext !== undefined) {
+      _setting.oneShotSetting.InPopupContext = to.meta.InPopupContext
+    } else {
+      _setting.oneShotSetting.InPopupContext = false
+    }
   })
 
   return router

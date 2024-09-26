@@ -26,6 +26,8 @@ export interface OneShotSetting {
 
   CreatingDefaultNetwork: boolean
   CreatingDefaultToken: boolean
+
+  InPopupContext: boolean
 }
 
 export interface MenuItem {

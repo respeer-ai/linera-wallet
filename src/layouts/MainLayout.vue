@@ -60,7 +60,9 @@ watch(showSettingMenu, () => {
 
 const viewWidth = computed(() => extensionMode.value ? '368px' : '800px')
 const viewHeight = computed(() => extensionMode.value ? '600px' : '100%')
-const bodyHeight = computed(() => extensionMode.value ? '600px' : `calc(${viewHeight.value} - ${headerHeight.value}px - ${footerHeight.value}px - (${outerHeight.value}px - ${innerHeight.value}px))`)
+const bodyHeight = computed(() => extensionMode.value
+  ? `${localStore.oneShotSetting.inPopupContext ? window.visualViewport?.height as number : 600}px`
+  : `calc(${viewHeight.value} - ${headerHeight.value}px - ${footerHeight.value}px - (${outerHeight.value}px - ${innerHeight.value}px))`)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })

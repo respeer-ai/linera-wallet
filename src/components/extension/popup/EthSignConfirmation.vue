@@ -15,7 +15,7 @@
         <ProcessingView :processing='processing' />
       </div>
     </div>
-    <div v-if='step < 3 && step !== 2' class='extra-bottom-margin page-x-padding'>
+    <div v-if='step < 3 && step !== 2' class='page-x-padding'>
       <q-btn
         flat
         rounded
@@ -30,7 +30,7 @@
         rounded
         outlined
         label='Cancel'
-        class='btn btn-alt full-width vertical-items-margin'
+        class='btn btn-alt full-width vertical-items-margin extra-bottom-margin'
         @click='onCancelClick'
         no-caps
       />

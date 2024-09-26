@@ -1,8 +1,8 @@
 <template>
-  <div class='row' :style='{width: "100%", padding: "24px"}'>
+  <div class='row full-width'>
     <q-img :src='connection?.favicon' width='36px' height='36px' />
     <div :style='{marginLeft: "16px"}'>
-      <div class='text-bold text-brown-8'>
+      <div class='text-bold'>
         {{ connection?.name }}
       </div>
       <div class='text-blue-6'>

@@ -48,6 +48,9 @@ export const useSettingStore = defineStore('one-shot-setting', {
         path = path.slice(path.indexOf('/') + path.indexOf('/') >= 0 ? '/'.length : 0)
         return this.oneShotSetting.ExtensionMode ? '/extension/' + path : '/' + path
       }
+    },
+    inPopupContext (): boolean {
+      return this.oneShotSetting.InPopupContext
     }
   },
   actions: {}

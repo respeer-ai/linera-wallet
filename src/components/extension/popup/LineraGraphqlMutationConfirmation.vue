@@ -1,173 +1,38 @@
 <template>
-  <div class='text-center' :style='{height: "100%"}'>
-    <div
-      v-if='step === 1'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Mutate Linera Wallet
+  <div class='text-center full-height'>
+    <div :style='{ height: "calc(100% - " + actionHeight + "px" + ")" }'>
+      <div v-if='step === 1' class='full-height page-x-padding'>
+        <div class='selector-y-padding'>
+          <CheckboxView
+            text='Change Linera account state (transfer, generate block, etc.)'
+            :caption='`Requested now for ${shortid.shortId(publicKey, 4)}`'
+            v-model='allowMutateWallet'
+          />
         </div>
-        <q-resize-observer @resize='onHeaderResize' />
+        <div>{{ localStore.popup }}</div>
       </div>
-      <div
-        :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
-        }'
-        class='flex justify-center items-center'
-      >
-        <q-card :style='{width: "100%", padding: publicKeys.length ? "" : "48px 24px"}'>
-          <div v-if='publicKeys.length' :style='{width: "100%"}'>
-            <q-radio
-              v-model='publicKey'
-              v-for='(_publicKey, index) in publicKeys'
-              :key='_publicKey'
-              :val='_publicKey'
-              :style='{
-                padding: "24px 12px",
-                borderBottom: index < publicKeys.length - 1 ? "1px solid grey" : "",
-                width: "100%"
-              }'
-              class='cursor-pointer'
-            >
-              <div class='row'>
-                <q-img :src='lineraLogo' width='36px' height='36px' />
-                <div :style='{margin: "0 0 0 16px"}' class='text-left'>
-                  <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                    {{ shortid.shortId(_publicKey, 6) }}
-                  </div>
-                  <div class='text-brown-6'>
-                    {{ 0.00 }} TLINERA
-                  </div>
-                </div>
-              </div>
-            </q-radio>
-          </div>
-          <div v-else :style='{width: "100%"}' class='row'>
-            <q-space />
-            <div :style='{lineHeight: "36px"}'>
-              No account available.
-            </div>
-            <q-btn
-              dense
-              flat
-              class='text-blue-6'
-            >
-              Create
-            </q-btn>
-            <q-space />
-          </div>
-        </q-card>
+      <div v-if='step === 2' class='full-height'>
+        <ProcessingView :processing='processing' />
       </div>
     </div>
-    <div
-      v-if='step === 2'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Permissions
-        </div>
-        <q-resize-observer @resize='onHeaderResize' />
-      </div>
-      <div
-        :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
-        }'
-        class='flex justify-center items-center'
-      >
-        <q-card :style='{width: "100%", padding: publicKeys.length ? "" : "48px 24px"}'>
-          <div :style='{width: "100%"}'>
-            <q-checkbox
-              v-model='allowCheckAccount'
-              :style='{
-                padding: "24px 12px",
-                width: "100%"
-              }'
-              class='cursor-pointer'
-              checked-icon='task_alt'
-              unchecked-icon='highlight_off'
-            >
-              <div :style='{margin: "0 0 0 16px"}' class='text-left'>
-                <div class='text-bold text-brown-10' :style='{fontSize: "18px"}'>
-                  Change Linera account state (transfer, generate block, etc.)
-                </div>
-                <div class='text-brown-6'>
-                  Requested now for {{ shortid.shortId(publicKey, 4) }}
-                </div>
-              </div>
-            </q-checkbox>
-          </div>
-        </q-card>
-      </div>
-    </div>
-    <div
-      v-if='step === 3'
-      :style='{
-        height: "calc(100% - " + actionHeight + "px" + ")"
-      }'
-    >
-      <div>
-        <div class='text-bold text-brown-10' :style='{fontSize: "24px", margin: "24px 0 0 0"}'>
-          Authenticating
-        </div>
-        <q-resize-observer @resize='onHeaderResize' />
-      </div>
-      <div
-        :style='{
-          padding: "24px 0 36px 0",
-          borderRadius: "16px",
-          height: "calc(100% - " + headerHeight + "px" + ")"
-        }'
-        class='flex justify-center items-center'
-      >
-        <q-card :style='{height: "160px", width: "100%"}' flat>
-          <q-inner-loading
-            :showing='processing'
-            class='text-red-4'
-          >
-            <q-spinner-facebook size='80px' />
-          </q-inner-loading>
-        </q-card>
-      </div>
-    </div>
-    <div v-if='step < 3'>
-      <div class='text-brown-6' :style='{fontSize: "16px"}'>
-        Only approve trusted application
-      </div>
+    <div v-if='step < 3 && step !== 2' class='page-x-padding'>
       <q-btn
         flat
-        dense
         rounded
         label='Continue'
-        class='text-brown-10 bg-red-2'
-        :style='{
-          margin: "16px 0 4px 0",
-          width: "100%"
-        }'
+        class='btn full-width vertical-items-margin'
         @click='onNextStepClick'
-        :disable='!forwadable()'
+        :disable='!forwardable()'
+        no-caps
       />
       <q-btn
         flat
-        dense
         rounded
         outlined
         label='Cancel'
-        class='text-brown-10'
-        :style='{
-          margin: "4px 0 16px 0",
-          width: "100%"
-        }'
+        class='btn btn-alt full-width vertical-items-margin extra-bottom-margin'
         @click='onCancelClick'
+        no-caps
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
@@ -177,18 +42,17 @@
 
 <script setup lang='ts'>
 import { localStore } from 'src/localstores'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 
 import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
+import CheckboxView from '../CheckboxView.vue'
+import ProcessingView from '../../processing/ProcessingView.vue'
 
-import lineraLogo from '../../../assets/LineraLogo.png'
-
-const publicKeys = ref([])
 const publicKey = ref('')
 const step = ref(1)
-const allowCheckAccount = ref(false)
+const allowMutateWallet = ref(false)
 const respond = computed(() => localStore.popup._popupRespond)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
@@ -196,9 +60,11 @@ const processing = ref(false)
 
 const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
 
+const title = defineModel<string>('title')
+
 const onNextStepClick = () => {
   step.value += 1
-  if (step.value === 3) {
+  if (step.value === 2) {
     processing.value = true
     setTimeout(() => {
       processing.value = false
@@ -228,12 +94,12 @@ const onCancelClick = () => {
   localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
-const forwadable = () => {
+const forwardable = () => {
   if (step.value === 1) {
     return publicKey.value.length > 0
   }
   if (step.value === 2) {
-    return allowCheckAccount.value
+    return allowMutateWallet.value
   }
   return false
 }
@@ -243,14 +109,21 @@ interface Size {
   height: number
 }
 
-const headerHeight = ref(0)
 const actionHeight = ref(0)
 
-const onHeaderResize = (size: Size) => {
-  headerHeight.value = size.height
-}
 const onActionResize = (size: Size) => {
   actionHeight.value = size.height
 }
+
+onMounted(() => {
+  title.value = 'Permissions'
+})
+
+watch(step, () => {
+  switch (step.value) {
+    case 1: title.value = 'Permissions'; return
+    case 2: title.value = 'Authenticating'
+  }
+})
 
 </script>
