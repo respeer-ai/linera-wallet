@@ -4,20 +4,47 @@ import { createHttpLink, InMemoryCache, split } from '@apollo/client/core'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
+import { dbBase } from 'src/controller'
+import { db } from 'src/model'
+
+export enum EndpointType {
+  Faucet,
+  Rpc
+}
+
+export async function getClientOptionsWithEndpointType (endpointType: EndpointType) {
+  const network = (await dbBase.networks.toArray()).find((el) => el.selected)
+
+  let schema = network?.rpcSchema
+  let wsSchema = network?.wsSchema
+  let host = network?.host
+  let port = network?.port
+
+  if (endpointType === EndpointType.Faucet && network) {
+    const url = new URL(network.faucetUrl)
+    const protocol = url.protocol.replace(':', '')
+    schema = protocol as db.HTTPSchema
+    wsSchema = protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS
+    host = url.hostname
+    port = parseInt(url.port)
+  }
+
+  return getClientOptions(schema, wsSchema, host, port)
+}
 
 export /* async */ function getClientOptions (
   schema?: string,
-  waSchema?: string,
+  wsSchema?: string,
   host?: string,
   port?: number
 ) {
   const schema1 = schema || 'https'
   const port1 = port?.toString() || '8080'
   const host1 = host || 'localhost'
-  const waSchema1 = waSchema || 'ws'
+  const wsSchema1 = wsSchema || 'ws'
 
   const httpBaseUrl = schema1 + '://' + host1 + ':' + port1
-  const wsBaseUrl = waSchema1 + '://' + host1 + ':' + port1 + '/ws'
+  const wsBaseUrl = wsSchema1 + '://' + host1 + ':' + port1 + '/ws'
 
   const wsLink = new GraphQLWsLink(
     createClient({

@@ -88,7 +88,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
   await updateChainAccountBalances(microchain, publicKeys)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcBlockBridge.value?.subscribe(
+  await rpcBlockBridge.value?.subscribe(
     microchain.microchain,
     async (height: number) => {
       const password = (await dbBase.passwords.toArray()).find((el) => el.active)

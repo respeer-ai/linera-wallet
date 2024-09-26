@@ -1,12 +1,12 @@
 <script setup lang='ts'>
-import { getClientOptions } from 'src/apollo'
+import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
-import { graphqlResult, endpoint } from 'src/utils'
+import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 
 const accountBalance = async (chainId: string, publicKey?: string): Promise<number> => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
@@ -33,7 +33,7 @@ const accountBalance = async (chainId: string, publicKey?: string): Promise<numb
 }
 
 const getChainAccountBalances = async (chainIds: string[], publicKeys: string[]): Promise<rpc.ChainAccountBalancesResp> => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`

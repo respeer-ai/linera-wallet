@@ -1,13 +1,13 @@
 <script setup lang='ts'>
-import { getClientOptions } from 'src/apollo'
+import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
-import { graphqlResult, endpoint, _hex } from 'src/utils'
+import { graphqlResult, _hex } from 'src/utils'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { rpc } from 'src/model'
 
 const getPendingRawBlock = async (chainId: string) => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
@@ -37,7 +37,7 @@ const getPendingRawBlock = async (chainId: string) => {
 }
 
 const submitBlockSignature = async (chainId: string, height: number, signature: string) => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -60,8 +60,8 @@ const signNewBlock = async (chainId: string, notifiedHeight: number, keyPair: Ed
   await submitBlockSignature(chainId, height, signature)
 }
 
-const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingMessage?: () => void) => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingMessage?: () => void) => {
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(gql`
@@ -96,7 +96,7 @@ const subscribe = (chainId: string, onNewRawBlock?: (height: number) => void, on
 }
 
 const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.BlockResp> => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`

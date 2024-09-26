@@ -1,12 +1,13 @@
 <script setup lang='ts'>
-import { getClientOptions } from 'src/apollo'
+import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
-import { graphqlResult, endpoint } from 'src/utils'
+import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
+import { dbBase } from 'src/controller'
 
 const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
-  const options = getClientOptions(endpoint.faucetSchema, endpoint.faucetWsSchema, endpoint.faucetPublicHost, endpoint.faucetPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
@@ -28,8 +29,10 @@ const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
 }
 
 const initMicrochainChainStore = async (publicKey: string, signature: string, chainId: string, messageId: string, certificateHash: string) => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
+
+  const faucetUrl = (await dbBase.networks.toArray()).find((el) => el.selected)?.faucetUrl
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
     mutation walletInitWithoutKeypair ($publicKey: String!, $signature: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $certificateHash: String!) {
@@ -38,7 +41,7 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   return await mutate({
     publicKey,
     signature,
-    faucetUrl: endpoint.faucetLocalUrl,
+    faucetUrl,
     chainId,
     messageId,
     certificateHash
@@ -47,7 +50,7 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   // TODO: support query with publicKey

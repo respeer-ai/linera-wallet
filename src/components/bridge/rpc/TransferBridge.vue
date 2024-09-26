@@ -1,11 +1,11 @@
 <script setup lang='ts'>
-import { getClientOptions } from 'src/apollo'
+import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
-import { _hex, endpoint } from 'src/utils'
+import { _hex } from 'src/utils'
 
 const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number, userData?: string) => {
-  const options = getClientOptions(endpoint.rpcSchema, endpoint.rpcWsSchema, endpoint.rpcHost, endpoint.rpcPort)
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const userDataBytes = userData ? _hex.toBytes(userData) : undefined
