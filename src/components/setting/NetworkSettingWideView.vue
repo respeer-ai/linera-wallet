@@ -27,7 +27,7 @@
             <q-avatar size='28px' color='grey-4' class='page-item-x-margin-left'>
               <q-img :src='network.icon' width='24px' height='24px' />
             </q-avatar>
-            <div :class='[ "page-item-x-margin-left text-grey-9", network.id === displayNetwork?.id ? "text-bold" : "" ]'>
+            <div :class='[ "page-item-x-margin-left text-grey-9 word-break-all", network.id === displayNetwork?.id ? "text-bold" : "" ]' :style='{maxWidth: "calc(100% - 28px - 28px - 28px - 18px)"}'>
               {{ network.name }}
             </div>
             <q-icon
