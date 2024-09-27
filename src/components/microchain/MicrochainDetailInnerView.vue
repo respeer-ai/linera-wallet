@@ -74,17 +74,8 @@
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       Chain activity
     </div>
-    <div class='vertical-menus-margin extra-large-bottom-margin'>
-      <div v-if='activities.length > 0'>
-        <div v-for='activity in activities' :key='activity.id'>
-          {{ activity }}
-        </div>
-      </div>
-      <div v-else>
-        <p class='text-grey-6 text-center'>
-          This microchain doesn't have any transaction.
-        </p>
-      </div>
+    <div class='extra-large-bottom-margin'>
+      <ActivitiesView x-padding='0' />
     </div>
   </div>
   <MicrochainBalanceBridge :token-id='nativeTokenId' v-model:token-balance='chainTokenBalance' v-model:usd-balance='chainUsdBalance' />
@@ -100,6 +91,7 @@
 <script setup lang='ts'>
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
+import { localStore } from 'src/localstores'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -107,7 +99,7 @@ import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
 import ActivityBridge from '../bridge/db/ActivityBridge.vue'
-import { localStore } from 'src/localstores'
+import ActivitiesView from '../activity/ActivitiesView.vue'
 
 interface Props {
   microchain: db.Microchain

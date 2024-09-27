@@ -8,6 +8,7 @@
     <DbMicrochainOwnerBalanceBridge ref='dbMicrochainOwnerBalanceBridge' />
     <DbOwnerBridge ref='dbOwnerBridge' />
     <DbTokenBridge ref='dbTokenBridge' />
+    <DbActivityBridge ref='dbActivityBridge' />
   </div>
 </template>
 
@@ -26,6 +27,7 @@ import DbMicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import DbMicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
+import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -35,6 +37,7 @@ const dbMicrochainBalanceBridge = ref<InstanceType<typeof DbMicrochainBalanceBri
 const dbMicrochainOwnerBalanceBridge = ref<InstanceType<typeof DbMicrochainOwnerBalanceBridge>>()
 const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
+const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
 
 const microchains = ref([] as db.Microchain[])
 
@@ -102,9 +105,50 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
     }, async (hash: string) => {
       await updateChainAccountBalances(microchain, publicKeys)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      const blockResp = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash)
-      console.log(blockResp)
-      // TODO: add activity
+      const blockResp = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as rpc.BlockResp
+      for (const bundle of blockResp?.value?.executedBlock?.block?.incomingBundles || []) {
+        for (const message of bundle.bundle.messages) {
+          if (message.message?.System?.Credit) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await dbActivityBridge.value?.createActivity(
+              bundle.origin.sender,
+              message.message?.System?.Credit?.source,
+              blockResp.value.executedBlock.block.chainId,
+              message.message?.System?.Credit?.target,
+              message.message?.System?.Credit?.amount,
+              blockResp.value.executedBlock.block.height,
+              blockResp.value.executedBlock.block.timestamp,
+              blockResp.hash,
+              message.grant
+            )
+          }
+        }
+      }
+      for (const operation of blockResp?.value?.executedBlock?.block.operations || []) {
+        if (operation.System?.Transfer) {
+          let grant = undefined as unknown as string | undefined
+          for (const messages of blockResp?.value?.executedBlock?.outcome?.messages || []) {
+            grant = messages.find((el) => {
+              return el.destination?.Recipient === operation.System.Transfer.recipient.Account?.chain_id &&
+                     el.message.source === operation.System.Transfer.owner &&
+                     el.message.target === operation.System.Transfer.recipient?.Account?.owner
+            })?.grant
+            if (grant?.length) break
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          await dbActivityBridge.value?.createActivity(
+            blockResp.value.executedBlock.block.chainId,
+            operation.System.Transfer.owner,
+            operation.System.Transfer.recipient.Account.chain_id,
+            operation.System.Transfer.recipient.Account.owner,
+            operation.System.Transfer.amount,
+            blockResp.value.executedBlock.block.height,
+            blockResp.value.executedBlock.block.timestamp,
+            blockResp.hash,
+            grant as string
+          )
+        }
+      }
     }, () => {
       // DO NOTHING
     })

@@ -65,7 +65,7 @@ const ownerActivities = async (owner: db.Owner): Promise<db.Activity[]> => {
   return acts
 }
 
-const addActivity = async (
+const createActivity = async (
   sourceChain: string,
   sourceAddress: string | undefined,
   targetChain: string,
@@ -104,7 +104,7 @@ const addActivity = async (
 defineExpose({
   addressActivities,
   ownerActivities,
-  addActivity
+  createActivity
 })
 
 </script>

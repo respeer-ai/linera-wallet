@@ -68,7 +68,6 @@
   />
   <TokenBridge ref='dbTokenBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
-  <ActivityBridge v-model:activities='activities' :microchain='microchain.microchain' />
 </template>
 
 <script setup lang='ts'>
@@ -82,7 +81,6 @@ import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
 import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
-import ActivityBridge from '../bridge/db/ActivityBridge.vue'
 import MicrochainDetailInnerView from './MicrochainDetailInnerView.vue'
 
 interface Props {
@@ -95,7 +93,6 @@ const chainTokenBalance = ref(0)
 const chainUsdBalance = ref(0)
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
-const activities = ref([] as db.Activity[])
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 

@@ -30,11 +30,46 @@ export interface BlockResp {
         chainId: string
         epoch: number
         incomingBundles: {
-          origin: unknown
-          bundle: unknown
+          origin: {
+            sender: string
+            medium: string
+          }
+          bundle: {
+            certificate_hash: string
+            height: number
+            messages: {
+              authenticated_signer?: string
+              grant: string
+              index: number
+              message: {
+                System: {
+                  Credit: {
+                    amount: string
+                    source?: string
+                    target: string
+                  }
+                }
+              }
+              refund_grant_to?: string
+            }[]
+          }
           action: unknown
         }[]
-        operations: unknown[]
+        operations: {
+          System: {
+            Transfer: {
+              amount: string
+              owner?: string
+              recipient: {
+                Account: {
+                  chain_id: string
+                  owner?: string
+                }
+                user_data?: string
+              }
+            }
+          }
+        }[]
         height: number
         timestamp: number
         authenticatedSigner: string
@@ -42,13 +77,19 @@ export interface BlockResp {
       }
       outcome: {
         messages: {
-          destination: string
-          authenticatedSigner: string
+          destination: {
+            Recipient: string
+          }
+          authenticatedSigner?: string
           grant: string
           refundGrandTo: unknown
           kind: string
-          message: unknown
-        }
+          message: {
+            amount: string
+            source: string
+            target: string
+          }
+        }[][]
         stateHash: string
         oracleResponses: unknown[]
         events: {
