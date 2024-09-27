@@ -2,6 +2,9 @@
   <q-item class='row full-width tab-panel-item' clickable :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <q-avatar size='28px'>
       <q-icon name='bi-box-arrow-in-right' size='24px' />
+      <q-badge color='transparent' rounded transparent floating>
+        <q-img :src='lineraLogo' width='14px' height='14px' />
+      </q-badge>
     </q-avatar>
     <div class='selector-margin-x-left row' :style='{width: "calc(100% - 28px - 12px)"}'>
       <div>
@@ -16,11 +19,16 @@
             <q-icon name='bi-copy' size='12px' />
           </div>
         </div>
+        <div class='text-left label-text-small text-grey-6'>
+          {{ date.formatDate(activity.timestamp / 1000, 'YYYY/MM/DD HH:mm:ss') }}
+        </div>
       </div>
       <q-space />
-      <div class='header-items-margin-x-right'>
-        <q-icon :name='direction' color='blue-8' />
-        {{ Number(activity.amount) }} TLINERA
+      <div class='header-items-margin-x-right row'>
+        <q-icon :name='direction' color='black' size='12px' :style='{marginTop: "5px"}' />
+        <div class='page-item-x-margin-left'>
+          {{ Number(activity.amount) }} TLINERA
+        </div>
       </div>
     </div>
   </q-item>
@@ -32,9 +40,12 @@
 import { db } from 'src/model'
 import { shortid } from 'src/utils'
 import { computed, ref, toRef } from 'vue'
+import { date } from 'quasar'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
+
+import { lineraLogo } from 'src/assets'
 
 interface Props {
   activity: db.Activity
@@ -92,3 +103,8 @@ const direction = computed(() => {
 })
 
 </script>
+
+<style scope lang='sass'>
+.q-badge
+  padding: 2px 0
+</style>

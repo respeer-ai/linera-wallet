@@ -2,7 +2,7 @@
   <div class='fill-parent text-center'>
     <q-space />
     <div v-if='activities.length > 0'>
-      <ActivityCardView v-for='activity in activities' :key='activity.id' :activity='activity' :x-padding='xPadding' />
+      <ActivityCardView v-for='activity in displayActivities' :key='activity.id' :activity='activity' :x-padding='xPadding' />
     </div>
     <div v-else class='page-item-placeholder'>
       <div>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRef } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { db } from 'src/model'
 
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
@@ -31,5 +31,8 @@ const props = defineProps<Props>()
 const xPadding = toRef(props, 'xPadding')
 
 const activities = ref([] as db.Activity[])
+const displayActivities = computed(() => {
+  return [...activities.value].sort((a, b) => b.timestamp - a.timestamp)
+})
 
 </script>
