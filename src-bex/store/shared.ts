@@ -16,11 +16,8 @@ export const getMicrochains = async (owner?: string) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const authenticated = (origin: string, method: RpcMethod) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  // TODO: get from dexie database
-  return false
+export const authenticated = async (origin: string, method: RpcMethod) => {
+  return (await dbBase.rpcAuths.toArray()).find((el) => el.origin === origin && el.method === method)
 }
 
 export const getRpcMicrochain = async (origin: string, publicKey: string): Promise<string | undefined> => {

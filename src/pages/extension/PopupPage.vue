@@ -48,17 +48,19 @@ const title = ref('')
 const popupCount = computed(() => localStore.popup.popups.size)
 const popupType = computed(() => localStore.popup._popupType)
 const popupRequest = computed(() => localStore.popup._popupRequest)
+const closeTimeout = ref(-1)
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
+  if (closeTimeout.value >= 0) {
+    window.clearTimeout(closeTimeout.value)
+  }
   switch (payload.data.type) {
     case middlewaretypes.PopupRequestType.CONFIRMATION:
-      if (payload.data.type === middlewaretypes.PopupRequestType.CONFIRMATION) {
-        localStore.popup.addConnection({
-          origin: payload.data.request.origin,
-          favicon: payload.data.request.favicon,
-          name: payload.data.request.name
-        })
-      }
+      localStore.popup.addConnection({
+        origin: payload.data.request.origin,
+        favicon: payload.data.request.favicon,
+        name: payload.data.request.name
+      })
       return localStore.popup.insertRequest(payload)
     default:
       return void payload.respond({})
@@ -78,7 +80,7 @@ watch(popupCount, () => {
   if (popupCount.value > 0) {
     return
   }
-  setTimeout(() => {
+  closeTimeout.value = window.setTimeout(() => {
     window.close()
   }, 100)
 })

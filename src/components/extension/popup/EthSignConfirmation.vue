@@ -1,6 +1,6 @@
 <template>
   <div class='text-center' :style='{height: "100%"}'>
-    <div :style='{ height: "calc(100% - " + actionHeight + "px" + ")" }'>
+    <div :style='{ height: "calc(100% - " + (step !== 2 ? actionHeight : 0) + "px" + ")" }'>
       <div v-if='step === 1' class='full-height overflow-scroll'>
         <SignInfoView
           :public-key='publicKey'
@@ -9,7 +9,10 @@
         />
       </div>
       <div v-if='step === 2' class='full-height page-x-padding'>
-        <VerifyPassword :show-title='false' @verified='onPasswordVerified' @error='onVerifyPasswordError' />
+        <VerifyPassword
+          :show-title='false' @verified='onPasswordVerified' @error='onVerifyPasswordError' v-model:password='password'
+          :check-login-timeout='true'
+        />
       </div>
       <div v-if='step === 3' class='full-height'>
         <ProcessingView :processing='processing' />
@@ -58,7 +61,6 @@ import SignInfoView from '../SignInfoView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
 
 const step = ref(1)
-const allowCheckAccount = ref(false)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
 const respond = computed(() => localStore.popup._popupRespond)
@@ -82,15 +84,15 @@ const onVerifyPasswordError = () => {
 
 const signResponse = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const _account = await ownerBridge.value?.getOwnerWithPublicKey(publicKey.value) as db.Owner
+  const _account = await ownerBridge.value?.getOwnerWithPublicKeyPrefix(publicKey.value) as db.Owner
   if (!_account) {
     return onCancelClick()
   }
   const privateKey = db.privateKey(_account, password.value)
+  console.log(_account, password.value, privateKey)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
   const bytes = Web3.utils.hexToBytes(hexContent.value as string)
   const signature = Web3.utils.bytesToHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
-  processing.value = true
   setTimeout(() => {
     processing.value = false
     void respond.value?.({
@@ -103,16 +105,15 @@ const signResponse = async () => {
   }, 2000)
 }
 
-const onPasswordVerified = () => {
+const onPasswordVerified = async () => {
   passwordVerified.value = true
   step.value += 1
+  processing.value = true
+  await signResponse()
 }
 
-const onNextStepClick = async () => {
+const onNextStepClick = () => {
   step.value += 1
-  if (step.value === 3) {
-    await signResponse()
-  }
 }
 
 const onCancelClick = () => {
@@ -129,9 +130,6 @@ const forwardable = () => {
   }
   if (step.value === 2) {
     return passwordVerified.value
-  }
-  if (step.value === 3) {
-    return allowCheckAccount.value
   }
   return false
 }

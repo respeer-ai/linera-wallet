@@ -42,9 +42,16 @@ const verifyPassword = async (passwd: string) => {
   return db.decryptPassword(pwd) === passwd
 }
 
+const getPassword = async () => {
+  const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!passwd) return
+  return db.decryptPassword(passwd)
+}
+
 defineExpose({
   savePassword,
-  verifyPassword
+  verifyPassword,
+  getPassword
 })
 
 </script>

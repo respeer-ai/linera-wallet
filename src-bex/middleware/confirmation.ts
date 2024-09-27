@@ -19,13 +19,13 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.ETH_SIGN, true]
 ])
 
-export const needConfirm = (req: RpcRequest) => {
+export const needConfirm = async (req: RpcRequest) => {
   let shouldConfirm = confirmations.get(req.request.method as RpcMethod)
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  console.log(`Method should confirm ${shouldConfirm}`, req)
   if (shouldConfirm) {
-    shouldConfirm = !sharedStore.authenticated(req.origin, req.request.method as RpcMethod)
+    shouldConfirm = !await sharedStore.authenticated(req.origin, req.request.method as RpcMethod)
   }
+  // TODO: check with origin and publicKey
   return shouldConfirm === undefined || shouldConfirm || req.request.method === RpcMethod.ETH_SIGN
 }
 
@@ -47,7 +47,7 @@ const confirmationWithExistPopup = (req: RpcRequest, resolve: (message: string |
 }
 
 export const confirmationHandler = async (req: RpcRequest): Promise<string | undefined> => {
-  if (!needConfirm(req)) {
+  if (!await needConfirm(req)) {
     return await Promise.resolve(undefined)
   }
 
