@@ -101,7 +101,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
       const privateKey = db.privateKey(owners[0], _password)
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
+      await rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
     }, async (hash: string) => {
       await updateChainAccountBalances(microchain, publicKeys)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -110,7 +110,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
         for (const message of bundle.bundle.messages) {
           if (message.message?.System?.Credit) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await dbActivityBridge.value?.createActivity(
+            console.log(await dbActivityBridge.value?.createActivity(
               bundle.origin.sender,
               message.message?.System?.Credit?.source,
               blockResp.value.executedBlock.block.chainId,
@@ -120,7 +120,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
               blockResp.value.executedBlock.block.timestamp,
               blockResp.hash,
               message.grant
-            )
+            ))
           }
         }
       }
@@ -136,7 +136,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
             if (grant?.length) break
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await dbActivityBridge.value?.createActivity(
+          console.log(await dbActivityBridge.value?.createActivity(
             blockResp.value.executedBlock.block.chainId,
             operation.System.Transfer.owner,
             operation.System.Transfer.recipient.Account.chain_id,
@@ -146,7 +146,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
             blockResp.value.executedBlock.block.timestamp,
             blockResp.hash,
             grant as string
-          )
+          ))
         }
       }
     }, () => {
@@ -157,7 +157,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
 const subscribeMicrochains = async () => {
   for (const microchain of microchains.value) {
     if (subscribed.value.get(microchain.microchain)) continue
-    await subscribeMicrochain(microchain)
+    await subscribeMicrochain({ ...microchain })
     subscribed.value.set(microchain.microchain, true)
   }
 }
