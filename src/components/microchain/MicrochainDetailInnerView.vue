@@ -75,7 +75,7 @@
       Chain activity
     </div>
     <div class='extra-large-bottom-margin'>
-      <ActivitiesView x-padding='0' />
+      <ActivitiesView x-padding='8px' />
     </div>
   </div>
   <MicrochainBalanceBridge :token-id='nativeTokenId' v-model:token-balance='chainTokenBalance' v-model:usd-balance='chainUsdBalance' />
