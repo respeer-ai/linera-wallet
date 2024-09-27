@@ -20,7 +20,7 @@
         {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
       </div>
       <div class='text-left' v-else>
-        <span class='text-grey-6 selector-item-currency-sub'>LINERA</span>
+        <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
       </div>
     </div>
     <q-space />
