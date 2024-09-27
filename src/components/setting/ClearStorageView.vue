@@ -37,6 +37,10 @@ const onConfirmClick = async () => {
     await dbBase.delete()
     // TODO: verify password and backup database here
     window.location.pathname = localStore.oneShotSetting.formalizePath('/')
+    if (document.URL.startsWith('chrome-extension://')) {
+      window.location.pathname = '/www/index.html'
+      window.location.hash = '#/extension/onboarding'
+    }
   }
 }
 
