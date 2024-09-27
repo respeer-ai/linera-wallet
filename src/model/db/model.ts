@@ -105,7 +105,7 @@ export interface Network {
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
   name: 'Linera Testnet',
-  faucetUrl: 'http://172.16.31.73:8080',
+  faucetUrl: 'http://172.16.31.73:10080',
   rpcSchema: HTTPSchema.HTTP,
   wsSchema: WSSchema.WS,
   host: '172.16.31.73',
