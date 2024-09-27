@@ -42,7 +42,7 @@ const createdMicrochain = ref(undefined as unknown as db.Microchain)
 const step = ref(1)
 
 const emit = defineEmits<{(ev: 'created', value: db.Microchain): void,
-  (ev: 'failed'): void
+  (ev: 'error'): void
 }>()
 
 const createMicrochain = async (): Promise<db.Microchain> => {
@@ -74,7 +74,7 @@ onMounted(() => {
     createdMicrochain.value = microchain
     step.value++
   }).catch(() => {
-    emit('failed')
+    emit('error')
   })
 })
 
