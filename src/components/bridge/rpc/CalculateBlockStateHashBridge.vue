@@ -4,7 +4,7 @@ import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
-import Operation from '../../../../wasm/linera-protocol/linera-service-graphql-client/gql/service_schema.graphql'
+import * as types from '../../../../dist/generated/graphql/graphql'
 
 // TODO: use type in gql definition
 const calculateBlockStateHashWithFullMaterials = async (chainId: string): Promise<rpc.CalculateBlockStateHashResp> => {
@@ -12,7 +12,7 @@ const calculateBlockStateHashWithFullMaterials = async (chainId: string): Promis
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation calculateBlockStateHashWithFullMaterials ($chainId: String!, $operations: [Operation!]!) {
+    mutation calculateBlockStateHashWithFullMaterials ($chainId: String!, $operations: [types.Scalars!]!) {
       calculateBlockStateHashWithFullMaterials(chainId: $chainId, operations: $operations) {
         messageId
         chainId
