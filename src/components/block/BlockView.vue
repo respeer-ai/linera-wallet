@@ -9,6 +9,8 @@
     <DbOwnerBridge ref='dbOwnerBridge' />
     <DbTokenBridge ref='dbTokenBridge' />
     <DbActivityBridge ref='dbActivityBridge' />
+    <RpcPendingMessagesBridge ref='rpcPendingMessagesBridge' />
+    <RpcCalculateBlockStateHashBridge ref='rpcCalculateBlockStateHashBridge' />
   </div>
 </template>
 
@@ -28,6 +30,8 @@ import DbMicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceB
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
+import RpcPendingMessagesBridge from '../bridge/rpc/PendingMessagesBridge.vue'
+import RpcCalculateBlockStateHashBridge from '../bridge/rpc/CalculateBlockStateHashBridge.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -38,6 +42,8 @@ const dbMicrochainOwnerBalanceBridge = ref<InstanceType<typeof DbMicrochainOwner
 const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
+const rpcPendingMessagesBridge = ref<InstanceType<typeof RpcPendingMessagesBridge>>()
+const rpcCalculateBlockStateHashBridge = ref<InstanceType<typeof RpcCalculateBlockStateHashBridge>>()
 
 const microchains = ref([] as db.Microchain[])
 
@@ -82,6 +88,91 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
   }
 }
 
+const processNewRawBlock = async (microchain: db.Microchain, height: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
+  if (!owners.length) return
+
+  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!password) return Promise.reject(new Error('Invalid password'))
+
+  const _password = db.decryptPassword(password)
+  // TODO: process multiple owners chain
+  const privateKey = db.privateKey(owners[0], _password)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
+}
+
+const processNewBlock = async (microchain: db.Microchain, hash: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
+  if (!owners.length) return
+
+  const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
+  await updateChainAccountBalances(microchain, publicKeys)
+
+  await updateChainAccountBalances(microchain, publicKeys)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const blockResp = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as rpc.BlockResp
+  for (const bundle of blockResp?.value?.executedBlock?.block?.incomingBundles || []) {
+    for (const message of bundle.bundle.messages) {
+      if (message.message?.System?.Credit) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await dbActivityBridge.value?.createActivity(
+          bundle.origin.sender,
+          message.message?.System?.Credit?.source,
+          blockResp.value.executedBlock.block.chainId,
+          message.message?.System?.Credit?.target,
+          message.message?.System?.Credit?.amount,
+          blockResp.value.executedBlock.block.height,
+          blockResp.value.executedBlock.block.timestamp,
+          blockResp.hash,
+          message.grant
+        )
+      }
+    }
+  }
+  for (const operation of blockResp?.value?.executedBlock?.block.operations || []) {
+    if (operation.System?.Transfer) {
+      let grant = undefined as unknown as string | undefined
+      for (const messages of blockResp?.value?.executedBlock?.outcome?.messages || []) {
+        grant = messages.find((el) => {
+          return el.destination?.Recipient === operation.System.Transfer.recipient.Account?.chain_id &&
+                     el.message.source === operation.System.Transfer.owner &&
+                     el.message.target === operation.System.Transfer.recipient?.Account?.owner
+        })?.grant
+        if (grant?.length) break
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await dbActivityBridge.value?.createActivity(
+        blockResp.value.executedBlock.block.chainId,
+        operation.System.Transfer.owner,
+        operation.System.Transfer.recipient.Account.chain_id,
+        operation.System.Transfer.recipient.Account.owner,
+        operation.System.Transfer.amount,
+        blockResp.value.executedBlock.block.height,
+        blockResp.value.executedBlock.block.timestamp,
+        blockResp.hash,
+            grant as string
+      )
+    }
+  }
+}
+
+const processNewIncomingMessage = (microchain: db.Microchain) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  rpcPendingMessagesBridge.value?.getPendingMessages(microchain.microchain).then(async (messages) => {
+    console.log(messages)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    const stateHash = await rpcCalculateBlockStateHashBridge.value?.calculateBlockStateHashWithFullMaterials(microchain.microchain)
+    console.log(stateHash)
+  }).catch((error) => {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Fail get pending message ${error}`)
+  })
+}
+
 const subscribeMicrochain = async (microchain: db.Microchain) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
@@ -94,63 +185,11 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
   await rpcBlockBridge.value?.subscribe(
     microchain.microchain,
     async (height: number) => {
-      const password = (await dbBase.passwords.toArray()).find((el) => el.active)
-      if (!password) return Promise.reject(new Error('Invalid password'))
-      const _password = db.decryptPassword(password)
-      // TODO: process multiple owners chain
-      const privateKey = db.privateKey(owners[0], _password)
-      const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
+      await processNewRawBlock(microchain, height)
     }, async (hash: string) => {
-      await updateChainAccountBalances(microchain, publicKeys)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      const blockResp = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as rpc.BlockResp
-      for (const bundle of blockResp?.value?.executedBlock?.block?.incomingBundles || []) {
-        for (const message of bundle.bundle.messages) {
-          if (message.message?.System?.Credit) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            console.log(await dbActivityBridge.value?.createActivity(
-              bundle.origin.sender,
-              message.message?.System?.Credit?.source,
-              blockResp.value.executedBlock.block.chainId,
-              message.message?.System?.Credit?.target,
-              message.message?.System?.Credit?.amount,
-              blockResp.value.executedBlock.block.height,
-              blockResp.value.executedBlock.block.timestamp,
-              blockResp.hash,
-              message.grant
-            ))
-          }
-        }
-      }
-      for (const operation of blockResp?.value?.executedBlock?.block.operations || []) {
-        if (operation.System?.Transfer) {
-          let grant = undefined as unknown as string | undefined
-          for (const messages of blockResp?.value?.executedBlock?.outcome?.messages || []) {
-            grant = messages.find((el) => {
-              return el.destination?.Recipient === operation.System.Transfer.recipient.Account?.chain_id &&
-                     el.message.source === operation.System.Transfer.owner &&
-                     el.message.target === operation.System.Transfer.recipient?.Account?.owner
-            })?.grant
-            if (grant?.length) break
-          }
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          console.log(await dbActivityBridge.value?.createActivity(
-            blockResp.value.executedBlock.block.chainId,
-            operation.System.Transfer.owner,
-            operation.System.Transfer.recipient.Account.chain_id,
-            operation.System.Transfer.recipient.Account.owner,
-            operation.System.Transfer.amount,
-            blockResp.value.executedBlock.block.height,
-            blockResp.value.executedBlock.block.timestamp,
-            blockResp.hash,
-            grant as string
-          ))
-        }
-      }
+      await processNewBlock(microchain, hash)
     }, () => {
-      // DO NOTHING
+      processNewIncomingMessage(microchain)
     })
 }
 

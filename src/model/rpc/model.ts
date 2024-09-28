@@ -22,6 +22,33 @@ export interface ApplicationsResp {
   }
 }
 
+export interface IncomingBundle {
+  origin: {
+    sender: string
+    medium: string
+  }
+  bundle: {
+    certificate_hash: string
+    height: number
+    messages: {
+      authenticated_signer?: string
+      grant: string
+      index: number
+      message: {
+        System: {
+          Credit: {
+            amount: string
+            source?: string
+            target: string
+          }
+        }
+      }
+      refund_grant_to?: string
+    }[]
+  }
+  action: unknown
+}
+
 export interface BlockResp {
   hash: string
   value: {
@@ -29,32 +56,7 @@ export interface BlockResp {
       block: {
         chainId: string
         epoch: number
-        incomingBundles: {
-          origin: {
-            sender: string
-            medium: string
-          }
-          bundle: {
-            certificate_hash: string
-            height: number
-            messages: {
-              authenticated_signer?: string
-              grant: string
-              index: number
-              message: {
-                System: {
-                  Credit: {
-                    amount: string
-                    source?: string
-                    target: string
-                  }
-                }
-              }
-              refund_grant_to?: string
-            }[]
-          }
-          action: unknown
-        }[]
+        incomingBundles: IncomingBundle[]
         operations: {
           System: {
             Transfer: {
@@ -109,3 +111,7 @@ export interface ChainAccountBalances {
 }
 
 export type ChainAccountBalancesResp = Record<string, ChainAccountBalances>
+
+export type PendingMessagesResp = IncomingBundle[]
+
+export type CalculateBlockStateHashResp = string
