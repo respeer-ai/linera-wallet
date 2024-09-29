@@ -11,7 +11,7 @@ const getPendingMessages = async (chainId: string): Promise<rpc.PendingMessagesR
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query pendingMessages($chainId: String!) {
-      pendingMessages(chainId: $chainId, hash: $hash) {
+      pendingMessages(chainId: $chainId) {
         action
         bundle
         origin
@@ -25,6 +25,7 @@ const getPendingMessages = async (chainId: string): Promise<rpc.PendingMessagesR
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
+      console.log(res)
       const messages = graphqlResult.data(res, 'pendingMessages') as rpc.PendingMessagesResp
       resolve(messages)
     })

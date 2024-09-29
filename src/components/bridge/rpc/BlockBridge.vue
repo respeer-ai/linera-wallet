@@ -60,7 +60,7 @@ const signNewBlock = async (chainId: string, notifiedHeight: number, keyPair: Ed
   await submitBlockSignature(chainId, height, signature)
 }
 
-const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingMessage?: () => void) => {
+const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingBundle?: () => void) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -88,9 +88,9 @@ const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => vo
     if (newBlock) {
       onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)
     }
-    const newIncomingMessage = graphqlResult.keyValue(reason, 'NewIncomingMessage')
-    if (newIncomingMessage) {
-      onNewIncomingMessage?.()
+    const newIncomingBundle = graphqlResult.keyValue(reason, 'NewIncomingBundle')
+    if (newIncomingBundle) {
+      onNewIncomingBundle?.()
     }
   })
 }

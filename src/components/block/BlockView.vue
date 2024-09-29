@@ -91,7 +91,7 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
 const processNewRawBlock = async (microchain: db.Microchain, height: number) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
-  if (!owners.length) return
+  if (!owners?.length) return
 
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!password) return Promise.reject(new Error('Invalid password'))
@@ -160,12 +160,16 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   }
 }
 
-const processNewIncomingMessage = (microchain: db.Microchain) => {
+const processNewIncomingBundle = (microchain: db.Microchain) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   rpcPendingMessagesBridge.value?.getPendingMessages(microchain.microchain).then(async (messages) => {
-    console.log(messages)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const stateHash = await rpcCalculateBlockStateHashBridge.value?.calculateBlockStateHashWithFullMaterials(microchain.microchain)
+    const stateHash = await rpcCalculateBlockStateHashBridge.value?.calculateBlockStateHashWithFullMaterials(
+      microchain.microchain,
+      [],
+      messages,
+      Date.now()
+    )
     console.log(stateHash)
   }).catch((error) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -185,11 +189,18 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
   await rpcBlockBridge.value?.subscribe(
     microchain.microchain,
     async (height: number) => {
-      await processNewRawBlock(microchain, height)
+      try {
+        if (microchain.microchain === 'feeeed172c74027e2675311c4ec3239dbe8e4b4fcf46b12e6f775523a002d64e') {
+          await processNewRawBlock(microchain, height)
+        }
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Fail process new raw block ${error}`)
+      }
     }, async (hash: string) => {
       await processNewBlock(microchain, hash)
     }, () => {
-      processNewIncomingMessage(microchain)
+      processNewIncomingBundle(microchain)
     })
 }
 
