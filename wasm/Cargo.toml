@@ -25,6 +25,7 @@ serde_json = "1.0.116"
 tokio = "1.38.0"
 local-encoding = "0.2.0"
 rand_chacha = "0.3.1"
+serde_path_to_error = "0.1.16"
 
 [dependencies.bip39]
 git = "https://github.com/rust-bitcoin/rust-bip39.git"
@@ -85,3 +86,6 @@ branch = "respeer-pub-field-1efe6a93"
 [features]
 default = ["no-storage"]
 no-storage = ["linera-client/no-storage"]
+
+[profile.release]
+debug = true

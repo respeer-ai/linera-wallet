@@ -49,58 +49,60 @@ export interface IncomingBundle {
   action: unknown
 }
 
+export interface ExecutedBlock {
+  block: {
+    chainId: string
+    epoch: number
+    incomingBundles: IncomingBundle[]
+    operations: {
+      System: {
+        Transfer: {
+          amount: string
+          owner?: string
+          recipient: {
+            Account: {
+              chain_id: string
+              owner?: string
+            }
+            user_data?: string
+          }
+        }
+      }
+    }[]
+    height: number
+    timestamp: number
+    authenticatedSigner: string
+    previousBlockHash: string
+  }
+  outcome: {
+    messages: {
+      destination: {
+        Recipient: string
+      }
+      authenticatedSigner?: string
+      grant: string
+      refundGrandTo: unknown
+      kind: string
+      message: {
+        amount: string
+        source: string
+        target: string
+      }
+    }[][]
+    stateHash: string
+    oracleResponses: unknown[]
+    events: {
+      streamId: string
+      key: number[]
+      value: number[]
+    }[]
+  }
+}
+
 export interface BlockResp {
   hash: string
   value: {
-    executedBlock: {
-      block: {
-        chainId: string
-        epoch: number
-        incomingBundles: IncomingBundle[]
-        operations: {
-          System: {
-            Transfer: {
-              amount: string
-              owner?: string
-              recipient: {
-                Account: {
-                  chain_id: string
-                  owner?: string
-                }
-                user_data?: string
-              }
-            }
-          }
-        }[]
-        height: number
-        timestamp: number
-        authenticatedSigner: string
-        previousBlockHash: string
-      }
-      outcome: {
-        messages: {
-          destination: {
-            Recipient: string
-          }
-          authenticatedSigner?: string
-          grant: string
-          refundGrandTo: unknown
-          kind: string
-          message: {
-            amount: string
-            source: string
-            target: string
-          }
-        }[][]
-        stateHash: string
-        oracleResponses: unknown[]
-        events: {
-          streamId: string
-          key: number[]
-          value: number[]
-        }[]
-      }
-    }
+    executedBlock: ExecutedBlock
     status: string
   }
 }
@@ -114,7 +116,18 @@ export type ChainAccountBalancesResp = Record<string, ChainAccountBalances>
 
 export type PendingMessagesResp = IncomingBundle[]
 
-export type CalculateBlockStateHashResp = string
+export type Round = 'Fast' |
+  { MultiLeader: number } |
+  { SingleLeader: number } |
+  { Validator: number }
+
+export type BlockMaterialResp = {
+  incomingBundles: IncomingBundle[]
+  localTime: number
+  round: Round
+}
+
+export type ExecuteBlockResp = ExecutedBlock
 
 export type Recipient = {
   Account: {

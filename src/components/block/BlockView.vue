@@ -10,7 +10,8 @@
     <DbTokenBridge ref='dbTokenBridge' />
     <DbActivityBridge ref='dbActivityBridge' />
     <RpcPendingMessagesBridge ref='rpcPendingMessagesBridge' />
-    <RpcCalculateBlockStateHashBridge ref='rpcCalculateBlockStateHashBridge' />
+    <RpcExecuteBlockBridge ref='rpcExecuteBlockBridge' />
+    <RpcBlockMaterialBridge ref='rpcBlockMaterialBridge' />
     <ConstructBlock ref='constructBlock' />
   </div>
 </template>
@@ -22,6 +23,9 @@ import { dbBase } from 'src/controller'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
 import { localStore } from 'src/localstores'
+import { sha3 } from 'hash-wasm'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { toSnake } from 'ts-case-convert'
 
 import RpcBlockBridge from '../bridge/rpc/BlockBridge.vue'
 import RpcAccountBridge from '../bridge/rpc/AccountBridge.vue'
@@ -33,7 +37,8 @@ import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 import RpcPendingMessagesBridge from '../bridge/rpc/PendingMessagesBridge.vue'
-import RpcCalculateBlockStateHashBridge from '../bridge/rpc/CalculateBlockStateHashBridge.vue'
+import RpcExecuteBlockBridge from '../bridge/rpc/ExecuteBlockBridge.vue'
+import RpcBlockMaterialBridge from '../bridge/rpc/BlockMaterialBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
@@ -46,7 +51,8 @@ const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
 const rpcPendingMessagesBridge = ref<InstanceType<typeof RpcPendingMessagesBridge>>()
-const rpcCalculateBlockStateHashBridge = ref<InstanceType<typeof RpcCalculateBlockStateHashBridge>>()
+const rpcExecuteBlockBridge = ref<InstanceType<typeof RpcExecuteBlockBridge>>()
+const rpcBlockMaterialBridge = ref<InstanceType<typeof RpcBlockMaterialBridge>>()
 const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 
 const microchains = ref([] as db.Microchain[])
@@ -164,25 +170,72 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   }
 }
 
-const processNewIncomingBundle = (microchain: string, operation?: rpc.Operation) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcPendingMessagesBridge.value?.getPendingMessages(microchain).then(async (messages) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const stateHash = await rpcCalculateBlockStateHashBridge.value?.calculateBlockStateHashWithFullMaterials(
-      microchain,
-      operation ? [operation] : [],
-      messages,
-      Date.now()
-    )
-    console.log(1, stateHash)
-    // TODO: construct block
+const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: rpc.BlockMaterialResp) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      const executedBlock = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
+        microchain,
+        operation ? [operation] : [],
+        blockMaterial.incomingBundles,
+        blockMaterial.localTime
+      ) as rpc.ExecuteBlockResp
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const stateHash1 = constructBlock.value?.calculateBlockStateHashWithFullMaterials(microchain, operation, messages, Date.now())
-    console.log(2, stateHash1)
-  }).catch((error) => {
+      if (!executedBlock) return reject('Failed execute block')
+
+      if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
+      if (operation) {
+        const executedOperation = executedBlock.block.operations[0]
+        if (await sha3(JSON.stringify(operation, (key, value) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          if (value !== null) return value
+        })) !== await sha3(JSON.stringify(executedOperation, (key, value) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          if (value !== null) return value
+        }))) return reject('Invalid operation payload')
+      }
+
+      // TODO: we actually should construct block with local rust code but it's too hard now, so we just validate executed block calculated by node service
+      //       It has the same security level as local rust code
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      // const stateHash1 = await constructBlock.value?.constructBlock(microchain, operation, blockMaterial.incomingBundles, blockMaterial.localTime)
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const block = JSON.parse(JSON.stringify(executedBlock.block), function (this: Record<string, unknown>, key: string, value: unknown) {
+        if (value === null) return
+        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1)) {
+          const _key = toSnake(key)
+          if (!_key.includes('_') || _key === key) return value
+          if (this) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            this[_key] = value
+          }
+          return
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      const payload = await lineraWasm.executed_block_payload(
+        JSON.stringify(block, null, 2),
+        JSON.stringify(blockMaterial.round),
+        ''
+      ) as string
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const owner = await dbMicrochainBridge.value?.microchainOwner(microchain) as db.Owner
+      if (!owner) reject('Invalid owner')
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const signature = await rpcBlockBridge.value?.signPayload(owner, JSON.parse(payload)) as string
+      if (!signature) reject('Failed generate signature')
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await rpcBlockBridge.value?.submitBlockAndSignature(microchain, executedBlock.block.height, executedBlock, blockMaterial.round, signature)
+    }).catch((error) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Fail process incoming bundle: ${error}`)
+      console.log(`Fail process incoming bundle: ${error}`)
+    })
   })
 }
 
@@ -208,8 +261,8 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
       }
     }, async (hash: string) => {
       await processNewBlock(microchain, hash)
-    }, () => {
-      processNewIncomingBundle(microchain.microchain)
+    }, async () => {
+      await processNewIncomingBundle(microchain.microchain)
     })
 }
 
@@ -227,14 +280,21 @@ watch(microchains, async () => {
 
 const handlerOperation = () => {
   localStore.operation.$subscribe((_, state) => {
-    state.operations.forEach((operation, index) => {
+    for (const [index, operation] of state.operations.entries()) {
       try {
-        processNewIncomingBundle(operation.microchain, operation.operation)
-        state.operations.splice(index, 1)
+        processNewIncomingBundle(operation.microchain, operation.operation).then(() => {
+          state.operations.splice(index, 1)
+        }).catch((error) => {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.log(`Failed process incoming bundle: ${error}`)
+          setTimeout(() => {
+            handlerOperation()
+          }, 1000)
+        })
       } catch {
         // DO NOTHING
       }
-    })
+    }
   })
 }
 

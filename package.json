@@ -15,6 +15,7 @@
     "bex": "quasar dev -m bex",
     "build:bex": "quasar build -m bex",
     "build:wasm": "wasm-pack build --out-dir ../src-bex/wasm --target web wasm",
+    "build:wasm:debug": "wasm-pack build --debug --out-dir ../src-bex/wasm --target web wasm",
     "graphql:generate": "graphql-codegen --config graphql-codegen.ts"
   },
   "dependencies": {
@@ -78,6 +79,7 @@
     "qrcode.vue": "^3.4.1",
     "quasar": "^2.16.3",
     "readable-stream": "^4.5.2",
+    "ts-case-convert": "^2.1.0",
     "ts-node": "^10.9.2",
     "tsconfck": "^3.1.0",
     "ua-parser-js": "^1.0.38",

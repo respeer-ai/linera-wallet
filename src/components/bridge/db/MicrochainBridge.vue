@@ -68,6 +68,12 @@ const ownerMicrochains = (owner: string): db.Microchain[] => {
   }) || []
 }
 
+const microchainOwner = async (microchain: string): Promise<db.Owner | undefined> => {
+  const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter((el) => el.microchain === microchain)
+  if (!microchainOwners.length) return undefined
+  return (await dbWallet.owners.toArray()).find((el) => microchainOwners.findIndex((el1) => el1.owner === el.owner) >= 0)
+}
+
 const createMicrochain = async (owner: string, microchainId: string, messageId?: string, certificateHash?: string, name?: string, _default?: boolean): Promise<db.Microchain> => {
   const exist = microchains.value?.find((el) => el.microchain === microchainId)
   if (exist) return exist
@@ -97,7 +103,8 @@ defineExpose({
   updateMicrochain,
   getMicrochains,
   microchainsCount,
-  getMicrochain
+  getMicrochain,
+  microchainOwner
 })
 
 </script>

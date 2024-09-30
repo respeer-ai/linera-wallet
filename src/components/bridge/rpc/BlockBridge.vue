@@ -4,7 +4,8 @@ import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult, _hex } from 'src/utils'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
-import { rpc } from 'src/model'
+import { db, rpc } from 'src/model'
+import { dbBase } from 'src/controller'
 
 const getPendingRawBlock = async (chainId: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
@@ -51,6 +52,23 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
+const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: rpc.ExecutedBlock, round: rpc.Round, signature: string) => {
+  const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+  const apolloClient = new ApolloClient(options)
+
+  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
+    mutation submitBlockAndSignature ($chainId: String!, $height: Int!, $executedBlock: ExecutedBlock!, $round: Round!, $signature: String!) {
+      submitBlockAndSignature(chainId: $chainId, height: $height, executedBlock: $executedBlock, round: $round, signature: $signature)
+    }`))
+  return await mutate({
+    chainId,
+    height,
+    executedBlock,
+    round,
+    signature
+  })
+}
+
 const signNewBlock = async (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey) => {
   const rawBlockAndRound = await getPendingRawBlock(chainId)
   if (!rawBlockAndRound) return
@@ -58,6 +76,15 @@ const signNewBlock = async (chainId: string, notifiedHeight: number, keyPair: Ed
   const signature = _hex.toHex(keyPair.sign(new Memory(payloadBytes as Uint8Array)).to_bytes().bytes)
   const height = graphqlResult.keyValue(rawBlockAndRound, 'height') as number
   await submitBlockSignature(chainId, height, signature)
+}
+
+const signPayload = async (owner: db.Owner, payload: Uint8Array): Promise<string> => {
+  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!password) return Promise.reject('Invalid password')
+  const _password = db.decryptPassword(password)
+  const privateKey = db.privateKey(owner, _password)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+  return _hex.toHex(keyPair.sign(new Memory(payload)).to_bytes().bytes)
 }
 
 const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingBundle?: () => void) => {
@@ -167,7 +194,9 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
 defineExpose({
   signNewBlock,
   subscribe,
-  getBlockWithHash
+  getBlockWithHash,
+  submitBlockAndSignature,
+  signPayload
 })
 
 </script>

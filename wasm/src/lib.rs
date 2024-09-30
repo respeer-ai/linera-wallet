@@ -1,4 +1,5 @@
 use bip39::Mnemonic;
+use linera_views::common::AdminKeyValueStore;
 /**
 This module defines the client API for the Web extension.
 
@@ -11,11 +12,16 @@ arguments to these functions cannot be trusted and _must_ be verified!
 */
 use std::str::FromStr;
 
-use linera_base::{crypto::KeyPair, data_types::Timestamp, identifiers::ChainId};
-use linera_chain::data_types::IncomingBundle;
+use linera_base::{
+    crypto::{CryptoHash, KeyPair, PublicKey},
+    data_types::{BlockHeight, OracleResponse, Round, Timestamp},
+    identifiers::ChainId,
+};
+use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
 use linera_execution::Operation;
+use linera_views::crypto::Hashable;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use web_sys::*;
 
@@ -31,6 +37,9 @@ type WebStorage =
 
 pub async fn get_storage() -> Result<WebStorage, JsError> {
     let root_key = &[];
+    let store_config = linera_views::memory::MemoryStoreConfig::new(1);
+    let namespace = "linera";
+    linera_views::memory::MemoryStore::create(&store_config, namespace).await?;
     Ok(linera_storage::DbStorage::new(
         linera_views::memory::MemoryStoreConfig::new(1),
         "linera",
@@ -108,12 +117,9 @@ pub async fn get_client_context() -> Result<ClientContext, JsError> {
 }
 
 pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
-    let wallet = linera_client::config::WalletState::new_no_storage(FakeWallet::new());
-    Ok(SignClientContext::new(
-        get_storage().await?,
-        OPTIONS,
-        wallet,
-    ))
+    let wallet = linera_client::config::WalletState::new(FakeWallet::new());
+    let storage = get_storage().await?;
+    Ok(SignClientContext::new(storage, OPTIONS, wallet))
 }
 
 #[wasm_bindgen]
@@ -175,43 +181,66 @@ pub async fn dapp_query(n: u32) -> u32 {
     n + 1
 }
 
+#[wasm_bindgen]
+pub async fn executed_block_payload(block: &str, round: &str, oracle_responses: &str) -> Result<String, JsError> {
+    let deserializer = &mut serde_json::Deserializer::from_str(block);
+    let block: Block = serde_path_to_error::deserialize(deserializer)?;
+
+    let round: Round = serde_json::from_str(round)?;
+    let oracle_responses: Option<Vec<Vec<OracleResponse>>> = match serde_json::from_str(oracle_responses) {
+        Ok(responses) => Some(responses),
+        Err(_) => None,
+    };
+    let content = ProposalContent {
+        block,
+        round,
+        forced_oracle_responses: oracle_responses
+    };
+    let mut message = Vec::new();
+    content.write(&mut message);
+    Ok(serde_json::to_string(&message)?)
+}
+
 // Execute operation to get
 #[wasm_bindgen]
 #[cfg(feature = "no-storage")]
-pub async fn execute_operations_with_full_materials(
+pub async fn construct_block(
     chain_id: &str,
-    operation: &str,
+    public_key: &str,
+    admin_id: &str,
+    block_hash: &str,
+    operations: &str,
     incoming_bundles: &str,
     local_time: u64,
+    next_block_height: u64,
 ) -> Result<Option<String>, JsError> {
     let chain_id: ChainId = ChainId::from_str(chain_id)?;
-    let operations: Vec<Operation> = match serde_json::from_str(operation) {
-        Ok(operation) => [operation].to_vec(),
-        Err(_) => Vec::new(),
-    };
+    let operations: Vec<Operation> = serde_json::from_str(operations)?;
     let incoming_bundles: Vec<IncomingBundle> = serde_json::from_str(incoming_bundles)?;
     let client_context: SignClientContext = get_fake_client_context().await?;
-    let chain_client = client_context.make_chain_client(chain_id);
+    let key_pair = KeyPair::from_public_key(PublicKey::from_str(public_key)?);
+    let admin_id: ChainId = ChainId::from_str(admin_id)?;
+    let block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(block_hash)?);
 
-    let state_hash = chain_client
-        .calculate_block_state_hash_with_full_materials(
+    let chain_client = client_context.make_chain_client_ext(
+        chain_id,
+        key_pair,
+        admin_id,
+        block_hash,
+        Timestamp::from(local_time),
+        BlockHeight::from(next_block_height),
+    );
+
+    let executed_block = chain_client
+        .execute_block_with_full_materials(
             operations.clone(),
             incoming_bundles,
             Timestamp::from(local_time),
         )
         .await?;
-    log::info!("State hash {}", state_hash);
 
-    chain_client
-        .execute_block_without_block_proposal(operations)
-        .await?;
-    match chain_client.peek_candidate_block_proposal().await {
-        Some(block_proposal) => {
-            let json = serde_json::to_string(&block_proposal)?;
-            Ok(Some(String::from(json)))
-        }
-        _ => Ok(None),
-    }
+    let json = serde_json::to_string(&executed_block)?;
+    Ok(Some(String::from(json)))
 }
 
 #[derive(Serialize)]
