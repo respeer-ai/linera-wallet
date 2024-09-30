@@ -18,10 +18,10 @@ const _networks = useObservable<db.Network[]>(
 watch(_networks, async () => {
   selectedNetwork.value = _networks.value?.find((el) => el.selected)
   networks.value = _networks.value
-  if (localStore.oneShotSetting.creatingDefaultNetwork) {
+  if (localStore.setting.creatingDefaultNetwork) {
     return
   }
-  localStore.oneShotSetting.oneShotSetting.CreatingDefaultNetwork = true
+  localStore.setting.CreatingDefaultNetwork = true
   if (!_networks.value?.length && !await dbBase.networks.count()) {
     await dbBase.networks.add(db.defaultNetwork)
   }

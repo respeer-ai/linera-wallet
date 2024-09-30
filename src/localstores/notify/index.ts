@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { Notification } from './types'
 
-export const useNotificationStore = defineStore('notification', {
+export const useNotificationStore = defineStore('notifications', {
   state: () => ({
     Notifications: [] as Array<Notification>
   }),

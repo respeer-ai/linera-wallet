@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "text-center onboarding-container shadow-1", localStore.oneShotSetting.extensionMode ? "" : "onboarding-padding" ]'>
+  <div :class='[ "text-center onboarding-container shadow-1", localStore.setting.extensionMode ? "" : "onboarding-padding" ]'>
     <LoginPassword v-model:password='password' @unlocked='unlocked' />
     <LoginTimestampBridge ref='loginTimestampBridge' />
   </div>
@@ -22,7 +22,7 @@ const router = useRouter()
 const unlocked = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await loginTimestampBridge.value?.saveLoginTimestamp()
-  void router.push({ path: localStore.oneShotSetting.formalizePath('/home') })
+  void router.push({ path: localStore.setting.formalizePath('/home') })
 }
 
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class='extra-margin-bottom'>
-    <div :class='[ "row", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "row", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='flex items-center justify-center'>
         <q-icon name='bi-view-list' size='16px' />
       </div>

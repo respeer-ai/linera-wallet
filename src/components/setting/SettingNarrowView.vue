@@ -21,7 +21,7 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { localStore, oneShotSettingDef } from 'src/localstores'
+import { localStore, settingDef } from 'src/localstores'
 
 import SidebarMenu from './SidebarMenu.vue'
 import SettingInnerNarrowView from './SettingInnerNarrowView.vue'
@@ -33,7 +33,7 @@ const settingInnerView = ref<InstanceType<typeof SettingInnerNarrowView>>()
 
 const onBackClick = () => {
   if (step.value === 1) {
-    localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+    localStore.setting.ShowSettingMenu = false
     return
   }
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
@@ -41,7 +41,7 @@ const onBackClick = () => {
 }
 
 const onCloseClick = () => {
-  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+  localStore.setting.ShowSettingMenu = false
 }
 
 const onInnerBack = () => {
@@ -51,7 +51,7 @@ const onInnerBack = () => {
   }
 }
 
-const onMenuClicked = (menu: oneShotSettingDef.MenuItem) => {
+const onMenuClicked = (menu: settingDef.MenuItem) => {
   title.value = menu.label
   step.value++
 }

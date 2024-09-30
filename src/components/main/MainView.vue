@@ -1,10 +1,10 @@
 <template>
-  <div :class='[ "full-width page-y-padding", localStore.oneShotSetting.extensionMode ? "" : "page-x-padding" ]'>
-    <div v-if='localStore.oneShotSetting.homeAction === localStore.oneShotSettingDef.HomeAction.SHOW_MAIN'>
+  <div :class='[ "full-width page-y-padding", localStore.setting.extensionMode ? "" : "page-x-padding" ]'>
+    <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_MAIN'>
       <MainInnerView />
     </div>
-    <div v-if='localStore.oneShotSetting.homeAction === localStore.oneShotSettingDef.HomeAction.SHOW_MICROCHAIN'>
-      <MicrochainDetailView v-if='localStore.oneShotSetting.homeAction' :microchain='(localStore.oneShotSetting.homeActionParams as db.Microchain)' @back='onMicrochainDetailBack' @close='onMicrochainDetailClosed' />
+    <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_MICROCHAIN'>
+      <MicrochainDetailView v-if='localStore.setting.homeAction' :microchain='(localStore.setting.homeActionParams as db.Microchain)' @back='onMicrochainDetailBack' @close='onMicrochainDetailClosed' />
     </div>
   </div>
 </template>
@@ -17,11 +17,11 @@ import MainInnerView from './MainInnerView.vue'
 import MicrochainDetailView from '../microchain/MicrochainDetailView.vue'
 
 const onMicrochainDetailBack = () => {
-  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MAIN
+  localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_MAIN
 }
 
 const onMicrochainDetailClosed = () => {
-  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MAIN
+  localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_MAIN
 }
 
 </script>

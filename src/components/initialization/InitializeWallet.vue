@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "full-width text-center onboarding-container", localStore.oneShotSetting.extensionMode ? "onboarding-stepper-narrow-padding" : "onboarding-stepper-padding" ]'>
+  <div :class='[ "full-width text-center onboarding-container", localStore.setting.extensionMode ? "onboarding-stepper-narrow-padding" : "onboarding-stepper-padding" ]'>
     <q-stepper
       flat
       v-model='step'
@@ -114,7 +114,7 @@ const savePassword = async () => {
 const saveAccount = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await ownerBridge.value?.createOwner(publicKey.value, privateKey.value)
-  void router.push({ path: localStore.oneShotSetting.formalizePath('/home') })
+  void router.push({ path: localStore.setting.formalizePath('/home') })
 }
 
 const onNextStepClick = async () => {

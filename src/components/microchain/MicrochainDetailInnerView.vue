@@ -1,27 +1,27 @@
 <template>
   <div>
-    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       Chain balance
     </div>
     <div class='vertical-items-margin'>
       <MicrochainCardView
         :microchain='microchain' :show-account-balance='false' :integrated-mode='false' :clickable='false'
-        :show-indicator='false' :x-padding='localStore.oneShotSetting.extensionMode ? "8px" : "0"'
+        :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
-    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       Account balance
     </div>
     <div class='vertical-items-margin'>
       <MicrochainCardView
         :microchain='microchain' :show-account-balance='true' :integrated-mode='false' :clickable='false'
-        :show-indicator='false' :x-padding='localStore.oneShotSetting.extensionMode ? "8px" : "0"'
+        :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
-    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       Chain details
     </div>
-    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Microchain ID
       </div>
@@ -34,7 +34,7 @@
         <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
       </div>
     </div>
-    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Creation message ID
       </div>
@@ -47,7 +47,7 @@
         <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
       </div>
     </div>
-    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Creation certificate hash
       </div>
@@ -60,7 +60,7 @@
         <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
       </div>
     </div>
-    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
         Default chain
       </div>
@@ -71,7 +71,7 @@
         </div>
       </div>
     </div>
-    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       Chain activity
     </div>
     <div class='extra-large-bottom-margin'>

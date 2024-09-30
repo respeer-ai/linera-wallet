@@ -67,7 +67,7 @@ const onNetworkSelected = async (_network: db.Network) => {
 }
 
 const onAddNetworkClick = () => {
-  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = true
+  localStore.setting.ShowSettingMenu = true
   emit('add')
 }
 

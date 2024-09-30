@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class='[ "row", localStore.oneShotSetting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div :class='[ "row", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <AccountDetailAvatarView :owner='owner' :editable='true' />
       <q-space />
       <q-icon name='bi-check-circle-fill' size='16px' color='green-4' v-if='owner.selected' />
@@ -10,7 +10,7 @@
       Microchains
     </div>
     <div class='vertical-items-margin'>
-      <MicrochainsInnerView :searchable='false' :show-indicator='false' @selected='onMicrochainSelected' :x-padding='localStore.oneShotSetting.extensionMode ? "8px" : "0"' />
+      <MicrochainsInnerView :searchable='false' :show-indicator='false' @selected='onMicrochainSelected' :x-padding='localStore.setting.extensionMode ? "8px" : "0"' />
       <div class='row vertical-sections-margin selector-margin-left cursor-pointer setting-item-inner-padding' @click='onAddMicrochainClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>

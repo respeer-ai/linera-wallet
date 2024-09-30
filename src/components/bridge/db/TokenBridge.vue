@@ -17,13 +17,13 @@ const _tokens = useObservable<db.Token[]>(
 watch(_tokens, async () => {
   if (tokens.value === _tokens.value) return
   tokens.value = _tokens.value
-  if (localStore.oneShotSetting.creatingDefaultToken) {
+  if (localStore.setting.creatingDefaultToken) {
     return
   }
-  localStore.oneShotSetting.oneShotSetting.CreatingDefaultToken = true
+  localStore.setting.CreatingDefaultToken = true
   if (_tokens.value !== undefined && !await dbBase.tokens.count()) {
     await dbBase.tokens.add(db.lineraToken)
-    localStore.oneShotSetting.oneShotSetting.CreatingDefaultToken = false
+    localStore.setting.CreatingDefaultToken = false
   }
 })
 

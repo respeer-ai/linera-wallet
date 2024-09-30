@@ -1,17 +1,17 @@
 <template>
-  <div :class='[ "sidebar extra-large-margin-bottom", localStore.oneShotSetting.extensionMode ? "full-width" : "" ]'>
-    <div v-if='!localStore.oneShotSetting.extensionMode' class='setting-label text-grey-9 text-bold'>
+  <div :class='[ "sidebar extra-large-margin-bottom", localStore.setting.extensionMode ? "full-width" : "" ]'>
+    <div v-if='!localStore.setting.extensionMode' class='setting-label text-grey-9 text-bold'>
       Settings
     </div>
     <q-tabs
-      vertical no-caps inline-label v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu'
+      vertical no-caps inline-label v-model='localStore.setting.SelectedSettingMenu'
       indicator-color='red-6'
     >
       <div v-for='(menu, i) in menus' :key='menu.menu'>
         <q-tab
           :name='menu.menu'
           v-ripple
-          :class='[ localStore.oneShotSetting.selectedSettingMenu === menu.menu ? "bg-red-1" : "" ]'
+          :class='[ localStore.setting.selectedSettingMenu === menu.menu ? "bg-red-1" : "" ]'
           :disable='menu.disable'
           @click='onTabClick(menu)'
         >
@@ -21,7 +21,7 @@
           <q-item-section>
             {{ menu.label }}
           </q-item-section>
-          <q-item-section v-if='localStore.oneShotSetting.extensionMode'>
+          <q-item-section v-if='localStore.setting.extensionMode'>
             <div class='row'>
               <q-space />
               <q-icon name='bi-chevron-right' />
@@ -35,16 +35,16 @@
 </template>
 
 <script setup lang='ts'>
-import { localStore, oneShotSettingDef } from 'src/localstores'
+import { localStore, settingDef } from 'src/localstores'
 import { computed } from 'vue'
 
-const emit = defineEmits<{(ev: 'clicked', value: oneShotSettingDef.MenuItem): void}>()
+const emit = defineEmits<{(ev: 'clicked', value: settingDef.MenuItem): void}>()
 
-const onTabClick = (menu: oneShotSettingDef.MenuItem) => {
+const onTabClick = (menu: settingDef.MenuItem) => {
   emit('clicked', menu)
 }
 
-const menus = computed(() => localStore.oneShotSettingDef.SettingMenus.filter((el) => !el.hide))
+const menus = computed(() => localStore.settingDef.SettingMenus.filter((el) => !el.hide))
 
 </script>
 

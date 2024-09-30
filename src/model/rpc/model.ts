@@ -123,13 +123,13 @@ export type Recipient = {
   }
 } | 'Burn'
 
-export interface Operation {
+export type Operation = {
   System: {
     Transfer: {
       owner?: string
       recipient: Recipient
       amount: string
-      user_data?: Int8Array
+      user_data: number[]
     }
   } | {
     Claim: {
@@ -137,7 +137,7 @@ export interface Operation {
       target_id: string
       recipient: Recipient
       amount: string
-      user_data?: Int8Array
+      user_data: Int8Array | undefined
     }
   } | {
     // TODO: OpenChain
@@ -169,7 +169,8 @@ export interface Operation {
       chain_id: string
       application_id: string
     }
-  } | 'CloseChain',
+  } | 'CloseChain'
+} | {
   User: {
     application_id: string
     bytes: Int8Array

@@ -12,7 +12,7 @@ export enum HomeAction {
   SHOW_MICROCHAIN = 'ShowMicrochain'
 }
 
-export interface OneShotSetting {
+export interface Setting {
   ShowHeaderMenu: boolean
   ExtensionMode: boolean
   ShowFooterMenu: boolean

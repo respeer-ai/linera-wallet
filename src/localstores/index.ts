@@ -1,21 +1,25 @@
 import { useNotificationStore } from './notify'
 import { usePopupStore } from './popup'
-import { useSettingStore as useOneShotSettingStore } from './setting/oneshot'
+import { useSettingStore } from './setting'
+import { useOperationStore } from './operation'
 
 import * as notify from './notify'
-import * as oneShotSettingDef from './setting/oneshot'
+import * as settingDef from './setting'
 
 export const notification = useNotificationStore()
-export const oneShotSetting = useOneShotSettingStore()
+export const setting = useSettingStore()
 export const popup = usePopupStore()
+export const operation = useOperationStore()
 
 export const localStore = {
   notification,
   notify,
-  oneShotSetting,
-  oneShotSettingDef,
-  popup
+  setting,
+  settingDef,
+  popup,
+  operation
 }
 
 export * as notify from './notify'
-export * as oneShotSettingDef from './setting/oneshot'
+export * as settingDef from './setting'
+export * as operationDef from './operation'

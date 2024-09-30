@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "fill-parent text-center onboarding-container shadow-1", localStore.oneShotSetting.extensionMode ? "" : "onboarding-padding" ]'>
+  <div :class='[ "fill-parent text-center onboarding-container shadow-1", localStore.setting.extensionMode ? "" : "onboarding-padding" ]'>
     <q-carousel
       v-model='slide'
       transition-prev='scale'
@@ -10,13 +10,13 @@
       navigation
       padding
       arrows
-      :class='[ "text-black rounded-borders", localStore.oneShotSetting.extensionMode ? "carousel-dense-slides" : "" ]'
+      :class='[ "text-black rounded-borders", localStore.setting.extensionMode ? "carousel-dense-slides" : "" ]'
     >
       <q-carousel-slide name='first' class='column no-wrap flex-center'>
         <h5 class='onboarding-page-title'>
           Let's get started
         </h5>
-        <p v-if='localStore.oneShotSetting.extensionMode'>
+        <p v-if='localStore.setting.extensionMode'>
           CheCko is a secure wallet making the world of real time & reactive dApps on Linera accessible to all.
         </p>
         <p v-else>
@@ -86,7 +86,7 @@ const slide = ref('first')
 
 const onCreateWalletClick = () => {
   void router.push({
-    path: localStore.oneShotSetting.formalizePath('/improvement'),
+    path: localStore.setting.formalizePath('/improvement'),
     query: {
       target: '/initializewallet'
     }
@@ -95,7 +95,7 @@ const onCreateWalletClick = () => {
 
 const onImportWalletClick = () => {
   void router.push({
-    path: localStore.oneShotSetting.formalizePath('/improvement'),
+    path: localStore.setting.formalizePath('/improvement'),
     query: {
       target: '/importwallet'
     }

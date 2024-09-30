@@ -121,7 +121,7 @@ const router = useRouter()
 
 const onTransferClick = () => {
   void router.push({
-    path: localStore.oneShotSetting.formalizePath('/transfer'),
+    path: localStore.setting.formalizePath('/transfer'),
     query: {
       fromMicrochainId: microchain.value.microchain
     }

@@ -1,6 +1,6 @@
 <template>
   <div class='full-width full-height'>
-    <div v-if='localStore.oneShotSetting.extensionMode'>
+    <div v-if='localStore.setting.extensionMode'>
       <SettingNarrowView />
     </div>
     <div v-else>

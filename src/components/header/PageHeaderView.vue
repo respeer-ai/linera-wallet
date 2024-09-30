@@ -12,7 +12,7 @@
         <template #label>
           <div class='row'>
             <q-img :src='selectedNetwork?.icon' width='20px' height='20px' />
-            <div v-if='!localStore.oneShotSetting.extensionMode' class='header-items-margin-x-left page-header-network'>
+            <div v-if='!localStore.setting.extensionMode' class='header-items-margin-x-left page-header-network'>
               {{ selectedNetwork?.name }}
             </div>
           </div>
@@ -165,7 +165,7 @@ const onOwnerSelected = (owner?: db.Owner) => {
 }
 
 const onSettingsClick = () => {
-  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = true
+  localStore.setting.ShowSettingMenu = true
 }
 
 const onAccountDetailClick = () => {

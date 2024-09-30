@@ -42,11 +42,11 @@ const onBackClick = () => {
 }
 
 const onCloseClick = () => {
-  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+  localStore.setting.ShowSettingMenu = false
 }
 
 const onInnerBack = () => {
-  localStore.oneShotSetting.oneShotSetting.ShowSettingMenu = false
+  localStore.setting.ShowSettingMenu = false
 }
 
 </script>

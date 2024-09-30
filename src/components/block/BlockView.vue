@@ -11,6 +11,7 @@
     <DbActivityBridge ref='dbActivityBridge' />
     <RpcPendingMessagesBridge ref='rpcPendingMessagesBridge' />
     <RpcCalculateBlockStateHashBridge ref='rpcCalculateBlockStateHashBridge' />
+    <ConstructBlock ref='constructBlock' />
   </div>
 </template>
 
@@ -20,6 +21,7 @@ import { db, rpc } from 'src/model'
 import { dbBase } from 'src/controller'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
+import { localStore } from 'src/localstores'
 
 import RpcBlockBridge from '../bridge/rpc/BlockBridge.vue'
 import RpcAccountBridge from '../bridge/rpc/AccountBridge.vue'
@@ -32,6 +34,7 @@ import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 import RpcPendingMessagesBridge from '../bridge/rpc/PendingMessagesBridge.vue'
 import RpcCalculateBlockStateHashBridge from '../bridge/rpc/CalculateBlockStateHashBridge.vue'
+import ConstructBlock from './ConstructBlock.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -44,6 +47,7 @@ const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
 const rpcPendingMessagesBridge = ref<InstanceType<typeof RpcPendingMessagesBridge>>()
 const rpcCalculateBlockStateHashBridge = ref<InstanceType<typeof RpcCalculateBlockStateHashBridge>>()
+const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 
 const microchains = ref([] as db.Microchain[])
 
@@ -107,7 +111,7 @@ const processNewRawBlock = async (microchain: db.Microchain, height: number) => 
 const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
-  if (!owners.length) return
+  if (!owners?.length) return
 
   const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
   await updateChainAccountBalances(microchain, publicKeys)
@@ -154,26 +158,31 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
         blockResp.value.executedBlock.block.height,
         blockResp.value.executedBlock.block.timestamp,
         blockResp.hash,
-            grant as string
+        grant as string
       )
     }
   }
 }
 
-const processNewIncomingBundle = (microchain: db.Microchain) => {
+const processNewIncomingBundle = (microchain: string, operation?: rpc.Operation) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcPendingMessagesBridge.value?.getPendingMessages(microchain.microchain).then(async (messages) => {
+  rpcPendingMessagesBridge.value?.getPendingMessages(microchain).then(async (messages) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const stateHash = await rpcCalculateBlockStateHashBridge.value?.calculateBlockStateHashWithFullMaterials(
-      microchain.microchain,
-      [],
+      microchain,
+      operation ? [operation] : [],
       messages,
       Date.now()
     )
-    console.log(stateHash)
+    console.log(1, stateHash)
+    // TODO: construct block
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const stateHash1 = constructBlock.value?.calculateBlockStateHashWithFullMaterials(microchain, operation, messages, Date.now())
+    console.log(2, stateHash1)
   }).catch((error) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Fail get pending message ${error}`)
+    console.log(`Fail process incoming bundle: ${error}`)
   })
 }
 
@@ -200,7 +209,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
     }, async (hash: string) => {
       await processNewBlock(microchain, hash)
     }, () => {
-      processNewIncomingBundle(microchain)
+      processNewIncomingBundle(microchain.microchain)
     })
 }
 
@@ -216,8 +225,22 @@ watch(microchains, async () => {
   await subscribeMicrochains()
 })
 
+const handlerOperation = () => {
+  localStore.operation.$subscribe((_, state) => {
+    state.operations.forEach((operation, index) => {
+      try {
+        processNewIncomingBundle(operation.microchain, operation.operation)
+        state.operations.splice(index, 1)
+      } catch {
+        // DO NOTHING
+      }
+    })
+  })
+}
+
 onMounted(async () => {
   await subscribeMicrochains()
+  handlerOperation()
 })
 
 </script>

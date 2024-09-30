@@ -6,7 +6,7 @@ import {
   createWebHistory
 } from 'vue-router'
 import routes from './routes'
-import { useSettingStore } from 'src/localstores/setting/oneshot'
+import { useSettingStore } from 'src/localstores/setting'
 
 /*
  * If not building with SSR mode, you can
@@ -37,27 +37,27 @@ export default route(function (/* { store, ssrContext } */) {
   router.beforeEach((to) => {
     const _setting = useSettingStore()
     if (to.meta?.ShowHeaderMenu !== undefined) {
-      _setting.oneShotSetting.ShowHeaderMenu = to.meta.ShowHeaderMenu
+      _setting.ShowHeaderMenu = to.meta.ShowHeaderMenu
     } else {
-      _setting.oneShotSetting.ShowHeaderMenu = true
+      _setting.ShowHeaderMenu = true
     }
     if (to.meta?.ExtensionMode !== undefined) {
-      _setting.oneShotSetting.ExtensionMode = to.meta.ExtensionMode
+      _setting.ExtensionMode = to.meta.ExtensionMode
     }
     if (to.meta?.ShowFooterMenu !== undefined) {
-      _setting.oneShotSetting.ShowFooterMenu = to.meta.ShowFooterMenu
+      _setting.ShowFooterMenu = to.meta.ShowFooterMenu
     } else {
-      _setting.oneShotSetting.ShowFooterMenu = true
+      _setting.ShowFooterMenu = true
     }
     if (to.meta?.AlignPageCenter !== undefined) {
-      _setting.oneShotSetting.AlignPageCenter = to.meta.AlignPageCenter
+      _setting.AlignPageCenter = to.meta.AlignPageCenter
     } else {
-      _setting.oneShotSetting.AlignPageCenter = true
+      _setting.AlignPageCenter = true
     }
     if (to.meta?.InPopupContext !== undefined) {
-      _setting.oneShotSetting.InPopupContext = to.meta.InPopupContext
+      _setting.InPopupContext = to.meta.InPopupContext
     } else {
-      _setting.oneShotSetting.InPopupContext = false
+      _setting.InPopupContext = false
     }
   })
 

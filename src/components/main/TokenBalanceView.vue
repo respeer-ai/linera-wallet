@@ -77,7 +77,7 @@ onMounted(async () => {
 })
 
 const onTransferClick = () => {
-  void router.push({ path: localStore.oneShotSetting.formalizePath('/transfer') })
+  void router.push({ path: localStore.setting.formalizePath('/transfer') })
 }
 
 </script>

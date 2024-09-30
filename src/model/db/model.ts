@@ -35,7 +35,7 @@ export interface Application {
   applicationIndex: number
 }
 
-const ownerFromPublicKey = async (publicKey: string) => {
+export const ownerFromPublicKey = async (publicKey: string) => {
   const publicKeyBytes = _hex.toBytes(publicKey)
   const typeNameBytes = new TextEncoder().encode('PublicKey::')
   const bytes = new Uint8Array([...typeNameBytes, ...publicKeyBytes])

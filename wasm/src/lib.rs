@@ -1,3 +1,4 @@
+use bip39::Mnemonic;
 /**
 This module defines the client API for the Web extension.
 
@@ -8,29 +9,25 @@ callable from all Web pages to which the Web client has been
 connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
-
 use std::str::FromStr;
-use bip39::Mnemonic;
 
-use linera_base::{crypto::KeyPair, identifiers::ChainId};
+use linera_base::{crypto::KeyPair, data_types::Timestamp, identifiers::ChainId};
 use linera_chain::data_types::IncomingBundle;
-use linera_core::node::{
-    LocalValidatorNode as _,
-    LocalValidatorNodeProvider as _,
-};
 use linera_execution::Operation;
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
 
-use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions, wallet::Wallet, fake_wallet::FakeWallet};
+#[cfg(feature = "no-storage")]
+use linera_client::fake_wallet::FakeWallet;
+#[cfg(not(feature = "no-storage"))]
+use linera_client::wallet::Wallet;
+use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions};
 
 // TODO convert to IndexedDbStore once we refactor Context
-type WebStorage = linera_storage::DbStorage<
-    linera_views::memory::MemoryStore,
-    linera_storage::WallClock,
->;
+type WebStorage =
+    linera_storage::DbStorage<linera_views::memory::MemoryStore, linera_storage::WallClock>;
 
 pub async fn get_storage() -> Result<WebStorage, JsError> {
     let root_key = &[];
@@ -39,7 +36,8 @@ pub async fn get_storage() -> Result<WebStorage, JsError> {
         "linera",
         root_key,
         None,
-    ).await?)
+    )
+    .await?)
 }
 
 #[cfg(not(feature = "no-storage"))]
@@ -102,20 +100,30 @@ pub const OPTIONS: ClientOptions = ClientOptions {
 pub async fn get_client_context() -> Result<ClientContext, JsError> {
     let wallet = linera_client::config::WalletState::read_from_local_storage("linera-wallet")?;
     let mut storage = get_storage().await?;
-    wallet.genesis_config().initialize_storage(&mut storage).await?;
+    wallet
+        .genesis_config()
+        .initialize_storage(&mut storage)
+        .await?;
     Ok(ClientContext::new(get_storage().await?, OPTIONS, wallet))
 }
 
 pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
     let wallet = linera_client::config::WalletState::new_no_storage(FakeWallet::new());
-    Ok(SignClientContext::new(get_storage().await?, OPTIONS, wallet))
+    Ok(SignClientContext::new(
+        get_storage().await?,
+        OPTIONS,
+        wallet,
+    ))
 }
 
 #[wasm_bindgen]
 #[cfg(not(feature = "no-storage"))]
 pub async fn dapp_query_validators() -> Result<(), JsError> {
     let mut client_context: ClientContext = get_client_context().await?;
-    let chain_id = client_context.wallet().default_chain().expect("No default chain");
+    let chain_id = client_context
+        .wallet()
+        .default_chain()
+        .expect("No default chain");
 
     let mut chain_client = client_context.make_chain_client(chain_id);
     log::info!(
@@ -125,7 +133,9 @@ pub async fn dapp_query_validators() -> Result<(), JsError> {
     chain_client.synchronize_from_validators().await?;
     log::info!("Synchronized state from validators");
     let result = chain_client.local_committee().await;
-    client_context.update_and_save_wallet(&mut chain_client).await;
+    client_context
+        .update_and_save_wallet(&mut chain_client)
+        .await;
     let committee = result?;
     log::info!("{:?}", committee.validators());
     let node_provider = client_context.make_node_provider();
@@ -153,7 +163,10 @@ pub async fn dapp_query_validators() -> Result<(), JsError> {
 #[wasm_bindgen]
 pub async fn set_wallet(wallet: &str) -> Result<(), wasm_bindgen::JsError> {
     #[cfg(not(feature = "no-storage"))]
-    linera_client::config::WalletState::create_from_local_storage("linera-wallet", serde_json::from_str(wallet)?)?;
+    linera_client::config::WalletState::create_from_local_storage(
+        "linera-wallet",
+        serde_json::from_str(wallet)?,
+    )?;
     Ok(())
 }
 
@@ -165,21 +178,37 @@ pub async fn dapp_query(n: u32) -> u32 {
 // Execute operation to get
 #[wasm_bindgen]
 #[cfg(feature = "no-storage")]
-pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, messages: &str) -> Result<Option<String>, JsError> {
+pub async fn execute_operations_with_full_materials(
+    chain_id: &str,
+    operation: &str,
+    incoming_bundles: &str,
+    local_time: u64,
+) -> Result<Option<String>, JsError> {
     let chain_id: ChainId = ChainId::from_str(chain_id)?;
     let operations: Vec<Operation> = match serde_json::from_str(operation) {
         Ok(operation) => [operation].to_vec(),
         Err(_) => Vec::new(),
     };
-    let messages: Vec<IncomingBundle> = serde_json::from_str(messages)?;
-    let mut client_context: SignClientContext = get_fake_client_context().await?;
-    let mut chain_client = client_context.make_chain_client(chain_id);
+    let incoming_bundles: Vec<IncomingBundle> = serde_json::from_str(incoming_bundles)?;
+    let client_context: SignClientContext = get_fake_client_context().await?;
+    let chain_client = client_context.make_chain_client(chain_id);
 
-    chain_client.execute_block_without_block_proposal(operations).await?;
+    let state_hash = chain_client
+        .calculate_block_state_hash_with_full_materials(
+            operations.clone(),
+            incoming_bundles,
+            Timestamp::from(local_time),
+        )
+        .await?;
+    log::info!("State hash {}", state_hash);
+
+    chain_client
+        .execute_block_without_block_proposal(operations)
+        .await?;
     match chain_client.peek_candidate_block_proposal().await {
         Some(block_proposal) => {
-        let json = serde_json::to_string(&block_proposal)?;
-        Ok(Some(String::from(json)))
+            let json = serde_json::to_string(&block_proposal)?;
+            Ok(Some(String::from(json)))
         }
         _ => Ok(None),
     }
@@ -188,23 +217,27 @@ pub async fn execute_operation_with_messages(chain_id: &str, operation: &str, me
 #[derive(Serialize)]
 struct MnemonicKeyPair {
     mnemonic: Mnemonic,
-    secret_key: String
+    secret_key: String,
 }
 
 #[wasm_bindgen]
 pub async fn generate_key_pair(passphrase: &str) -> Result<String, JsError> {
     let mut rng = bip39::rand::thread_rng();
     let mnemonic = bip39::Mnemonic::generate_in_with(&mut rng, bip39::Language::English, 24)?;
-    let secret_key = generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?;
+    let secret_key =
+        generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?;
     let secret_key = secret_key.replace("\"", "");
     Ok(serde_json::to_string(&MnemonicKeyPair {
         mnemonic: mnemonic.clone(),
-        secret_key
+        secret_key,
     })?)
 }
 
 #[wasm_bindgen]
-pub async fn generate_key_pair_from_mnemonic(mnemonic: &str, passphrase: &str) -> Result<String, JsError> {
+pub async fn generate_key_pair_from_mnemonic(
+    mnemonic: &str,
+    passphrase: &str,
+) -> Result<String, JsError> {
     let mnemonic = bip39::Mnemonic::parse_normalized(mnemonic)?;
     let seed = mnemonic.to_seed(passphrase);
     use rand_chacha::rand_core::SeedableRng;

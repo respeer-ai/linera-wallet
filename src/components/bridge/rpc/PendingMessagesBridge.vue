@@ -25,7 +25,6 @@ const getPendingMessages = async (chainId: string): Promise<rpc.PendingMessagesR
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      console.log(res)
       const messages = graphqlResult.data(res, 'pendingMessages') as rpc.PendingMessagesResp
       resolve(messages)
     })

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class='[ "onboarding-container", localStore.oneShotSetting.extensionMode ? "page-x-padding" : "onboarding-padding" ]'>
+    <div :class='[ "onboarding-container", localStore.setting.extensionMode ? "page-x-padding" : "onboarding-padding" ]'>
       <h5 class='onboarding-page-title text-center'>
         Help us improve CheCko
       </h5>
@@ -51,7 +51,7 @@ const target = ref((route.query as unknown as Query).target)
 const router = useRouter()
 
 const onAnyBtnClick = () => {
-  void router.push({ path: localStore.oneShotSetting.formalizePath(target.value) })
+  void router.push({ path: localStore.setting.formalizePath(target.value) })
 }
 
 </script>

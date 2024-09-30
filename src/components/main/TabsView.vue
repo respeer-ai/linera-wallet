@@ -3,16 +3,16 @@
     <q-tabs
       v-model='tab' no-caps indicator-color='red-6' dense
     >
-      <q-tab name='microchains' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
+      <q-tab name='microchains' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
         Microchains
       </q-tab>
-      <q-tab name='tokens' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
+      <q-tab name='tokens' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
         Tokens
       </q-tab>
-      <q-tab name='applications' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
+      <q-tab name='applications' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
         Applications
       </q-tab>
-      <q-tab name='activities' :class='[ localStore.oneShotSetting.extensionMode ? "extension-tab" : "" ]'>
+      <q-tab name='activities' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
         Activities
       </q-tab>
     </q-tabs>

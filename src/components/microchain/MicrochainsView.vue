@@ -171,8 +171,8 @@ onMounted(async () => {
 })
 
 const onMicrochainClick = (microchain: db.Microchain) => {
-  localStore.oneShotSetting.oneShotSetting.HomeAction = localStore.oneShotSettingDef.HomeAction.SHOW_MICROCHAIN
-  localStore.oneShotSetting.oneShotSetting.HomeActionParams = microchain
+  localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_MICROCHAIN
+  localStore.setting.HomeActionParams = microchain
 }
 
 </script>

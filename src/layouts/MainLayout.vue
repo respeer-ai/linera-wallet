@@ -48,20 +48,20 @@ import FooterMenu from 'src/components/footer/FooterMenu.vue'
 import BlockView from 'src/components/block/BlockView.vue'
 import StoreLoader from 'src/components/loader/StoreLoader.vue'
 
-const showFooterMenu = computed(() => localStore.oneShotSetting.showFooterMenu)
-const showHeaderMenu = computed(() => localStore.oneShotSetting.showHeaderMenu)
-const alignPageCenter = computed(() => localStore.oneShotSetting.alignPageCenter)
-const extensionMode = computed(() => localStore.oneShotSetting.extensionMode)
-const showSettingMenu = computed(() => localStore.oneShotSetting.showSettingMenu)
+const showFooterMenu = computed(() => localStore.setting.showFooterMenu)
+const showHeaderMenu = computed(() => localStore.setting.showHeaderMenu)
+const alignPageCenter = computed(() => localStore.setting.alignPageCenter)
+const extensionMode = computed(() => localStore.setting.extensionMode)
+const showSettingMenu = computed(() => localStore.setting.showSettingMenu)
 
 watch(showSettingMenu, () => {
-  localStore.oneShotSetting.oneShotSetting.ShowFooterMenu = showSettingMenu.value
+  localStore.setting.ShowFooterMenu = showSettingMenu.value
 })
 
 const viewWidth = computed(() => extensionMode.value ? '368px' : '800px')
 const viewHeight = computed(() => extensionMode.value ? '600px' : '100%')
 const bodyHeight = computed(() => extensionMode.value
-  ? `${localStore.oneShotSetting.inPopupContext ? window.visualViewport?.height as number : 600}px`
+  ? `${localStore.setting.inPopupContext ? window.visualViewport?.height as number : 600}px`
   : `calc(${viewHeight.value} - ${headerHeight.value}px - ${footerHeight.value}px - (${outerHeight.value}px - ${innerHeight.value}px))`)
 
 // eslint-disable-next-line @typescript-eslint/unbound-method

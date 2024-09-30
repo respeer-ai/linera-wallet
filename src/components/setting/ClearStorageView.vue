@@ -36,7 +36,7 @@ const onConfirmClick = async () => {
     await dbWallet.delete()
     await dbBase.delete()
     // TODO: verify password and backup database here
-    window.location.pathname = localStore.oneShotSetting.formalizePath('/')
+    window.location.pathname = localStore.setting.formalizePath('/')
     if (document.URL.startsWith('chrome-extension://')) {
       window.location.pathname = '/www/index.html'
       window.location.hash = '#/extension/onboarding'

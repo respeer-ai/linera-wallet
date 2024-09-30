@@ -63,7 +63,6 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { db } from 'src/model'
-import { localStore } from 'src/localstores'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import SelectTransferAccount from './SelectTransferAccount.vue'
@@ -107,33 +106,16 @@ const onBackClick = () => {
   void router.back()
 }
 
-const onTransferConfirmed = () => {
+const onTransferConfirmed = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcTransferBridge.value?.transfer(
+  await rpcTransferBridge.value?.transferV1(
     fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
     selectedFromMicrochain.value?.microchain,
     toChainBalance.value ? undefined : selectedToOwner.value?.address,
     selectedToMicrochain.value?.microchain,
     amount.value,
     undefined
-  ).then(() => {
-    localStore.notification.pushNotification({
-      Title: 'Transfer',
-      Message: 'Transaction is successful',
-      Popup: true,
-      Type: localStore.notify.NotifyType.Info
-    })
-    void router.back()
-  }).catch((error) => {
-    localStore.notification.pushNotification({
-      Title: 'Transfer',
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Transaction is failed: ${error}`,
-      Popup: true,
-      Type: localStore.notify.NotifyType.Error
-    })
-    void router.back()
-  })
+  )
 }
 
 onMounted(async () => {

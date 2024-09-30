@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "full-width", localStore.oneShotSetting.extensionMode ? "page-x-padding" : "" ]'>
+  <div :class='[ "full-width", localStore.setting.extensionMode ? "page-x-padding" : "" ]'>
     <div class='text-bold'>
       Network name
     </div>

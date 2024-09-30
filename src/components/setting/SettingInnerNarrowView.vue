@@ -1,21 +1,21 @@
 <template>
-  <q-tab-panels v-model='localStore.oneShotSetting.oneShotSetting.SelectedSettingMenu' animated>
-    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.NETWORKS'>
+  <q-tab-panels v-model='localStore.setting.SelectedSettingMenu' animated>
+    <q-tab-panel :name='localStore.settingDef.Menu.NETWORKS'>
       <NetworkSettingNarrowView ref='networkSettingView' @back='onBack' />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ABOUT_US'>
+    <q-tab-panel :name='localStore.settingDef.Menu.ABOUT_US'>
       <AboutUsView />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.STORAGE'>
+    <q-tab-panel :name='localStore.settingDef.Menu.STORAGE'>
       <StorageOperationView />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ACCOUNTS'>
+    <q-tab-panel :name='localStore.settingDef.Menu.ACCOUNTS'>
       <AccountsView ref='accountsView' @back='onBack' />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ADDRESSES_BOOK'>
+    <q-tab-panel :name='localStore.settingDef.Menu.ADDRESSES_BOOK'>
       <AddressesBook />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.oneShotSettingDef.Menu.ENGINEERING'>
+    <q-tab-panel :name='localStore.settingDef.Menu.ENGINEERING'>
       <EngineeringView />
     </q-tab-panel>
   </q-tab-panels>
@@ -36,11 +36,11 @@ const accountsView = ref<InstanceType<typeof AccountsView>>()
 const networkSettingView = ref<InstanceType<typeof NetworkSettingNarrowView>>()
 
 const back = () => {
-  switch (localStore.oneShotSetting.selectedSettingMenu) {
-    case localStore.oneShotSettingDef.Menu.ACCOUNTS:
+  switch (localStore.setting.selectedSettingMenu) {
+    case localStore.settingDef.Menu.ACCOUNTS:
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
       return accountsView.value?.back()
-    case localStore.oneShotSettingDef.Menu.NETWORKS:
+    case localStore.settingDef.Menu.NETWORKS:
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       return networkSettingView.value?.back()
     default:
