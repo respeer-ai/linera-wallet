@@ -198,6 +198,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
 
       // TODO: we actually should construct block with local rust code but it's too hard now, so we just validate executed block calculated by node service
       //       It has the same security level as local rust code
+      // TODO: construct block locally and compare with block in executed block
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       // const stateHash1 = await constructBlock.value?.constructBlock(microchain, operation, blockMaterial.incomingBundles, blockMaterial.localTime)
@@ -223,15 +224,55 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         JSON.stringify(block, null, 2),
         JSON.stringify(blockMaterial.round),
         ''
-      ) as string
+      )
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       const owner = await dbMicrochainBridge.value?.microchainOwner(microchain) as db.Owner
       if (!owner) reject('Invalid owner')
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       const signature = await rpcBlockBridge.value?.signPayload(owner, JSON.parse(payload)) as string
       if (!signature) reject('Failed generate signature')
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const _executedBlock = JSON.parse(JSON.stringify(executedBlock), function (this: Record<string, unknown>, key: string, value: unknown) {
+        if (value === null) return
+        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1)) {
+          const _key = toSnake(key)
+          if (!_key.includes('_') || _key === key) return value
+          if (this) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            this[_key] = value
+          }
+          return
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value
+      })
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await rpcBlockBridge.value?.submitBlockAndSignature(microchain, executedBlock.block.height, executedBlock, blockMaterial.round, signature)
+      rpcBlockBridge.value?.submitBlockAndSignature(
+        microchain,
+        executedBlock.block.height,
+        _executedBlock,
+        blockMaterial.round,
+        signature
+      ).then(() => {
+        if (operation) {
+          localStore.notification.pushNotification({
+            Title: 'Execute operation',
+            Message: 'Success execute operation.',
+            Popup: true,
+            Type: localStore.notify.NotifyType.Info
+          })
+        }
+      }).catch((error) => {
+        localStore.notification.pushNotification({
+          Title: 'Execute operation',
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          Message: `Failed execute operation: ${error}.`,
+          Popup: true,
+          Type: localStore.notify.NotifyType.Error
+        })
+      })
     }).catch((error) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Fail process incoming bundle: ${error}`)

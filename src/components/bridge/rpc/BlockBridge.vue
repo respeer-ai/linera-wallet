@@ -57,7 +57,7 @@ const submitBlockAndSignature = async (chainId: string, height: number, executed
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation submitBlockAndSignature ($chainId: String!, $height: Int!, $executedBlock: ExecutedBlock!, $round: Round!, $signature: String!) {
+    mutation submitBlockAndSignature ($chainId: String!, $height: Int!, $executedBlock: UserExecutedBlock!, $round: Round!, $signature: String!) {
       submitBlockAndSignature(chainId: $chainId, height: $height, executedBlock: $executedBlock, round: $round, signature: $signature)
     }`))
   return await mutate({

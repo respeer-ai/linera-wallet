@@ -116,6 +116,7 @@ const onTransferConfirmed = async () => {
     amount.value,
     undefined
   )
+  void router.back()
 }
 
 onMounted(async () => {

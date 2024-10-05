@@ -87,5 +87,3 @@ branch = "respeer-pub-field-1efe6a93"
 default = ["no-storage"]
 no-storage = ["linera-client/no-storage"]
 
-[profile.release]
-debug = true
