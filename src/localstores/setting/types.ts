@@ -1,3 +1,5 @@
+import { MicrochainImportState } from './const'
+
 export enum Menu {
   NETWORKS = 'Networks',
   ABOUT_US = 'AboutUs',
@@ -27,7 +29,9 @@ export interface Setting {
   CreatingDefaultNetwork: boolean
   CreatingDefaultToken: boolean
 
-  InPopupContext: boolean
+  InPopupContext: boolean,
+
+  MicrochainImportState: MicrochainImportState
 }
 
 export interface MenuItem {

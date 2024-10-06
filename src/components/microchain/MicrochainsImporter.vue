@@ -11,6 +11,7 @@ import { ref, computed, watch } from 'vue'
 import { db } from 'src/model'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
+import { localStore } from 'src/localstores'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import DbMicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
@@ -27,11 +28,13 @@ const selectedNetwork = ref(undefined as unknown as db.Network)
 const networkId = computed(() => selectedNetwork.value?.id)
 
 watch(networkId, async () => {
+  localStore.setting.MicrochainImportState = localStore.settingDef.MicrochainImportState.MicrochainImporting
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const password = await dbPasswordBridge.value?.getPassword()
   if (!password) return Promise.reject(new Error('Invalid password'))
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const microchains = await dbMicrochainBridge.value?.getMicrochains(0, 1000) as db.Microchain[] || [] as db.Microchain[]
+  const microchains = await dbMicrochainBridge.value?.getMicrochains(0, 1000, false) as db.Microchain[] || [] as db.Microchain[]
   for (const microchain of microchains) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) || []
@@ -52,6 +55,7 @@ watch(networkId, async () => {
         })
     }
   }
+  localStore.setting.MicrochainImportState = localStore.settingDef.MicrochainImportState.MicrochainImported
 })
 
 </script>

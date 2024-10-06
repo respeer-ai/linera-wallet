@@ -67,8 +67,8 @@
   </q-dialog>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+<script setup lang='ts'>
+import { computed, onMounted, ref, watch } from 'vue'
 import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
 
@@ -91,6 +91,8 @@ const creatingMicrochain = ref(false)
 const importingMicrochain = ref(false)
 const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
+
+const microchainImportState = computed(() => localStore.setting.MicrochainImportState)
 
 const onMicrochainCreated = async () => {
   creatingMicrochain.value = false
@@ -174,5 +176,12 @@ const onMicrochainClick = (microchain: db.Microchain) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_MICROCHAIN
   localStore.setting.HomeActionParams = microchain
 }
+
+watch(microchainImportState, async () => {
+  switch (microchainImportState.value) {
+    case localStore.settingDef.MicrochainImportState.MicrochainImported:
+      await loadMicrochains()
+  }
+})
 
 </script>

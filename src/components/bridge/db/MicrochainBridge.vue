@@ -50,8 +50,8 @@ watch(_microchains, () => {
   }
 })
 
-const getMicrochains = async (offset: number, limit: number): Promise<db.Microchain[]> => {
-  return await dbWallet.microchains.offset(offset).limit(limit).toArray()
+const getMicrochains = async (offset: number, limit: number, imported?: boolean): Promise<db.Microchain[]> => {
+  return (await dbWallet.microchains.offset(offset).limit(limit).toArray()).filter((el) => !imported || el.imported)
 }
 
 const getMicrochain = async (microchain: string): Promise<db.Microchain | undefined> => {
