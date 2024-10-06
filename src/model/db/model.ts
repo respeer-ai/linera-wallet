@@ -18,7 +18,6 @@ export interface Microchain {
   microchain: string
   messageId: string
   certificateHash: string
-  networkId: number
   name: string
   default: boolean
   imported: boolean // If it's imported in selected network

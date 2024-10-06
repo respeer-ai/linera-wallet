@@ -85,7 +85,7 @@ const createMicrochain = async (owner: string, microchainId: string, messageId?:
     networkId: selectedNetwork.value.id,
     name,
     default: _default,
-    selected: true
+    imported: true
   } as db.Microchain
   await dbWallet.microchains.add(microchain)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
