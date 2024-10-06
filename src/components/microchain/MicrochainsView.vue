@@ -157,7 +157,7 @@ const onSynchronizeMicrochainsClick = () => {
 const loadMicrochainsRecursive = async (total: number, offset: number, limit: number) => {
   if (offset >= total) return
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  microchains.value.push(...(await dbMicrochainBridge.value?.getMicrochains(offset, limit)) || [])
+  microchains.value.push(...(await dbMicrochainBridge.value?.getMicrochains(offset, limit, true)) || [])
   void loadMicrochainsRecursive(total, offset + limit, limit)
 }
 
