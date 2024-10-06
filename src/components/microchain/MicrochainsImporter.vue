@@ -41,20 +41,18 @@ watch(networkId, async () => {
     for (const owner of owners) {
       const privateKey = db.privateKey(owner as db.Owner, password as string)
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await rpcMicrochainBridge.value?.initMicrochainStore(keyPair, microchain.microchain, microchain.messageId, microchain.certificateHash)
+        microchain.imported = true
+      } catch {
+        microchain.imported = false
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcMicrochainBridge.value?.initMicrochainStore(keyPair, microchain.microchain, microchain.messageId, microchain.certificateHash)
-        .then(async () => {
-          microchain.imported = true
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await dbMicrochainBridge.value?.updateMicrochain(microchain)
-        })
-        .catch(async () => {
-          microchain.imported = false
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await dbMicrochainBridge.value?.updateMicrochain(microchain)
-        })
+      await dbMicrochainBridge.value?.updateMicrochain(microchain)
     }
   }
+
   localStore.setting.MicrochainImportState = localStore.settingDef.MicrochainImportState.MicrochainImported
 })
 
