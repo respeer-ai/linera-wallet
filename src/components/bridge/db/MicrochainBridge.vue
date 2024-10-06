@@ -33,9 +33,9 @@ const _microchains = useObservable<db.Microchain[]>(
     if (owner.value !== undefined) {
       const microchainOwners = await dbWallet.microchainOwners.where('owner').equals(owner.value).toArray()
       const microchainIds = microchainOwners.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, [])
-      return await dbWallet.microchains.where('microchain').anyOf(microchainIds).toArray()
+      return (await dbWallet.microchains.where('microchain').anyOf(microchainIds).toArray()).filter((el) => el.imported)
     }
-    return await dbWallet.microchains.toArray()
+    return (await dbWallet.microchains.toArray()).filter((el) => el.imported)
   }) as never
 )
 

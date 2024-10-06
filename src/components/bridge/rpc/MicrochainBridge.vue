@@ -56,19 +56,21 @@ const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
   // TODO: support query with publicKey
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query chains {
-      chains {
+    query chainsWithPublicKey ($publicKey: String!) {
+      chainsWithPublicKey(publicKey: $publicKey) {
         list
         default
       }
     }
-  `, {}, {
+  `, {
+    publicKey
+  }, {
     fetchPolicy: 'network-only'
   }))
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const chains = graphqlResult.data(res, 'chains') as rpc.ChainsResp
+      const chains = graphqlResult.data(res, 'chainsWithPublicKey') as rpc.ChainsResp
       resolve(chains)
     })
 

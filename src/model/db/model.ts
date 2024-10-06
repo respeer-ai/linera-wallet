@@ -21,6 +21,7 @@ export interface Microchain {
   networkId: number
   name: string
   default: boolean
+  imported: boolean // If it's imported in selected network
 }
 
 export const microchainAvatar = (microchain: Microchain) => {
