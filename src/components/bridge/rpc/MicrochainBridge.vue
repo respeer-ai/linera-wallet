@@ -2,9 +2,10 @@
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
-import { graphqlResult } from 'src/utils'
+import { _hex, graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { dbBase } from 'src/controller'
+import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 
 const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
@@ -28,18 +29,22 @@ const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
   } as rpc.OpenChainResp
 }
 
-const initMicrochainChainStore = async (publicKey: string, signature: string, chainId: string, messageId: string, certificateHash: string) => {
+const initMicrochainStore = async (keyPair: Ed25519SigningKey, chainId: string, messageId: string, certificateHash: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   const faucetUrl = (await dbBase.networks.toArray()).find((el) => el.selected)?.faucetUrl
+
+  const typeNameBytes = new TextEncoder().encode('Nonce::')
+  const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
+  const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
     mutation walletInitWithoutKeypair ($publicKey: String!, $signature: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $certificateHash: String!) {
       walletInitWithoutKeypair(publicKey: $publicKey, signature: $signature, faucetUrl: $faucetUrl, chainId: $chainId, messageId: $messageId, certificateHash: $certificateHash)
     }`))
   return await mutate({
-    publicKey,
+    publicKey: _hex.toHex(keyPair.public().to_bytes().bytes),
     signature,
     faucetUrl,
     chainId,
@@ -48,12 +53,9 @@ const initMicrochainChainStore = async (publicKey: string, signature: string, ch
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
-
-  // TODO: support query with publicKey
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
     query chainsWithPublicKey ($publicKey: String!) {
@@ -83,7 +85,7 @@ const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
 
 defineExpose({
   openChain,
-  initMicrochainChainStore,
+  initMicrochainStore,
   chains
 })
 

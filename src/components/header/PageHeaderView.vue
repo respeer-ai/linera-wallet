@@ -108,6 +108,8 @@
   </div>
   <NetworkBridge v-model:networks='networks' v-model:selected-network='selectedNetwork' />
   <OwnerBridge v-model:owners='owners' v-model:selected-owner='selectedOwner' />
+  <MicrochainBridge ref='dbMicrochainBridge' />
+  <MicrochainsImporter />
   <q-dialog v-model='selectingNetwork'>
     <NetworkSelector v-model='selectedNetwork' @selected='onNetworkSelected' @add='onAddNetwork' />
   </q-dialog>
@@ -127,9 +129,11 @@ import { localStore } from 'src/localstores'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
+import MicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import NetworkSelector from '../selector/NetworkSelector.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import AccountDetailView from '../account/AccountDetailView.vue'
+import MicrochainsImporter from '../microchain/MicrochainsImporter.vue'
 
 const networks = ref([] as db.Network[])
 const selectedNetwork = ref(undefined as unknown as db.Network)
@@ -139,6 +143,8 @@ const selectedOwner = ref(undefined as unknown as db.Owner)
 const selectingNetwork = ref(false)
 const selectingOwner = ref(false)
 const displayingOwnerDetail = ref(false)
+
+const dbMicrochainBridge = ref<InstanceType<typeof MicrochainBridge>>()
 
 const onNetworkClick = () => {
   selectingNetwork.value = true
@@ -151,6 +157,9 @@ const onAccountClick = () => {
 const onNetworkSelected = (network: db.Network) => {
   selectingNetwork.value = false
   selectedNetwork.value = network
+  // TODO: initialize all microchains
+  // TODO: unsubscribe exists subscription from old network
+  // TODO: subscribe to selected network
 }
 
 const onAddNetwork = () => {

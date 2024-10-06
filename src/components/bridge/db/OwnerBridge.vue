@@ -89,6 +89,10 @@ const getOwnerWithPublicKey = async (publicKey: string) => {
   return (await dbWallet.owners.toArray()).find((el) => el.address === publicKey)
 }
 
+const getOwner = async (owner: string) => {
+  return (await dbWallet.owners.toArray()).find((el) => el.owner === owner)
+}
+
 const getOwnerWithPublicKeyPrefix = async (prefix: string) => {
   return (await dbWallet.owners.toArray()).find((el) => el.address.includes(prefix.slice(prefix.startsWith('0x') ? 2 : 0)))
 }
@@ -104,7 +108,8 @@ defineExpose({
   ownerBalance,
   publicKey2Owner,
   getOwnerWithPublicKey,
-  getOwnerWithPublicKeyPrefix
+  getOwnerWithPublicKeyPrefix,
+  getOwner
 })
 
 </script>

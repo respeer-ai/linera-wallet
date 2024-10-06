@@ -26,17 +26,14 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   const resp = await rpcMicrochainBridge.value?.openChain(owner?.address) as rpc.OpenChainResp
   if (!resp) return Promise.reject(new Error('Invalid open chain'))
 
-  const typeNameBytes = new TextEncoder().encode('Nonce::')
-  const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(resp.certificateHash)])
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!password) return Promise.reject(new Error('Invalid password'))
   const _password = db.decryptPassword(password)
   const privateKey = db.privateKey(owner, _password)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcMicrochainBridge.value?.initMicrochainChainStore(owner.address, signature, resp.chainId, resp.messageId, resp.certificateHash)
+  await rpcMicrochainBridge.value?.initMicrochainStore(keyPair, resp.chainId, resp.messageId, resp.certificateHash)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcBlockBridge.value?.signNewBlock(resp.chainId, 0, keyPair)
 
@@ -50,17 +47,14 @@ const importMicrochain = async (chainId: string, messageId: string, certificateH
   const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
   if (!owner) return Promise.reject(new Error('Invalid owner'))
 
-  const typeNameBytes = new TextEncoder().encode('Nonce::')
-  const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(certificateHash)])
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!password) return Promise.reject(new Error('Invalid password'))
   const _password = db.decryptPassword(password)
   const privateKey = db.privateKey(owner, _password)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcMicrochainBridge.value?.initMicrochainChainStore(owner.address, signature, chainId, messageId, certificateHash)
+  await rpcMicrochainBridge.value?.initMicrochainStore(keyPair, chainId, messageId, certificateHash)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcBlockBridge.value?.signNewBlock(chainId, 0, keyPair)
 
