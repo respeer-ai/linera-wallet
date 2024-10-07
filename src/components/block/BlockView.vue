@@ -173,6 +173,7 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
 }
 
 const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
+  console.log('processNewIncomingBundle', microchain, operation)
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: rpc.BlockMaterialResp) => {
@@ -266,6 +267,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             Type: localStore.notify.NotifyType.Info
           })
         }
+        resolve()
       }).catch((error) => {
         localStore.notification.pushNotification({
           Title: 'Execute operation',
@@ -274,10 +276,12 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
           Popup: true,
           Type: localStore.notify.NotifyType.Error
         })
+        reject(error)
       })
     }).catch((error) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Fail process incoming bundle: ${error}`)
+      reject(error)
     })
   })
 }
@@ -348,8 +352,9 @@ const handlerOperation = () => {
             handlerOperation()
           }, 1000)
         })
-      } catch {
-        // DO NOTHING
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed process incoming bundle: ${error}`)
       }
     }
   })
