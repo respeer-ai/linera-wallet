@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { HomeAction, Menu, Setting } from './types'
+import { MicrochainsImportState } from './const'
 
 export const useSettingStore = defineStore('settings', {
   state: () =>
@@ -56,6 +57,9 @@ export const useSettingStore = defineStore('settings', {
     },
     inPopupContext(): boolean {
       return this.InPopupContext
+    },
+    microchainsImportState(): MicrochainsImportState {
+      return this.MicrochainsImportState
     }
   },
   actions: {}

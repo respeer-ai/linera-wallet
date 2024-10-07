@@ -92,7 +92,7 @@ const importingMicrochain = ref(false)
 const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
-const microchainImportState = computed(() => localStore.setting.MicrochainImportState)
+const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
 
 const onMicrochainCreated = async () => {
   creatingMicrochain.value = false
@@ -177,9 +177,9 @@ const onMicrochainClick = (microchain: db.Microchain) => {
   localStore.setting.HomeActionParams = microchain
 }
 
-watch(microchainImportState, async () => {
-  switch (microchainImportState.value) {
-    case localStore.settingDef.MicrochainImportState.MicrochainImported:
+watch(microchainsImportState, async () => {
+  switch (microchainsImportState.value) {
+    case localStore.settingDef.MicrochainsImportState.MicrochainsImported:
       await loadMicrochains()
   }
 })

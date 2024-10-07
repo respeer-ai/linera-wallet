@@ -43,7 +43,7 @@ export const SettingMenus = [
   }
 ] as Array<MenuItem>
 
-export enum MicrochainImportState {
-  MicrochainImporting,
-  MicrochainImported
+export enum MicrochainsImportState {
+  MicrochainsImporting,
+  MicrochainsImported
 }

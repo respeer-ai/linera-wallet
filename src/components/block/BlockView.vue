@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { db, rpc } from 'src/model'
 import { dbBase } from 'src/controller'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
@@ -56,8 +56,10 @@ const rpcBlockMaterialBridge = ref<InstanceType<typeof RpcBlockMaterialBridge>>(
 const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 
 const microchains = ref([] as db.Microchain[])
+const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
 
-const subscribed = ref(new Map<string, boolean>())
+type stopFunc = () => void
+const subscribed = ref(new Map<string, stopFunc>())
 
 const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -280,16 +282,16 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
   })
 }
 
-const subscribeMicrochain = async (microchain: db.Microchain) => {
+const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => void> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
-  if (!owners.length) return
+  if (!owners.length) return Promise.reject('Invalid owners')
 
   const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
   await updateChainAccountBalances(microchain, publicKeys)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcBlockBridge.value?.subscribe(
+  return await rpcBlockBridge.value?.subscribe(
     microchain.microchain,
     async (height: number) => {
       try {
@@ -304,19 +306,33 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
       await processNewBlock(microchain, hash)
     }, async () => {
       await processNewIncomingBundle(microchain.microchain)
-    })
+    }) as () => void
 }
 
 const subscribeMicrochains = async () => {
   for (const microchain of microchains.value) {
     if (subscribed.value.get(microchain.microchain)) continue
-    await subscribeMicrochain({ ...microchain })
-    subscribed.value.set(microchain.microchain, true)
+    const stop = await subscribeMicrochain({ ...microchain })
+    subscribed.value.set(microchain.microchain, stop)
   }
+}
+
+const ubsunscribeMicrochains = () => {
+  subscribed.value.forEach((stop) => {
+    stop()
+  })
 }
 
 watch(microchains, async () => {
   await subscribeMicrochains()
+})
+
+watch(microchainsImportState, async () => {
+  switch (microchainsImportState.value) {
+    case localStore.settingDef.MicrochainsImportState.MicrochainsImported:
+      ubsunscribeMicrochains()
+      await subscribeMicrochains()
+  }
 })
 
 const handlerOperation = () => {
@@ -342,6 +358,10 @@ const handlerOperation = () => {
 onMounted(async () => {
   await subscribeMicrochains()
   handlerOperation()
+})
+
+onUnmounted(() => {
+  ubsunscribeMicrochains()
 })
 
 </script>

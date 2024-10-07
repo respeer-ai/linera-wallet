@@ -1,4 +1,4 @@
-import { MicrochainImportState } from './const'
+import { MicrochainsImportState } from './const'
 
 export enum Menu {
   NETWORKS = 'Networks',
@@ -31,7 +31,7 @@ export interface Setting {
 
   InPopupContext: boolean
 
-  MicrochainImportState: MicrochainImportState
+  MicrochainsImportState: MicrochainsImportState
 }
 
 export interface MenuItem {

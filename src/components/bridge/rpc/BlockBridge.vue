@@ -87,11 +87,11 @@ const signPayload = async (owner: db.Owner, payload: Uint8Array): Promise<string
   return _hex.toHex(keyPair.sign(new Memory(payload)).to_bytes().bytes)
 }
 
-const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingBundle?: () => void) => {
+const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => void, onNewBlock?: (hash: string) => void, onNewIncomingBundle?: () => void): Promise<() => void> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(gql`
+  const { /* result, refetch, fetchMore, */ stop, onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(gql`
     subscription notifications($chainId: String!) {
       notifications(chainId: $chainId)
     }
@@ -120,6 +120,8 @@ const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => vo
       onNewIncomingBundle?.()
     }
   })
+
+  return stop
 }
 
 const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.BlockResp> => {

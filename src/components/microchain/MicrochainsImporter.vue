@@ -28,7 +28,7 @@ const selectedNetwork = ref(undefined as unknown as db.Network)
 const networkId = computed(() => selectedNetwork.value?.id)
 
 watch(networkId, async () => {
-  localStore.setting.MicrochainImportState = localStore.settingDef.MicrochainImportState.MicrochainImporting
+  localStore.setting.MicrochainsImportState = localStore.settingDef.MicrochainsImportState.MicrochainsImporting
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const password = await dbPasswordBridge.value?.getPassword()
@@ -53,7 +53,7 @@ watch(networkId, async () => {
     }
   }
 
-  localStore.setting.MicrochainImportState = localStore.settingDef.MicrochainImportState.MicrochainImported
+  localStore.setting.MicrochainsImportState = localStore.settingDef.MicrochainsImportState.MicrochainsImported
 })
 
 </script>
