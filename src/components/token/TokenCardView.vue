@@ -25,15 +25,19 @@
       </div>
     </div>
     <div :class='[ "selector-indicator selector-margin-x-left" ]' />
-    <OwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='token.id' />
+    <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='token.id' />
+    <DbOwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
+    <DbTokenBridge ref='dbTokenBridge' />
   </q-item>
 </template>
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { ref, toRef } from 'vue'
+import { onMounted, ref, toRef, watch } from 'vue'
 
-import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
+import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
+import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
+import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
 
@@ -45,5 +49,30 @@ const token = toRef(props, 'token')
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
+
+const selectedOwner = ref(undefined as unknown as db.Owner)
+
+const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
+const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
+
+const getBalance = async () => {
+  if (!selectedOwner.value) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 0
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const balance = await dbOwnerBridge.value?.ownerBalance(selectedOwner.value, nativeTokenId)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  tokenBalance.value = balance?.tokenBalance || 0
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  usdBalance.value = balance?.usdBalance || 0
+}
+
+watch(selectedOwner, async () => {
+  await getBalance()
+})
+
+onMounted(async () => {
+  await getBalance()
+})
 
 </script>
