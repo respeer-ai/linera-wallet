@@ -29,7 +29,7 @@ export interface Setting {
   CreatingDefaultNetwork: boolean
   CreatingDefaultToken: boolean
 
-  InPopupContext: boolean,
+  InPopupContext: boolean
 
   MicrochainImportState: MicrochainImportState
 }

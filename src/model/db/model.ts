@@ -24,7 +24,10 @@ export interface Microchain {
 }
 
 export const microchainAvatar = (microchain: Microchain) => {
-  return 'data:image/png;base64,' + new Identicon(microchain.microchain, 420).toString()
+  return (
+    'data:image/png;base64,' +
+    new Identicon(microchain.microchain, 420).toString()
+  )
 }
 
 export interface Application {
@@ -54,7 +57,12 @@ export interface Owner {
 
 export const DEFAULT_ACCOUNT_NAME = 'Account'
 
-export const buildOwner = async (publicKey: string, privateKey: string, password: string, name: string) => {
+export const buildOwner = async (
+  publicKey: string,
+  privateKey: string,
+  password: string,
+  name: string
+) => {
   const owner = await ownerFromPublicKey(publicKey)
   const salt = CryptoJS.lib.WordArray.random(16).toString(enc.Base64)
   const key = CryptoJS.SHA256(salt + password + salt).toString()
@@ -116,13 +124,27 @@ export const defaultNetwork = {
 } as Network
 
 export const rpcUrl = (network: Network) => {
-  if (!network.rpcSchema?.length || !network.host?.length || network.port === undefined) return ''
-  return `${network.rpcSchema}://${network.host}:${network.port}${network.path?.length > 1 ? '/' + network.path : ''}`
+  if (
+    !network.rpcSchema?.length ||
+    !network.host?.length ||
+    network.port === undefined
+  )
+    return ''
+  return `${network.rpcSchema}://${network.host}:${network.port}${
+    network.path?.length > 1 ? '/' + network.path : ''
+  }`
 }
 
 export const wsUrl = (network: Network) => {
-  if (!network.wsSchema?.length || !network.host?.length || network.port === undefined) return ''
-  return `${network.wsSchema}://${network.host}:${network.port}${network.path?.length > 1 ? '/ws/' + network.path : '/ws'}`
+  if (
+    !network.wsSchema?.length ||
+    !network.host?.length ||
+    network.port === undefined
+  )
+    return ''
+  return `${network.wsSchema}://${network.host}:${network.port}${
+    network.path?.length > 1 ? '/ws/' + network.path : '/ws'
+  }`
 }
 
 export interface Password {

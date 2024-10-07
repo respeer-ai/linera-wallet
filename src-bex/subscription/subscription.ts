@@ -1,6 +1,9 @@
 import { unsafeRandomBytes } from '@metamask/eth-json-rpc-filters/hexUtils'
 
-export type SubscriptionHandler = (subscriptionId: string, payload: unknown) => Promise<void>
+export type SubscriptionHandler = (
+  subscriptionId: string,
+  payload: unknown
+) => Promise<void>
 
 interface SubscriptionParams {
   topics: string[]
@@ -15,20 +18,23 @@ export interface SubscriptionPayload {
 export class Subscription {
   // eslint-disable-next-line no-use-before-define
   static #instance: Subscription
-  #subscribers:Map<string, SubscriptionParams>
+  #subscribers: Map<string, SubscriptionParams>
 
-  private constructor () {
+  private constructor() {
     this.#subscribers = new Map<string, SubscriptionParams>()
   }
 
-  public static get instance (): Subscription {
+  public static get instance(): Subscription {
     if (!Subscription.#instance) {
       Subscription.#instance = new Subscription()
     }
     return Subscription.#instance
   }
 
-  public static subscribe (topics: string[], handler: SubscriptionHandler): string {
+  public static subscribe(
+    topics: string[],
+    handler: SubscriptionHandler
+  ): string {
     const subscriptionId = unsafeRandomBytes(16)
     Subscription.instance.#subscribers.set(subscriptionId, {
       topics,
@@ -37,13 +43,16 @@ export class Subscription {
     return subscriptionId
   }
 
-  public static unsubscribe (subscriptionId: string): SubscriptionHandler | undefined {
-    const handler = Subscription.instance.#subscribers.get(subscriptionId)?.handler
+  public static unsubscribe(
+    subscriptionId: string
+  ): SubscriptionHandler | undefined {
+    const handler =
+      Subscription.instance.#subscribers.get(subscriptionId)?.handler
     Subscription.instance.#subscribers.delete(subscriptionId)
     return handler
   }
 
-  public static handle (data: unknown) {
+  public static handle(data: unknown) {
     Subscription.instance.#subscribers.forEach((subscriber, subscriptionId) => {
       // TODO: here we should filter topics
       void subscriber.handler(subscriptionId, data)

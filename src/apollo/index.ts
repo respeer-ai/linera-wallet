@@ -12,7 +12,9 @@ export enum EndpointType {
   Rpc
 }
 
-export async function getClientOptionsWithEndpointType (endpointType: EndpointType) {
+export async function getClientOptionsWithEndpointType(
+  endpointType: EndpointType
+) {
   const network = (await dbBase.networks.toArray()).find((el) => el.selected)
 
   let schema = network?.rpcSchema
@@ -24,7 +26,8 @@ export async function getClientOptionsWithEndpointType (endpointType: EndpointTy
     const url = new URL(network.faucetUrl)
     const protocol = url.protocol.replace(':', '')
     schema = protocol as db.HTTPSchema
-    wsSchema = protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS
+    wsSchema =
+      protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS
     host = url.hostname
     port = parseInt(url.port)
   }
@@ -32,7 +35,7 @@ export async function getClientOptionsWithEndpointType (endpointType: EndpointTy
   return getClientOptions(schema, wsSchema, host, port)
 }
 
-export /* async */ function getClientOptions (
+export /* async */ function getClientOptions(
   schema?: string,
   wsSchema?: string,
   host?: string,

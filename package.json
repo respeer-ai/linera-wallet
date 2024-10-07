@@ -16,7 +16,9 @@
     "build:bex": "quasar build -m bex",
     "build:wasm": "wasm-pack build --out-dir ../src-bex/wasm --target web wasm",
     "build:wasm:debug": "wasm-pack build --debug --out-dir ../src-bex/wasm --target web wasm",
-    "graphql:generate": "graphql-codegen --config graphql-codegen.ts"
+    "graphql:generate": "graphql-codegen --config graphql-codegen.ts",
+    "prettier:check": "prettier --check \"**/*.{js,json,md,ts,yml}\"",
+    "prettier:write": "prettier --write \"**/*.{js,json,md,ts,yml}\""
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",

@@ -13,7 +13,8 @@ export const langOptions = [
   {
     label: '中文简体',
     value: 'zh-CN'
-  }, {
+  },
+  {
     label: 'English',
     value: 'en-US'
   }

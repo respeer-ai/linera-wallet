@@ -35,12 +35,14 @@ export const RpcMethods = Object.values(RpcMethod)
 
 export interface RpcRequest {
   origin: string
-  name: string,
-  favicon: string,
+  name: string
+  favicon: string
   request: JsonRpcRequest<JsonRpcParams>
 }
 
-export type MiddlewareImplHandler = (req: RpcRequest) => Promise<string | undefined>
+export type MiddlewareImplHandler = (
+  req: RpcRequest
+) => Promise<string | undefined>
 
 export enum PopupRequestType {
   CONFIRMATION = 'confirmation'

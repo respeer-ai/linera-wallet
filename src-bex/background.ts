@@ -15,28 +15,31 @@ globalThis.process = process
 
 const installationManager = new InstallationManager()
 
-export default bexBackground((bridge: BexBridge /*, allActiveConnections */) => {
-  basebridge.EventBus.instance.setBridge(bridge)
+export default bexBackground(
+  (bridge: BexBridge /*, allActiveConnections */) => {
+    basebridge.EventBus.instance.setBridge(bridge)
 
-  const _engine = new engine.Engine()
-  bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
-    const res = {} as PendingJsonRpcResponse<Json>
-    _engine.rpcExec(payload.data)
-      .then((rc) => {
-        res.result = rc as Json
-        void payload.respond(res)
-      })
-      .catch((e: Error) => {
-        res.error = {
-          code: -1,
-          message: e.message
-        }
-        void payload.respond(res)
-      })
-  })
+    const _engine = new engine.Engine()
+    bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
+      const res = {} as PendingJsonRpcResponse<Json>
+      _engine
+        .rpcExec(payload.data)
+        .then((rc) => {
+          res.result = rc as Json
+          void payload.respond(res)
+        })
+        .catch((e: Error) => {
+          res.error = {
+            code: -1,
+            message: e.message
+          }
+          void payload.respond(res)
+        })
+    })
 
-  sentinel.Sentinel.run()
-  void setupLineraSubscription()
-})
+    sentinel.Sentinel.run()
+    void setupLineraSubscription()
+  }
+)
 
 installationManager.initializeOnInstalledListener()

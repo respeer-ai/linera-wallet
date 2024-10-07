@@ -4,22 +4,25 @@ import { subscription } from '../subscription'
 import * as lineraWasm from '../wasm/linera_wasm'
 
 export class Sentinel {
-  static async onMessage (subscriptionId: string, data: unknown) {
+  static async onMessage(subscriptionId: string, data: unknown) {
     console.log(subscriptionId, data)
     console.log('dApp query', await lineraWasm.dapp_query(10))
   }
 
-  public static run () {
+  public static run() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    fetch(wasmModuleUrl).then((buffer) => {
-      void initWasm(buffer)
-    }).catch(() => {
-      // TODO
-    })
+    fetch(wasmModuleUrl)
+      .then((buffer) => {
+        void initWasm(buffer)
+      })
+      .catch(() => {
+        // TODO
+      })
 
     subscription.Subscription.subscribe(
       ['NewIncomingMessage'],
-      (subscriptionId: string, data: unknown) => Sentinel.onMessage(subscriptionId, data)
+      (subscriptionId: string, data: unknown) =>
+        Sentinel.onMessage(subscriptionId, data)
     )
   }
 }

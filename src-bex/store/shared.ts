@@ -7,42 +7,72 @@ export const getAccounts = async () => {
 }
 
 export const getAccountWithPrefix = async (prefix: string) => {
-  return (await dbWallet.owners.toArray()).find((el) => el.address.startsWith(prefix.slice(prefix.startsWith('0x') ? 2 : 0)))?.address
+  return (await dbWallet.owners.toArray()).find((el) =>
+    el.address.startsWith(prefix.slice(prefix.startsWith('0x') ? 2 : 0))
+  )?.address
 }
 
 export const getMicrochains = async (owner?: string) => {
-  const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter((el) => el.owner === owner)
-  return (await dbWallet.microchains.toArray()).filter((el1) => microchainOwners.findIndex((el) => el.microchain === el1.microchain) >= 0).map((el) => el.microchain)
+  const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter(
+    (el) => el.owner === owner
+  )
+  return (await dbWallet.microchains.toArray())
+    .filter(
+      (el1) =>
+        microchainOwners.findIndex((el) => el.microchain === el1.microchain) >=
+        0
+    )
+    .map((el) => el.microchain)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const authenticated = async (origin: string, method: RpcMethod) => {
-  return (await dbBase.rpcAuths.toArray()).find((el) => el.origin === origin && el.method === method)
+  return (await dbBase.rpcAuths.toArray()).find(
+    (el) => el.origin === origin && el.method === method
+  )
 }
 
-export const getRpcMicrochain = async (origin: string, publicKey: string): Promise<string | undefined> => {
-  return (await dbBase.rpcMicrochains.toArray()).find((el) => el.origin === origin && el.publicKey === publicKey)?.microchain
+export const getRpcMicrochain = async (
+  origin: string,
+  publicKey: string
+): Promise<string | undefined> => {
+  return (await dbBase.rpcMicrochains.toArray()).find(
+    (el) => el.origin === origin && el.publicKey === publicKey
+  )?.microchain
 }
 
 export const getRpcMicrochains = async (origin: string): Promise<string[]> => {
-  return (await dbBase.rpcMicrochains.toArray()).filter((el) => el.origin === origin).map((el) => el.microchain)
+  return (await dbBase.rpcMicrochains.toArray())
+    .filter((el) => el.origin === origin)
+    .map((el) => el.microchain)
 }
 
-export const getOriginPublicKeys = async (origin: string): Promise<string[]> => {
-  return (await dbBase.rpcMicrochains.toArray()).filter((el) => el.origin === origin).map((el) => el.publicKey).reduce((ids: string[], el): string[] => {
-    if (!ids.includes(el)) ids.push(el)
-    return ids
-  }, [])
+export const getOriginPublicKeys = async (
+  origin: string
+): Promise<string[]> => {
+  return (await dbBase.rpcMicrochains.toArray())
+    .filter((el) => el.origin === origin)
+    .map((el) => el.publicKey)
+    .reduce((ids: string[], el): string[] => {
+      if (!ids.includes(el)) ids.push(el)
+      return ids
+    }, [])
 }
 
 export const getRpcEndpoint = async () => {
-  const network = (await dbBase.networks.toArray()).find((el) => el.selected) as db.Network
+  const network = (await dbBase.networks.toArray()).find(
+    (el) => el.selected
+  ) as db.Network
   if (!network) return ''
-  return network.rpcSchema + '://' + network.host + ':' + network.port.toString()
+  return (
+    network.rpcSchema + '://' + network.host + ':' + network.port.toString()
+  )
 }
 
 export const getSubscriptionEndpoint = async () => {
-  const network = (await dbBase.networks.toArray()).find((el) => el.selected) as db.Network
+  const network = (await dbBase.networks.toArray()).find(
+    (el) => el.selected
+  ) as db.Network
   if (!network) return ''
   return network.wsSchema + '://' + network.host + ':' + network.port.toString()
 }

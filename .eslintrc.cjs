@@ -125,5 +125,11 @@ module.exports = {
 
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+
+    // TODO: Work around for prettier
+    'space-before-function-paren': 'off',
+
+    // For prettier curly fix
+    'curly': 'off'
   },
 }

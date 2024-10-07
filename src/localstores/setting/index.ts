@@ -2,52 +2,59 @@ import { defineStore } from 'pinia'
 import { HomeAction, Menu, Setting } from './types'
 
 export const useSettingStore = defineStore('settings', {
-  state: () => ({
-    SelectedSettingMenu: Menu.NETWORKS,
-    HomeAction: HomeAction.SHOW_MAIN
-  } as Setting),
+  state: () =>
+    ({
+      SelectedSettingMenu: Menu.NETWORKS,
+      HomeAction: HomeAction.SHOW_MAIN
+    } as Setting),
   getters: {
-    showHeaderMenu (): boolean {
+    showHeaderMenu(): boolean {
       return this.ShowHeaderMenu
     },
-    extensionMode (): boolean {
+    extensionMode(): boolean {
       return this.ExtensionMode
     },
-    showFooterMenu (): boolean {
+    showFooterMenu(): boolean {
       return this.ShowFooterMenu
     },
-    alignPageCenter (): boolean {
+    alignPageCenter(): boolean {
       return this.AlignPageCenter
     },
-    showSettingMenu (): boolean {
+    showSettingMenu(): boolean {
       return this.ShowSettingMenu
     },
-    selectedSettingMenu (): Menu {
+    selectedSettingMenu(): Menu {
       return this.SelectedSettingMenu
     },
-    homeAction (): HomeAction {
+    homeAction(): HomeAction {
       return this.HomeAction
     },
-    homeActionParams (): unknown {
+    homeActionParams(): unknown {
       return this.HomeActionParams
     },
-    creatingDefaultNetwork (): boolean {
+    creatingDefaultNetwork(): boolean {
       return this.CreatingDefaultNetwork
     },
-    creatingDefaultToken (): boolean {
+    creatingDefaultToken(): boolean {
       return this.CreatingDefaultToken
     },
-    basePath (): string {
+    basePath(): string {
       return this.ExtensionMode ? '/extension' : '/'
     },
-    formalizePath (): (path: string) => string {
+    formalizePath(): (path: string) => string {
       return (path: string) => {
-        path = path.slice(path.indexOf('/extension') + path.indexOf('/extension') >= 0 ? '/extension'.length : 0)
-        path = path.slice(path.indexOf('/') + path.indexOf('/') >= 0 ? '/'.length : 0)
+        path = path.slice(
+          path.indexOf('/extension') + path.indexOf('/extension') >= 0
+            ? '/extension'.length
+            : 0
+        )
+        path = path.slice(
+          path.indexOf('/') + path.indexOf('/') >= 0 ? '/'.length : 0
+        )
         return this.ExtensionMode ? '/extension/' + path : '/' + path
       }
     },
-    inPopupContext (): boolean {
+    inPopupContext(): boolean {
       return this.InPopupContext
     }
   },

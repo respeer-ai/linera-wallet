@@ -22,13 +22,17 @@ interface RpcRequestAttr {
   needChainId: boolean
 }
 
-const RpcRequestAttrs: Map<RpcMethod, RpcRequestAttr> = new Map<RpcMethod, RpcRequestAttr>(
+const RpcRequestAttrs: Map<RpcMethod, RpcRequestAttr> = new Map<
+  RpcMethod,
+  RpcRequestAttr
+>([
   [
-    [RpcMethod.ETH_SIGN, {
+    RpcMethod.ETH_SIGN,
+    {
       needChainId: false
-    }]
+    }
   ]
-)
+])
 
 const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!request) {
@@ -38,7 +42,10 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!query || !query.query) {
     return await Promise.reject('Invalid query')
   }
-  const microchain = await sharedStore.getRpcMicrochain(request.origin, query.publicKey)
+  const microchain = await sharedStore.getRpcMicrochain(
+    request.origin,
+    query.publicKey
+  )
   if (!microchain) {
     return Promise.reject(new Error('Invalid microchain'))
   }
@@ -59,27 +66,30 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
     return await Promise.reject('Invalid graphql endpoint')
   }
   if (query.applicationId) {
-    graphqlUrl += '/checko/chains/' + microchain + '/applications/' + query.applicationId
+    graphqlUrl +=
+      '/checko/chains/' + microchain + '/applications/' + query.applicationId
   }
   return new Promise((resolve, reject) => {
     axios({
       method: 'post',
       url: graphqlUrl,
       data: query.query
-    }).then((res) => {
-      if (!res.data) {
-        return reject('Invalid response')
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if ((res.data.errors as unknown[])?.length) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        return reject(new Error(JSON.stringify(res.data.errors)))
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      resolve(res.data.data)
-    }).catch((e) => {
-      reject(e)
     })
+      .then((res) => {
+        if (!res.data) {
+          return reject('Invalid response')
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if ((res.data.errors as unknown[])?.length) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          return reject(new Error(JSON.stringify(res.data.errors)))
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        resolve(res.data.data)
+      })
+      .catch((e) => {
+        reject(e)
+      })
   })
 }
 
@@ -102,17 +112,17 @@ export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
       if (!microchain) {
         return Promise.reject(new Error('Invalid microchain'))
       }
-      const _data = data as Record<string, Record<string, Record<string, string>>>
+      const _data = data as Record<
+        string,
+        Record<string, Record<string, string>>
+      >
       if (microchain !== _data.data.notifications.chain_id) {
         return
       }
-      void basebridge.EventBus.bridge?.send(
-        'linera_subscription',
-        {
-          subscriptionId,
-          payload: _data.data
-        } as subscription.SubscriptionPayload
-      )
+      void basebridge.EventBus.bridge?.send('linera_subscription', {
+        subscriptionId,
+        payload: _data.data
+      } as subscription.SubscriptionPayload)
     }
   )
   return await Promise.resolve(subscriptionId)
@@ -122,7 +132,11 @@ export const lineraGraphqlUnsubscribeHandler = async (request?: RpcRequest) => {
   if (!request) {
     return await Promise.reject('Invalid request')
   }
-  const subscriptionId = (request.request.params?.length ? (request.request.params as Json[])[0] : undefined) as string
+  const subscriptionId = (
+    request.request.params?.length
+      ? (request.request.params as Json[])[0]
+      : undefined
+  ) as string
   if (!subscriptionId) {
     return await Promise.reject(new Error('Invalid subscription id'))
   }
@@ -143,17 +157,19 @@ export const setupLineraSubscription = async () => {
   })
   const microchains = await sharedStore.getMicrochains()
   microchains.forEach((microchain) => {
-    client.request({
-      query: `subscription notifications($chainId: String!) {
+    client
+      .request({
+        query: `subscription notifications($chainId: String!) {
         notifications(chainId: $chainId)
       }`,
-      variables: {
-        chainId: microchain
-      }
-    }).subscribe({
-      next (data: unknown) {
-        subscription.Subscription.handle(data)
-      }
-    })
+        variables: {
+          chainId: microchain
+        }
+      })
+      .subscribe({
+        next(data: unknown) {
+          subscription.Subscription.handle(data)
+        }
+      })
   })
 }

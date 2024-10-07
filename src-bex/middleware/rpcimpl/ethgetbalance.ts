@@ -22,9 +22,13 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
   }
 
   const query = gql`
-    query getChainAccountBalances($chainIds: [String!]!, $publicKeys: [String!]!) {
+    query getChainAccountBalances(
+      $chainIds: [String!]!
+      $publicKeys: [String!]!
+    ) {
       balances(chainIds: $chainIds, publicKeys: $publicKeys)
-    }`
+    }
+  `
   return new Promise((resolve, reject) => {
     lineraGraphqlQueryHandler({
       origin: request.origin,
@@ -43,20 +47,28 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
           }
         } as JsonRpcParams
       } as JsonRpcRequest<JsonRpcParams>
-    }).then((result) => {
-      const balances = (result as Record<string, unknown>).balances as Record<string, unknown>
-      let balance = 0
-      Object.values(balances).forEach((_balance) => {
-        const __balance = _balance as Record<string, unknown>
-        balance += Number(__balance.chain_balance || 0)
-        const accountBalances = __balance.account_balances as Record<string, string>
-        Object.values(accountBalances).forEach((amount) => {
-          balance += Number(amount)
-        })
-      })
-      resolve(balance)
-    }).catch((e: Error) => {
-      reject(e)
     })
+      .then((result) => {
+        const balances = (result as Record<string, unknown>).balances as Record<
+          string,
+          unknown
+        >
+        let balance = 0
+        Object.values(balances).forEach((_balance) => {
+          const __balance = _balance as Record<string, unknown>
+          balance += Number(__balance.chain_balance || 0)
+          const accountBalances = __balance.account_balances as Record<
+            string,
+            string
+          >
+          Object.values(accountBalances).forEach((amount) => {
+            balance += Number(amount)
+          })
+        })
+        resolve(balance)
+      })
+      .catch((e: Error) => {
+        reject(e)
+      })
   })
 }

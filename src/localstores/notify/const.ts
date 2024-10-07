@@ -3,5 +3,5 @@ export enum NotifyType {
   Info = 'info',
   Warning = 'warning',
   Waiting = 'waiting',
-  Success = 'success',
+  Success = 'success'
 }

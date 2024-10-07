@@ -8,11 +8,7 @@
     "128": "icons/favicon.png"
   },
 
-  "permissions": [
-    "storage",
-    "tabs",
-    "activeTab"
-  ],
+  "permissions": ["storage", "tabs", "activeTab"],
   "host_permissions": [
     "http://localhost:8080/",
     "http://localhost:8081/",
@@ -33,8 +29,8 @@
   "content_scripts": [
     {
       "matches": ["file://*/*", "http://*/*", "https://*/*"],
-      "css": [ "assets/content.css" ],
-      "js": [ "content.js" ]
+      "css": ["assets/content.css"],
+      "js": ["content.js"]
     }
   ],
 
@@ -44,7 +40,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": [ "*" ],
+      "resources": ["*"],
       "matches": ["file://*/*", "http://*/*", "https://*/*"]
     }
   ]

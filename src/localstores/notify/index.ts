@@ -7,10 +7,10 @@ export const useNotificationStore = defineStore('notifications', {
   }),
   getters: {},
   actions: {
-    pushNotification (notification: Notification) {
+    pushNotification(notification: Notification) {
       this.Notifications.push(notification)
     },
-    popNotification (): Notification | undefined {
+    popNotification(): Notification | undefined {
       if (this.Notifications.length > 0) {
         const notification = this.Notifications[0]
         this.Notifications = this.Notifications.splice(0, 1)

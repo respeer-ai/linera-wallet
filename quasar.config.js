@@ -270,7 +270,7 @@ module.exports = configure(function (/* ctx */) {
     bex: {
       contentScripts: ['content'],
 
-      extendBexScriptsConf (esbuildConf) {
+      extendBexScriptsConf(esbuildConf) {
         esbuildConf.target = 'es2020'
         esbuildConf.define = {
           'process.version': JSON.stringify(process.version),
