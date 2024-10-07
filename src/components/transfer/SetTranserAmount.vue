@@ -4,7 +4,7 @@
     <div class='row text-center'>
       <q-space />
       <q-input
-        class='label-text-extra-large' dense v-model='amount' :style='{ width: inputWidth }'
+        class='label-text-extra-large text-right' dense v-model='amount' :style='{ width: inputWidth, minWidth: "16px", maxWidth: "calc(100% - 42px)" }'
         autofocus type='number'
       />
       <div class='label-text-extra-large page-item-x-margin-left'>
@@ -44,7 +44,7 @@
         class='btn full-width extra-margin-bottom'
         @click='onContinueClick'
         no-caps
-        :disable='amount === 0'
+        :disable='amount <= 0'
       />
     </div>
   </div>
@@ -78,10 +78,15 @@ const amount = defineModel<number>({ default: 0 })
 const fromChainBalance = defineModel<boolean>('fromChainBalance')
 
 watch(amount, () => {
+  if (amount.value.toString().startsWith('0.0')) {
+    if (!amount.value.toString().match(/[1-9]/)) {
+      return
+    }
+  }
   amount.value = Math.min(fromChainBalance.value ? chainTokenBalance.value : accountTokenBalance.value, Number(amount.value))
 })
 
-const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().length, 8), 1)) * 14).toString() + 'px')
+const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().length, 8), 1)) * 16).toString() + 'px')
 
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)
