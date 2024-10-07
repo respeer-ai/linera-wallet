@@ -24,8 +24,6 @@ const selectedNetwork = ref(undefined as unknown as db.Network)
 const microchains = defineModel<db.Microchain[]>('microchains')
 const defaultMicrochain = defineModel<db.Microchain>('defaultMicrochain')
 
-const microchainOwners = ref([] as db.MicrochainOwner[])
-
 const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const _microchains = useObservable<db.Microchain[]>(
@@ -62,10 +60,11 @@ const microchainsCount = async (): Promise<number> => {
   return await dbWallet.microchains.count()
 }
 
-const ownerMicrochains = (owner: string): db.Microchain[] => {
-  return microchains.value?.filter((microchain) => {
-    return microchainOwners.value.findIndex((el) => el.owner === owner && el.microchain === microchain.microchain) >= 0
-  }) || []
+const ownerMicrochains = async (offset: number, limit: number, owner: string, imported?: boolean): Promise<db.Microchain[]> => {
+  const microchainOwners = await dbWallet.microchainOwners.where('owner').equals(owner).toArray()
+  return (await dbWallet.microchains.offset(offset).limit(limit).toArray()).filter((microchain) => {
+    return microchainOwners.findIndex((el) => el.owner === owner && el.microchain === microchain.microchain) >= 0 && (!imported || microchain.imported)
+  })
 }
 
 const microchainOwner = async (microchain: string): Promise<db.Owner | undefined> => {

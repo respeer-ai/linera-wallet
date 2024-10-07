@@ -52,32 +52,52 @@
     </div>
     <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='nativeTokenId' />
     <DbTokenBridge ref='dbTokenBridge' />
+    <DbOwnerBridge v-model:selected-owner='selectedOwner' ref='dbOwnerBridge' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
+import { db } from 'src/model'
 
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
+import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
+const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
 const nativeTokenId = ref(0)
+const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const router = useRouter()
-
-onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
-})
 
 const onTransferClick = () => {
   void router.push({ path: localStore.setting.formalizePath('/transfer') })
 }
+
+const getBalance = async () => {
+  if (!selectedOwner.value) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 0
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const balance = await dbOwnerBridge.value?.ownerBalance(selectedOwner.value, nativeTokenId)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  tokenBalance.value = balance?.tokenBalance || 0
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  usdBalance.value = balance?.usdBalance || 0
+}
+
+watch(selectedOwner, async () => {
+  await getBalance()
+})
+
+onMounted(async () => {
+  await getBalance()
+})
 
 </script>

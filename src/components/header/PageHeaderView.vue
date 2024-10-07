@@ -114,7 +114,7 @@
     <NetworkSelector v-model='selectedNetwork' @selected='onNetworkSelected' @add='onAddNetwork' />
   </q-dialog>
   <q-dialog v-model='selectingOwner'>
-    <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' />
+    <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' :persistent='true' />
   </q-dialog>
   <q-dialog v-model='displayingOwnerDetail'>
     <AccountDetailView :owner='selectedOwner' @canceled='onAccountDetailCanceled' @done='onAccountDetailDone' />

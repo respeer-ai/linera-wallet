@@ -3,6 +3,8 @@
   <PasswordBridge v-model:password='password' />
   <MicrochainBridge ref='microchainBridge' v-model:microchains='microchains' />
   <MicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
+  <MicrochainBalanceBridge ref='microchainBalanceBridge' />
+  <MicrochainOwnerBalanceBridge ref='microchainOwnerBalanceBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -16,6 +18,8 @@ import NetworkBridge from './NetworkBridge.vue'
 import PasswordBridge from './PasswordBridge.vue'
 import MicrochainBridge from './MicrochainBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
+import MicrochainBalanceBridge from './MicrochainBalanceBridge.vue'
+import MicrochainOwnerBalanceBridge from './MicrochainOwnerBalanceBridge.vue'
 
 const selectedNetwork = ref(undefined as unknown as db.Network)
 const password = ref(undefined as unknown as string)
@@ -26,10 +30,12 @@ const owners = defineModel<db.Owner[]>('owners')
 const selectedOwner = defineModel<db.Owner>('selectedOwner')
 
 const microchainBridge = ref<InstanceType<typeof MicrochainBridge>>()
+const microchainBalanceBridge = ref<InstanceType<typeof MicrochainBalanceBridge>>()
+const microchainOwnerBalanceBridge = ref<InstanceType<typeof MicrochainOwnerBalanceBridge>>()
 
 const _owners = useObservable<db.Owner[]>(
   liveQuery(async () => {
-    return await dbWallet.owners.toArray()
+    return [...await dbWallet.owners.toArray()]
   }) as never
 )
 
@@ -77,12 +83,22 @@ const deleteOwner = async (id: number) => {
   await dbWallet.owners.delete(id)
 }
 
-const ownerBalance = (owner: db.Owner) => {
-  const balance = microchainOwners.value.filter((el) => el.owner === owner.owner).reduce((sum) => sum + 0, 0)
+const ownerBalance = async (owner: db.Owner, tokenId: number): Promise<{tokenBalance: number, usdBalance: number}> => {
+  const token = await dbBase.tokens.get(tokenId)
+  if (!token) return Promise.reject('Invalid token')
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const microchains = microchainBridge.value?.ownerMicrochains(owner.owner) || []
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  return balance + microchains.reduce((sum) => sum + 0, 0) || 0
+  const microchains = await microchainBridge.value?.ownerMicrochains(0, 1000, owner.owner, true) || []
+
+  let balance = 0
+  for (const microchain of microchains) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    balance += (await microchainBalanceBridge.value?.microchainFungibleTokenBalance(microchain, tokenId))?.balance || 0
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    balance += (await microchainOwnerBalanceBridge.value?.microchainOwnerFungibleTokenBalance(microchain.microchain, owner.owner, tokenId))?.balance || 0
+  }
+
+  return { tokenBalance: balance, usdBalance: balance * (token?.usdCurrency || 0) }
 }
 
 const getOwnerWithPublicKey = async (publicKey: string) => {

@@ -23,3 +23,4 @@ yarn.lock
 wasm
 .quasar
 src-bex/wasm
+src/router/index.ts

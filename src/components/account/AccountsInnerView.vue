@@ -35,12 +35,12 @@
           <div class='row'>
             <q-space />
             <span>$</span>
-            <strong class='text-grey-9'>{{ ownerBridge?.ownerBalance(_owner).toFixed(2) }}</strong>
+            <strong class='text-grey-9'>{{ ownerUsdBalances.get(_owner.address)?.toFixed(2) }}</strong>
             <span class='text-grey-6 header-items-margin-x-left'>USD</span>
           </div>
           <div class='row'>
             <q-img :src='lineraLogo' width='18px' height='18px' />
-            <span class='text-grey-9 selector-item-currency-sub header-items-margin-x-left'>{{ ownerBridge?.ownerBalance(_owner).toFixed(4) }}</span>
+            <span class='text-grey-9 selector-item-currency-sub header-items-margin-x-left'>{{ ownerBalances.get(_owner.address)?.toFixed(4) }}</span>
             <span class='text-grey-6 selector-item-currency-sub header-items-margin-x-left'>TLINERA</span>
           </div>
         </div>
@@ -51,14 +51,16 @@
     </q-list>
   </div>
   <OwnerBridge ref='ownerBridge' v-model:owners='owners' v-model:selected-owner='owner' />
+  <TokenBridge ref='tokenBridge' />
 </template>
 
 <script setup lang='ts'>
-import { computed, ref, toRef } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { db } from 'src/model'
 import { shortid } from 'src/utils'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
+import TokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
 
@@ -86,7 +88,11 @@ const displayOwners = computed(() => owners.value.filter((el) => {
   return el.name.includes(searchText.value) || el.address.includes(searchText.value)
 }))
 
+const ownerBalances = ref(new Map<string, number>())
+const ownerUsdBalances = ref(new Map<string, number>())
+
 const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
+const tokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
 const onActionClick = (owner: db.Owner) => {
   // TODO
@@ -102,5 +108,18 @@ const onOwnerSelected = async (_owner: db.Owner) => {
   }
   emit('selected', _owner)
 }
+
+watch(owners, async () => {
+  for (const _owner of owners.value) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const token = await tokenBridge.value?.nativeToken() as db.Token
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+    const balance = await ownerBridge.value?.ownerBalance(_owner, token?.id || 0)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    ownerBalances.value.set(_owner.address, balance?.tokenBalance || 0)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    ownerUsdBalances.value.set(_owner.address, balance?.usdBalance || 0)
+  }
+})
 
 </script>

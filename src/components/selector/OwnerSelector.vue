@@ -38,7 +38,8 @@ interface Props {
   persistent?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
-  creatable: true
+  creatable: true,
+  persistent: true
 })
 const creatable = toRef(props, 'creatable')
 const persistent = toRef(props, 'persistent')

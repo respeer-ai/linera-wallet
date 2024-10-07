@@ -157,11 +157,12 @@ const onSynchronizeMicrochainsClick = () => {
 const loadMicrochainsRecursive = async (total: number, offset: number, limit: number) => {
   if (offset >= total) return
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  microchains.value.push(...(await dbMicrochainBridge.value?.getMicrochains(offset, limit, true)) || [])
+  microchains.value.push(...(await dbMicrochainBridge.value?.ownerMicrochains(offset, limit, selectedOwner.value?.owner, true)) || [])
   void loadMicrochainsRecursive(total, offset + limit, limit)
 }
 
 const loadMicrochains = async () => {
+  if (!selectedOwner.value) return
   microchains.value = []
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const count = (await dbMicrochainBridge.value?.microchainsCount()) as number || 0
@@ -182,6 +183,10 @@ watch(microchainsImportState, async () => {
     case localStore.settingDef.MicrochainsImportState.MicrochainsImported:
       await loadMicrochains()
   }
+})
+
+watch(selectedOwner, async () => {
+  await loadMicrochains()
 })
 
 </script>
