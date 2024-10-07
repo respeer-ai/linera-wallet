@@ -27,7 +27,9 @@ const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
 const selectedNetwork = ref(undefined as unknown as db.Network)
 const networkId = computed(() => selectedNetwork.value?.id)
 
-watch(networkId, async () => {
+watch(networkId, async (newValue) => {
+  if (newValue === networkId.value) return
+
   localStore.setting.MicrochainsImportState = localStore.settingDef.MicrochainsImportState.MicrochainsImporting
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
