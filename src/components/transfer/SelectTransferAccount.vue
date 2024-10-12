@@ -172,13 +172,13 @@
     <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='true' />
   </q-dialog>
   <q-dialog v-model='selectingFromMicrochain'>
-    <MicrochainSelector v-model='selectedFromMicrochain' @selected='onFromMicrochainSelected' />
+    <MicrochainSelector :owner='selectedFromOwner?.owner' v-model='selectedFromMicrochain' @selected='onFromMicrochainSelected' />
   </q-dialog>
   <q-dialog v-model='selectingToOwner'>
     <OwnerSelector v-model='selectedToOwner' @selected='onToOwnerSelected' :creatable='false' :persistent='false' />
   </q-dialog>
   <q-dialog v-model='selectingToMicrochain'>
-    <MicrochainSelector v-model='selectedToMicrochain' @selected='onToMicrochainSelected' />
+    <MicrochainSelector :owner='selectedToOwner?.owner' v-model='selectedToMicrochain' @selected='onToMicrochainSelected' />
   </q-dialog>
 </template>
 

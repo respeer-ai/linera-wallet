@@ -5,7 +5,7 @@
         <OwnerSelector v-model='owner' />
       </div>
       <div v-if='step === 2' class='full-height'>
-        <MicrochainSelector v-model='microchain' />
+        <MicrochainSelector :owner='owner?.owner' v-model='microchain' />
       </div>
       <div v-if='step === 3' class='full-height page-x-padding'>
         <div class='selector-y-padding'>

@@ -24,7 +24,7 @@
       </div>
     </div>
   </div>
-  <MicrochainBridge v-model:microchains='microchains' />
+  <MicrochainBridge :owner='owner' v-model:microchains='microchains' />
 </template>
 
 <script setup lang='ts'>
@@ -38,18 +38,21 @@ interface Props {
   searchable: boolean
   showIndicator?: boolean
   xPadding?: string
-  showSelected?: boolean
+  showSelected?: boolean,
+  owner?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   searchable: true,
   showIndicator: true,
   xPadding: '0',
-  showSelected: false
+  showSelected: false,
+  owner: undefined
 })
 const searchable = toRef(props, 'searchable')
 const showIndicator = toRef(props, 'showIndicator')
 const xPadding = toRef(props, 'xPadding')
 const showSelected = toRef(props, 'showSelected')
+const owner = toRef(props, 'owner')
 
 const microchains = ref([] as db.Microchain[])
 const searchText = ref('')
