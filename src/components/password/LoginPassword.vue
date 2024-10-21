@@ -74,7 +74,7 @@ const onUnlockClick = () => {
 const router = useRouter()
 
 const onForgetPasswordClick = () => {
-  void router.push({ path: '/resetwallet' })
+  void router.push({ path: localStore.setting.formalizePath('/resetwallet') })
 }
 
 </script>

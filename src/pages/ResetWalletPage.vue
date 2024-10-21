@@ -1,9 +1,9 @@
 <template>
-  <ImportWallet :reset='true' />
+  <ResetWallet />
 </template>
 
 <script setup lang='ts'>
 
-import ImportWallet from 'src/components/wallet/ImportWallet.vue'
+import ResetWallet from 'src/components/wallet/ResetWallet.vue'
 
 </script>

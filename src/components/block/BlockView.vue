@@ -122,7 +122,11 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   if (!owners?.length) return
 
   const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
-  await updateChainAccountBalances(microchain, publicKeys)
+  try {
+    await updateChainAccountBalances(microchain, publicKeys)
+  } catch (error) {
+    console.log('Failed update chain account balances', error)
+  }
 
   await updateChainAccountBalances(microchain, publicKeys)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

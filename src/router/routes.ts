@@ -119,10 +119,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'resetwallet',
-        component: () => import('pages/ResetWalletPage.vue'),
-        meta: {
-          ExtensionMode: false
-        }
+        component: () => import('pages/ResetWalletPage.vue')
       },
       {
         path: 'importwallet',

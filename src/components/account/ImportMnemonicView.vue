@@ -1,7 +1,7 @@
 <template>
   <div class='fill-parent text-center onboarding-content'>
     <h5 class='onboarding-page-title'>
-      Access your wallet with<br>secret recovery phrase
+      Access your wallet with secret<br>recovery phrase
     </h5>
     <div>
       CheCko cannot recover your wallet. We will use your secret recovery phrase to validate your ownership, restore your wallet and setup a new password.
