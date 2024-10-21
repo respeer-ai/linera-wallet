@@ -163,8 +163,7 @@ const deviceFingerPrint = (): string => {
           ${parser.getDevice().type || ''},
           ${parser.getDevice().vendor || ''},
           ${parser.getEngine().name || ''},
-          ${parser.getOS().name || ''},
-          ${parser.getUA()}`
+          ${parser.getOS().name || ''}`
 }
 
 export const decryptPassword = (password: Password): string => {

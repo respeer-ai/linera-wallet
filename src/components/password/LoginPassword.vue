@@ -17,7 +17,7 @@
         </div>
         <q-btn
           flat
-          class='btn full-width  vertical-sections-margin'
+          class='btn full-width vertical-sections-margin'
           label='Unlock'
           @click='onUnlockClick'
           :disable='password.length < 8 || passwordError'
@@ -26,6 +26,7 @@
         <q-btn
           flat
           dense
+          rounded
           class='text-blue-6 full-width'
           label='Forget password?'
           @click='onForgetPasswordClick'
@@ -41,6 +42,7 @@
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { localStore } from 'src/localstores'
+import { useRouter } from 'vue-router'
 
 import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
@@ -54,6 +56,7 @@ const emit = defineEmits(['unlocked'])
 const passwordError = ref(false)
 
 const unlock = () => {
+  console.log(password.value, 111, decryptedPassword.value)
   if (password.value === decryptedPassword.value) return emit('unlocked')
   localStore.notification.pushNotification({
     Title: 'Restore Wallet',
@@ -68,8 +71,10 @@ const onUnlockClick = () => {
   unlock()
 }
 
+const router = useRouter()
+
 const onForgetPasswordClick = () => {
-  // TODO: help user to reload private key again
+  void router.push({ path: '/resetwallet' })
 }
 
 </script>

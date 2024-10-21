@@ -62,6 +62,13 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'recovery',
         component: () => import('pages/RecoveryPage.vue')
+      },
+      {
+        path: 'resetwallet',
+        component: () => import('pages/ResetWalletPage.vue'),
+        meta: {
+          ExtensionMode: false
+        }
       }
     ]
   },
@@ -108,6 +115,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/RecoveryPage.vue'),
         meta: {
           ShowHeaderMenu: false
+        }
+      },
+      {
+        path: 'resetwallet',
+        component: () => import('pages/ResetWalletPage.vue'),
+        meta: {
+          ExtensionMode: false
         }
       },
       {

@@ -1,10 +1,10 @@
 <template>
-  <div class='fill-parent text-center'>
+  <div class='fill-parent text-center onboarding-content'>
     <h5 class='onboarding-page-title'>
-      Access your wallet with secret recovery phrase
+      Access your wallet with<br>secret recovery phrase
     </h5>
     <div>
-      CheCko cannot recover your password. We will use your secret recovery phrase to validate your ownership, restore your wallet and setup a new password.
+      CheCko cannot recover your wallet. We will use your secret recovery phrase to validate your ownership, restore your wallet and setup a new password.
     </div>
     <div class='text-left full-width tip info info-bg text-grey-8 row vertical-sections-margin'>
       <q-icon name='bi-info-circle-fill' color='green-4' size='20px' />

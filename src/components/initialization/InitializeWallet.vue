@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "full-width text-center onboarding-container", localStore.setting.extensionMode ? "onboarding-stepper-narrow-padding" : "onboarding-stepper-padding" ]'>
+  <div :class='[ "full-width text-center onboarding-container", localStore.setting.extensionMode ? "" : "onboarding-stepper-padding" ]'>
     <q-stepper
       flat
       v-model='step'

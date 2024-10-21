@@ -1,13 +1,16 @@
 <template>
-  <div class='full-width text-center flex items-center justify-center'>
+  <div class='full-width text-center flex items-center justify-center onboarding-content'>
     <h5 class='onboarding-page-title'>
-      Create password
+      Reset password
     </h5>
     <p>
-      This password will unlock your CheCko wallet only on this device. CheCko can not recover this password.
+      CheCko never store your password anywhere outside the wallet. If you really lose your password, the only way is to create a new password, then import your wallet with mnemonic or private keys.
+    </p>
+    <p>
+      Before you continue, please make sure you have stored all of your account materials outside the wallet properly.
     </p>
     <NewPasswordInputView v-model:password='password' v-model:error='error' />
-    <p class='text-center' :style='{margin: "24px 0 0 0"}'>
+    <p class='text-center vertical-sections-margin text-grey-6'>
       By continue you understand CheCko cannot recover this password. <a href='#'>Learn more</a>
     </p>
   </div>

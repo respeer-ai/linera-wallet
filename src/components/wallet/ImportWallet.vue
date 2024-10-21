@@ -1,43 +1,54 @@
 <template>
-  <div :class='[ "text-center onboarding-container", localStore.setting.extensionMode ? "onboarding-stepper-narrow-padding" : "onboarding-stepper-padding" ]'>
-    <q-stepper
-      flat
-      v-model='step'
-      active-color='brown-8'
-      inactive-color='brown-4'
-      done-color='green-6'
-      animated
-      alternative-labels
-      header-class='hide'
-    >
-      <q-step
-        :name='1'
-        title='Create Password'
-        :done='step > 1'
+  <div :class='[ "text-center onboarding-container", localStore.setting.extensionMode ? "" : "onboarding-stepper-padding" ]'>
+    <div class='bg-white shadow-1'>
+      <q-stepper
+        flat
+        v-model='step'
+        active-color='brown-8'
+        inactive-color='brown-4'
+        done-color='green-6'
+        animated
+        alternative-labels
+        header-class='hide'
       >
-        <NewPassword v-model:password='password' v-model:error='passwordError' />
-      </q-step>
-      <q-step
-        :name='2'
-        title='Import Account'
-        :done='step > 2'
-      >
-        <ImportMnemonicView v-model='mnemonic' />
-      </q-step>
-    </q-stepper>
-    <div class='full-width row'>
-      <q-space />
-      <div class='onboarding-btns'>
-        <q-btn
-          flat
-          class='btn full-width'
-          :label='btnText'
-          :disable='!canGotoNext()'
-          @click='onNextStepClick'
-          no-caps
-        />
+        <q-step
+          :name='1'
+          title='Create Password'
+          :done='step > 1'
+        >
+          <div class='row'>
+            <q-space />
+            <ResetPassword v-if='reset' v-model:password='password' v-model:error='passwordError' />
+            <NewPassword v-else v-model:password='password' v-model:error='passwordError' />
+            <q-space />
+          </div>
+        </q-step>
+        <q-step
+          :name='2'
+          title='Import Account'
+          :done='step > 2'
+        >
+          <div class='row'>
+            <q-space />
+            <ImportMnemonicView v-model='mnemonic' />
+            <q-space />
+          </div>
+        </q-step>
+      </q-stepper>
+      <div class='full-width row'>
+        <q-space />
+        <div class='onboarding-btns extra-large-margin-bottom'>
+          <q-btn
+            flat
+            class='btn full-width'
+            :label='btnText'
+            :disable='!canGotoNext()'
+            @click='onNextStepClick'
+            no-caps
+          />
+        </div>
+        <q-space />
       </div>
-      <q-space />
     </div>
   </div>
   <GenerateKey ref='generateKey' />
@@ -46,15 +57,24 @@
 </template>
 
 <script setup lang='ts'>
-import { ref, computed } from 'vue'
+import { ref, computed, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
 
-import NewPassword from 'src/components/password/NewPassword.vue'
+import NewPassword from '../password/NewPassword.vue'
+import ResetPassword from '../password/ResetPassword.vue'
 import ImportMnemonicView from '../account/ImportMnemonicView.vue'
 import GenerateKey from '../account/GenerateKey.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
+
+interface Props {
+  reset?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  reset: true
+})
+const reset = toRef(props, 'reset')
 
 const step = ref(1)
 const password = ref('')
