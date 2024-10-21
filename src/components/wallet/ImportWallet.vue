@@ -1,6 +1,6 @@
 <template>
   <div :class='[ "text-center onboarding-container", localStore.setting.extensionMode ? "" : "onboarding-stepper-padding" ]'>
-    <div class='bg-white shadow-1'>
+    <div class='bg-white'>
       <q-stepper
         flat
         v-model='step'
@@ -37,7 +37,7 @@
       </q-stepper>
       <div class='full-width row'>
         <q-space />
-        <div class='onboarding-btns extra-large-margin-bottom'>
+        <div class='onboarding-btns extra-large-margin-bottom page-x-padding'>
           <q-btn
             flat
             class='btn full-width'
@@ -72,7 +72,7 @@ interface Props {
   reset?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
-  reset: true
+  reset: false
 })
 const reset = toRef(props, 'reset')
 

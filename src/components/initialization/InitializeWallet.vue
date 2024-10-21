@@ -33,7 +33,7 @@
         <ValidateAccount :mnemonic='mnemonic' v-model='mnemonicValid' />
       </q-step>
     </q-stepper>
-    <div v-if='!showInnerActionBtn' class='row'>
+    <div v-if='!showInnerActionBtn' class='row page-x-padding'>
       <q-space />
       <div class='onboarding-btns row'>
         <q-btn
