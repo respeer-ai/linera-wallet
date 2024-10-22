@@ -275,19 +275,19 @@ export enum ApplicationType {
 
 export interface NamedApplication {
   id?: number
-  application_type: ApplicationType
+  applicationType: ApplicationType
   name: string
-  application_id: string
+  applicationId: string
 }
 
 export const defaultNamedApplications = [
   {
-    application_type: ApplicationType.SWAP,
+    applicationType: ApplicationType.SWAP,
     name: 'swap',
-    application_id: 'd95aa6a5f476326496a8ff23a20d3626726853f90f89adfd3692065bc1bff813365a265926d69564a9c9e1e02de9d8c4a809996e1cca9ec6ec0fe2fa9851b4fffeeeed172c74027e2675311c4ec3239dbe8e4b4fcf46b12e6f775523a002d64e010000000000000000000000'
+    applicationId: 'd95aa6a5f476326496a8ff23a20d3626726853f90f89adfd3692065bc1bff813365a265926d69564a9c9e1e02de9d8c4a809996e1cca9ec6ec0fe2fa9851b4fffeeeed172c74027e2675311c4ec3239dbe8e4b4fcf46b12e6f775523a002d64e010000000000000000000000'
   }, {
-    application_type: ApplicationType.WLINERA,
-    name: 'swap',
-    application_id: '07429a45a514b25c431c5fd1bdbcb13628992dd3f865a61505286f9340690806180cf9c01f40b4686b5b8b83c036acfa55796d03438e06e31b70f3653498ea5ca393137daba303e8b561cb3a5bff50efba1fb7f24950db28f1844b7ac2c1cf27010000000000000000000000'
+    applicationType: ApplicationType.WLINERA,
+    name: 'wlinera',
+    applicationId: '07429a45a514b25c431c5fd1bdbcb13628992dd3f865a61505286f9340690806180cf9c01f40b4686b5b8b83c036acfa55796d03438e06e31b70f3653498ea5ca393137daba303e8b561cb3a5bff50efba1fb7f24950db28f1844b7ac2c1cf27010000000000000000000000'
   }
 ] as NamedApplication[]

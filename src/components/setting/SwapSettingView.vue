@@ -59,17 +59,17 @@ const nameApplications = ref([] as db.NamedApplication[])
 
 const editingSwapApplication = ref(false)
 const editingWlineraApplication = ref(false)
-const swapApplication = computed(() => nameApplications.value.find((el) => el.application_type === db.ApplicationType.SWAP))
-const wlineraApplication = computed(() => nameApplications.value.find((el) => el.application_type === db.ApplicationType.WLINERA))
-const swapApplicationId = ref(swapApplication.value?.application_id)
-const wlineraApplicationId = ref(wlineraApplication.value?.application_id)
+const swapApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.SWAP))
+const wlineraApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.WLINERA))
+const swapApplicationId = ref(swapApplication.value?.applicationId)
+const wlineraApplicationId = ref(wlineraApplication.value?.applicationId)
 
 watch(swapApplication, () => {
-  swapApplicationId.value = swapApplication.value?.application_id
+  swapApplicationId.value = swapApplication.value?.applicationId
 })
 
 watch(wlineraApplication, () => {
-  wlineraApplicationId.value = wlineraApplication.value?.application_id
+  wlineraApplicationId.value = wlineraApplication.value?.applicationId
 })
 
 const namedApplicationBridge = ref<InstanceType<typeof NamedApplicationBridge>>()

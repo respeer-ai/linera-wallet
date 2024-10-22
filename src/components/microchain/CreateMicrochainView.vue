@@ -55,6 +55,8 @@ const createMicrochain = async (): Promise<db.Microchain> => {
         Popup: true,
         Type: localStore.notify.NotifyType.Info
       })
+      // TODO: request SWAP and WLINERA application
+      // TODO: subscribe SWAP and WLINERA application
       resolve(microchain)
     }).catch((error) => {
       localStore.notification.pushNotification({
