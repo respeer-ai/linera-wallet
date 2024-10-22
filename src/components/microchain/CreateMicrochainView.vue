@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-unsafe-assignment -->
 <template>
   <div class='full-width'>
     <q-stepper
@@ -24,6 +25,8 @@
       </q-step>
     </q-stepper>
     <OpenChain ref='openChain' />
+    <RpcOperationBridge ref='rpcOperationBridge' />
+    <DbNamedApplicationBridge ref='dbNamedApplicationBridge' />
   </div>
 </template>
 
@@ -35,8 +38,12 @@ import { localStore } from 'src/localstores'
 import OpenChain from './OpenChain.vue'
 import MicrochainCreationView from './MicrochainCreationView.vue'
 import ValidateMicrochainView from './ValidateMicrochainView.vue'
+import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
+import DbNamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
 
 const openChain = ref<InstanceType<typeof OpenChain>>()
+const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
+const dbNamedApplicationBridge = ref<InstanceType<typeof DbNamedApplicationBridge>>()
 
 const createdMicrochain = ref(undefined as unknown as db.Microchain)
 const step = ref(1)
@@ -48,15 +55,24 @@ const emit = defineEmits<{(ev: 'created', value: db.Microchain): void,
 const createMicrochain = async (): Promise<db.Microchain> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    openChain.value?.openMicrochain().then((microchain: db.Microchain) => {
+    openChain.value?.openMicrochain().then(async (microchain: db.Microchain) => {
       localStore.notification.pushNotification({
         Title: 'Open chain',
         Message: 'Success open microchain.',
         Popup: true,
         Type: localStore.notify.NotifyType.Info
       })
-      // TODO: request SWAP and WLINERA application
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+      let namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
+      if (!namedApplication) return
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      rpcOperationBridge.value?.requestApplication(namedApplication.creatorChain, namedApplication.applicationId, microchain.microchain)
       // TODO: subscribe SWAP and WLINERA application
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+      namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
+      if (!namedApplication) return
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      rpcOperationBridge.value?.requestApplication(namedApplication.creatorChain, namedApplication.applicationId, microchain.microchain)
       resolve(microchain)
     }).catch((error) => {
       localStore.notification.pushNotification({
