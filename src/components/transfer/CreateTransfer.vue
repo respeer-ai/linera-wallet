@@ -55,7 +55,7 @@
     </div>
     <q-space />
   </q-card>
-  <RpcTransferBridge ref='rpcTransferBridge' />
+  <RpcOperationBridge ref='rpcOperationBridge' />
   <DbMicrochainBridge ref='dbMicrochainBridge' />
 </template>
 
@@ -68,7 +68,7 @@ import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
 import ConfirmTransfer from './ConfirmTransfer.vue'
-import RpcTransferBridge from '../bridge/rpc/TransferBridge.vue'
+import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
 
 interface Query {
   fromMicrochainId: string
@@ -90,7 +90,7 @@ const toChainBalance = ref(false)
 const amount = ref(0)
 
 const router = useRouter()
-const rpcTransferBridge = ref<InstanceType<typeof RpcTransferBridge>>()
+const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
 const onSelectTransferAccountNext = () => {
@@ -108,7 +108,7 @@ const onBackClick = () => {
 
 const onTransferConfirmed = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcTransferBridge.value?.transferV1(
+  await rpcOperationBridge.value?.transfer(
     fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
     selectedFromMicrochain.value?.microchain,
     toChainBalance.value ? undefined : selectedToOwner.value?.address,
