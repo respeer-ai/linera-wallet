@@ -5,7 +5,15 @@ export const SettingMenus = [
     icon: 'bi-plugin',
     label: 'Networks',
     menu: Menu.NETWORKS,
-    disable: false
+    disable: false,
+    separator: true
+  },
+  {
+    icon: 'bi-box-seam',
+    label: 'Swap',
+    menu: Menu.SWAP_AND_WLINERA,
+    disable: false,
+    separator: true
   },
   {
     icon: 'bi-view-list',

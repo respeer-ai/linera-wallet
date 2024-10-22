@@ -39,6 +39,9 @@ export const useSettingStore = defineStore('settings', {
     creatingDefaultToken(): boolean {
       return this.CreatingDefaultToken
     },
+    creatingDefaultNamedApplication(): boolean {
+      return this.CreatingDefaultNamedApplication
+    },
     basePath(): string {
       return this.ExtensionMode ? '/extension' : '/'
     },

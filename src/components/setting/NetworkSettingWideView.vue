@@ -1,7 +1,12 @@
 <template>
   <div class='full-width full-height'>
     <div class='row setting-header'>
-      <div>Networks</div>
+      <div class='flex items-center justify-center'>
+        <q-icon name='bi-plugin' size='16px' />
+      </div>
+      <div class='page-item-x-margin-left'>
+        Networks
+      </div>
       <q-space />
       <q-btn
         dense flat class='btn' no-caps

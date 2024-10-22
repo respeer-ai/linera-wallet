@@ -2,6 +2,7 @@ import { MicrochainsImportState } from './const'
 
 export enum Menu {
   NETWORKS = 'Networks',
+  SWAP_AND_WLINERA = 'SwapAndWlinera',
   ABOUT_US = 'AboutUs',
   STORAGE = 'Storage',
   ACCOUNTS = 'Accounts',
@@ -28,6 +29,7 @@ export interface Setting {
 
   CreatingDefaultNetwork: boolean
   CreatingDefaultToken: boolean
+  CreatingDefaultNamedApplication: boolean
 
   InPopupContext: boolean
 
