@@ -12,7 +12,7 @@ const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation openChain ($publicKey: String!) {
+    mutation openChain ($publicKey: PublicKey!) {
       claim(publicKey: $publicKey) {
         messageId
         chainId
@@ -40,7 +40,7 @@ const initMicrochainStore = async (keyPair: Ed25519SigningKey, chainId: string, 
   const signature = _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation walletInitWithoutKeypair ($publicKey: String!, $signature: String!, $faucetUrl: String!, $chainId: String!, $messageId: String!, $certificateHash: String!) {
+    mutation walletInitWithoutKeypair ($publicKey: PublicKey!, $signature: Signature!, $faucetUrl: String!, $chainId: ChainId!, $messageId: MessageId!, $certificateHash: CryptoHash!) {
       walletInitWithoutKeypair(publicKey: $publicKey, signature: $signature, faucetUrl: $faucetUrl, chainId: $chainId, messageId: $messageId, certificateHash: $certificateHash)
     }`))
   return await mutate({
@@ -58,7 +58,7 @@ const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query chainsWithPublicKey ($publicKey: String!) {
+    query chainsWithPublicKey ($publicKey: PublicKey!) {
       chainsWithPublicKey(publicKey: $publicKey) {
         list
         default

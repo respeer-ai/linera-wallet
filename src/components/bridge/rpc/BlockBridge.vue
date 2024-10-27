@@ -12,7 +12,7 @@ const getPendingRawBlock = async (chainId: string) => {
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query getPendingRawBlock($chainId: String!) {
+    query getPendingRawBlock($chainId: ChainId!) {
       peekCandidateRawBlockPayload(chainId: $chainId) {
         height
         payloadBytes
@@ -42,7 +42,7 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation submitBlockSignature ($chainId: String!, $height: Int!, $signature: String!) {
+    mutation submitBlockSignature ($chainId: ChainId!, $height: BlockHeight!, $signature: Signature!) {
       submitBlockSignature(chainId: $chainId, height: $height, signature: $signature)
     }`))
   return await mutate({
@@ -57,7 +57,7 @@ const submitBlockAndSignature = async (chainId: string, height: number, executed
   const apolloClient = new ApolloClient(options)
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation submitBlockAndSignature ($chainId: String!, $height: Int!, $executedBlock: UserExecutedBlock!, $round: Round!, $signature: String!) {
+    mutation submitBlockAndSignature ($chainId: ChainId!, $height: BlockHeight!, $executedBlock: UserExecutedBlock!, $round: Round!, $signature: Signature!) {
       submitBlockAndSignature(chainId: $chainId, height: $height, executedBlock: $executedBlock, round: $round, signature: $signature)
     }`))
   return await mutate({
@@ -92,7 +92,7 @@ const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => vo
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ stop, onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(gql`
-    subscription notifications($chainId: String!) {
+    subscription notifications($chainId: ChainId!) {
       notifications(chainId: $chainId)
     }
   `, {
@@ -129,7 +129,7 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query block($chainId: String!, $hash: String!) {
+    query block($chainId: ChainId!, $hash: CryptoHash!) {
       block(chainId: $chainId, hash: $hash) {
         hash
         value {

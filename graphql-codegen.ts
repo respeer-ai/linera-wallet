@@ -2,9 +2,17 @@
 import { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  schema: './wasm/linera-protocol/linera-service-graphql-client/gql/*.graphql',
+  overwrite: true,
   generates: {
-    './dist/__generated__/graphql/graphql.ts': {
+    './dist/__generated__/graphql/service/': {
+      schema: 'http://172.16.31.73:30080',
+      documents: ['src/graphql/service.ts'],
+      preset: 'client',
+      plugins: []
+    },
+    './dist/__generated__/graphql/faucet/': {
+      schema: 'http://172.16.31.73:40080',
+      documents: ['src/graphql/faucet.ts'],
       preset: 'client',
       plugins: []
     }

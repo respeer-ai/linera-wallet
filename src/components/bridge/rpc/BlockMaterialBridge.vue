@@ -10,7 +10,7 @@ const getBlockMaterial = async (chainId: string): Promise<rpc.BlockMaterialResp>
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query blockMaterial($chainId: String!) {
+    query blockMaterial($chainId: ChainId!) {
       blockMaterial(chainId: $chainId) {
         incomingBundles {
           action

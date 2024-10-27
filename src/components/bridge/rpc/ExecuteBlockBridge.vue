@@ -25,10 +25,10 @@ const executeBlockWithFullMaterials = async (
 
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
     mutation executeBlockWithFullMaterials (
-      $chainId: String!,
+      $chainId: ChainId!,
       $operations: [Operation!]!,
       $incomingBundles: [UserIncomingBundle!]!,
-      $localTime: Int!
+      $localTime: Timestamp!
     ) {
       executeBlockWithFullMaterials(
         chainId: $chainId,

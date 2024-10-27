@@ -4,16 +4,14 @@ import { ApolloClient, gql } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
+import { GET_ACCOUNT_BALANCE } from 'src/graphql'
 
 const accountBalance = async (chainId: string, publicKey?: string): Promise<number> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query getAccountBalance($chainId: String!, $publicKey: String) {
-      balance(chainId: $chainId, publicKey: $publicKey)
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(GET_ACCOUNT_BALANCE, {
     chainId,
     publicKey
   }, {
@@ -37,7 +35,7 @@ const getChainAccountBalances = async (chainIds: string[], publicKeys: string[])
   const apolloClient = new ApolloClient(options)
 
   const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query getChainAccountBalances($chainIds: [String!]!, $publicKeys: [String!]!) {
+    query getChainAccountBalances($chainIds: [ChainId!]!, $publicKeys: [PublicKey!]!) {
       balances(chainIds: $chainIds, publicKeys: $publicKeys)
     }
   `, {
