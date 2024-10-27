@@ -140,8 +140,21 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
               epoch
               incomingBundles {
                 origin
+                bundle {
+                  height
+                  timestamp
+                  certificateHash
+                  transactionIndex
+                  messages {
+                    authenticatedSigner
+                    grant
+                    refundGrantTo
+                    kind
+                    index
+                    message
+                  }
+                }
                 action
-                bundle
               }
               operations
               height

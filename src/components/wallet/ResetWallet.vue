@@ -1,6 +1,6 @@
 <template>
   <div class='text-center onboarding-container shadow-1'>
-    <div class='onboarding-content full-width full-height page-x-padding'>
+    <div class='onboarding-content full-width full-height page-x-padding extra-margin-bottom'>
       <div class='row vertical-menus-margin'>
         <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
         <q-space />
@@ -10,7 +10,7 @@
         <q-space />
         <div :style='{ width: "24px" }' />
       </div>
-      <div class='full-width text-left vertical-sections-margin'>
+      <div class='full-width text-left vertical-items-margin'>
         <q-card class='bg-grey-2 page-x-padding selector-y-padding'>
           <q-checkbox v-model='passwordConfirmed'>
             CheCko is decentralized wallet for Linera microchain. It never store user password or mnemonic outside of the wallet. That means we cannot find your lost password or mnemonic back.

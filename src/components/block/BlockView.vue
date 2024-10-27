@@ -343,21 +343,17 @@ watch(microchainsImportState, async () => {
 })
 
 const handlerOperation = () => {
-  localStore.operation.$subscribe((_, state) => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  localStore.operation.$subscribe(async (_, state) => {
     for (const [index, operation] of state.operations.entries()) {
       try {
-        processNewIncomingBundle(operation.microchain, operation.operation).then(() => {
-          state.operations.splice(index, 1)
-        }).catch((error) => {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`Failed process incoming bundle: ${error}`)
-          setTimeout(() => {
-            handlerOperation()
-          }, 1000)
-        })
+        await processNewIncomingBundle(operation.microchain, operation.operation)
+        state.operations.splice(index, 1)
       } catch (error) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Failed process incoming bundle: ${error}`)
+        // When fail, don't continue
+        break
       }
     }
   })

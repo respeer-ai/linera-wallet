@@ -14,7 +14,20 @@ const getBlockMaterial = async (chainId: string): Promise<rpc.BlockMaterialResp>
       blockMaterial(chainId: $chainId) {
         incomingBundles {
           action
-          bundle
+          bundle {
+            height
+            timestamp
+            certificateHash
+            transactionIndex
+            messages {
+              authenticatedSigner
+              grant
+              refundGrantTo
+              kind
+              index
+              message
+            }
+          }
           origin
         }
         localTime

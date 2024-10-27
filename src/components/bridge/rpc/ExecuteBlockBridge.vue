@@ -45,7 +45,20 @@ const executeBlockWithFullMaterials = async (
           previousBlockHash
           incomingBundles {
             origin
-            bundle
+            bundle {
+              height
+              timestamp
+              certificateHash
+              transactionIndex
+              messages {
+                authenticatedSigner
+                grant
+                refundGrantTo
+                kind
+                index
+                message
+              }
+            }
             action
           }
           operations

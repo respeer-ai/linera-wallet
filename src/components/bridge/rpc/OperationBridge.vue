@@ -26,9 +26,9 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
   } as operationDef.ChainOperation)
 }
 
-const requestApplication = (chainId: string, applicationId: string, targetChainId: string) => {
+const requestApplication = (requesterChainId: string, applicationId: string, targetChainId: string) => {
   localStore.operation.operations.push({
-    microchain: chainId,
+    microchain: requesterChainId,
     operation: {
       System: {
         RequestApplication: {
