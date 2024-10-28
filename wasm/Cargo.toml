@@ -43,7 +43,7 @@ features = ["web"]
 [dependencies.linera-client]
 path = "./linera-protocol/linera-client"
 default-features = false
-features = ["web", "local-storage"]
+features = ["web"]
 
 [dependencies.linera-core]
 path = "./linera-protocol/linera-core"
