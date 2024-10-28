@@ -1,5 +1,4 @@
 use bip39::Mnemonic;
-use linera_views::common::AdminKeyValueStore;
 /**
 This module defines the client API for the Web extension.
 
@@ -37,9 +36,6 @@ type WebStorage =
 
 pub async fn get_storage() -> Result<WebStorage, JsError> {
     let root_key = &[];
-    let store_config = linera_views::memory::MemoryStoreConfig::new(1);
-    let namespace = "linera";
-    linera_views::memory::MemoryStore::create(&store_config, namespace).await?;
     Ok(linera_storage::DbStorage::new(
         linera_views::memory::MemoryStoreConfig::new(1),
         "linera",
@@ -68,7 +64,7 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     // Timeout for sending queries (milliseconds)
     send_timeout: std::time::Duration::from_millis(4000),
     recv_timeout: std::time::Duration::from_millis(4000),
-    max_pending_messages: 10,
+    max_pending_message_bundles: 10,
 
     // The WebAssembly runtime to use.
     wasm_runtime: None,
@@ -83,10 +79,10 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     cache_size: 1000,
 
     // Delay increment for retrying to connect to a validator for notifications.
-    notification_retry_delay: std::time::Duration::from_millis(1000),
+    retry_delay: std::time::Duration::from_millis(1000),
 
     // Number of times to retry connecting to a validator for notifications.
-    notification_retries: 10,
+    max_retries: 10,
 
     // Whether to wait until a quorum of validators has confirmed that all sent cross-chain
     // messages have been delivered.
@@ -229,7 +225,7 @@ pub async fn construct_block(
         block_hash,
         Timestamp::from(local_time),
         BlockHeight::from(next_block_height),
-    );
+    )?;
 
     let executed_block = chain_client
         .execute_block_with_full_materials(
