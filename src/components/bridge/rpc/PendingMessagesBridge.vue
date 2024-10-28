@@ -1,23 +1,17 @@
 <script setup lang='ts'>
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { ApolloClient, gql } from '@apollo/client/core'
+import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
+import { PENDING_MESSAGES } from 'src/graphql'
 
 const getPendingMessages = async (chainId: string): Promise<rpc.PendingMessagesResp> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query pendingMessages($chainId: String!) {
-      pendingMessages(chainId: $chainId) {
-        action
-        bundle
-        origin
-      }
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(PENDING_MESSAGES, {
     chainId
   }, {
     fetchPolicy: 'network-only'

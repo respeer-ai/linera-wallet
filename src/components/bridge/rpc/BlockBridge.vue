@@ -1,24 +1,19 @@
 <script setup lang='ts'>
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { ApolloClient, gql } from '@apollo/client/core'
+import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult, _hex } from 'src/utils'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { db, rpc } from 'src/model'
 import { dbBase } from 'src/controller'
+import { GET_PENDING_RAW_BLOCK, SUBMIT_BLOCK_SIGNATURE, SUBMIT_BLOCK_AND_SIGNATURE, NOTIFICATIONS, BLOCK } from 'src/graphql'
 
 const getPendingRawBlock = async (chainId: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query getPendingRawBlock($chainId: ChainId!) {
-      peekCandidateRawBlockPayload(chainId: $chainId) {
-        height
-        payloadBytes
-      }
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(GET_PENDING_RAW_BLOCK, {
     chainId
   }, {
     fetchPolicy: 'network-only'
@@ -41,10 +36,8 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation submitBlockSignature ($chainId: ChainId!, $height: BlockHeight!, $signature: Signature!) {
-      submitBlockSignature(chainId: $chainId, height: $height, signature: $signature)
-    }`))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(SUBMIT_BLOCK_SIGNATURE))
   return await mutate({
     chainId,
     height,
@@ -56,10 +49,8 @@ const submitBlockAndSignature = async (chainId: string, height: number, executed
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation submitBlockAndSignature ($chainId: ChainId!, $height: BlockHeight!, $executedBlock: UserExecutedBlock!, $round: Round!, $signature: Signature!) {
-      submitBlockAndSignature(chainId: $chainId, height: $height, executedBlock: $executedBlock, round: $round, signature: $signature)
-    }`))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(SUBMIT_BLOCK_AND_SIGNATURE))
   return await mutate({
     chainId,
     height,
@@ -91,11 +82,8 @@ const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => vo
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ stop, onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(gql`
-    subscription notifications($chainId: ChainId!) {
-      notifications(chainId: $chainId)
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ stop, onResult, onError } = provideApolloClient(apolloClient)(() => useSubscription(NOTIFICATIONS, {
     chainId
   }))
 
@@ -128,65 +116,8 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query block($chainId: ChainId!, $hash: CryptoHash!) {
-      block(chainId: $chainId, hash: $hash) {
-        hash
-        value {
-          status
-          executedBlock {
-            block {
-              chainId
-              epoch
-              incomingBundles {
-                origin
-                bundle {
-                  height
-                  timestamp
-                  certificateHash
-                  transactionIndex
-                  messages {
-                    authenticatedSigner
-                    grant
-                    refundGrantTo
-                    kind
-                    index
-                    message
-                  }
-                }
-                action
-              }
-              operations
-              height
-              timestamp
-              authenticatedSigner
-              previousBlockHash
-            }
-            outcome {
-              messages {
-                destination
-                authenticatedSigner
-                grant
-                refundGrantTo
-                kind
-                message
-              }
-              stateHash
-              oracleResponses
-              events {
-                streamId {
-                  applicationId
-                  streamName
-                }
-                key
-                value
-              }
-            }
-          }
-        }
-      }
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(BLOCK, {
     chainId,
     hash
   }, {

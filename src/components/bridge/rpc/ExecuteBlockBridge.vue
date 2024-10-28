@@ -1,9 +1,10 @@
 <script setup lang='ts'>
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { ApolloClient, gql } from '@apollo/client/core'
+import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
+import { EXECUTE_BLOCK_WITH_FULL_MATERIALS } from 'src/graphql'
 
 // TODO: use type in gql definition
 const executeBlockWithFullMaterials = async (
@@ -23,68 +24,8 @@ const executeBlockWithFullMaterials = async (
     } as rpc.IncomingBundle
   })
 
-  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(gql`
-    mutation executeBlockWithFullMaterials (
-      $chainId: ChainId!,
-      $operations: [Operation!]!,
-      $incomingBundles: [UserIncomingBundle!]!,
-      $localTime: Timestamp!
-    ) {
-      executeBlockWithFullMaterials(
-        chainId: $chainId,
-        operations: $operations,
-        incomingBundles: $incomingBundles,
-        localTime: $localTime
-      ) {
-        block {
-          chainId
-          epoch
-          height
-          timestamp
-          authenticatedSigner
-          previousBlockHash
-          incomingBundles {
-            origin
-            bundle {
-              height
-              timestamp
-              certificateHash
-              transactionIndex
-              messages {
-                authenticatedSigner
-                grant
-                refundGrantTo
-                kind
-                index
-                message
-              }
-            }
-            action
-          }
-          operations
-        }
-        outcome {
-          messages {
-            destination
-            authenticatedSigner
-            grant
-            refundGrantTo
-            kind
-            message
-          }
-          stateHash
-          oracleResponses
-          events {
-            streamId {
-              applicationId
-              streamName
-            }
-            key
-            value
-          }
-        }
-      }
-    }`))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { mutate } = provideApolloClient(apolloClient)(() => useMutation(EXECUTE_BLOCK_WITH_FULL_MATERIALS))
   const res = await mutate({
     chainId,
     operations,

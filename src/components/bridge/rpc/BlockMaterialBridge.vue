@@ -1,40 +1,17 @@
 <script setup lang='ts'>
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { ApolloClient, gql } from '@apollo/client/core'
+import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
+import { BLOCK_MATERIAL } from 'src/graphql'
 
 const getBlockMaterial = async (chainId: string): Promise<rpc.BlockMaterialResp> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query blockMaterial($chainId: ChainId!) {
-      blockMaterial(chainId: $chainId) {
-        incomingBundles {
-          action
-          bundle {
-            height
-            timestamp
-            certificateHash
-            transactionIndex
-            messages {
-              authenticatedSigner
-              grant
-              refundGrantTo
-              kind
-              index
-              message
-            }
-          }
-          origin
-        }
-        localTime
-        round
-      }
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(BLOCK_MATERIAL, {
     chainId
   }, {
     fetchPolicy: 'network-only'
