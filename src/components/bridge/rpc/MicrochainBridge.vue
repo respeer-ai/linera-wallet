@@ -6,6 +6,7 @@ import { _hex, graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { dbBase } from 'src/controller'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { CHAINS_WITH_PUBLIC_KEY } from 'src/graphql'
 
 const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
@@ -57,14 +58,8 @@ const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query chainsWithPublicKey ($publicKey: PublicKey!) {
-      chainsWithPublicKey(publicKey: $publicKey) {
-        list
-        default
-      }
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(CHAINS_WITH_PUBLIC_KEY, {
     publicKey
   }, {
     fetchPolicy: 'network-only'

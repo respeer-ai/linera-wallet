@@ -1,23 +1,17 @@
 <script setup lang='ts'>
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { ApolloClient, gql } from '@apollo/client/core'
+import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
+import { APPLICATIONS } from 'src/graphql'
 
 const microchainApplications = async (microchain: string): Promise<rpc.ApplicationsResp[]> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
-  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(gql`
-    query applications($chainId: ChainId!) {
-      applications(chainId: $chainId) {
-        id
-        link
-        description
-      }
-    }
-  `, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(APPLICATIONS, {
     chainId: microchain
   }, {
     fetchPolicy: 'network-only'
