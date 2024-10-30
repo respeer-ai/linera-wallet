@@ -29,8 +29,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { db, rpc } from 'src/model'
+import { db } from 'src/model'
 import { localStore } from 'src/localstores'
+import { type ApplicationOverview } from 'src/__generated__/graphql/service/graphql'
 
 import RpcApplicationBridge from '../bridge/rpc/ApplicationBridge.vue'
 import DbApplicationBridge from '../bridge/db/ApplicationBridge.vue'
@@ -47,7 +48,7 @@ const microchainIds = computed(() => microchains.value.reduce((ids: string[], a)
 
 const onSynchronizeApplicationsClick = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcApplicationBridge.value?.applications(microchainIds.value).then(async (resps: rpc.ApplicationsResp[]) => {
+  rpcApplicationBridge.value?.applications(microchainIds.value).then(async (resps: ApplicationOverview[]) => {
     for (const resp of resps) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbApplicationBridge.value?.addApplication(resp.id, resp.description?.creation?.chainId, resp.description?.creation?.height, resp.description?.creation?.index)

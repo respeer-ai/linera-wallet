@@ -69,8 +69,9 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { db, rpc } from 'src/model'
+import { db } from 'src/model'
 import { localStore } from 'src/localstores'
+import { type Chains } from 'src/__generated__/graphql/service/graphql'
 
 import DbMicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
@@ -132,10 +133,10 @@ const onViewMoreClick = () => {
 const onSynchronizeMicrochainsClick = () => {
   if (!selectedOwner.value) return
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcMicrochainBridge.value?.chains(selectedOwner.value?.address).then(async (resp: rpc.ChainsResp) => {
-    for (const microchain of resp.list) {
+  rpcMicrochainBridge.value?.chains(selectedOwner.value?.address).then(async (chains: Chains) => {
+    for (const microchain of chains.list) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbMicrochainBridge.value?.createMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, resp.default === microchain)
+      await dbMicrochainBridge.value?.createMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, chains.default === microchain)
     }
     localStore.notification.pushNotification({
       Title: 'Synchronize microchains',

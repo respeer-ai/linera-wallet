@@ -6,6 +6,7 @@
 import { rpc } from 'src/model'
 import { ref } from 'vue'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { type IncomingBundle } from 'src/__generated__/graphql/service/graphql'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
@@ -14,7 +15,7 @@ const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 const constructBlock = async (
   microchain: string,
   operation: rpc.Operation | undefined,
-  incomingBundles: rpc.IncomingBundle[],
+  incomingBundles: IncomingBundle[],
   localTime: number
 ): Promise<string> => {
   return new Promise((resolve, reject) => {

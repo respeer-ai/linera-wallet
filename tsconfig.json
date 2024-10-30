@@ -15,7 +15,8 @@
       }
     ],
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "noImplicitAny": false
   },
   "esModuleInterop": true,
   "exclude": [

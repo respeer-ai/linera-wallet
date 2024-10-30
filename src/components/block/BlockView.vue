@@ -26,6 +26,7 @@ import { localStore } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { toSnake } from 'ts-case-convert'
+import { type HashedCertificateValue, type CandidateBlockMaterial, type ExecutedBlock } from 'src/__generated__/graphql/service/graphql'
 
 import RpcBlockBridge from '../bridge/rpc/BlockBridge.vue'
 import RpcAccountBridge from '../bridge/rpc/AccountBridge.vue'
@@ -63,7 +64,7 @@ const subscribed = ref(new Map<string, stopFunc>())
 
 const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const balancesResp = await rpcAccountBridge.value?.getChainAccountBalances([microchain.microchain], publicKeys) as rpc.ChainAccountBalancesResp
+  const balancesResp = await rpcAccountBridge.value?.getChainAccountBalances([microchain.microchain], publicKeys) as rpc.ChainAccountBalances
   if (!balancesResp[microchain.microchain]) return
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const nativeToken = (await dbTokenBridge.value?.nativeToken()) as db.Token
@@ -130,46 +131,51 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
 
   await updateChainAccountBalances(microchain, publicKeys)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const blockResp = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as rpc.BlockResp
-  for (const bundle of blockResp?.value?.executedBlock?.block?.incomingBundles || []) {
+  const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
+  for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
     for (const message of bundle.bundle.messages) {
-      if (message.message?.System?.Credit) {
+      const _message = message.message as rpc.Message
+      if (_message?.System?.Credit) {
+        const origin = bundle.origin as rpc.Origin
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await dbActivityBridge.value?.createActivity(
-          bundle.origin.sender,
-          message.message?.System?.Credit?.source,
-          blockResp.value.executedBlock.block.chainId,
-          message.message?.System?.Credit?.target,
-          message.message?.System?.Credit?.amount,
-          blockResp.value.executedBlock.block.height,
-          blockResp.value.executedBlock.block.timestamp,
-          blockResp.hash,
+          origin.sender,
+          _message?.System?.Credit?.source,
+          block.value.executedBlock?.block.chainId,
+          _message?.System?.Credit?.target,
+          _message?.System?.Credit?.amount,
+          block.value.executedBlock?.block.height,
+          block.value.executedBlock?.block.timestamp,
+          block.hash,
           message.grant
         )
       }
     }
   }
-  for (const operation of blockResp?.value?.executedBlock?.block.operations || []) {
-    if (operation.System?.Transfer) {
+  for (const operation of block?.value?.executedBlock?.block.operations || []) {
+    const _operation = operation as rpc.Operation
+    if (_operation.System?.Transfer) {
       let grant = undefined as unknown as string | undefined
-      for (const messages of blockResp?.value?.executedBlock?.outcome?.messages || []) {
+      for (const messages of block?.value?.executedBlock?.outcome?.messages || []) {
         grant = messages.find((el) => {
-          return el.destination?.Recipient === operation.System.Transfer.recipient.Account?.chain_id &&
-                     el.message.source === operation.System.Transfer.owner &&
-                     el.message.target === operation.System.Transfer.recipient?.Account?.owner
-        })?.grant
+          const destination = el.destination as rpc.Destination
+          const message = el.message as rpc.Message
+          return destination?.Recipient === _operation.System?.Transfer.recipient.Account?.chain_id &&
+                     message?.System?.Credit?.source === _operation.System?.Transfer.owner &&
+                     message?.System?.Credit?.target === _operation?.System.Transfer.recipient?.Account?.owner
+        })?.grant as string
         if (grant?.length) break
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbActivityBridge.value?.createActivity(
-        blockResp.value.executedBlock.block.chainId,
-        operation.System.Transfer.owner,
-        operation.System.Transfer.recipient.Account.chain_id,
-        operation.System.Transfer.recipient.Account.owner,
-        operation.System.Transfer.amount,
-        blockResp.value.executedBlock.block.height,
-        blockResp.value.executedBlock.block.timestamp,
-        blockResp.hash,
+        block.value.executedBlock?.block.chainId,
+        _operation.System.Transfer.owner,
+        _operation.System.Transfer.recipient.Account.chain_id,
+        _operation.System.Transfer.recipient.Account.owner,
+        _operation.System.Transfer.amount,
+        block.value.executedBlock?.block.height,
+        block.value.executedBlock?.block.timestamp,
+        block.hash,
         grant as string
       )
     }
@@ -179,20 +185,20 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
 const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: rpc.BlockMaterialResp) => {
+    rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const executedBlock = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
         microchain,
         operation ? [operation] : [],
         blockMaterial.incomingBundles,
         blockMaterial.localTime
-      ) as rpc.ExecuteBlockResp
+      ) as ExecutedBlock
 
       if (!executedBlock) return reject('Failed execute block')
 
       if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
       if (operation) {
-        const executedOperation = executedBlock.block.operations[0]
+        const executedOperation = executedBlock.block.operations[0] as rpc.Operation
         if (await sha3(JSON.stringify(operation, (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
