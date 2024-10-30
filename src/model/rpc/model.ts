@@ -26,12 +26,12 @@ export type Recipient = {
 
 export type Message = {
   System: {
-      Credit: {
-        amount: string
-        source?: string
-        target: string
-      }
+    Credit: {
+      amount: string
+      source?: string
+      target: string
     }
+  }
 }
 
 export type Operation = {
@@ -41,14 +41,14 @@ export type Operation = {
       recipient: Recipient
       amount: string
       user_data: number[]
-    },
+    }
     Claim: {
       owner: string
       target_id: string
       recipient: Recipient
       amount: string
       user_data: Int8Array | undefined
-    },
+    }
     // TODO: OpenChain
     // TODO: ChangeOwnership
     // TODO: ChangeApplicationPermissions
@@ -57,25 +57,25 @@ export type Operation = {
     // TODO: Admin
     PublishByteCode: {
       bytecode_id: string
-    },
+    }
     PublishDataBlob: {
       blob_hash: string
-    },
+    }
     ReadBlob: {
       blob_id: string
-    },
+    }
     CreateApplication: {
       bytecode_id: string
       parameters: Int8Array
       instantiation_argument: Int8Array
       required_application_ids: string[]
-    },
+    }
     RequestApplication: {
       chain_id: string
       application_id: string
-    },
+    }
     CloseChain: unknown
-  },
+  }
   User: {
     application_id: string
     bytes: Int8Array

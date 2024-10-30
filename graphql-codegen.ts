@@ -17,7 +17,8 @@ const config: CodegenConfig = {
       plugins: []
     },
     './src/__generated__/graphql/sdk/': {
-      schema: './wasm/linera-protocol/linera-service-graphql-client/gql/*.graphql',
+      schema:
+        './wasm/linera-protocol/linera-service-graphql-client/gql/*.graphql',
       documents: [],
       preset: 'client',
       plugins: []

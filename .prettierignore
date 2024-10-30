@@ -24,3 +24,4 @@ wasm
 .quasar
 src-bex/wasm
 src/router/index.ts
+src/__generated__
