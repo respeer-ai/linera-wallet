@@ -5,8 +5,9 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { APPLICATIONS } from 'src/graphql'
+import { type ApplicationsQuery } from 'src/__generated__/graphql/service/graphql'
 
-const microchainApplications = async (microchain: string): Promise<rpc.ApplicationsResp[]> => {
+const microchainApplications = async (microchain: string): Promise<rpc.Application[]> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -19,8 +20,7 @@ const microchainApplications = async (microchain: string): Promise<rpc.Applicati
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const applications = graphqlResult.data(res, 'applications') as rpc.ApplicationsResp[]
-      resolve(applications)
+      resolve((graphqlResult.rootData(res) as ApplicationsQuery).applications)
     })
 
     onError((error) => {
@@ -32,7 +32,7 @@ const microchainApplications = async (microchain: string): Promise<rpc.Applicati
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const applications = async (microchains: string[]) => {
-  const _applications = [] as rpc.ApplicationsResp[]
+  const _applications = [] as rpc.Application[]
   for (const microchain of microchains) {
     _applications.push(...await microchainApplications(microchain))
   }

@@ -3,10 +3,10 @@ import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
-import { rpc } from 'src/model'
 import { BLOCK_MATERIAL } from 'src/graphql'
+import { type BlockMaterialQuery, type CandidateBlockMaterial } from 'src/__generated__/graphql/service/graphql'
 
-const getBlockMaterial = async (chainId: string): Promise<rpc.BlockMaterialResp> => {
+const getBlockMaterial = async (chainId: string): Promise<CandidateBlockMaterial> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -19,8 +19,7 @@ const getBlockMaterial = async (chainId: string): Promise<rpc.BlockMaterialResp>
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const blockMaterial = graphqlResult.data(res, 'blockMaterial') as rpc.BlockMaterialResp
-      resolve(blockMaterial)
+      resolve((graphqlResult.rootData(res) as BlockMaterialQuery).blockMaterial)
     })
 
     onError((error) => {

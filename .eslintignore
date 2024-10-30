@@ -10,3 +10,4 @@ babel.config.js
 /quasar.config.*.temporary.compiled*
 /wasm
 /src-bex/wasm
+/src/__generated__

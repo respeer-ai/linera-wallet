@@ -3,12 +3,13 @@ import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
 import { _hex, graphqlResult } from 'src/utils'
-import { rpc } from 'src/model'
 import { dbBase } from 'src/controller'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { CHAINS_WITH_PUBLIC_KEY, WALLET_INIT_WITHOUT_KEYPAIR, OPEN_CHAIN } from 'src/graphql'
+import { type OpenChainMutation, type ClaimOutcome } from 'src/__generated__/graphql/faucet/graphql'
+import { type Chains, type ChainsWithPublicKeyQuery } from 'src/__generated__/graphql/service/graphql'
 
-const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
+const openChain = async (publicKey: string): Promise<ClaimOutcome> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
   const apolloClient = new ApolloClient(options)
 
@@ -17,11 +18,7 @@ const openChain = async (publicKey: string): Promise<rpc.OpenChainResp> => {
   const res = await mutate({
     publicKey
   })
-  return {
-    chainId: graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'chainId') as string,
-    messageId: graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'messageId') as string,
-    certificateHash: graphqlResult.keyValue(graphqlResult.data(res, 'claim'), 'certificateHash') as string
-  } as rpc.OpenChainResp
+  return (graphqlResult.rootData(res) as OpenChainMutation).claim
 }
 
 const initMicrochainStore = async (keyPair: Ed25519SigningKey, chainId: string, messageId: string, certificateHash: string) => {
@@ -46,7 +43,7 @@ const initMicrochainStore = async (keyPair: Ed25519SigningKey, chainId: string, 
   })
 }
 
-const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
+const chains = async (publicKey: string): Promise<Chains> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -59,8 +56,7 @@ const chains = async (publicKey: string): Promise<rpc.ChainsResp> => {
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const chains = graphqlResult.data(res, 'chainsWithPublicKey') as rpc.ChainsResp
-      resolve(chains)
+      resolve((graphqlResult.rootData(res) as ChainsWithPublicKeyQuery).chainsWithPublicKey)
     })
 
     onError((error) => {

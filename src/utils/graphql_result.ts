@@ -21,6 +21,10 @@ export const data = (result: unknown, key: string) => {
   ]
 }
 
+export const rootData = (result: unknown) => {
+  return (result as Record<string, unknown>).data
+}
+
 export interface Origin {
   sender: string
   medium: string

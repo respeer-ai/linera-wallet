@@ -8,8 +8,9 @@
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
 import { dbBase, dbWallet } from 'src/controller'
-import { rpc, db } from 'src/model'
+import { db } from 'src/model'
 import { ref } from 'vue'
+import { type ClaimOutcome } from 'src/__generated__/graphql/faucet/graphql'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import RpcMicrochainBridge from '../bridge/rpc/MicrochainBridge.vue'
@@ -23,7 +24,7 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
   if (!owner) return Promise.reject(new Error('Invalid owner'))
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const resp = await rpcMicrochainBridge.value?.openChain(owner?.address) as rpc.OpenChainResp
+  const resp = await rpcMicrochainBridge.value?.openChain(owner?.address) as ClaimOutcome
   if (!resp) return Promise.reject(new Error('Invalid open chain'))
 
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)

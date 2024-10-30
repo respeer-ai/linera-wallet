@@ -3,10 +3,10 @@ import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
-import { rpc } from 'src/model'
 import { PENDING_MESSAGES } from 'src/graphql'
+import { type IncomingBundle, type PendingMessagesQuery } from 'src/__generated__/graphql/service/graphql'
 
-const getPendingMessages = async (chainId: string): Promise<rpc.PendingMessagesResp> => {
+const getPendingMessages = async (chainId: string): Promise<IncomingBundle[]> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -19,8 +19,7 @@ const getPendingMessages = async (chainId: string): Promise<rpc.PendingMessagesR
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const messages = graphqlResult.data(res, 'pendingMessages') as rpc.PendingMessagesResp
-      resolve(messages)
+      resolve((graphqlResult.rootData(res) as PendingMessagesQuery).pendingMessages)
     })
 
     onError((error) => {

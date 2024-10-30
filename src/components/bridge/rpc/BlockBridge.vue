@@ -7,6 +7,7 @@ import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { db, rpc } from 'src/model'
 import { dbBase } from 'src/controller'
 import { GET_PENDING_RAW_BLOCK, SUBMIT_BLOCK_SIGNATURE, SUBMIT_BLOCK_AND_SIGNATURE, NOTIFICATIONS, BLOCK } from 'src/graphql'
+import { type BlockQuery, type GetPendingRawBlockQuery, type NotificationsSubscription, type HashedCertificateValue, type ExecutedBlock } from 'src/__generated__/graphql/service/graphql'
 
 const getPendingRawBlock = async (chainId: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
@@ -21,8 +22,7 @@ const getPendingRawBlock = async (chainId: string) => {
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const rawBlock = graphqlResult.data(res, 'peekCandidateRawBlockPayload')
-      resolve(rawBlock)
+      resolve((graphqlResult.rootData(res) as GetPendingRawBlockQuery).peekCandidateRawBlockPayload)
     })
 
     onError((error) => {
@@ -45,7 +45,7 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: rpc.ExecutedBlock, round: rpc.Round, signature: string) => {
+const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: ExecutedBlock, round: rpc.Round, signature: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -93,7 +93,7 @@ const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => vo
   })
 
   onResult((res) => {
-    const notifications = graphqlResult.data(res, 'notifications')
+    const notifications = (graphqlResult.rootData(res) as NotificationsSubscription).notifications as unknown
     const reason = graphqlResult.keyValue(notifications, 'reason')
     const newRawBlock = graphqlResult.keyValue(reason, 'NewRawBlock')
     if (newRawBlock) {
@@ -112,7 +112,7 @@ const subscribe = async (chainId: string, onNewRawBlock?: (height: number) => vo
   return stop
 }
 
-const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.BlockResp> => {
+const getBlockWithHash = async (chainId: string, hash: string): Promise<HashedCertificateValue> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -126,8 +126,7 @@ const getBlockWithHash = async (chainId: string, hash: string): Promise<rpc.Bloc
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const block = graphqlResult.data(res, 'block') as rpc.BlockResp
-      resolve(block)
+      resolve((graphqlResult.rootData(res) as BlockQuery).block as HashedCertificateValue)
     })
 
     onError((error) => {

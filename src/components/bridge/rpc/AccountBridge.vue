@@ -5,6 +5,7 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { GET_ACCOUNT_BALANCE, GET_CHAIN_ACCOUNT_BALANCES } from 'src/graphql'
+import { type GetAccountBalanceQuery, type GetChainAccountBalancesQuery } from 'src/__generated__/graphql/service/graphql'
 
 const accountBalance = async (chainId: string, publicKey?: string): Promise<number> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
@@ -20,7 +21,7 @@ const accountBalance = async (chainId: string, publicKey?: string): Promise<numb
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      resolve(graphqlResult.data(res, 'balance') as number)
+      resolve(Number((graphqlResult.rootData(res) as GetAccountBalanceQuery).balance))
     })
 
     onError((error) => {
@@ -30,7 +31,7 @@ const accountBalance = async (chainId: string, publicKey?: string): Promise<numb
   })
 }
 
-const getChainAccountBalances = async (chainIds: string[], publicKeys: string[]): Promise<rpc.ChainAccountBalancesResp> => {
+const getChainAccountBalances = async (chainIds: string[], publicKeys: string[]): Promise<rpc.ChainAccountBalances> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -44,7 +45,7 @@ const getChainAccountBalances = async (chainIds: string[], publicKeys: string[])
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      resolve(graphqlResult.data(res, 'balances') as rpc.ChainAccountBalancesResp)
+      resolve((graphqlResult.rootData(res) as GetChainAccountBalancesQuery).balances as rpc.ChainAccountBalances)
     })
 
     onError((error) => {
