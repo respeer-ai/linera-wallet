@@ -113,8 +113,7 @@ const onTransferConfirmed = async () => {
     selectedFromMicrochain.value?.microchain,
     toChainBalance.value ? undefined : selectedToOwner.value?.address,
     selectedToMicrochain.value?.microchain,
-    amount.value,
-    undefined
+    amount.value
   )
   void router.back()
 }

@@ -40,7 +40,6 @@ export type Operation = {
       owner?: string
       recipient: Recipient
       amount: string
-      user_data: number[]
     }
     Claim: {
       owner: string

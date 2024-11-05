@@ -182,6 +182,21 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   }
 }
 
+const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => {
+  const sortedKeys = Object.keys(obj).sort()
+  const _sortedObject: Record<string, unknown> = {}
+  for (const key of sortedKeys) {
+    const value = obj[key]
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      _sortedObject[key] = sortedObject(value as Record<string, unknown>)
+    } else {
+      _sortedObject[key] = value
+    }
+  }
+
+  return _sortedObject
+}
+
 const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -199,13 +214,18 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
       if (operation) {
         const executedOperation = executedBlock.block.operations[0] as rpc.Operation
-        if (await sha3(JSON.stringify(operation, (key, value) => {
+        console.log(executedBlock.block)
+        const operationHash = await sha3(JSON.stringify(sortedObject(operation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
-        })) !== await sha3(JSON.stringify(executedOperation, (key, value) => {
+        }))
+        const executedOperationHash = await sha3(JSON.stringify(sortedObject(executedOperation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
-        }))) return reject('Invalid operation payload')
+        }))
+        if (operationHash !== executedOperationHash) {
+          return reject('Invalid operation payload')
+        }
       }
 
       // TODO: we actually should construct block with local rust code but it's too hard now, so we just validate executed block calculated by node service

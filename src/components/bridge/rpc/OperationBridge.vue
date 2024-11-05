@@ -2,7 +2,7 @@
 import { localStore, operationDef } from 'src/localstores'
 import { db, rpc } from 'src/model'
 
-const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number, userData?: number[]) => {
+const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number) => {
   const fromOwner = fromPublicKey !== undefined ? await db.ownerFromPublicKey(fromPublicKey) : undefined
   const toOwner = toPublicKey !== undefined ? await db.ownerFromPublicKey(toPublicKey) : undefined
 
@@ -18,8 +18,7 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
               owner: toOwner
             }
           },
-          amount: amount.toString(),
-          user_data: userData || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          amount: amount.toString()
         }
       }
     } as rpc.Operation
