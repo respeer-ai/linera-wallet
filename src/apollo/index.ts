@@ -9,11 +9,14 @@ import { db } from 'src/model'
 
 export enum EndpointType {
   Faucet,
-  Rpc
+  Rpc,
+  Application
 }
 
 export async function getClientOptionsWithEndpointType(
-  endpointType: EndpointType
+  endpointType: EndpointType,
+  chainId?: string,
+  applicationId?: string
 ) {
   const network = (await dbBase.networks.toArray()).find((el) => el.selected)
 
@@ -32,21 +35,23 @@ export async function getClientOptionsWithEndpointType(
     port = parseInt(url.port)
   }
 
-  return getClientOptions(schema, wsSchema, host, port)
+  return getClientOptions(schema, wsSchema, host, port, chainId, applicationId)
 }
 
 export /* async */ function getClientOptions(
   schema?: string,
   wsSchema?: string,
   host?: string,
-  port?: number
+  port?: number,
+  chainId?: string,
+  applicationId?: string
 ) {
   const schema1 = schema || 'https'
   const port1 = port?.toString() || '8080'
   const host1 = host || 'localhost'
   const wsSchema1 = wsSchema || 'ws'
 
-  const httpBaseUrl = schema1 + '://' + host1 + ':' + port1
+  const httpBaseUrl = schema1 + '://' + host1 + ':' + port1 + (chainId ? `/chains/${chainId}` : '') + (applicationId ? `/applications/${applicationId}` : '')
   const wsBaseUrl = wsSchema1 + '://' + host1 + ':' + port1 + '/ws'
 
   const wsLink = new GraphQLWsLink(

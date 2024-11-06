@@ -214,7 +214,6 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
       if (operation) {
         const executedOperation = executedBlock.block.operations[0] as rpc.Operation
-        console.log(executedBlock.block)
         const operationHash = await sha3(JSON.stringify(sortedObject(operation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
@@ -238,7 +237,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const block = JSON.parse(JSON.stringify(executedBlock.block), function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
-        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1)) {
+        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
           const _key = toSnake(key)
           if (!_key.includes('_') || _key === key) return value
           if (this) {
@@ -267,7 +266,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const _executedBlock = JSON.parse(JSON.stringify(executedBlock), function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
-        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1)) {
+        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
           const _key = toSnake(key)
           if (!_key.includes('_') || _key === key) return value
           if (this) {

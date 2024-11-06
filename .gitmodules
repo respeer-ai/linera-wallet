@@ -1,4 +1,4 @@
 [submodule "wasm/linera-protocol"]
 	path = wasm/linera-protocol
 	url = https://github.com/respeer-ai/linera-protocol.git
-	branch = respeer-maas-fefa995f-2024_10_13
+	branch = feat/serialize-u64-to-string

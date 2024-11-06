@@ -48,10 +48,15 @@ const deleteNetwork = async (id: number) => {
   await dbBase.networks.delete(id)
 }
 
+const _selectedNetwork = async () => {
+  return (await dbBase.networks.toArray()).find((el) => el.selected)
+}
+
 defineExpose({
   createNetwork,
   deleteNetwork,
-  updateNetwork
+  updateNetwork,
+  _selectedNetwork
 })
 
 </script>
