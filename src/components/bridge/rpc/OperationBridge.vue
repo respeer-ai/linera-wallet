@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import { uid } from 'quasar'
 import { localStore, operationDef } from 'src/localstores'
 import { db, rpc } from 'src/model'
 
@@ -7,6 +8,7 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
   const toOwner = toPublicKey !== undefined ? await db.ownerFromPublicKey(toPublicKey) : undefined
 
   localStore.operation.operations.push({
+    operation_id: uid(),
     microchain: fromChainId,
     operation: {
       System: {
@@ -27,6 +29,7 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
 
 const requestApplication = (requesterChainId: string, applicationId: string, targetChainId: string) => {
   localStore.operation.operations.push({
+    operation_id: uid(),
     microchain: requesterChainId,
     operation: {
       System: {

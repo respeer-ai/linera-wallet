@@ -353,30 +353,43 @@ watch(microchainsImportState, async () => {
   }
 })
 
-const handlerOperation = () => {
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  localStore.operation.$subscribe(async (_, state) => {
-    for (const [index, operation] of state.operations.entries()) {
-      try {
-        await processNewIncomingBundle(operation.microchain, operation.operation)
-        state.operations.splice(index, 1)
-      } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Failed process incoming bundle: ${error}`)
-        // When fail, don't continue
-        break
-      }
+const _unmounted = ref(false)
+
+const _handleOperations = async () => {
+  const operations = [...localStore.operation.operations]
+  for (const operation of operations) {
+    try {
+      await processNewIncomingBundle(operation.microchain, operation.operation)
+      const index = localStore.operation.operations.findIndex((el) => el.operation_id === operation.operation_id)
+      localStore.operation.operations.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`Failed process incoming bundle: ${error}`)
+      // When fail, don't continue
+      break
     }
-  })
+  }
+}
+
+const delay = async (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+const handleOperations = async () => {
+  while (!_unmounted.value) {
+    await _handleOperations()
+    await delay(60000)
+  }
 }
 
 onMounted(async () => {
   await subscribeMicrochains()
-  handlerOperation()
+  void handleOperations()
 })
 
 onUnmounted(() => {
   ubsunscribeMicrochains()
+  _unmounted.value = true
 })
 
 </script>
