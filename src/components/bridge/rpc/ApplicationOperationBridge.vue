@@ -1,5 +1,6 @@
 <template>
   <DbNetworkBridge ref='dbNetworkBridge' />
+  <DbApplicationCreatorChainSubscription ref='dbApplicationCreatorChainSubscription' />
 </template>
 <script setup lang='ts'>
 import { DocumentNode } from 'graphql'
@@ -10,11 +11,12 @@ import axios from 'axios'
 import { graphqlResult } from 'src/utils'
 import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE } from 'src/graphql'
 import { uid } from 'quasar'
-import { dbWallet } from 'src/controller'
 
 import DbNetworkBridge from '../db/NetworkBridge.vue'
+import DbApplicationCreatorChainSubscription from '../db/DbApplicationCreatorChainSubscription.vue'
 
 const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
+const dbApplicationCreatorChainSubscription = ref<InstanceType<typeof DbApplicationCreatorChainSubscription>>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Int8Array | undefined> => {
@@ -44,11 +46,13 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
 }
 
 const subscribeCreatorChain = async (chainId: string, applicationId: string) => {
-  if ((await dbWallet.applicationCreatorChainSubscriptions.toArray()).findIndex((el) => el.microchain === chainId && el.applicationId === applicationId) >= 0) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (await dbApplicationCreatorChainSubscription.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return
 
   const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
 
   localStore.operation.operations.push({
+    operation_type: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
     operation_id: uid(),
     microchain: chainId,
     operation: {

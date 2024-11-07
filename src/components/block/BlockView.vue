@@ -15,13 +15,14 @@
     <ConstructBlock ref='constructBlock' />
     <SwapApplicationOperationBridge ref='swapApplicationOperationBridge' />
     <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
+    <DbApplicationCreatorChainSubscription ref='dbApplicationCreatorChainSubscription' />
   </div>
 </template>
 
 <script setup lang='ts'>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { db, rpc } from 'src/model'
-import { localStore } from 'src/localstores'
+import { localStore, operationDef } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { toSnake } from 'ts-case-convert'
@@ -42,6 +43,7 @@ import RpcBlockMaterialBridge from '../bridge/rpc/BlockMaterialBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
 import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
+import DbApplicationCreatorChainSubscription from '../bridge/db/DbApplicationCreatorChainSubscription.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -58,6 +60,7 @@ const rpcBlockMaterialBridge = ref<InstanceType<typeof RpcBlockMaterialBridge>>(
 const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 const swapApplicationOperationBridge = ref<InstanceType<typeof SwapApplicationOperationBridge>>()
 const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
+const dbApplicationCreatorChainSubscription = ref<InstanceType<typeof DbApplicationCreatorChainSubscription>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
@@ -362,6 +365,10 @@ const _handleOperations = async () => {
       await processNewIncomingBundle(operation.microchain, operation.operation)
       const index = localStore.operation.operations.findIndex((el) => el.operation_id === operation.operation_id)
       localStore.operation.operations.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
+      if (operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN === operation.operation_type) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await dbApplicationCreatorChainSubscription.value?.createApplicationCreatorChainSubscription(operation.microchain, operation.operation.User.application_id)
+      }
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Failed process incoming bundle: ${error}`)
@@ -378,7 +385,7 @@ const delay = async (ms: number) => {
 const handleOperations = async () => {
   while (!_unmounted.value) {
     await _handleOperations()
-    await delay(10000)
+    await delay(60000)
   }
 }
 
