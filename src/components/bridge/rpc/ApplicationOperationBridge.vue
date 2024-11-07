@@ -8,20 +8,24 @@ import { db, rpc } from 'src/model'
 import { ref } from 'vue'
 import axios from 'axios'
 // import { graphqlResult } from 'src/utils'
-import { SUBSCRIBE_CREATION_CHAIN } from 'src/graphql'
+import { SUBSCRIBE_CREATION_CHAIN, LEGACY_REQUEST_SUBSCRIBE } from 'src/graphql'
 
 import DbNetworkBridge from '../db/NetworkBridge.vue'
 
 const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode): Promise<Int8Array | undefined> => {
+const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Int8Array | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const network = await dbNetworkBridge.value?._selectedNetwork() as db.Network
   if (!network) return
 
   const applicationUrl = `http://${network?.host}:${network?.port}/chains/${chainId}/applications/${applicationId}`
-  axios.post(applicationUrl).then((res) => {
+  axios.post(applicationUrl, {
+    query: query.loc?.source.body,
+    variables: variables || {},
+    operationName
+  }).then((res) => {
     console.log(res)
   }).catch((e) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -30,7 +34,21 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
 }
 
 const subscribeCreatorChain = async (chainId: string, applicationId: string) => {
-  const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATION_CHAIN)
+  const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATION_CHAIN, 'subscribeCreationChain')
+
+  localStore.operation.operations.push({
+    microchain: chainId,
+    operation: {
+      User: {
+        application_id: applicationId,
+        bytes: queryRespBytes
+      }
+    } as rpc.Operation
+  } as operationDef.ChainOperation)
+}
+
+const requestSubscribe = async (chainId: string, applicationId: string) => {
+  const queryRespBytes = await queryApplication(chainId, applicationId, LEGACY_REQUEST_SUBSCRIBE, 'requestSubscribe')
 
   localStore.operation.operations.push({
     microchain: chainId,
@@ -45,7 +63,8 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string) => 
 
 defineExpose({
   queryApplication,
-  subscribeCreatorChain
+  subscribeCreatorChain,
+  requestSubscribe
 })
 
 </script>

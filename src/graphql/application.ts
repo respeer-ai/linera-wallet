@@ -5,3 +5,9 @@ export const SUBSCRIBE_CREATION_CHAIN = gql`
     subscribeCreationChain
   }
 `
+
+export const LEGACY_REQUEST_SUBSCRIBE = gql`
+  mutation requestSubscribe {
+    requestSubscribe
+  }
+`

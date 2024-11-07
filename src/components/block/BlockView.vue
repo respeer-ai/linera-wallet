@@ -201,6 +201,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
+      console.log(operation)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const executedBlock = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
         microchain,

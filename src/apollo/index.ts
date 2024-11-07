@@ -51,7 +51,14 @@ export /* async */ function getClientOptions(
   const host1 = host || 'localhost'
   const wsSchema1 = wsSchema || 'ws'
 
-  const httpBaseUrl = schema1 + '://' + host1 + ':' + port1 + (chainId ? `/chains/${chainId}` : '') + (applicationId ? `/applications/${applicationId}` : '')
+  const httpBaseUrl =
+    schema1 +
+    '://' +
+    host1 +
+    ':' +
+    port1 +
+    (chainId ? `/chains/${chainId}` : '') +
+    (applicationId ? `/applications/${applicationId}` : '')
   const wsBaseUrl = wsSchema1 + '://' + host1 + ':' + port1 + '/ws'
 
   const wsLink = new GraphQLWsLink(
