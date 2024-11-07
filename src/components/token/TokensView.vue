@@ -23,11 +23,11 @@
   <DbTokenBridge v-model:tokens='tokens' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
   <q-dialog v-model='importingToken'>
-    <q-card class='dialog'>
+    <q-card class='dialog page-y-padding'>
       <h5 class='onboarding-page-title text-center page-title'>
         Importing ERC20 compatible token
       </h5>
-      <ImportTokenView @created='onTokenCreated' @error='onCreateTokenError' />
+      <ImportTokenView @imported='onTokenImported' @error='onImportTokenError' />
     </q-card>
   </q-dialog>
   <q-dialog v-model='displayingAccount'>
@@ -51,11 +51,11 @@ const selectedOwner = ref(undefined as unknown as db.Owner)
 const displayingAccount = ref(false)
 const importingToken = ref(false)
 
-const onTokenCreated = () => {
+const onTokenImported = () => {
   importingToken.value = false
 }
 
-const onCreateTokenError = () => {
+const onImportTokenError = () => {
   importingToken.value = false
 }
 

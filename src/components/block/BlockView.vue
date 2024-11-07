@@ -378,7 +378,7 @@ const delay = async (ms: number) => {
 const handleOperations = async () => {
   while (!_unmounted.value) {
     await _handleOperations()
-    await delay(60000)
+    await delay(10000)
   }
 }
 
