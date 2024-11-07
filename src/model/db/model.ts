@@ -299,3 +299,9 @@ export const defaultNamedApplications = [
       '717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3'
   }
 ] as NamedApplication[]
+
+export interface ApplicationCreatorChainSubscription {
+  id?: number
+  applicationId: string
+  microchain: string
+}

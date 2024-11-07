@@ -37,6 +37,10 @@ export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
   applications: EntityTable<dbModel.Application, 'id'>
   activities: EntityTable<dbModel.Activity, 'id'>
   namedApplications: EntityTable<dbModel.NamedApplication, 'id'>
+  applicationCreatorChainSubscriptions: EntityTable<
+    dbModel.ApplicationCreatorChainSubscription,
+    'id'
+  >
 }
 
 dbWallet.version(1).stores({
@@ -52,5 +56,6 @@ dbWallet.version(1).stores({
     '++id, applicationId, creationMicrochain, creationHeight, applicationIndex',
   activities:
     '++id, sourceChain, sourceAddress, targetChain, targetAddress, amount, blockHeight, timestamp, certificateHash, grant',
-  namedApplications: '++id, applicationType, name, applicationId, creatorChain'
+  namedApplications: '++id, applicationType, name, applicationId, creatorChain',
+  applicationCreatorChainSubscriptions: '++id, applicationId, microchain'
 })

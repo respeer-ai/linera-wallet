@@ -4,12 +4,13 @@
 <script setup lang='ts'>
 import { DocumentNode } from 'graphql'
 import { localStore, operationDef } from 'src/localstores'
-import { db, rpc } from 'src/model'
+import { rpc, db } from 'src/model'
 import { ref } from 'vue'
 import axios from 'axios'
 import { graphqlResult } from 'src/utils'
 import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE } from 'src/graphql'
 import { uid } from 'quasar'
+import { dbWallet } from 'src/controller'
 
 import DbNetworkBridge from '../db/NetworkBridge.vue'
 
@@ -43,6 +44,8 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
 }
 
 const subscribeCreatorChain = async (chainId: string, applicationId: string) => {
+  if ((await dbWallet.applicationCreatorChainSubscriptions.toArray()).findIndex((el) => el.microchain === chainId && el.applicationId === applicationId) >= 0) return
+
   const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
 
   localStore.operation.operations.push({
