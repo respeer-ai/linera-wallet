@@ -43,7 +43,7 @@ import RpcBlockMaterialBridge from '../bridge/rpc/BlockMaterialBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
 import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
-import DbApplicationCreatorChainSubscription from '../bridge/db/DbApplicationCreatorChainSubscription.vue'
+import DbApplicationCreatorChainSubscription from '../bridge/db/ApplicationCreatorChainSubscription.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
