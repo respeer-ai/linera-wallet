@@ -5,7 +5,7 @@
       <div v-if='tokens.length > 0'>
         <TokenCardView v-for='token in tokens' :key='token.id' :token='token' />
       </div>
-      <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer' @click='onCreateTokenClick'>
+      <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer' @click='onReceiveTokensClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
           Receive tokens
@@ -21,13 +21,17 @@
     <q-space />
   </div>
   <DbTokenBridge v-model:tokens='tokens' />
-  <q-dialog v-model='creatingToken'>
+  <OwnerBridge v-model:selected-owner='selectedOwner' />
+  <q-dialog v-model='importingToken'>
     <q-card class='dialog'>
       <h5 class='onboarding-page-title text-center page-title'>
-        Create token
+        Importing ERC20 compatible token
       </h5>
       <ImportTokenView @created='onTokenCreated' @error='onCreateTokenError' />
     </q-card>
+  </q-dialog>
+  <q-dialog v-model='displayingAccount'>
+    <AccountDetailView :owner='selectedOwner' @canceled='onDisplayAccountCanceled' @done='onDisplayAccountDone' />
   </q-dialog>
 </template>
 
@@ -38,25 +42,37 @@ import { db } from 'src/model'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import TokenCardView from './TokenCardView.vue'
 import ImportTokenView from './ImportTokenView.vue'
+import OwnerBridge from '../bridge/db/OwnerBridge.vue'
+import AccountDetailView from '../account/AccountDetailView.vue'
 
 const tokens = ref([] as db.Token[])
+const selectedOwner = ref(undefined as unknown as db.Owner)
 
-const creatingToken = ref(false)
+const displayingAccount = ref(false)
+const importingToken = ref(false)
 
 const onTokenCreated = () => {
-  creatingToken.value = false
+  importingToken.value = false
 }
 
 const onCreateTokenError = () => {
-  creatingToken.value = false
-}
-
-const onCreateTokenClick = () => {
-  creatingToken.value = true
+  importingToken.value = false
 }
 
 const onImportTokenClick = () => {
-  // TODO
+  importingToken.value = true
+}
+
+const onReceiveTokensClick = () => {
+  displayingAccount.value = true
+}
+
+const onDisplayAccountCanceled = () => {
+  displayingAccount.value = false
+}
+
+const onDisplayAccountDone = () => {
+  displayingAccount.value = false
 }
 
 </script>
