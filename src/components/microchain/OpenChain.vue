@@ -35,8 +35,7 @@ const openMicrochain = async (): Promise<db.Microchain> => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcMicrochainBridge.value?.initMicrochainStore(keyPair, resp.chainId, resp.messageId, resp.certificateHash)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcBlockBridge.value?.signNewBlock(resp.chainId, 0, keyPair)
+  // The first block will be signed in BlockView
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
   const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, resp.chainId, resp.messageId, resp.certificateHash) as db.Microchain
@@ -56,8 +55,7 @@ const importMicrochain = async (chainId: string, messageId: string, certificateH
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await rpcMicrochainBridge.value?.initMicrochainStore(keyPair, chainId, messageId, certificateHash)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcBlockBridge.value?.signNewBlock(chainId, 0, keyPair)
+  // The first block will be signed in BlockView
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
   const microchain = await dbMicrochainBridge.value?.createMicrochain(owner.owner, chainId, messageId, certificateHash) as db.Microchain

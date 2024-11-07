@@ -21,9 +21,6 @@
 <script setup lang='ts'>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { db, rpc } from 'src/model'
-import { dbBase } from 'src/controller'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
-import { _hex } from 'src/utils'
 import { localStore } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
@@ -160,22 +157,6 @@ const parseActivities = async (microchain: db.Microchain, hash: string) => {
   }
 }
 
-const processNewRawBlock = async (microchain: db.Microchain, height: number) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
-  if (!owners?.length) return
-
-  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
-  if (!password) return Promise.reject(new Error('Invalid password'))
-
-  const _password = db.decryptPassword(password)
-  // TODO: process multiple owners chain
-  const privateKey = db.privateKey(owners[0], _password)
-  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
-}
-
 const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
@@ -213,7 +194,6 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
-      console.log(operation)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const executedBlock = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
         microchain,
@@ -338,15 +318,8 @@ const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => voi
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   return await rpcBlockBridge.value?.subscribe(
     microchain.microchain,
-    async (height: number) => {
-      try {
-        if (microchain.microchain === 'feeeed172c74027e2675311c4ec3239dbe8e4b4fcf46b12e6f775523a002d64e') {
-          await processNewRawBlock(microchain, height)
-        }
-      } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Fail process new raw block ${error}`)
-      }
+    async () => {
+      // DO NOTHING
     }, async (hash: string) => {
       await processNewBlock(microchain, hash)
     }, async () => {

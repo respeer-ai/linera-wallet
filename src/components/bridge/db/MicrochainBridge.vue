@@ -86,9 +86,9 @@ const createMicrochain = async (owner: string, microchainId: string, messageId?:
     default: _default,
     imported: true
   } as db.Microchain
-  await dbWallet.microchains.add(microchain)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await microchainOwnerBridge.value?.createMicrochainOwner(owner, microchainId)
+  await dbWallet.microchains.add(microchain)
   return microchain
 }
 
