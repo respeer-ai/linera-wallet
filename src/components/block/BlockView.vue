@@ -13,6 +13,8 @@
     <RpcExecuteBlockBridge ref='rpcExecuteBlockBridge' />
     <RpcBlockMaterialBridge ref='rpcBlockMaterialBridge' />
     <ConstructBlock ref='constructBlock' />
+    <SwapApplicationOperationBridge ref='swapApplicationOperationBridge' />
+    <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
   </div>
 </template>
 
@@ -41,6 +43,8 @@ import RpcPendingMessagesBridge from '../bridge/rpc/PendingMessagesBridge.vue'
 import RpcExecuteBlockBridge from '../bridge/rpc/ExecuteBlockBridge.vue'
 import RpcBlockMaterialBridge from '../bridge/rpc/BlockMaterialBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
+import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
+import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -55,6 +59,8 @@ const rpcPendingMessagesBridge = ref<InstanceType<typeof RpcPendingMessagesBridg
 const rpcExecuteBlockBridge = ref<InstanceType<typeof RpcExecuteBlockBridge>>()
 const rpcBlockMaterialBridge = ref<InstanceType<typeof RpcBlockMaterialBridge>>()
 const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
+const swapApplicationOperationBridge = ref<InstanceType<typeof SwapApplicationOperationBridge>>()
+const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
@@ -101,35 +107,7 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
   }
 }
 
-const processNewRawBlock = async (microchain: db.Microchain, height: number) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
-  if (!owners?.length) return
-
-  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
-  if (!password) return Promise.reject(new Error('Invalid password'))
-
-  const _password = db.decryptPassword(password)
-  // TODO: process multiple owners chain
-  const privateKey = db.privateKey(owners[0], _password)
-  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
-}
-
-const processNewBlock = async (microchain: db.Microchain, hash: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
-  if (!owners?.length) return
-
-  const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
-  try {
-    await updateChainAccountBalances(microchain, publicKeys)
-  } catch (error) {
-    console.log('Failed update chain account balances', error)
-  }
-
-  await updateChainAccountBalances(microchain, publicKeys)
+const parseActivities = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
   for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
@@ -180,6 +158,40 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
       )
     }
   }
+}
+
+const processNewRawBlock = async (microchain: db.Microchain, height: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
+  if (!owners?.length) return
+
+  const password = (await dbBase.passwords.toArray()).find((el) => el.active)
+  if (!password) return Promise.reject(new Error('Invalid password'))
+
+  const _password = db.decryptPassword(password)
+  // TODO: process multiple owners chain
+  const privateKey = db.privateKey(owners[0], _password)
+  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await rpcBlockBridge.value?.signNewBlock(microchain.microchain, height, keyPair)
+}
+
+const processNewBlock = async (microchain: db.Microchain, hash: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
+  if (!owners?.length) return
+
+  const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
+  try {
+    await updateChainAccountBalances(microchain, publicKeys)
+  } catch (error) {
+    console.log('Failed update chain account balances', error)
+  }
+  await parseActivities(microchain, hash)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await erc20ApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain)
 }
 
 const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => {

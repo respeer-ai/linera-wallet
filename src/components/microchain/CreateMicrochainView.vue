@@ -27,7 +27,6 @@
     <OpenChain ref='openChain' />
     <RpcOperationBridge ref='rpcOperationBridge' />
     <DbNamedApplicationBridge ref='dbNamedApplicationBridge' />
-    <RpcApplicationOperationBridge ref='rpcApplicationOperationBridge' />
   </div>
 </template>
 
@@ -41,12 +40,10 @@ import MicrochainCreationView from './MicrochainCreationView.vue'
 import ValidateMicrochainView from './ValidateMicrochainView.vue'
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
 import DbNamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
-import RpcApplicationOperationBridge from '../bridge/rpc/ApplicationOperationBridge.vue'
 
 const openChain = ref<InstanceType<typeof OpenChain>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbNamedApplicationBridge = ref<InstanceType<typeof DbNamedApplicationBridge>>()
-const rpcApplicationOperationBridge = ref<InstanceType<typeof RpcApplicationOperationBridge>>()
 
 const createdMicrochain = ref(undefined as unknown as db.Microchain)
 const step = ref(1)
@@ -71,16 +68,14 @@ const createMicrochain = async (): Promise<db.Microchain> => {
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcApplicationOperationBridge.value?.subscribeCreatorChain(microchain.microchain, namedApplication.applicationId)
+      // Subscribe creation chain will be done when next block is signed
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcApplicationOperationBridge.value?.subscribeCreatorChain(microchain.microchain, namedApplication.applicationId)
+      // Subscribe creation chain will be done when next block is signed
 
       resolve(microchain)
     }).catch((error) => {

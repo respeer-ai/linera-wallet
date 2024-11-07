@@ -1,47 +1,21 @@
+<template>
+  <MonoApplicationOperationBridge ref='monoApplicationOperationBridge' />
+</template>
 <script setup lang='ts'>
-import { localStore, operationDef } from 'src/localstores'
-import { db, rpc } from 'src/model'
+import { db } from 'src/model'
+import { ref } from 'vue'
 
-const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number) => {
-  const fromOwner = fromPublicKey !== undefined ? await db.ownerFromPublicKey(fromPublicKey) : undefined
-  const toOwner = toPublicKey !== undefined ? await db.ownerFromPublicKey(toPublicKey) : undefined
+import MonoApplicationOperationBridge from './MonoApplicationOperationBridge.vue'
 
-  localStore.operation.operations.push({
-    microchain: fromChainId,
-    operation: {
-      System: {
-        Transfer: {
-          owner: fromOwner,
-          recipient: {
-            Account: {
-              chain_id: toChainId,
-              owner: toOwner
-            }
-          },
-          amount: amount.toString()
-        }
-      }
-    } as rpc.Operation
-  } as operationDef.ChainOperation)
-}
+const monoApplicationOperationBridge = ref<InstanceType<typeof MonoApplicationOperationBridge>>()
 
-const requestApplication = (chainId: string, applicationId: string, targetChainId: string) => {
-  localStore.operation.operations.push({
-    microchain: chainId,
-    operation: {
-      System: {
-        RequestApplication: {
-          application_id: applicationId,
-          chain_id: targetChainId
-        }
-      }
-    } as rpc.Operation
-  } as operationDef.ChainOperation)
+const subscribeCreationChain = async (chainId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await monoApplicationOperationBridge.value?.subscribeCreationChainWithType(chainId, db.ApplicationType.SWAP)
 }
 
 defineExpose({
-  transfer,
-  requestApplication
+  subscribeCreationChain
 })
 
 </script>

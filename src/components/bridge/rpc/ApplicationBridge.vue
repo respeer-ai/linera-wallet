@@ -39,7 +39,8 @@ const applications = async (microchains: string[]) => {
 }
 
 defineExpose({
-  applications
+  applications,
+  microchainApplications
 })
 
 </script>
