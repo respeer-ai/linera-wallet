@@ -320,7 +320,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         reject(error)
       })
     }).catch((error) => {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Fail process incoming bundle: ${error}`)
       reject(error)
     })
@@ -341,9 +341,19 @@ const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => voi
     async () => {
       // DO NOTHING
     }, async (hash: string) => {
-      await processNewBlock(microchain, hash)
+      try {
+        await processNewBlock(microchain, hash)
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Fail process new block: ${error}`)
+      }
     }, async () => {
-      await processNewIncomingBundle(microchain.microchain)
+      try {
+        await processNewIncomingBundle(microchain.microchain)
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Fail process incoming bundle: ${error}`)
+      }
     }) as () => void
 }
 
