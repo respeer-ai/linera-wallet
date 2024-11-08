@@ -16,21 +16,22 @@ const dbNamedApplicationBridge = ref<InstanceType<typeof DbNamedApplicationBridg
 const rpcApplicationBridge = ref<InstanceType<typeof RpcApplicationBridge>>()
 const rpcApplicationOperationBridge = ref<InstanceType<typeof RpcApplicationOperationBridge>>()
 
-const subscribeCreationChainWithId = async (chainId: string, applicationId: string) => {
+const subscribeCreationChainWithId = async (chainId: string, applicationId: string, applicationType: db.ApplicationType, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const applications = await rpcApplicationBridge.value?.microchainApplications(chainId) as ApplicationOverview[]
-  if (!applications) return
-  if (applications?.findIndex((el: ApplicationOverview) => el.id === applicationId) < 0) return
+  if (!applications) return false
+  if (applications?.findIndex((el: ApplicationOverview) => el.id === applicationId) < 0) return false
   // TODO: check if it's already subscribed
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcApplicationOperationBridge.value?.subscribeCreatorChain(chainId, applicationId)
+  await rpcApplicationOperationBridge.value?.subscribeCreatorChain(chainId, applicationId, applicationType, force)
+  return true
 }
 
-const subscribeCreationChainWithType = async (chainId: string, applicationType: db.ApplicationType) => {
+const subscribeCreationChainWithType = async (chainId: string, applicationType: db.ApplicationType, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const swap = await dbNamedApplicationBridge.value?.getNamedApplicationWithType(applicationType) as db.NamedApplication
-  if (!swap) return
-  await subscribeCreationChainWithId(chainId, swap.applicationId)
+  const application = await dbNamedApplicationBridge.value?.getNamedApplicationWithType(applicationType) as db.NamedApplication
+  if (!application) return false
+  return await subscribeCreationChainWithId(chainId, application.applicationId, applicationType, force)
 }
 
 defineExpose({

@@ -45,9 +45,9 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
   })
 }
 
-const subscribeCreatorChain = async (chainId: string, applicationId: string) => {
+const subscribeCreatorChain = async (chainId: string, applicationId: string, applicationType: db.ApplicationType, force?: boolean) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  if (await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return
+  if (!force && await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return
 
   if (localStore.operation.operations.findIndex((el) => {
     return el.operationType === operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
@@ -57,6 +57,7 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string) => 
 
   localStore.operation.operations.push({
     operationType: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
+    applicationType,
     operationId: uid(),
     microchain: chainId,
     operation: {
