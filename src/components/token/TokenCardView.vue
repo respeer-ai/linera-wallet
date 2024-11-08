@@ -2,7 +2,7 @@
   <q-item class='row full-width tab-panel-item' clickable>
     <div :class='[ "selector-indicator", token.native ? "selector-indicator-selected" : "" ]' />
     <q-avatar class='selector-margin-x-left'>
-      <q-img :src='token.icon' />
+      <q-img :src='token.logo' />
       <q-badge
         v-if='!token.native' color='transparent' rounded transparent
         floating

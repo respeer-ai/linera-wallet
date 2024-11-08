@@ -198,21 +198,34 @@ enum TokenType {
 export interface Token {
   id?: number
   name: string
+  description: string
   ticker: string
   tokenType: TokenType
-  icon: string
+  logo: string
   applicationId?: string
   native: boolean
   usdCurrency: number
   mono: boolean
+  discord: string
+  telegram: string
+  twitter: string
+  website: string
+  github: string
 }
 
 export const lineraToken = {
   name: 'Linera',
+  description: 'The first L1 blockchain infrastructure optimized for real-time applications',
   ticker: 'TLINERA',
   tokenType: TokenType.Native,
-  icon: lineraLogo,
-  native: true
+  logo: lineraLogo,
+  native: true,
+  mono: true,
+  discord: 'https://discord.com/invite/linera',
+  telegram: 'http://t.me/linera_official',
+  twitter: 'https://x.com/linera_io',
+  website: 'https://linera.io',
+  github: 'https://github.com/linera-io/linera-protocol'
 } as Token
 
 export interface MicrochainFungibleTokenBalance {
