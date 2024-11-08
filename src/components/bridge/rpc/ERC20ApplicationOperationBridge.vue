@@ -52,6 +52,12 @@ const persistApplication = async (chainId: string, applicationId: string) => {
   return new Promise((resolve, reject) => {
     onResult((res) => {
       const token = graphqlResult.rootData(res) as rpc.ERC20Token
+      if (!token.tokenMetadata) {
+        // Add to ticker run let block subscription run it
+        return localStore.operation.tickerRuns.set(uid(), () => {
+          void persistApplication(chainId, applicationId)
+        })
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       void dbTokenBridge.value?.createToken({
         name: token.name,

@@ -180,7 +180,11 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // Here we don't care about the result. If ticker run think they need to run again when fail, they should append themselves again
   const tickerRuns = localStore.operation.tickerRuns
   for (const [id, tickerRun] of tickerRuns) {
-    tickerRun()
+    try {
+      tickerRun()
+    } catch {
+      // DO NOTHING
+    }
     localStore.operation.tickerRuns.delete(id)
   }
 }
@@ -385,27 +389,33 @@ const _handleOperations = async () => {
       // When fail, don't continue
       continue
     }
-    console.log(`Operation ${JSON.stringify(operation)}`)
-    switch (operation.operationType) {
-      case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
-        if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.WLINERA) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.User.application_id)
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-        await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, operation.operation.User.application_id)
-        break
-      case operationDef.OperationType.REQUEST_APPLICATION:
-        if (operation.applicationType === db.ApplicationType.WLINERA)
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)
-        else if (operation.applicationType === db.ApplicationType.ERC20)
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, operation.operation.System.RequestApplication.application_id, true)
-        else
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.System.RequestApplication.application_id)
-        break
+    try {
+      switch (operation.operationType) {
+        case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
+          if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.WLINERA) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.User.application_id)
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+          await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, operation.operation.User.application_id)
+          break
+        case operationDef.OperationType.REQUEST_APPLICATION:
+          if (operation.applicationType === db.ApplicationType.WLINERA)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)
+          else if (operation.applicationType === db.ApplicationType.ERC20)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, operation.operation.System.RequestApplication.application_id, true)
+          else
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.System.RequestApplication.application_id)
+          break
+      }
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`Failed post process operation: ${error}`)
+      // When fail, don't continue
+      continue
     }
   }
 }
