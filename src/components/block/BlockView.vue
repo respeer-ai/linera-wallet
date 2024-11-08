@@ -176,6 +176,13 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain)
+
+  // Here we don't care about the result. If ticker run think they need to run again when fail, they should append themselves again
+  const tickerRuns = localStore.operation.tickerRuns
+  for (const [id, tickerRun] of tickerRuns) {
+    tickerRun()
+    localStore.operation.tickerRuns.delete(id)
+  }
 }
 
 const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => {
@@ -378,6 +385,7 @@ const _handleOperations = async () => {
       // When fail, don't continue
       continue
     }
+    console.log(`Operation ${JSON.stringify(operation)}`)
     switch (operation.operationType) {
       case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
         if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.WLINERA) {

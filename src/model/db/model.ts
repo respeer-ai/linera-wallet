@@ -215,7 +215,8 @@ export interface Token {
 
 export const lineraToken = {
   name: 'Linera',
-  description: 'The first L1 blockchain infrastructure optimized for real-time applications',
+  description:
+    'The first L1 blockchain infrastructure optimized for real-time applications',
   ticker: 'TLINERA',
   tokenType: TokenType.Native,
   logo: lineraLogo,

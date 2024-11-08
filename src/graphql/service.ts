@@ -92,8 +92,8 @@ export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
       height: $height
       executedBlock: $executedBlock
       round: $round
-      signature: $signature,
-      retry: $retry,
+      signature: $signature
+      retry: $retry
       validatedBlockCertificateHash: $validatedBlockCertificateHash
     )
   }
