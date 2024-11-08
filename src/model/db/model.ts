@@ -204,6 +204,7 @@ export interface Token {
   applicationId?: string
   native: boolean
   usdCurrency: number
+  mono: boolean
 }
 
 export const lineraToken = {

@@ -2,7 +2,8 @@ import { MicrochainsImportState } from './const'
 
 export enum Menu {
   NETWORKS = 'Networks',
-  SWAP_AND_WLINERA = 'SwapAndWlinera',
+  SWAP = 'Swap',
+  WLINERA = 'WLinera',
   ABOUT_US = 'AboutUs',
   STORAGE = 'Storage',
   ACCOUNTS = 'Accounts',

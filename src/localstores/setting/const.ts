@@ -11,7 +11,14 @@ export const SettingMenus = [
   {
     icon: 'bi-box-seam',
     label: 'Swap',
-    menu: Menu.SWAP_AND_WLINERA,
+    menu: Menu.SWAP,
+    disable: false,
+    separator: false
+  },
+  {
+    icon: 'bi-box-seam',
+    label: 'WTLinera',
+    menu: Menu.WLINERA,
     disable: false,
     separator: true
   },

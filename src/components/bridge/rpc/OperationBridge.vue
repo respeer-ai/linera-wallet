@@ -8,7 +8,8 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
   const toOwner = toPublicKey !== undefined ? await db.ownerFromPublicKey(toPublicKey) : undefined
 
   localStore.operation.operations.push({
-    operation_id: uid(),
+    operationType: operationDef.OperationType.TRANSFER,
+    operationId: uid(),
     microchain: fromChainId,
     operation: {
       System: {
@@ -27,9 +28,11 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
   } as operationDef.ChainOperation)
 }
 
-const requestApplication = (requesterChainId: string, applicationId: string, targetChainId: string) => {
+const requestApplication = (requesterChainId: string, applicationId: string, targetChainId: string, applicationType: db.ApplicationType) => {
   localStore.operation.operations.push({
-    operation_id: uid(),
+    operationType: operationDef.OperationType.REQUEST_APPLICATION,
+    applicationType,
+    operationId: uid(),
     microchain: requesterChainId,
     operation: {
       System: {

@@ -338,6 +338,13 @@ export type ExecutedBlock = {
   outcome: BlockExecutionOutcome;
 };
 
+export type ExecutedBlockMaterial = {
+  __typename?: 'ExecutedBlockMaterial';
+  executedBlock: ExecutedBlock;
+  retry: Scalars['Boolean']['output'];
+  validatedBlockCertificateHash?: Maybe<Scalars['CryptoHash']['output']>;
+};
+
 export type ExecutionStateView = {
   __typename?: 'ExecutionStateView';
   system: SystemExecutionStateView;
@@ -516,7 +523,7 @@ export type MutationRoot = {
    */
   createCommittee: Scalars['CryptoHash']['output'];
   /** Calculate block execution state hash */
-  executeBlockWithFullMaterials: ExecutedBlock;
+  executeBlockWithFullMaterials: ExecutedBlockMaterial;
   /**
    * Creates (or activates) a new chain by installing the given authentication key.
    * This will automatically subscribe to the future committees created by `admin_id`.
@@ -715,8 +722,10 @@ export type MutationRootSubmitBlockAndSignatureArgs = {
   chainId: Scalars['ChainId']['input'];
   executedBlock: Scalars['UserExecutedBlock']['input'];
   height: Scalars['BlockHeight']['input'];
+  retry: Scalars['Boolean']['input'];
   round: Scalars['Round']['input'];
   signature: Scalars['Signature']['input'];
+  validatedBlockCertificateHash?: InputMaybe<Scalars['CryptoHash']['input']>;
 };
 
 

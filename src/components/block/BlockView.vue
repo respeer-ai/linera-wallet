@@ -15,7 +15,7 @@
     <ConstructBlock ref='constructBlock' />
     <SwapApplicationOperationBridge ref='swapApplicationOperationBridge' />
     <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
-    <DbApplicationCreatorChainSubscription ref='dbApplicationCreatorChainSubscription' />
+    <DbApplicationCreatorChainSubscriptionBridge ref='dbApplicationCreatorChainSubscriptionBridge' />
   </div>
 </template>
 
@@ -26,7 +26,7 @@ import { localStore, operationDef } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { toSnake } from 'ts-case-convert'
-import { type HashedCertificateValue, type CandidateBlockMaterial, type ExecutedBlock } from 'src/__generated__/graphql/service/graphql'
+import { type HashedCertificateValue, type CandidateBlockMaterial, type ExecutedBlockMaterial } from 'src/__generated__/graphql/service/graphql'
 
 import RpcBlockBridge from '../bridge/rpc/BlockBridge.vue'
 import RpcAccountBridge from '../bridge/rpc/AccountBridge.vue'
@@ -43,7 +43,7 @@ import RpcBlockMaterialBridge from '../bridge/rpc/BlockMaterialBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
 import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
-import DbApplicationCreatorChainSubscription from '../bridge/db/ApplicationCreatorChainSubscription.vue'
+import DbApplicationCreatorChainSubscriptionBridge from '../bridge/db/ApplicationCreatorChainSubscriptionBridge.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -60,7 +60,7 @@ const rpcBlockMaterialBridge = ref<InstanceType<typeof RpcBlockMaterialBridge>>(
 const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 const swapApplicationOperationBridge = ref<InstanceType<typeof SwapApplicationOperationBridge>>()
 const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
-const dbApplicationCreatorChainSubscription = ref<InstanceType<typeof DbApplicationCreatorChainSubscription>>()
+const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
@@ -175,7 +175,7 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await erc20ApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain)
+  await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain)
 }
 
 const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => {
@@ -198,17 +198,21 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      const executedBlock = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
+      const executedBlockMaterial = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
         microchain,
         operation ? [operation] : [],
         blockMaterial.incomingBundles,
         blockMaterial.localTime
-      ) as ExecutedBlock
+      ) as ExecutedBlockMaterial
+
+      const executedBlock = executedBlockMaterial?.executedBlock
+      const validatedBlockCertificateHash = executedBlockMaterial?.validatedBlockCertificateHash as string
+      const isRetryBlock = executedBlockMaterial?.retry
 
       if (!executedBlock) return reject('Failed execute block')
 
       if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
-      if (operation) {
+      if (operation && !isRetryBlock) {
         const executedOperation = executedBlock.block.operations[0] as rpc.Operation
         const operationHash = await sha3(JSON.stringify(sortedObject(operation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -281,7 +285,9 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         executedBlock.block.height,
         _executedBlock,
         blockMaterial.round,
-        signature
+        signature,
+        isRetryBlock,
+        validatedBlockCertificateHash
       ).then(() => {
         if (operation) {
           localStore.notification.pushNotification({
@@ -338,7 +344,7 @@ const subscribeMicrochains = async () => {
   }
 }
 
-const ubsunscribeMicrochains = () => {
+const unsubscribeMicrochains = () => {
   subscribed.value.forEach((stop) => {
     stop()
   })
@@ -351,7 +357,7 @@ watch(microchains, async () => {
 watch(microchainsImportState, async () => {
   switch (microchainsImportState.value) {
     case localStore.settingDef.MicrochainsImportState.MicrochainsImported:
-      ubsunscribeMicrochains()
+      unsubscribeMicrochains()
       await subscribeMicrochains()
   }
 })
@@ -360,14 +366,23 @@ const _unmounted = ref(false)
 
 const _handleOperations = async () => {
   const operations = [...localStore.operation.operations]
+  // TODO: merge operations of the same microchain
   for (const operation of operations) {
     try {
       await processNewIncomingBundle(operation.microchain, operation.operation)
-      const index = localStore.operation.operations.findIndex((el) => el.operation_id === operation.operation_id)
+      const index = localStore.operation.operations.findIndex((el) => el.operationId === operation.operationId)
       localStore.operation.operations.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
-      if (operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN === operation.operation_type) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        await dbApplicationCreatorChainSubscription.value?.createApplicationCreatorChainSubscription(operation.microchain, operation.operation.User.application_id)
+      switch (operation.operationType) {
+        case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+          await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, operation.operation.User.application_id)
+          break
+        case operationDef.OperationType.REQUEST_APPLICATION:
+          if (operation.applicationType !== db.ApplicationType.ERC20 && operation.applicationType !== db.ApplicationType.WLINERA)
+            break
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.System.RequestApplication.application_id)
+          break
       }
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -395,7 +410,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  ubsunscribeMicrochains()
+  unsubscribeMicrochains()
   _unmounted.value = true
 })
 

@@ -27,6 +27,7 @@
     <OpenChain ref='openChain' />
     <RpcOperationBridge ref='rpcOperationBridge' />
     <DbNamedApplicationBridge ref='dbNamedApplicationBridge' />
+    <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
   </div>
 </template>
 
@@ -40,10 +41,12 @@ import MicrochainCreationView from './MicrochainCreationView.vue'
 import ValidateMicrochainView from './ValidateMicrochainView.vue'
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
 import DbNamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
+import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 
 const openChain = ref<InstanceType<typeof OpenChain>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbNamedApplicationBridge = ref<InstanceType<typeof DbNamedApplicationBridge>>()
+const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 
 const createdMicrochain = ref(undefined as unknown as db.Microchain)
 const step = ref(1)
@@ -67,14 +70,14 @@ const createMicrochain = async (): Promise<db.Microchain> => {
       let namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
+      rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.SWAP)
       // Subscribe creation chain will be done when next block is signed
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
+      erc20ApplicationOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
       // Subscribe creation chain will be done when next block is signed
 
       resolve(microchain)

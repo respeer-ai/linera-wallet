@@ -3,8 +3,11 @@
     <q-tab-panel :name='localStore.settingDef.Menu.NETWORKS'>
       <NetworkSettingWideView />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.settingDef.Menu.SWAP_AND_WLINERA'>
+    <q-tab-panel :name='localStore.settingDef.Menu.SWAP'>
       <SwapSettingView />
+    </q-tab-panel>
+    <q-tab-panel :name='localStore.settingDef.Menu.WLINERA'>
+      <WLineraSettingView />
     </q-tab-panel>
     <q-tab-panel :name='localStore.settingDef.Menu.ABOUT_US'>
       <AboutUsView />
@@ -35,6 +38,7 @@ import AccountsView from './AccountsView.vue'
 import AddressesBook from './AddressesBook.vue'
 import EngineeringView from './EngineeringView.vue'
 import SwapSettingView from './SwapSettingView.vue'
+import WLineraSettingView from './WLineraSettingView.vue'
 
 const accountsView = ref<InstanceType<typeof AccountsView>>()
 

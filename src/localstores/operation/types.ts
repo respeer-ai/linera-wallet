@@ -1,12 +1,16 @@
-import { rpc } from '../../model'
+import { db, rpc } from '../../model'
 
 export enum OperationType {
-  SUBSCRIBE_CREATOR_CHAIN = 'subscribeCreatorChain'
+  LEGACY_REQUEST_SUBSCRIBE = 'requestSubscribe',
+  SUBSCRIBE_CREATOR_CHAIN = 'subscribeCreatorChain',
+  REQUEST_APPLICATION = 'requestApplication',
+  TRANSFER = 'transfer'
 }
 
 export interface ChainOperation {
-  operation_type?: OperationType
-  operation_id: string
+  operationType?: OperationType
+  applicationType?: db.ApplicationType
+  operationId: string
   microchain: string
   operation: rpc.Operation
 }

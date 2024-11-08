@@ -27,6 +27,10 @@ watch(_tokens, async () => {
   }
 })
 
+const createToken = async (token: db.Token) => {
+  await dbBase.tokens.add(token)
+}
+
 const updateToken = async (token: db.Token) => {
   await dbBase.tokens.update(token.id, token)
 }
@@ -40,6 +44,7 @@ const nativeToken = async () => {
 }
 
 defineExpose({
+  createToken,
   deleteToken,
   updateToken,
   nativeToken

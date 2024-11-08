@@ -5,14 +5,14 @@ import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { EXECUTE_BLOCK_WITH_FULL_MATERIALS } from 'src/graphql'
-import { type IncomingBundle, type ExecuteBlockWithFullMaterialsMutation, type ExecutedBlock } from 'src/__generated__/graphql/service/graphql'
+import { type IncomingBundle, type ExecuteBlockWithFullMaterialsMutation, type ExecutedBlockMaterial } from 'src/__generated__/graphql/service/graphql'
 
 const executeBlockWithFullMaterials = async (
   chainId: string,
   operations: rpc.Operation[],
   incomingBundles: IncomingBundle[],
   localTime: number
-): Promise<ExecutedBlock> => {
+): Promise<ExecutedBlockMaterial> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 

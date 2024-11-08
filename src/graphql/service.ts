@@ -84,13 +84,17 @@ export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
     $executedBlock: UserExecutedBlock!
     $round: Round!
     $signature: Signature!
+    $retry: Boolean!
+    $validatedBlockCertificateHash: CryptoHash
   ) {
     submitBlockAndSignature(
       chainId: $chainId
       height: $height
       executedBlock: $executedBlock
       round: $round
-      signature: $signature
+      signature: $signature,
+      retry: $retry,
+      validatedBlockCertificateHash: $validatedBlockCertificateHash
     )
   }
 `
@@ -201,53 +205,57 @@ export const EXECUTE_BLOCK_WITH_FULL_MATERIALS = gql`
       incomingBundles: $incomingBundles
       localTime: $localTime
     ) {
-      block {
-        chainId
-        epoch
-        height
-        timestamp
-        authenticatedSigner
-        previousBlockHash
-        incomingBundles {
-          origin
-          bundle {
-            height
-            timestamp
-            certificateHash
-            transactionIndex
-            messages {
-              authenticatedSigner
-              grant
-              refundGrantTo
-              kind
-              index
-              message
-            }
-          }
-          action
-        }
-        operations
-      }
-      outcome {
-        messages {
-          destination
+      executedBlock {
+        block {
+          chainId
+          epoch
+          height
+          timestamp
           authenticatedSigner
-          grant
-          refundGrantTo
-          kind
-          message
-        }
-        stateHash
-        oracleResponses
-        events {
-          streamId {
-            applicationId
-            streamName
+          previousBlockHash
+          incomingBundles {
+            origin
+            bundle {
+              height
+              timestamp
+              certificateHash
+              transactionIndex
+              messages {
+                authenticatedSigner
+                grant
+                refundGrantTo
+                kind
+                index
+                message
+              }
+            }
+            action
           }
-          key
-          value
+          operations
+        }
+        outcome {
+          messages {
+            destination
+            authenticatedSigner
+            grant
+            refundGrantTo
+            kind
+            message
+          }
+          stateHash
+          oracleResponses
+          events {
+            streamId {
+              applicationId
+              streamName
+            }
+            key
+            value
+          }
         }
       }
+      validatedBlockCertificateHash
+      retry
     }
   }
 `

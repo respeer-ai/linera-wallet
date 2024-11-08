@@ -1,6 +1,6 @@
 <template>
   <DbNetworkBridge ref='dbNetworkBridge' />
-  <DbApplicationCreatorChainSubscription ref='dbApplicationCreatorChainSubscription' />
+  <DbApplicationCreatorChainSubscriptionBridge ref='dbApplicationCreatorChainSubscriptionBridge' />
 </template>
 <script setup lang='ts'>
 import { DocumentNode } from 'graphql'
@@ -13,10 +13,10 @@ import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE } from 'src/graphql'
 import { uid } from 'quasar'
 
 import DbNetworkBridge from '../db/NetworkBridge.vue'
-import DbApplicationCreatorChainSubscription from '../db/DbApplicationCreatorChainSubscription.vue'
+import DbApplicationCreatorChainSubscriptionBridge from '../db/ApplicationCreatorChainSubscriptionBridge.vue'
 
 const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
-const dbApplicationCreatorChainSubscription = ref<InstanceType<typeof DbApplicationCreatorChainSubscription>>()
+const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Int8Array | undefined> => {
@@ -47,13 +47,17 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
 
 const subscribeCreatorChain = async (chainId: string, applicationId: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  if (await dbApplicationCreatorChainSubscription.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return
+  if (await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return
+
+  if (localStore.operation.operations.findIndex((el) => {
+    return el.operationType === operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
+  }) >= 0) return
 
   const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
 
   localStore.operation.operations.push({
-    operation_type: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
-    operation_id: uid(),
+    operationType: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
+    operationId: uid(),
     microchain: chainId,
     operation: {
       User: {
@@ -68,7 +72,8 @@ const requestSubscribe = async (chainId: string, applicationId: string) => {
   const queryRespBytes = await queryApplication(chainId, applicationId, LEGACY_REQUEST_SUBSCRIBE, 'requestSubscribe')
 
   localStore.operation.operations.push({
-    operation_id: uid(),
+    operationType: operationDef.OperationType.LEGACY_REQUEST_SUBSCRIBE,
+    operationId: uid(),
     microchain: chainId,
     operation: {
       User: {

@@ -48,6 +48,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import { dbWallet } from 'src/controller'
+import { db } from 'src/model'
 
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
 
@@ -78,7 +79,7 @@ const onImportClick = async () => {
 
   for (const microchain of microchains) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChainId.value)
+    await rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChainId.value, db.ApplicationType.ERC20)
   }
 
   emit('imported')

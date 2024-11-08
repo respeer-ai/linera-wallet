@@ -45,7 +45,7 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: ExecutedBlock, round: rpc.Round, signature: string) => {
+const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: ExecutedBlock, round: rpc.Round, signature: string, retry: boolean, validatedBlockCertificateHash?: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
@@ -56,7 +56,9 @@ const submitBlockAndSignature = async (chainId: string, height: number, executed
     height,
     executedBlock,
     round,
-    signature
+    signature,
+    retry,
+    validatedBlockCertificateHash
   })
 }
 
