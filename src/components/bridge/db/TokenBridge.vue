@@ -28,6 +28,7 @@ watch(_tokens, async () => {
 })
 
 const createToken = async (token: db.Token) => {
+  if ((await dbBase.tokens.toArray()).findIndex((el) => el.applicationId === token.applicationId) >= 0) return
   await dbBase.tokens.add(token)
 }
 

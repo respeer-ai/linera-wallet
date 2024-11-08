@@ -85,3 +85,18 @@ export type Destination = {
   Recipient: string
   Subscribers: Int8Array
 }
+
+export type ERC20Token = {
+  name: string
+  symbol: string
+  totalSupply: string
+  tokenMetadata: {
+    discord: string
+    logo: string
+    telegram: string
+    twitter: string
+    website: string
+    github: string
+    description: string
+  }
+}

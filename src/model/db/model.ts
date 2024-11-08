@@ -189,7 +189,7 @@ export const buildPassword = (password: string): Password | undefined => {
   }
 }
 
-enum TokenType {
+export enum TokenType {
   Fungible = 'Fungible',
   NFT = 'NFT',
   Native = 'Native'

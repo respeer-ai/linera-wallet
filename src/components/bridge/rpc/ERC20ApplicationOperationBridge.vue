@@ -1,9 +1,10 @@
 <template>
   <MonoApplicationOperationBridge ref='monoApplicationOperationBridge' />
   <RpcOperationBridge ref='rpcOperationBridge' />
+  <DbTokenBridge ref='dbTokenBridge' />
 </template>
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { db, rpc } from 'src/model'
 import { ref } from 'vue'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
@@ -13,9 +14,11 @@ import { graphqlResult } from 'src/utils'
 
 import MonoApplicationOperationBridge from './MonoApplicationOperationBridge.vue'
 import RpcOperationBridge from './OperationBridge.vue'
+import DbTokenBridge from '../db/TokenBridge.vue'
 
 const monoApplicationOperationBridge = ref<InstanceType<typeof MonoApplicationOperationBridge>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
+const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
 const subscribeWLineraCreationChain = async (chainId: string, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
@@ -48,8 +51,24 @@ const persistApplication = async (chainId: string, applicationId: string) => {
 
   return new Promise((resolve, reject) => {
     onResult((res) => {
-      const tokenMetadata = graphqlResult.data(res, 'tokenMetadata')
-      console.log(tokenMetadata)
+      const token = graphqlResult.rootData(res) as rpc.ERC20Token
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      void dbTokenBridge.value?.createToken({
+        name: token.name,
+        description: token.tokenMetadata.description,
+        ticker: token.symbol,
+        tokenType: db.TokenType.Fungible,
+        logo: token.tokenMetadata.logo,
+        applicationId,
+        native: false,
+        usdCurrency: 0,
+        mono: true,
+        discord: token.tokenMetadata.discord,
+        telegram: token.tokenMetadata.telegram,
+        twitter: token.tokenMetadata.twitter,
+        website: token.tokenMetadata.website,
+        github: token.tokenMetadata.github
+      })
       // resolve((graphqlResult.rootData(res) as GetChainAccountBalancesQuery).balances as rpc.ChainAccountBalances)
       resolve(undefined)
     })
