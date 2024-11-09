@@ -28,6 +28,10 @@ export const needConfirm = async (req: RpcRequest) => {
       req.request.method as RpcMethod
     ))
   }
+  if (shouldConfirm === undefined) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Request ${req} is not in the confirmations`)
+  }
   // TODO: check with origin and publicKey
   return (
     shouldConfirm === undefined ||
