@@ -20,3 +20,9 @@ export const MINT = gql`
     mint(to: $to, amount: $amount)
   }
 `
+
+export const TRANSFER_ERC20 = gql`
+  mutation transfer($to: ChainAccountOwner, $amount: Amount!) {
+    transfer(to: $to, amount: $amount)
+  }
+`

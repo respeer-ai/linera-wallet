@@ -137,7 +137,7 @@ const onTransferClick = () => {
   void router.push({
     path: localStore.setting.formalizePath('/transfer'),
     query: {
-      tokenId: token.value.applicationId
+      applicationId: token.value.applicationId
     }
   })
 }

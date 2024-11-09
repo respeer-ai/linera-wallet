@@ -10,7 +10,7 @@ import { ref } from 'vue'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { BALANCE_OF, MINT, TOKEN_METADATA } from 'src/graphql'
+import { BALANCE_OF, MINT, TOKEN_METADATA, TRANSFER_ERC20 } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
 import { localStore, operationDef } from 'src/localstores'
 import { uid } from 'quasar'
@@ -147,13 +147,40 @@ const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccount
   }
 }
 
+const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAccountOwner | undefined, amount: number) => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const queryRespBytes = await rpcApplicationOperationBridge.value?.queryApplication(chainId, applicationId, TRANSFER_ERC20, 'transfer', {
+      to,
+      amount: amount.toString()
+    })
+    localStore.operation.operations.push({
+      operationType: operationDef.OperationType.MINT,
+      applicationType: db.ApplicationType.ERC20,
+      operationId: uid(),
+      microchain: chainId,
+      operation: {
+        User: {
+          application_id: applicationId,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          bytes: queryRespBytes
+        }
+      } as rpc.Operation
+    } as operationDef.ChainOperation)
+    return true
+  } catch {
+    return false
+  }
+}
+
 defineExpose({
   subscribeWLineraCreationChain,
   subscribeCreationChain,
   requestApplication,
   persistApplication,
   balanceOf,
-  mint
+  mint,
+  transfer
 })
 
 </script>

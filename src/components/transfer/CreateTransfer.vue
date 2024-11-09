@@ -57,25 +57,29 @@
   </q-card>
   <RpcOperationBridge ref='rpcOperationBridge' />
   <DbMicrochainBridge ref='dbMicrochainBridge' />
+  <RpcERC20ApplicationOperationBridge ref='rpcERC20ApplicationOperationBridge' />
 </template>
 
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { db } from 'src/model'
+import { db, rpc } from 'src/model'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
 import ConfirmTransfer from './ConfirmTransfer.vue'
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
+import RpcERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 
 interface Query {
   fromMicrochainId: string
+  applicationId?: string
 }
 
 const route = useRoute()
 const fromMicrochainId = ref((route.query as unknown as Query).fromMicrochainId)
+const applicationId = ref((route.query as unknown as Query).applicationId)
 
 const step = ref(1)
 
@@ -92,6 +96,7 @@ const amount = ref(0)
 const router = useRouter()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
+const rpcERC20ApplicationOperationBridge = ref<InstanceType<typeof RpcERC20ApplicationOperationBridge>>()
 
 const onSelectTransferAccountNext = () => {
   step.value++
@@ -107,14 +112,26 @@ const onBackClick = () => {
 }
 
 const onTransferConfirmed = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcOperationBridge.value?.transfer(
-    fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
-    selectedFromMicrochain.value?.microchain,
-    toChainBalance.value ? undefined : selectedToOwner.value?.address,
-    selectedToMicrochain.value?.microchain,
-    amount.value
-  )
+  if (!applicationId.value) {
+    const chainAccountOwner = {
+      chain_id: selectedToMicrochain.value?.microchain,
+      owner: `User:${selectedToOwner.value?.owner}`
+    } as rpc.ChainAccountOwner
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await rpcERC20ApplicationOperationBridge.value?.mint(
+      selectedFromMicrochain.value?.microchain,
+      applicationId.value as string,
+      chainAccountOwner, amount.value)
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await rpcOperationBridge.value?.transfer(
+      fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
+      selectedFromMicrochain.value?.microchain,
+      toChainBalance.value ? undefined : selectedToOwner.value?.address,
+      selectedToMicrochain.value?.microchain,
+      amount.value
+    )
+  }
   void router.back()
 }
 
