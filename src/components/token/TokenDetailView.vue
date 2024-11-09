@@ -56,6 +56,15 @@
             Stake
           </div>
         </div>
+        <!-- TODO: disabled should be reversed -->
+        <div v-if='!token.native' class='home-token-action-btn cursor-pointer' :disabled='token.mintable' @click='onMintClick'>
+          <q-avatar color='red-2' size='36px'>
+            <q-icon name='bi-plus-circle' size='24px' />
+          </q-avatar>
+          <div class='page-item-y-margin-top'>
+            Mint
+          </div>
+        </div>
         <q-space />
       </div>
     </div>
@@ -66,6 +75,14 @@
   <OwnerBalanceBridge :token-id='token?.id' v-model:token-balance='accountTokenBalance' v-model:usd-balance='accountUsdBalance' />
   <TokenBridge ref='dbTokenBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
+  <q-dialog v-model='minting'>
+    <q-card class='dialog transfer-card page-x-padding'>
+      <h5 class='onboarding-page-title text-center page-title'>
+        Mint {{ token.ticker }}
+      </h5>
+      <MintTokenView @minted='onTokenMinted' :token='token' />
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
@@ -79,6 +96,7 @@ import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import TokenDetailInnerView from './TokenDetailInnerView.vue'
 import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
+import MintTokenView from './MintTokenView.vue'
 
 interface Props {
   token: db.Token
@@ -88,6 +106,7 @@ const token = toRef(props, 'token')
 
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
+const minting = ref(false)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
@@ -121,6 +140,14 @@ const onTransferClick = () => {
       tokenId: token.value.applicationId
     }
   })
+}
+
+const onMintClick = () => {
+  minting.value = true
+}
+
+const onTokenMinted = () => {
+  minting.value = false
 }
 
 </script>

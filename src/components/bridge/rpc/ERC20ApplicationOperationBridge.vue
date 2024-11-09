@@ -2,6 +2,7 @@
   <MonoApplicationOperationBridge ref='monoApplicationOperationBridge' />
   <RpcOperationBridge ref='rpcOperationBridge' />
   <DbTokenBridge ref='dbTokenBridge' />
+  <RpcApplicationOperationBridge ref='rpcApplicationOperationBridge' />
 </template>
 <script setup lang='ts'>
 import { db, rpc } from 'src/model'
@@ -9,18 +10,20 @@ import { ref } from 'vue'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { BALANCE_OF, TOKEN_METADATA } from 'src/graphql'
+import { BALANCE_OF, MINT, TOKEN_METADATA } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
-import { localStore } from 'src/localstores'
+import { localStore, operationDef } from 'src/localstores'
 import { uid } from 'quasar'
 
 import MonoApplicationOperationBridge from './MonoApplicationOperationBridge.vue'
 import RpcOperationBridge from './OperationBridge.vue'
 import DbTokenBridge from '../db/TokenBridge.vue'
+import RpcApplicationOperationBridge from './ApplicationOperationBridge.vue'
 
 const monoApplicationOperationBridge = ref<InstanceType<typeof MonoApplicationOperationBridge>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
+const rpcApplicationOperationBridge = ref<InstanceType<typeof RpcApplicationOperationBridge>>()
 
 const subscribeWLineraCreationChain = async (chainId: string, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
@@ -72,7 +75,8 @@ const persistApplication = async (chainId: string, applicationId: string) => {
       telegram: token.tokenMetadata.telegram,
       twitter: token.tokenMetadata.twitter,
       website: token.tokenMetadata.website,
-      github: token.tokenMetadata.github
+      github: token.tokenMetadata.github,
+      mintable: token.tokenMetadata.mintable
     })
   })
 
@@ -117,12 +121,39 @@ const balanceOf = async (chainId: string, applicationId: string, publicKey?: str
   })
 }
 
+const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccountOwner | undefined, amount: number) => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const queryRespBytes = await rpcApplicationOperationBridge.value?.queryApplication(chainId, applicationId, MINT, 'mint', {
+      to,
+      amount: amount.toString()
+    })
+    localStore.operation.operations.push({
+      operationType: operationDef.OperationType.MINT,
+      applicationType: db.ApplicationType.ERC20,
+      operationId: uid(),
+      microchain: chainId,
+      operation: {
+        User: {
+          application_id: applicationId,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          bytes: queryRespBytes
+        }
+      } as rpc.Operation
+    } as operationDef.ChainOperation)
+    return true
+  } catch {
+    return false
+  }
+}
+
 defineExpose({
   subscribeWLineraCreationChain,
   subscribeCreationChain,
   requestApplication,
   persistApplication,
-  balanceOf
+  balanceOf,
+  mint
 })
 
 </script>

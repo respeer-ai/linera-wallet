@@ -14,3 +14,9 @@ export const BALANCE_OF = gql`
     balanceOf(owner: $owner)
   }
 `
+
+export const MINT = gql`
+  mutation mint($to: ChainAccountOwner, $amount: Amount!) {
+    mint(to: $to, amount: $amount)
+  }
+`

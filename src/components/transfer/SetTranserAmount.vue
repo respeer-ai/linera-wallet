@@ -86,7 +86,7 @@ watch(amount, () => {
   amount.value = Math.min(fromChainBalance.value ? chainTokenBalance.value : accountTokenBalance.value, Number(amount.value))
 })
 
-const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().length, 8), 1)) * 16).toString() + 'px')
+const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().length, 8), 2)) * 16).toString() + 'px')
 
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)

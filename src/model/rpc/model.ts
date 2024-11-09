@@ -98,6 +98,7 @@ export type ERC20Token = {
     website: string
     github: string
     description: string
+    mintable: boolean
   }
 }
 

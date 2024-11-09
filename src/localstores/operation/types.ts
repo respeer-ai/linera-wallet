@@ -4,7 +4,8 @@ export enum OperationType {
   LEGACY_REQUEST_SUBSCRIBE = 'requestSubscribe',
   SUBSCRIBE_CREATOR_CHAIN = 'subscribeCreatorChain',
   REQUEST_APPLICATION = 'requestApplication',
-  TRANSFER = 'transfer'
+  TRANSFER = 'transfer',
+  MINT = 'mint'
 }
 
 export interface ChainOperation {
