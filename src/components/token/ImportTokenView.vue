@@ -12,21 +12,10 @@
       outlined v-model='applicationId' type='textarea' :error='applicationIdError'
       autogrow hide-bottom-space class='vertical-items-margin'
     />
-    <div class='text-bold vertical-menus-margin'>
-      Creation Microchain ID
-    </div>
-    <q-input
-      outlined v-model='creationChainId' type='textarea' :error='creationChainIdError'
-      autogrow hide-bottom-space class='vertical-items-margin'
-    />
-    <q-toggle
-      v-if='false' dense v-model='importToAllChains' label='Import to all microchains'
-      class='vertical-menus-margin'
-    />
     <div class='vertical-sections-margin tip warn-bg warn row'>
       <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
       <div class='tip-text page-item-x-margin-left'>
-        You should confirm you import the right application with its creation microchain. You may lose your assets if you interact with malfunction application.
+        You should confirm you import the right application. You may lose your assets if you interact with malfunction application.
       </div>
     </div>
     <q-btn
@@ -43,26 +32,27 @@
     </q-btn>
   </div>
   <RpcOperationBridge ref='rpcOperationBridge' />
+  <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
 </template>
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import { dbWallet } from 'src/controller'
 import { db } from 'src/model'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
+import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 
 const applicationId = ref('')
-const creationChainId = ref('')
 const applicationIdError = ref(false)
-const creationChainIdError = ref(false)
-const importToAllChains = ref(false)
 
 const canImport = computed(() => {
-  return applicationId.value.length > 0 && creationChainId.value.length > 0
+  return applicationId.value.length > 0
 })
 
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
+const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 
 const emit = defineEmits<{(ev: 'imported'): void,
   (ev: 'error'): void,
@@ -71,17 +61,26 @@ const emit = defineEmits<{(ev: 'imported'): void,
 
 const onImportClick = async () => {
   applicationIdError.value = applicationId.value.length === 0
-  creationChainIdError.value = creationChainId.value.length === 0
-  if (applicationIdError.value || creationChainIdError.value) return
+  if (applicationIdError.value) return
 
-  const microchains = await dbWallet.microchains.toArray()
+  try {
+    const creationChain = await lineraWasm.application_creation_chain_id(applicationId.value)
+    const microchains = await dbWallet.microchains.toArray()
 
-  for (const microchain of microchains) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChainId.value, db.ApplicationType.ERC20)
+    for (const microchain of microchains) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (!await erc20ApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, applicationId.value, false)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChain, db.ApplicationType.WLINERA)
+      }
+    }
+
+    emit('imported')
+  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Failed refresh erc20 application: ${error}`)
+    emit('error')
   }
-
-  emit('imported')
 }
 
 const onCancelClick = () => {

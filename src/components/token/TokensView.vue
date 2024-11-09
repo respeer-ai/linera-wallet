@@ -27,7 +27,7 @@
       <h5 class='onboarding-page-title text-center page-title'>
         Importing ERC20 compatible token
       </h5>
-      <ImportTokenView @imported='onTokenImported' @error='onImportTokenError' />
+      <ImportTokenView @imported='onTokenImported' @error='onImportTokenError' @canceled='onImportTokenCanceled' />
     </q-card>
   </q-dialog>
   <q-dialog v-model='displayingAccount'>
@@ -56,6 +56,10 @@ const onTokenImported = () => {
 }
 
 const onImportTokenError = () => {
+  importingToken.value = false
+}
+
+const onImportTokenCanceled = () => {
   importingToken.value = false
 }
 

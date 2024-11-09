@@ -53,6 +53,8 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string, app
     return el.operationType === operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
   }) >= 0) return true
 
+  console.log(`Subscribed ${chainId}, ${applicationId}`)
+
   try {
     const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
     localStore.operation.operations.push({
