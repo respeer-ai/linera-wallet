@@ -6,7 +6,7 @@
     <div class='row vertical-items-margin'>
       <q-img :src='token.logo' width='128px' class='page-item-x-margin-left' />
       <div class='page-x-padding selector-y-padding selector-margin-x-left' :style='{width: "calc(100% - 128px - 12px - 12px)"}'>
-        <div v-html='token.description?.length > 0 ? token.description : "The creator <strong>DID NOT</strong> leave any description to the token! Please make sure you know the <strong>RISK</string> to interact with the token!"' />
+        <div v-html='token.description?.length > 0 ? token.description : "The creator <strong>DID NOT</strong> leave any description to the token! Please make sure you know the <strong>RISK</strong> to interact with the token!"' />
         <div class='row vertical-sections-margin'>
           <q-img
             v-if='token.github?.length > 0' :src='githubLogo' width='20px' height='20px'
