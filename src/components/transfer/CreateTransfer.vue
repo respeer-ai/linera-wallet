@@ -34,6 +34,7 @@
         <SetTranserAmount
           :from-owner='selectedFromOwner'
           :from-microchain='selectedFromMicrochain'
+          :token='selectedToken'
           v-model:from-chain-balance='fromChainBalance'
           @next='onSetTransferAmountNext'
           v-model='amount'
@@ -41,6 +42,7 @@
       </div>
       <div v-if='step === 3' class='full-width'>
         <ConfirmTransfer
+          :token='selectedToken'
           :from-owner='selectedFromOwner'
           :from-microchain='selectedFromMicrochain'
           :to-owner='selectedToOwner'
@@ -117,15 +119,15 @@ const onBackClick = () => {
 }
 
 const onTransferConfirmed = async () => {
-  if (!applicationId.value) {
+  if (!selectedToken.value.native) {
     const chainAccountOwner = {
       chain_id: selectedToMicrochain.value?.microchain,
       owner: `User:${selectedToOwner.value?.owner}`
     } as rpc.ChainAccountOwner
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcERC20ApplicationOperationBridge.value?.mint(
+    await rpcERC20ApplicationOperationBridge.value?.transfer(
       selectedFromMicrochain.value?.microchain,
-      applicationId.value as string,
+      selectedToken.value.applicationId as string,
       chainAccountOwner, amount.value)
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

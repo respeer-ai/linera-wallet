@@ -8,7 +8,7 @@
         autofocus type='number'
       />
       <div class='label-text-extra-large page-item-x-margin-left'>
-        TLINERA
+        {{ token.ticker }}
       </div>
       <q-space />
     </div>
@@ -69,10 +69,12 @@ import { lineraLogo } from 'src/assets'
 interface Props {
   fromOwner: db.Owner
   fromMicrochain: db.Microchain
+  token: db.Token
 }
 const props = defineProps<Props>()
 const fromOwner = toRef(props, 'fromOwner')
 const fromMicrochain = toRef(props, 'fromMicrochain')
+const token = toRef(props, 'token')
 
 const amount = defineModel<number>({ default: 0 })
 const fromChainBalance = defineModel<boolean>('fromChainBalance')

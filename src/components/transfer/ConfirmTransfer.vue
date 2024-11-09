@@ -9,7 +9,7 @@
       </q-avatar>
       <div class='selector-margin-x-left'>
         <div class='label-text-extra-large'>
-          {{ amount }} TLINERA
+          {{ amount }} {{ token.ticker }}
         </div>
         <div class='text-grey-6' :style='{marginTop: "-4px"}'>
           ≈ $ 0.00
@@ -151,6 +151,7 @@ import { lineraLogo } from 'src/assets'
 import { shortid } from 'src/utils'
 
 interface Props {
+  token: db.Token
   fromOwner: db.Owner
   fromMicrochain: db.Microchain
   toOwner?: db.Owner
@@ -162,6 +163,7 @@ interface Props {
   amount: number
 }
 const props = defineProps<Props>()
+const token = toRef(props, 'token')
 const fromOwner = toRef(props, 'fromOwner')
 const fromMicrochain = toRef(props, 'fromMicrochain')
 const toOwner = toRef(props, 'toOwner')
