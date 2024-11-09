@@ -9,7 +9,7 @@ import { ref } from 'vue'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { TOKEN_METADATA } from 'src/graphql'
+import { BALANCE_OF, TOKEN_METADATA } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
 import { localStore } from 'src/localstores'
 import { uid } from 'quasar'
@@ -38,7 +38,6 @@ const requestApplication = (chainId: string, applicationId: string, creationChai
 }
 
 const persistApplication = async (chainId: string, applicationId: string) => {
-  // TODO: check if we already persist application
   const options = await getClientOptionsWithEndpointType(EndpointType.Application, chainId, applicationId)
   const apolloClient = new ApolloClient(options)
 
@@ -78,21 +77,52 @@ const persistApplication = async (chainId: string, applicationId: string) => {
   })
 
   onError((error) => {
-  // Add to ticker run let block subscription run it
+    // Add to ticker run let block subscription run it
     localStore.operation.tickerRuns.set(uid(), () => {
       void persistApplication(chainId, applicationId)
     })
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Query token metadata: ${error}`)
   })
-  // TODO: check balance
+}
+
+const balanceOf = async (chainId: string, applicationId: string, publicKey?: string): Promise<number> => {
+  const chainAccountOwner = {
+    chain_id: chainId
+  } as rpc.ChainAccountOwner
+  if (publicKey) {
+    const owner = await db.ownerFromPublicKey(publicKey)
+    chainAccountOwner.owner = `User:${owner}`
+  }
+  const options = await getClientOptionsWithEndpointType(EndpointType.Application, chainId, applicationId)
+  const apolloClient = new ApolloClient(options)
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(BALANCE_OF, {
+    owner: chainAccountOwner
+  }, {
+    fetchPolicy: 'network-only'
+  }))
+
+  return new Promise((resolve, reject) => {
+    onResult((res) => {
+      const balance = Number(graphqlResult.data(res, 'balanceOf'))
+      resolve(balance)
+    })
+
+    onError((error) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      reject(`Query token metadata: ${error}`)
+    })
+  })
 }
 
 defineExpose({
   subscribeWLineraCreationChain,
   subscribeCreationChain,
   requestApplication,
-  persistApplication
+  persistApplication,
+  balanceOf
 })
 
 </script>

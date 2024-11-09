@@ -100,3 +100,8 @@ export type ERC20Token = {
     description: string
   }
 }
+
+export type ChainAccountOwner = {
+  chain_id: string
+  owner?: string /* User:$owner or Application:$applicationId */
+}

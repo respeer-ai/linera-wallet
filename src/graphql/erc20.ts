@@ -8,3 +8,9 @@ export const TOKEN_METADATA = gql`
     tokenMetadata
   }
 `
+
+export const BALANCE_OF = gql`
+  query balanceOf($owner: ChainAccountOwner!) {
+    balanceOf(owner: $owner)
+  }
+`

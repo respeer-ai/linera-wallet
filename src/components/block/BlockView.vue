@@ -68,6 +68,40 @@ const microchainsImportState = computed(() => localStore.setting.MicrochainsImpo
 type stopFunc = () => void
 const subscribed = ref(new Map<string, stopFunc>())
 
+const updateChainBalance = async (microchain: db.Microchain, tokenId: number, balance: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const microchainBalance = (await dbMicrochainBalanceBridge.value?.microchainFungibleTokenBalance(microchain, tokenId)) as db.MicrochainFungibleTokenBalance || {
+    microchain: microchain.microchain,
+    tokenId,
+    balance: 0
+  } as db.MicrochainFungibleTokenBalance
+  microchainBalance.balance = Number(balance)
+  microchainBalance.id === undefined
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    ? await dbMicrochainBalanceBridge.value?.createMicrochainFungibleTokenBalance(microchain, microchainBalance.tokenId, microchainBalance.balance)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    : await dbMicrochainBalanceBridge.value?.updateMicrochainFungibleTokenBalance(microchainBalance)
+}
+
+const updateAccountBalance = async (microchain: db.Microchain, tokenId: number, publicKey: string, balance: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const owner = await dbOwnerBridge.value?.publicKey2Owner(publicKey) as string
+  if (!owner) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const microchainOwnerBalance = (await dbMicrochainOwnerBalanceBridge.value?.microchainOwnerFungibleTokenBalance(microchain.microchain, owner, tokenId)) as db.MicrochainOwnerFungibleTokenBalance || {
+    microchain: microchain.microchain,
+    owner,
+    tokenId,
+    balance: 0
+  } as db.MicrochainOwnerFungibleTokenBalance
+  microchainOwnerBalance.balance = balance
+  microchainOwnerBalance.id === undefined
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    ? await dbMicrochainOwnerBalanceBridge.value?.createMicrochainOwnerFungibleBalance(microchain.microchain, owner, tokenId, microchainOwnerBalance.balance)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    : await dbMicrochainOwnerBalanceBridge.value?.updateMicrochainOwnerFungibleBalance(microchainOwnerBalance)
+}
+
 const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const balancesResp = await rpcAccountBridge.value?.getChainAccountBalances([microchain.microchain], publicKeys) as rpc.ChainAccountBalances
@@ -75,35 +109,9 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const nativeToken = (await dbTokenBridge.value?.nativeToken()) as db.Token
   if (!nativeToken) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const microchainBalance = (await dbMicrochainBalanceBridge.value?.microchainFungibleTokenBalance(microchain, nativeToken.id as number)) as db.MicrochainFungibleTokenBalance || {
-    microchain: microchain.microchain,
-    tokenId: nativeToken.id as number,
-    balance: 0
-  } as db.MicrochainFungibleTokenBalance
-  microchainBalance.balance = Number(balancesResp[microchain.microchain].chain_balance)
-  microchainBalance.id === undefined
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    ? await dbMicrochainBalanceBridge.value?.createMicrochainFungibleTokenBalance(microchain, microchainBalance.tokenId, microchainBalance.balance)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    : await dbMicrochainBalanceBridge.value?.updateMicrochainFungibleTokenBalance(microchainBalance)
+  await updateChainBalance(microchain, nativeToken.id as number, Number(balancesResp[microchain.microchain].chain_balance))
   for (const publicKey of publicKeys) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const owner = await dbOwnerBridge.value?.publicKey2Owner(publicKey) as string
-    if (!owner) return
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const microchainOwnerBalance = (await dbMicrochainOwnerBalanceBridge.value?.microchainOwnerFungibleTokenBalance(microchain.microchain, owner, nativeToken.id as number)) as db.MicrochainOwnerFungibleTokenBalance || {
-      microchain: microchain.microchain,
-      owner,
-      tokenId: nativeToken.id as number,
-      balance: 0
-    } as db.MicrochainOwnerFungibleTokenBalance
-    microchainOwnerBalance.balance = Number(balancesResp[microchain.microchain].account_balances[publicKey])
-    microchainOwnerBalance.id === undefined
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      ? await dbMicrochainOwnerBalanceBridge.value?.createMicrochainOwnerFungibleBalance(microchain.microchain, owner, nativeToken.id as number, microchainOwnerBalance.balance)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      : await dbMicrochainOwnerBalanceBridge.value?.updateMicrochainOwnerFungibleBalance(microchainOwnerBalance)
+    await updateAccountBalance(microchain, nativeToken.id as number, publicKey, Number(balancesResp[microchain.microchain].account_balances[publicKey]))
   }
 }
 
@@ -160,6 +168,23 @@ const parseActivities = async (microchain: db.Microchain, hash: string) => {
   }
 }
 
+const updateFungibleBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const tokens = await dbTokenBridge.value?.fungibleTokens() || []
+  for (const token of tokens) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const balance = await erc20ApplicationOperationBridge.value?.balanceOf(microchain.microchain, token.applicationId as string) || 0
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+    await updateChainBalance(microchain, token.id as number, balance)
+    for (const publicKey of publicKeys) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const balance = await erc20ApplicationOperationBridge.value?.balanceOf(microchain.microchain, token.applicationId as string, publicKey) || 0
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+      await updateAccountBalance(microchain, token.id as number, publicKey, balance)
+    }
+  }
+}
+
 const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
@@ -168,6 +193,7 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
   try {
     await updateChainAccountBalances(microchain, publicKeys)
+    await updateFungibleBalances(microchain, publicKeys)
   } catch (error) {
     console.log('Failed update chain account balances', error)
   }
@@ -329,7 +355,12 @@ const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => voi
   if (!owners.length) return Promise.reject('Invalid owners')
 
   const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
-  await updateChainAccountBalances(microchain, publicKeys)
+  try {
+    await updateChainAccountBalances(microchain, publicKeys)
+    await updateFungibleBalances(microchain, publicKeys)
+  } catch {
+    // DO NOTHING
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   return await rpcBlockBridge.value?.subscribe(
