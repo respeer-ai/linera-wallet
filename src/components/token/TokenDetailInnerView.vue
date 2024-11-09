@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div v-if='!token.native' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       Token price
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -59,6 +59,18 @@
         <q-space />
         <div class='word-break-all microchain-detail-value-text text-right'>
           {{ token.name }}
+        </div>
+      </div>
+    </div>
+    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+      <div class='microchain-detail-label text-grey-8 flex items-center'>
+        Token type
+      </div>
+      <q-space />
+      <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
+        <q-space />
+        <div class='word-break-all microchain-detail-value-text text-right'>
+          {{ token.tokenType }}
         </div>
       </div>
     </div>

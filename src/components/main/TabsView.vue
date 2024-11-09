@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { localStore } from 'src/localstores'
 
 import TokensView from '../token/TokensView.vue'
@@ -42,7 +42,12 @@ import MicrochainsView from '../microchain/MicrochainsView.vue'
 import ApplicationsView from '../application/ApplicationsView.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 
-const tab = ref('microchains')
+const tab = computed({
+  get: () => localStore.setting.homeTab || 'microchains',
+  set: (v: string) => {
+    localStore.setting.HomeTab = v
+  }
+})
 
 </script>
 

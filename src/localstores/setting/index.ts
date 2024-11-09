@@ -33,6 +33,9 @@ export const useSettingStore = defineStore('settings', {
     homeActionParams(): unknown {
       return this.HomeActionParams
     },
+    homeTab(): string {
+      return this.HomeTab
+    },
     creatingDefaultNetwork(): boolean {
       return this.CreatingDefaultNetwork
     },

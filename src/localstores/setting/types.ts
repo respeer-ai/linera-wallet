@@ -28,6 +28,7 @@ export interface Setting {
 
   HomeAction: HomeAction
   HomeActionParams: unknown
+  HomeTab: string
 
   CreatingDefaultNetwork: boolean
   CreatingDefaultToken: boolean
