@@ -4,6 +4,10 @@ import storageIcon from './StorageIcon.png'
 import onboardingExplorerBanner from './OnboardingExplorerBanner.png'
 import onboardingLoginBanner from './OnboardingLoginBanner.png'
 import onboardingImproveBanner from './OnboardingImproveBanner.png'
+import githubLogo from './Github.svg'
+import discordLogo from './Discord.svg'
+import twitterLogo from './Twitter.svg'
+import telegramLogo from './Telegram.svg'
 
 export {
   lineraLogo,
@@ -11,5 +15,9 @@ export {
   storageIcon,
   onboardingExplorerBanner,
   onboardingLoginBanner,
-  onboardingImproveBanner
+  onboardingImproveBanner,
+  githubLogo,
+  discordLogo,
+  twitterLogo,
+  telegramLogo
 }

@@ -3,7 +3,7 @@
     <q-space />
     <div>
       <div v-if='tokens.length > 0'>
-        <TokenCardView v-for='token in tokens' :key='token.id' :token='token' />
+        <TokenCardView v-for='token in tokens' :key='token.id' :token='token' @click='onTokenClick(token)' />
       </div>
       <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer' @click='onReceiveTokensClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
@@ -38,6 +38,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { db } from 'src/model'
+import { localStore } from 'src/localstores'
 
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import TokenCardView from './TokenCardView.vue'
@@ -77,6 +78,11 @@ const onDisplayAccountCanceled = () => {
 
 const onDisplayAccountDone = () => {
   displayingAccount.value = false
+}
+
+const onTokenClick = (token: db.Token) => {
+  localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_TOKEN
+  localStore.setting.HomeActionParams = token
 }
 
 </script>

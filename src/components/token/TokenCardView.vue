@@ -1,7 +1,7 @@
 <template>
   <q-item class='row full-width tab-panel-item' clickable>
-    <div :class='[ "selector-indicator", token.native ? "selector-indicator-selected" : "" ]' />
-    <q-avatar class='selector-margin-x-left'>
+    <div v-if='showIndicator' :class='[ "selector-indicator", token.native ? "selector-indicator-selected" : "" ]' />
+    <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='token.logo' />
       <q-badge
         v-if='!token.native' color='transparent' rounded transparent
@@ -24,7 +24,7 @@
         $ {{ usdBalance }} <span class='text-grey-6 selector-item-currency-sub'>USD</span>
       </div>
     </div>
-    <div :class='[ "selector-indicator selector-margin-x-left" ]' />
+    <div v-if='showIndicator' class='selector-indicator selector-margin-x-left' />
     <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='token.id' />
     <DbOwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
     <DbTokenBridge ref='dbTokenBridge' />
@@ -43,9 +43,13 @@ import { lineraLogo } from 'src/assets'
 
 interface Props {
   token: db.Token
+  showIndicator?: boolean
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showIndicator: true
+})
 const token = toRef(props, 'token')
+const showIndicator = toRef(props, 'showIndicator')
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)

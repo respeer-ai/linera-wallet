@@ -199,6 +199,7 @@ export interface Token {
   id?: number
   name: string
   description: string
+  totalSupply: number
   ticker: string
   tokenType: TokenType
   logo: string
@@ -218,6 +219,7 @@ export const lineraToken = {
   description:
     'The first L1 blockchain infrastructure optimized for real-time applications',
   ticker: 'TLINERA',
+  totalSupply: 2100000000,
   tokenType: TokenType.Native,
   logo: lineraLogo,
   native: true,

@@ -61,6 +61,7 @@ const persistApplication = async (chainId: string, applicationId: string) => {
     void dbTokenBridge.value?.createToken({
       name: token.name,
       description: token.tokenMetadata.description,
+      totalSupply: Number(token.totalSupply),
       ticker: token.symbol,
       tokenType: db.TokenType.Fungible,
       logo: token.tokenMetadata.logo,
