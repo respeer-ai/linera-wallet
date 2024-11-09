@@ -50,7 +50,6 @@
       </div>
       <q-space />
     </div>
-    <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='nativeTokenId' />
     <DbTokenBridge ref='dbTokenBridge' />
     <DbOwnerBridge v-model:selected-owner='selectedOwner' ref='dbOwnerBridge' />
   </div>
@@ -62,7 +61,6 @@ import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 
-import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 
@@ -71,7 +69,6 @@ const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
-const nativeTokenId = ref(0)
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const router = useRouter()
