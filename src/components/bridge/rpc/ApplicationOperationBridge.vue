@@ -45,28 +45,32 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
   })
 }
 
-const subscribeCreatorChain = async (chainId: string, applicationId: string, applicationType: db.ApplicationType, force?: boolean) => {
+const subscribeCreatorChain = async (chainId: string, applicationId: string, applicationType: db.ApplicationType, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  if (!force && await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return
+  if (!force && await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return true
 
   if (localStore.operation.operations.findIndex((el) => {
     return el.operationType === operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
-  }) >= 0) return
+  }) >= 0) return true
 
-  const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
-
-  localStore.operation.operations.push({
-    operationType: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
-    applicationType,
-    operationId: uid(),
-    microchain: chainId,
-    operation: {
-      User: {
-        application_id: applicationId,
-        bytes: queryRespBytes
-      }
-    } as rpc.Operation
-  } as operationDef.ChainOperation)
+  try {
+    const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
+    localStore.operation.operations.push({
+      operationType: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
+      applicationType,
+      operationId: uid(),
+      microchain: chainId,
+      operation: {
+        User: {
+          application_id: applicationId,
+          bytes: queryRespBytes
+        }
+      } as rpc.Operation
+    } as operationDef.ChainOperation)
+    return true
+  } catch {
+    return false
+  }
 }
 
 const requestSubscribe = async (chainId: string, applicationId: string) => {

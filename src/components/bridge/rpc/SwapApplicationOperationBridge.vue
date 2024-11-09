@@ -9,9 +9,9 @@ import MonoApplicationOperationBridge from './MonoApplicationOperationBridge.vue
 
 const monoApplicationOperationBridge = ref<InstanceType<typeof MonoApplicationOperationBridge>>()
 
-const subscribeCreationChain = async (chainId: string) => {
+const subscribeCreationChain = async (chainId: string, force?: boolean) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await monoApplicationOperationBridge.value?.subscribeCreationChainWithType(chainId, db.ApplicationType.SWAP)
+  await monoApplicationOperationBridge.value?.subscribeCreationChainWithType(chainId, db.ApplicationType.SWAP, force)
 }
 
 defineExpose({

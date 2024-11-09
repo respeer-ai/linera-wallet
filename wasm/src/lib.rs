@@ -14,7 +14,7 @@ use std::str::FromStr;
 use linera_base::{
     crypto::{CryptoHash, KeyPair, PublicKey},
     data_types::{BlockHeight, OracleResponse, Round, Timestamp},
-    identifiers::ChainId,
+    identifiers::{ApplicationId, ChainId},
 };
 use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
 use linera_execution::Operation;
@@ -175,6 +175,12 @@ pub async fn set_wallet(wallet: &str) -> Result<(), wasm_bindgen::JsError> {
 #[wasm_bindgen]
 pub async fn dapp_query(n: u32) -> u32 {
     n + 1
+}
+
+#[wasm_bindgen]
+pub async fn application_creation_chain_id(application_id: &str) -> Result<String, JsError> {
+    let application_id: ApplicationId = ApplicationId::from_str(application_id)?;
+    Ok(application_id.creation.chain_id.to_string())
 }
 
 #[wasm_bindgen]

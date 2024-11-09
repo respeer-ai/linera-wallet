@@ -42,57 +42,49 @@ const persistApplication = async (chainId: string, applicationId: string) => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Application, chainId, applicationId)
   const apolloClient = new ApolloClient(options)
 
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(TOKEN_METADATA, {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(TOKEN_METADATA, {
     // NO PARAMETER
-    }, {
-      fetchPolicy: 'network-only'
-    }))
-    return new Promise((resolve, reject) => {
-      onResult((res) => {
-        const token = graphqlResult.rootData(res) as rpc.ERC20Token
-        if (!token.tokenMetadata) {
-        // Add to ticker run let block subscription run it
-          return localStore.operation.tickerRuns.set(uid(), () => {
-            void persistApplication(chainId, applicationId)
-          })
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        void dbTokenBridge.value?.createToken({
-          name: token.name,
-          description: token.tokenMetadata.description,
-          ticker: token.symbol,
-          tokenType: db.TokenType.Fungible,
-          logo: token.tokenMetadata.logo,
-          applicationId,
-          native: false,
-          usdCurrency: 0,
-          mono: true,
-          discord: token.tokenMetadata.discord,
-          telegram: token.tokenMetadata.telegram,
-          twitter: token.tokenMetadata.twitter,
-          website: token.tokenMetadata.website,
-          github: token.tokenMetadata.github
-        })
-        resolve(undefined)
-      })
+  }, {
+    fetchPolicy: 'network-only'
+  }))
 
-      onError((error) => {
-      // Add to ticker run let block subscription run it
-        localStore.operation.tickerRuns.set(uid(), () => {
-          void persistApplication(chainId, applicationId)
-        })
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        reject(new Error(`Query token metadata: ${error}`))
+  onResult((res) => {
+    const token = graphqlResult.rootData(res) as rpc.ERC20Token
+    if (!token.tokenMetadata) {
+    // Add to ticker run let block subscription run it
+      return localStore.operation.tickerRuns.set(uid(), () => {
+        void persistApplication(chainId, applicationId)
       })
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    void dbTokenBridge.value?.createToken({
+      name: token.name,
+      description: token.tokenMetadata.description,
+      ticker: token.symbol,
+      tokenType: db.TokenType.Fungible,
+      logo: token.tokenMetadata.logo,
+      applicationId,
+      native: false,
+      usdCurrency: 0,
+      mono: true,
+      discord: token.tokenMetadata.discord,
+      telegram: token.tokenMetadata.telegram,
+      twitter: token.tokenMetadata.twitter,
+      website: token.tokenMetadata.website,
+      github: token.tokenMetadata.github
     })
-  // TODO: check balance
-  } catch (error) {
-    return localStore.operation.tickerRuns.set(uid(), () => {
+  })
+
+  onError((error) => {
+  // Add to ticker run let block subscription run it
+    localStore.operation.tickerRuns.set(uid(), () => {
       void persistApplication(chainId, applicationId)
     })
-  }
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Query token metadata: ${error}`)
+  })
+  // TODO: check balance
 }
 
 defineExpose({

@@ -5,11 +5,7 @@
         <q-icon name='bi-box-seam' size='16px' />
       </div>
       <div class='label-text-small page-item-x-margin-left'>
-        WTLINERA application and creation chain
-      </div>
-      <q-space />
-      <div class='flex items-center justify-center cursor-pointer clickable' @click='onRefresh'>
-        <q-icon name='bi-arrow-clockwise' size='16px' />
+        WTLINERA application
       </div>
     </div>
     <div class='word-break-all vertical-menus-margin extra-margin-bottom'>
@@ -18,14 +14,18 @@
       </div>
       <div class='vertical-menus-margin text-grey-8 row flex items-center' :style='{ paddingBottom: "4px" }'>
         <div>Application ID</div>
+        <q-space />
         <q-icon
-          v-if='editingWlineraApplication' name='bi-save' size='16px' class='page-item-x-margin-left cursor-pointer'
+          v-if='editingWlineraApplication' name='bi-save' size='16px' class='page-item-x-margin-left cursor-pointer clickable'
           @click='onSaveWlineraApplicationId'
         />
         <q-icon
-          v-else name='bi-pencil-square' size='16px' class='page-item-x-margin-left cursor-pointer'
+          v-else name='bi-pencil-square' size='16px' class='page-item-x-margin-left cursor-pointer clickable'
           @click='editingWlineraApplication = true'
         />
+        <div class='flex items-center justify-center cursor-pointer clickable page-item-x-margin-left' @click='onRefresh'>
+          <q-icon name='bi-arrow-clockwise' size='16px' />
+        </div>
       </div>
       <q-input
         v-model='wlineraApplicationId' v-if='editingWlineraApplication' autogrow hide-bottom-space
@@ -34,28 +34,10 @@
       <p v-else class='vertical-items-margin text-grey-6'>
         {{ wlineraApplicationId }}
       </p>
-      <div class='vertical-menus-margin text-grey-8 row flex items-center' :style='{ paddingBottom: "4px" }'>
-        <div>Creation chain</div>
-        <q-icon
-          v-if='editingWlineraCreatorChain' name='bi-save' size='16px' class='page-item-x-margin-left cursor-pointer'
-          @click='onSaveWlineraCreatorChain'
-        />
-        <q-icon
-          v-else name='bi-pencil-square' size='16px' class='page-item-x-margin-left cursor-pointer'
-          @click='editingWlineraCreatorChain = true'
-        />
-      </div>
-      <q-input
-        v-model='wlineraCreatorChain' v-if='editingWlineraCreatorChain' autogrow hide-bottom-space
-        type='textarea' :style='{marginTop: "-10px"}'
-      />
-      <p v-else class='vertical-items-margin text-grey-6'>
-        {{ wlineraCreatorChain }}
-      </p>
       <q-btn
-        flat class='btn btn-alt vertical-menus-margin full-width' label='Submit'
-        no-caps @click='onSubmit'
-        :disable='!wlineraApplicationId?.length || !wlineraCreatorChain?.length'
+        flat class='btn btn-alt vertical-menus-margin full-width' label='Save'
+        no-caps @click='onSaveWlineraApplicationId'
+        :disable='!wlineraApplicationId?.length'
       />
     </div>
   </div>
@@ -69,6 +51,7 @@ import { computed, ref, watch } from 'vue'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 import { dbWallet } from 'src/controller'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
 import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
@@ -80,59 +63,61 @@ const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20Application
 const nameApplications = ref([] as db.NamedApplication[])
 
 const editingWlineraApplication = ref(false)
-const editingWlineraCreatorChain = ref(false)
 
 const wlineraApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.WLINERA))
-
 const wlineraApplicationId = ref(wlineraApplication.value?.applicationId)
-const wlineraCreatorChain = ref(wlineraApplication.value?.creatorChain)
 
 watch(wlineraApplication, () => {
   wlineraApplicationId.value = wlineraApplication.value?.applicationId
-  wlineraCreatorChain.value = wlineraApplication.value?.creatorChain
 })
 
 const namedApplicationBridge = ref<InstanceType<typeof NamedApplicationBridge>>()
 
-const onSaveWlineraApplicationId = () => {
+const onSaveWlineraApplicationId = async () => {
   if (!wlineraApplicationId.value?.length) return
   editingWlineraApplication.value = false
-}
 
-const onSaveWlineraCreatorChain = () => {
-  if (!wlineraCreatorChain.value?.length) return
-  editingWlineraCreatorChain.value = false
-}
+  try {
+    const creationChain = await lineraWasm.application_creation_chain_id(wlineraApplicationId.value)
+    const microchains = await dbWallet.microchains.toArray()
 
-const onSubmit = async () => {
-  if (!wlineraApplicationId.value?.length || !wlineraCreatorChain.value?.length) return
-
-  const microchains = await dbWallet.microchains.toArray()
-
-  for (const microchain of microchains) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, wlineraCreatorChain.value, db.ApplicationType.WLINERA)
-  }
+    await namedApplicationBridge.value?.updateNamedApplication({
+      ...wlineraApplication.value,
+      creatorChain: creationChain,
+      applicationId: wlineraApplicationId.value
+    } as db.NamedApplication)
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await namedApplicationBridge.value?.updateNamedApplication({
-    ...wlineraApplication.value,
-    creatorChain: wlineraCreatorChain.value,
-    applicationId: wlineraApplicationId.value
-  } as db.NamedApplication)
+    for (const microchain of microchains) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, false)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+      }
+    }
+  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Failed update wlinera application: ${error}`)
+  }
 }
 
 const onRefresh = async () => {
-  if (!wlineraApplicationId.value?.length || !wlineraCreatorChain.value?.length) return
+  if (!wlineraApplicationId.value?.length) return
 
-  const microchains = await dbWallet.microchains.toArray()
+  try {
+    const creationChain = await lineraWasm.application_creation_chain_id(wlineraApplicationId.value)
+    const microchains = await dbWallet.microchains.toArray()
 
-  for (const microchain of microchains) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, true)) {
+    for (const microchain of microchains) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, wlineraCreatorChain.value, db.ApplicationType.WLINERA)
+      if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, true)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+      }
     }
+  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Failed refresh wlinera application: ${error}`)
   }
 }
 

@@ -20,11 +20,10 @@ const subscribeCreationChainWithId = async (chainId: string, applicationId: stri
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const applications = await rpcApplicationBridge.value?.microchainApplications(chainId) as ApplicationOverview[]
   if (!applications) return false
-  if (applications?.findIndex((el: ApplicationOverview) => el.id === applicationId) < 0) return false
+  if (applications?.findIndex((el: ApplicationOverview) => el.id === applicationId) >= 0) return false
   // TODO: check if it's already subscribed
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await rpcApplicationOperationBridge.value?.subscribeCreatorChain(chainId, applicationId, applicationType, force)
-  return true
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+  return await rpcApplicationOperationBridge.value?.subscribeCreatorChain(chainId, applicationId, applicationType, force) || false
 }
 
 const subscribeCreationChainWithType = async (chainId: string, applicationType: db.ApplicationType, force?: boolean): Promise<boolean> => {

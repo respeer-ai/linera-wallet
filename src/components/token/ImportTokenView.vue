@@ -73,7 +73,6 @@ const onImportClick = async () => {
   applicationIdError.value = applicationId.value.length === 0
   creationChainIdError.value = creationChainId.value.length === 0
   if (applicationIdError.value || creationChainIdError.value) return
-  // TODO: request application to my chain, of all of my chains
 
   const microchains = await dbWallet.microchains.toArray()
 

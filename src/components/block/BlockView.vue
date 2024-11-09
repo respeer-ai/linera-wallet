@@ -172,10 +172,6 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
     console.log('Failed update chain account balances', error)
   }
   await parseActivities(microchain, hash)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain)
 
   // Here we don't care about the result. If ticker run think they need to run again when fail, they should append themselves again
   const tickerRuns = localStore.operation.tickerRuns
@@ -413,12 +409,9 @@ const _handleOperations = async () => {
           if (operation.applicationType === db.ApplicationType.WLINERA)
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)
-          else if (operation.applicationType === db.ApplicationType.ERC20)
+          else if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.SWAP)
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, operation.operation.System.RequestApplication.application_id, true)
-          else
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.System.RequestApplication.application_id)
           break
       }
     } catch (error) {
