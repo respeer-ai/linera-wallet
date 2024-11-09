@@ -27,6 +27,7 @@
           v-model:to-microchain='toMicrochain'
           v-model:from-chain-balance='fromChainBalance'
           v-model:to-chain-balance='toChainBalance'
+          v-model:selected-token='selectedToken'
         />
       </div>
       <div v-if='step === 2' class='full-width'>
@@ -58,6 +59,7 @@
   <RpcOperationBridge ref='rpcOperationBridge' />
   <DbMicrochainBridge ref='dbMicrochainBridge' />
   <RpcERC20ApplicationOperationBridge ref='rpcERC20ApplicationOperationBridge' />
+  <DbTokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -71,6 +73,7 @@ import SetTranserAmount from './SetTranserAmount.vue'
 import ConfirmTransfer from './ConfirmTransfer.vue'
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
 import RpcERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
+import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 
 interface Query {
   fromMicrochainId: string
@@ -83,6 +86,7 @@ const applicationId = ref((route.query as unknown as Query).applicationId)
 
 const step = ref(1)
 
+const selectedToken = ref(undefined as unknown as db.Token)
 const selectedFromOwner = ref(undefined as unknown as db.Owner)
 const selectedFromMicrochain = ref(undefined as unknown as db.Microchain)
 const selectedToOwner = ref(undefined as unknown as db.Owner)
@@ -97,6 +101,7 @@ const router = useRouter()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 const rpcERC20ApplicationOperationBridge = ref<InstanceType<typeof RpcERC20ApplicationOperationBridge>>()
+const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
 const onSelectTransferAccountNext = () => {
   step.value++
@@ -139,6 +144,10 @@ onMounted(async () => {
   if (fromMicrochainId.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     selectedFromMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(fromMicrochainId.value) as db.Microchain
+  }
+  if (applicationId.value) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    selectedToken.value = await dbTokenBridge.value?.token(applicationId.value) as db.Token
   }
 })
 

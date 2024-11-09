@@ -48,12 +48,17 @@ const fungibleTokens = async () => {
   return (await dbBase.tokens.toArray()).filter((el) => el.tokenType === db.TokenType.Fungible)
 }
 
+const token = async (applicationId: string) => {
+  return (await dbBase.tokens.toArray()).find((el) => el.applicationId === applicationId)
+}
+
 defineExpose({
   createToken,
   deleteToken,
   updateToken,
   nativeToken,
-  fungibleTokens
+  fungibleTokens,
+  token
 })
 
 </script>

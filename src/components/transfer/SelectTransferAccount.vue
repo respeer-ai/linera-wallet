@@ -1,5 +1,32 @@
 <template>
   <div class='vertical-menus-margin decorate-underline'>
+    Token
+  </div>
+  <q-btn-dropdown
+    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-menus-margin'
+    no-caps dense
+    dropdown-icon='bi-chevron-down'
+    menu-anchor='bottom left'
+    menu-self='top left'
+    @click='onTokenClick'
+  >
+    <template #label>
+      <div class='row full-width'>
+        <q-avatar>
+          <q-img v-if='selectedToken' :src='selectedToken.logo' width='36px' height='36px' />
+        </q-avatar>
+        <div v-if='selectedToken' class='header-items-margin-x-left text-left' :style='{width: "calc(100% - 36px - 12px - 20px)"}'>
+          <div>
+            {{ selectedToken.ticker }}
+          </div>
+          <div class='text-grey-6 page-header-network'>
+            0x{{ shortid.shortId(selectedToken.applicationId as string, 10) }}
+          </div>
+        </div>
+      </div>
+    </template>
+  </q-btn-dropdown>
+  <div class='vertical-menus-margin decorate-underline'>
     From
   </div>
   <q-btn-dropdown
@@ -180,6 +207,9 @@
   <q-dialog v-model='selectingToMicrochain'>
     <MicrochainSelector :owner='selectedToOwner?.owner' v-model='selectedToMicrochain' @selected='onToMicrochainSelected' />
   </q-dialog>
+  <q-dialog v-model='selectingToken'>
+    <TokenSelector v-model='selectedToken' @selected='onTokenSelected' />
+  </q-dialog>
 </template>
 
 <script setup lang='ts'>
@@ -191,6 +221,7 @@ import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import MicrochainSelector from '../selector/MicrochainSelector.vue'
+import TokenSelector from '../selector/TokenSelector.vue'
 
 const selectedFromOwner = defineModel<db.Owner>('selectedFromOwner')
 const selectedFromMicrochain = defineModel<db.Microchain>('selectedFromMicrochain')
@@ -204,10 +235,13 @@ const toMicrochain = defineModel<string>('toMicrochain')
 const fromChainBalance = defineModel<boolean>('fromChainBalance')
 const toChainBalance = defineModel<boolean>('toChainBalance')
 
+const selectedToken = defineModel<db.Token>('selectedToken')
+
 const selectingFromOwner = ref(false)
 const selectingFromMicrochain = ref(false)
 const selectingToOwner = ref(false)
 const selectingToMicrochain = ref(false)
+const selectingToken = ref(false)
 
 const onFromAccountClick = () => {
   selectingFromOwner.value = true
@@ -260,6 +294,14 @@ const onClearToAccountClick = () => {
 const onToOwnerSelected = (owner?: db.Owner) => {
   selectingToOwner.value = false
   toAddress.value = owner?.owner || ''
+}
+
+const onTokenClick = () => {
+  selectingToken.value = true
+}
+
+const onTokenSelected = () => {
+  selectingToken.value = false
 }
 
 watch(selectedToMicrochain, () => {
