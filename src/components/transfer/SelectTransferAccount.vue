@@ -19,7 +19,10 @@
           <div>
             {{ selectedToken.ticker }}
           </div>
-          <div class='text-grey-6 page-header-network'>
+          <div v-if='selectedToken.native' class='text-grey-6 page-header-network'>
+            {{ selectedToken.name }}
+          </div>
+          <div v-else class='text-grey-6 page-header-network'>
             0x{{ shortid.shortId(selectedToken.applicationId as string, 10) }}
           </div>
         </div>

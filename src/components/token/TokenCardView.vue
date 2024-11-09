@@ -1,6 +1,6 @@
 <template>
   <q-item class='row full-width tab-panel-item' clickable>
-    <div v-if='showIndicator' :class='[ "selector-indicator", token.native ? "selector-indicator-selected" : "" ]' />
+    <div v-if='showIndicator' :class='[ "selector-indicator", (active || (activeNative && token.native)) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='token.logo' />
       <q-badge
@@ -44,12 +44,18 @@ import { lineraLogo } from 'src/assets'
 interface Props {
   token: db.Token
   showIndicator?: boolean
+  active?: boolean
+  activeNative?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
-  showIndicator: true
+  showIndicator: true,
+  active: false,
+  activeNative: true
 })
 const token = toRef(props, 'token')
 const showIndicator = toRef(props, 'showIndicator')
+const active = toRef(props, 'active')
+const activeNative = toRef(props, 'activeNative')
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)

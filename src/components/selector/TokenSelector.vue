@@ -16,7 +16,10 @@
       </q-input>
     </div>
     <div v-if='displayTokens.length > 0'>
-      <TokenCardView v-for='_token in displayTokens' :key='_token.id' :token='_token' @click='onTokenClick(_token)' />
+      <TokenCardView
+        v-for='_token in displayTokens' :key='_token.id' :token='_token' @click='onTokenClick(_token)'
+        :active-native='false' :active='token?.applicationId === _token.applicationId'
+      />
     </div>
   </q-card>
   <DbTokenBridge v-model:tokens='tokens' />

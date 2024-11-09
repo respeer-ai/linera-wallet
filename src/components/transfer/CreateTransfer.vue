@@ -148,6 +148,9 @@ onMounted(async () => {
   if (applicationId.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     selectedToken.value = await dbTokenBridge.value?.token(applicationId.value) as db.Token
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    selectedToken.value = await dbTokenBridge.value?.nativeToken() as db.Token
   }
 })
 
