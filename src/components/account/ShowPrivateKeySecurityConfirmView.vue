@@ -4,15 +4,15 @@
       <div class='row'>
         <q-space />
         <p class='text-center text-bold text-grey-9 selector-title'>
-          Protect private key
+          {{ $t('MSG_PROTECT_PRIVATE_KEY') }}
         </p>
         <q-space />
         <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
       </div>
       <div class='vertical-menus-margin'>
-        <p>This private key provide <strong>full permissions</strong> to its account assets.</p>
-        <p><strong>Please never share private key to anyone else.</strong> CheCko support team won't require to provide those information.</p>
-        <p><strong class='text-blue-8'>But, phishing users use it to steal your assets!</strong></p>
+        <p v-html='$t("MSG_PRIVATE_KEY_PROVIDE_FULL_PERMISSIONS")' />
+        <p v-html='$t("MSG_NEVER_SHARE_PRIVATE_KEY_TO_ANYONE_ELSE")' />
+        <p v-html='$t("MSG_PHISHING_USER_USE_IT_TO_STEAL_ASSETS")' />
       </div>
       <div class='vertical-sections-margin'>
         <q-btn
@@ -25,7 +25,7 @@
         >
           <template #loading>
             <q-spinner-gears class='on-left' />
-            Confirming
+            {{ $t('MSG_CONFIRMING') }}
           </template>
         </q-btn>
       </div>

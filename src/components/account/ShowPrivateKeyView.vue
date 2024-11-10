@@ -3,7 +3,7 @@
     <div class='row page-x-padding'>
       <q-space />
       <p class='text-center text-bold text-grey-9 selector-title'>
-        Show private key
+        {{ $t('MSG_SHOW_PRIVATE_KEY') }}
       </p>
       <q-space />
       <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
@@ -18,9 +18,7 @@
       </div>
       <div class='row warn vertical-sections-margin private-key-warn'>
         <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
-        <div :style='{width: "calc(100% - 24px - 12px)"}' class='selector-margin-x-left'>
-          Warning: DO NOT leak this private key! People who have this private key can access any assets in this account.
-        </div>
+        <div :style='{width: "calc(100% - 24px - 12px)"}' class='selector-margin-x-left' v-html='$t("MSG_WARNING_DO_NOT_LEAK_THIS_PRIVATE_KEY")' />
       </div>
       <div class='vertical-sections-margin'>
         <q-btn

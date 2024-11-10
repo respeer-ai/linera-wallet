@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class='text-center text-bold text-grey-9 selector-title'>
-      Select an account
+      {{ $t('MSG_SELECT_AN_ACCOUNT') }}
     </p>
     <AccountsInnerView :persistent='persistent' :searchable='true' @selected='onOwnerSelected' />
   </div>

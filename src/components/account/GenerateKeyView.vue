@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class='text-grey-9'>Account name</span>
+    <span class='text-grey-9'>{{ $t('MSG_ACCOUNT_NAME') }}</span>
     <div class='vertical-items-margin'>
       <q-input dense outlined v-model='accountName' />
     </div>
@@ -8,13 +8,13 @@
       flat class='btn full-width vertical-sections-margin' @click='onCreateClick'
       no-caps :disable='accountName.length === 0'
     >
-      Create
+      {{ $t('MSG_CREATE') }}
     </q-btn>
     <q-btn
       flat class='btn btn-alt full-width vertical-items-margin' @click='onCancelClick'
       no-caps
     >
-      Cancel
+      {{ $t('MSG_CANCEL') }}
     </q-btn>
     <GenerateKey ref='generateKey' />
     <OwnerBridge ref='ownerBridge' />

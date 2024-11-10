@@ -1,16 +1,16 @@
 <template>
   <div class='fill-parent text-center'>
     <h5 class='onboarding-page-title'>
-      Validate secret recovery phrase
+      {{ $t('MSG_VALIDATE_SECRET_RECOVERY_PHRASE') }}
     </h5>
     <div>
-      Fill right mnemonic into empty fields to confirm you already properly backup mnemonic.
+      {{ $t('MSG_FILL_RIGHT_MNEMONIC_INTO_EMPTY_FIELDS') }}
     </div>
     <div class='text-left text-bold vertical-sections-margin' :style='{paddingLeft: "20px"}'>
-      Tips:
+      {{ $t('MSG_TIPS') }}{{ $t('MSG_COLON') }}
     </div>
     <ul class='text-left' :style='{marginTop: "8px"}'>
-      <li>If you don't save mnemonic properly, it's safe to create a new one and discard the this one at this step.</li>
+      <li>{{ $t('MSG_DONT_SAVE_MNEMONIC_PROPERLY_SAFE_TO_CREATE_NEW') }}</li>
     </ul>
     <div class='row vertical-sections-margin'>
       <div v-for='(word, i) in mnemonicPartialWords' :key='word' :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'>

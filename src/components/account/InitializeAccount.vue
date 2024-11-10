@@ -1,27 +1,23 @@
 <template>
   <div class='text-center fill-parent'>
-    <h5 class='onboarding-page-title'>
-      Write down your Secret<br>Recovery Phrase
-    </h5>
-    <p>
-      Write donw this 24-words Secret Recovery Phrase and save it in a place that you trust and only you can access.
-    </p>
+    <h5 class='onboarding-page-title' v-html='$t("MSG_WRITE_DOWN_RECOVERY_PHRASE")' />
+    <p v-html='$t("MSG_WRITE_DOWN_24_WORDS_RECOVERY_PHRASE_AND_SAVE_IT")' />
     <div class='text-left text-bold vertical-sections-margin' :style='{paddingLeft: "20px"}'>
-      Tips:
+      {{ $t('MSG_TIPS') }}{{ $t('MSG_COLON') }}
     </div>
     <ul class='text-left' :style='{marginTop: "8px"}'>
-      <li>Save in a password manager</li>
-      <li>Store in a safe deposit box</li>
-      <li>Write down and store in multiple secret places</li>
+      <li>{{ $t('MSG_SAVE_IN_A_PASSWORD_MANAGER') }}</li>
+      <li>{{ $t('MSG_STORE_IN_A_SAFE_DEPOSIT_BOX') }}</li>
+      <li>{{ $t('MSG_WRITE_DOWN_AND_STORE_IN_MULTIPLE_SECRET_PLACES') }}</li>
     </ul>
     <div v-if='showMnemonic' class='vertical-sections-margin'>
       <div class='row'>
         <div class='text-bold'>
-          Mnemonic
+          {{ $t('MSG_MNEMONIC') }}
         </div>
         <q-space />
         <div class='text-blue-6 cursor-pointer label-text-small' @click='showMnemonic = false'>
-          Hide
+          {{ $t('MSG_HIDE') }}
         </div>
       </div>
       <div class='row vertical-items-margin'>
@@ -33,7 +29,7 @@
     <q-card bordered flat v-else class='page-y-padding vertical-sections-margin bg-grey-9'>
       <q-icon name='bi-eye' size='20px' color='white' class='vertical-sections-margin' />
       <div class='text-white vertical-items-margin label-text-small extra-margin-bottom'>
-        Make sure nobody is looking.
+        {{ $t('MSG_MAKE_SURE_NOBODY_IS_LOOKING') }}
       </div>
     </q-card>
     <div class='full-width vertical-sections-margin' v-if='showInnerActionBtn'>

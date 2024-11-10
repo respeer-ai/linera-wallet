@@ -1,16 +1,14 @@
 <template>
   <div>
-    <div>
-      Imported account won't be bound to current mnemonic.
-    </div>
+    <div v-html='$t("MSG_IMPORTED_ACCOUNT_WONT_BOUND_TO_MNEMONIC")' />
     <div class='vertical-sections-margin text-grey-8 text-bold'>
-      Account name
+      {{ $t('MSG_ACCOUNT_NAME') }}
     </div>
     <div class='vertical-items-margin'>
       <q-input outlined dense v-model='accountName' />
     </div>
     <div class='vertical-items-margin text-grey-8 text-bold'>
-      Private key
+      {{ $t('MSG_PRIVATE_KEY') }}
     </div>
     <div class='vertical-items-margin extra-margin-bottom'>
       <q-input outlined dense v-model='privateKey' :type='showPlainText ? "text" : "password"'>
@@ -23,13 +21,13 @@
       flat class='btn full-width vertical-items-margin' @click='onImportClick'
       no-caps :disable='privateKey.length === 0'
     >
-      Import
+      {{ $t('MSG_IMPORT') }}
     </q-btn>
     <q-btn
       flat class='btn btn-alt full-width vertical-items-margin' @click='onCancelClick'
       no-caps
     >
-      Cancel
+      {{ $t('MSG_CANCEL') }}
     </q-btn>
     <PasswordBridge ref='passwordBridge' v-model:password='password' />
     <GenerateKey ref='generateKey' />
