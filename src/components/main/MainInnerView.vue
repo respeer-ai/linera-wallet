@@ -8,9 +8,7 @@
         <div class='cursor-pointer' @click='onCreateAccountClick'>
           <q-icon name='bi-plus-circle' size='48px' color='grey-4' />
         </div>
-        <div class='page-item-y-margin-top'>
-          No account? <span class='cursor-pointer like-link'>Create</span> or <span class='cursor-pointer like-link'>Import</span>.
-        </div>
+        <div class='page-item-y-margin-top' v-html='$t("MSG_NO_ACCOUNT_CREATE_NEW")' />
       </div>
       <div :style='{height: "24px"}' />
     </div>

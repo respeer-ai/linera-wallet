@@ -56,7 +56,7 @@
                 <q-icon name='bi-bell-fill' size='12px' />
               </q-item-section>
               <q-item-section>
-                <span>Notifications</span>
+                <span>{{ $t('MSG_NOTIFICATION') }}</span>
               </q-item-section>
             </q-item>
             <q-separator />
@@ -65,7 +65,7 @@
                 <q-icon name='bi-person-bounding-box' size='12px' />
               </q-item-section>
               <q-item-section>
-                <span>Account details</span>
+                <span>{{ $t('MSG_ACCOUNT_DETAILS') }}</span>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup disabled>
@@ -73,7 +73,7 @@
                 <q-icon name='bi-box-arrow-up-right' size='12px' />
               </q-item-section>
               <q-item-section>
-                <span>View on explorer</span>
+                <span>{{ $t('MSG_VIEW_ON_EXPLORER') }}</span>
               </q-item-section>
             </q-item>
             <q-separator />
@@ -82,7 +82,7 @@
                 <q-icon name='bi-box-arrow-in-right' size='12px' />
               </q-item-section>
               <q-item-section>
-                <span>All permissions</span>
+                <span>{{ $t('MSG_ALL_PERMISSIONS') }}</span>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click='onSettingsClick'>
@@ -90,7 +90,7 @@
                 <q-icon name='bi-gear-fill' size='12px' />
               </q-item-section>
               <q-item-section>
-                <span>Settings</span>
+                <span>{{ $t('MSG_SETTINGS') }}</span>
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup disabled>
@@ -98,7 +98,7 @@
                 <q-icon name='bi-shield-lock-fill' size='12px' />
               </q-item-section>
               <q-item-section>
-                <span>Lock wallet</span>
+                <span>{{ $t('MSG_LOCK_WALLET') }}</span>
               </q-item-section>
             </q-item>
           </q-card>

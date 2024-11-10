@@ -10,14 +10,14 @@
     >
       <q-step
         :name='1'
-        title='Create password'
+        :title='$t("MSG_CREATE_PASSWORD")'
         :done='step > 1'
       >
         <NewPassword v-model:password='password' v-model:error='passwordError' />
       </q-step>
       <q-step
         :name='2'
-        title='Secure wallet'
+        :title='$t("MSG_SECURE_WALLET")'
         :done='step > 2'
       >
         <InitializeAccount
@@ -27,7 +27,7 @@
       </q-step>
       <q-step
         :name='3'
-        title='Validate recovery'
+        :title='$t("MSG_VALIDATE_RECOVERY")'
         :done='step > 3'
       >
         <ValidateAccount :mnemonic='mnemonic' v-model='mnemonicValid' />
@@ -57,6 +57,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
+import { useI18n } from 'vue-i18n'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
@@ -65,6 +66,9 @@ import NewPassword from 'src/components/password/NewPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ValidateAccount from 'src/components/account/ValidateAccount.vue'
 import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t } = useI18n({ useScope: 'global' })
 
 const step = ref(1)
 const password = ref(undefined as unknown as string)
@@ -95,13 +99,13 @@ const canGotoNext = () => {
 const btnText = computed(() => {
   switch (step.value) {
     case 1:
-      return 'Create a new wallet'
+      return t('MSG_CREATE_A_NEW_WALLET')
     case 2:
-      return 'Validate secret recovery phrase'
+      return t('MSG_VALIDATE_SECURE_RECOVERY_PHRASE')
     case 3:
-      return 'Linera now'
+      return t('MSG_LINERA_NOW')
   }
-  return 'Next'
+  return t('MSG_NEXT')
 })
 
 const savePassword = async () => {

@@ -1,10 +1,10 @@
 <template>
   <div class='page-padding full-width text-center home-token-balance'>
     <div>
-      {{ tokenBalance.toFixed(4) }} TLINERA
+      {{ tokenBalance.toFixed(4) }} {{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}
     </div>
     <div class='item-currency-sub text-grey-8'>
-      $ {{ usdBalance.toFixed(4) }} USD
+      $ {{ usdBalance.toFixed(4) }} {{ $t('MSG_USD') }}
     </div>
     <div class='row home-token-action text-center page-y-padding'>
       <q-space />
@@ -13,7 +13,7 @@
           <q-icon name='bi-currency-exchange' size='24px' />
         </q-avatar>
         <div class='page-item-y-margin-top'>
-          Exchange
+          {{ $t('MSG_EXCHANGE') }}
         </div>
       </div>
       <div class='home-token-action-btn cursor-pointer' @click='onTransferClick'>
@@ -21,7 +21,7 @@
           <q-icon name='bi-arrow-up-right' size='24px' />
         </q-avatar>
         <div class='page-item-y-margin-top'>
-          Transfer
+          {{ $t('MSG_TRANSFER') }}
         </div>
       </div>
       <div class='home-token-action-btn cursor-pointer' disabled>
@@ -29,7 +29,7 @@
           <q-icon name='bi-arrow-repeat' size='24px' />
         </q-avatar>
         <div class='page-item-y-margin-top'>
-          Swap
+          {{ $t('MSG_SWAP') }}
         </div>
       </div>
       <div class='home-token-action-btn cursor-pointer' disabled>
@@ -37,7 +37,7 @@
           <q-icon name='bi-arrow-left-right' size='24px' />
         </q-avatar>
         <div class='page-item-y-margin-top'>
-          Bridge
+          {{ $t('MSG_BRIDGE') }}
         </div>
       </div>
       <div class='home-token-action-btn cursor-pointer' disabled>
@@ -45,7 +45,7 @@
           <q-icon name='bi-clock' size='24px' />
         </q-avatar>
         <div class='page-item-y-margin-top'>
-          Stake
+          {{ $t('MSG_STAKE') }}
         </div>
       </div>
       <q-space />

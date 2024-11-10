@@ -3,19 +3,19 @@
     flat class='full-width text-left full-hight page-x-padding page-y-padding word-break-all overflow-scroll'
   >
     <div class='text-black text-bold label-text-middle'>
-      Account
+      {{ $t('MSG_ACCOUNT') }}
     </div>
     <div class='vertical-items-margin'>
       {{ publicKey }}
     </div>
     <div class='text-black text-bold label-text-middle vertical-menus-margin'>
-      Content
+      {{ $t('MSG_CONTENT') }}
     </div>
     <div class='vertical-items-margin'>
       {{ utf8Content }}
     </div>
     <div class='text-black text-bold label-text-middle  vertical-menus-margin'>
-      Encoded
+      {{ $t('MSG_ENCODED') }}
     </div>
     <div class='vertical-items-margin'>
       {{ hexContent }}

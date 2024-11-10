@@ -27,7 +27,7 @@
       <div class='header-items-margin-x-right row text-bold'>
         <q-icon :name='direction' color='black' size='12px' :style='{marginTop: "5px"}' />
         <div class='page-item-x-margin-left'>
-          {{ Number(activity.amount) }} TLINERA
+          {{ Number(activity.amount) }} {{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}
         </div>
       </div>
     </div>

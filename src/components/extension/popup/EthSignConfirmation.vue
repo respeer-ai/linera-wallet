@@ -22,7 +22,7 @@
       <q-btn
         flat
         rounded
-        label='Continue'
+        :label='$t("MSG_CONTINUE")'
         class='btn full-width vertical-items-margin'
         @click='onNextStepClick'
         :disable='!forwardable()'
@@ -32,7 +32,7 @@
         flat
         rounded
         outlined
-        label='Cancel'
+        :label='$t("MSG_CANCEL")'
         class='btn btn-alt full-width vertical-items-margin extra-bottom-margin'
         @click='onCancelClick'
         no-caps

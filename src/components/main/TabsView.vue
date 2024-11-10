@@ -4,16 +4,16 @@
       v-model='tab' no-caps indicator-color='red-6' dense
     >
       <q-tab name='microchains' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
-        Microchains
+        {{ $t('MSG_MICROCHAINS') }}
       </q-tab>
       <q-tab name='tokens' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
-        Tokens
+        {{ $t('MSG_TOKENS') }}
       </q-tab>
       <q-tab name='applications' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
-        Applications
+        {{ $t('MSG_APPLICATIONS') }}
       </q-tab>
       <q-tab name='activities' :class='[ localStore.setting.extensionMode ? "extension-tab" : "" ]'>
-        Activities
+        {{ $t('MSG_ACTIVITIES') }}
       </q-tab>
     </q-tabs>
     <q-tab-panels v-model='tab' swipeable animated>

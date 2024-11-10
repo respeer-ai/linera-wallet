@@ -8,9 +8,7 @@
       <div>
         <q-icon name='bi-plus-circle' size='48px' color='grey-4' />
       </div>
-      <div class='page-item-y-margin-top'>
-        New to Linera? <span class='cursor-pointer like-link'>Transfer</span> tokens.
-      </div>
+      <div class='page-item-y-margin-top' v-html='$t("MSG_NEW_TO_LINERA_TRANSFER_TOKENS")' />
     </div>
     <q-space />
   </div>

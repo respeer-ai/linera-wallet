@@ -1,14 +1,10 @@
 <template>
   <div class='footer-inner-padding row'>
-    <div v-if='!localStore.setting.extensionMode' class='row'>
-      Another browser wallet for Linera blockchain by
-      <a href='https://respeer.ai' class='footer-text-margin-x-left'>respeer.ai</a>
-      <strong class='footer-text-margin-x-left'>MaaS</strong>
-    </div>
+    <div v-if='!localStore.setting.extensionMode' class='row' v-html='$t("MSG_ANOTHER_BROWSER_WALLET_FOR_LINERA_BLOCKCHAIN_BY_RESPPER_MAAS")' />
     <q-space />
     <TestnetTip />
-    <a href='https://testnet.respeer.ai/policy' class='footer-menu-margin-x-left'>Policy</a>
-    <a href='https://testnet.respeer.ai/terms' class='footer-menu-margin-x-left'>Terms of use</a>
+    <a href='https://testnet.respeer.ai/policy' class='footer-menu-margin-x-left'>{{ $t('MSG_POLICY') }}</a>
+    <a href='https://testnet.respeer.ai/terms' class='footer-menu-margin-x-left'>{{ $t('MSG_TERM_OF_USE') }}</a>
     <q-space v-if='localStore.setting.extensionMode' />
   </div>
 </template>

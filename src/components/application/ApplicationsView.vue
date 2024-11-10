@@ -9,14 +9,12 @@
         <div class='cursor-pointer'>
           <q-icon name='bi-plus-circle' size='48px' color='grey-4' />
         </div>
-        <div class='page-item-y-margin-top'>
-          No application? <span class='cursor-pointer like-link cursor-pointer'>Create</span>.
-        </div>
+        <div class='page-item-y-margin-top' v-html='$t("MSG_NO_APPLICATIONS_CREATE_NEW")' />
       </div>
       <div class='row vertical-items-margin selector-margin-x-left cursor-pointer' @click='onSynchronizeApplicationsClick'>
         <q-icon name='bi-arrow-repeat' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-          Synchronize applications
+          {{ $t('MSG_SYNCHRONIZE_APPLICATIONS') }}
         </div>
       </div>
     </div>
