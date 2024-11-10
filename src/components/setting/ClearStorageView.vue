@@ -36,14 +36,16 @@ const onConfirmClick = async () => {
     await dbWallet.delete()
     await dbBase.delete()
     // TODO: verify password and backup database here
-    window.location.pathname = localStore.setting.formalizePath('/')
-    if (window.location.pathname.includes('extension')) {
-      return
-    }
+    let pathname = localStore.setting.formalizePath('/')
+    let hash = ''
     if (document.URL.startsWith('chrome-extension://')) {
-      window.location.pathname = '/www/index.html'
-      window.location.hash = '#/extension/onboarding'
+      pathname = '/www/index.html'
+      hash = '#/extension/onboarding'
     }
+    if (hash.length > 0) {
+      window.location.hash = hash
+    }
+    window.location.pathname = pathname
   }
 }
 
