@@ -14,6 +14,10 @@ const { configure } = require('quasar/wrappers')
 const path = require('path')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { stringify } = require('flatted')
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/unbound-method
+const { resolve, dirname } = require('node:path')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const VueI18nPlugin = require('@intlify/unplugin-vue-i18n/vite')
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -102,7 +106,11 @@ module.exports = configure(function (/* ctx */) {
             }
           },
           { server: false }
-        ]
+        ],
+        VueI18nPlugin({
+          include: resolve(dirname(__filename), './src/locales/**'),
+          jitCompilation: true
+        })
       ]
     },
 
