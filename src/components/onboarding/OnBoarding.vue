@@ -49,7 +49,7 @@
       <div class='onboarding-btns'>
         <q-btn
           flat
-          :label='$t("CREATE_A_NEW_WALLET")'
+          :label='$t("MSG_CREATE_A_NEW_WALLET")'
           class='btn vertical-items-margin full-width'
           @click='onCreateWalletClick'
           no-caps
