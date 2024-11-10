@@ -14,12 +14,8 @@ const { configure } = require('quasar/wrappers')
 const path = require('path')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { stringify } = require('flatted')
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/unbound-method
-const { resolve, dirname } = require('node:path')
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
-const VueI18nPlugin = require('@intlify/unplugin-vue-i18n/vite')
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     // https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
     supportTS: {
@@ -78,7 +74,13 @@ module.exports = configure(function (/* ctx */) {
       // distDir
 
       // extendViteConf (viteConf) {},
-      // viteVuePluginOptions: {},
+      viteVuePluginOptions: {
+        template: {
+          compilerOptions: {
+            jit: true
+          }
+        }
+      },
 
       vitePlugins: [
         [
@@ -107,11 +109,13 @@ module.exports = configure(function (/* ctx */) {
           },
           { server: false }
         ],
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        VueI18nPlugin({
-          include: resolve(dirname(__filename), './src/locales/**'),
-          jitCompilation: true
-        })
+        ctx.mode.ssr || ctx.mode.bex ? [
+          '@intlify/unplugin-vue-i18n/vite',
+          {
+            include: [path.resolve(__dirname, './src/i18n/**')],
+            jit: true
+          }
+        ] : []
       ]
     },
 
