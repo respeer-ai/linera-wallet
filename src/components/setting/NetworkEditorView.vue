@@ -1,25 +1,25 @@
 <template>
   <div :class='[ "full-width", localStore.setting.extensionMode ? "page-x-padding" : "" ]'>
     <div class='text-bold'>
-      Network name
+      {{ $t('MSG_NETWORK_NAME') }}
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='network.name' :disable='network.preset' />
     </div>
     <div class='text-bold vertical-menus-margin'>
-      Faucet URL
+      {{ $t('MSG_FAUCET_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='network.faucetUrl' :disable='network.preset' />
     </div>
     <div class='text-bold vertical-menus-margin'>
-      RPC URL
+      {{ $t('MSG_RPC_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='rpcUrl' :disable='network.preset' />
     </div>
     <div class='text-bold vertical-menus-margin'>
-      Subscription URL
+      {{ $t('MSG_SUBSCRIPTION_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
       <q-input dense outlined v-model='wsUrl' :disable='network.preset' />
@@ -30,14 +30,14 @@
         @click='onSaveClick'
         v-if='!network.preset'
       >
-        Save
+        {{ $t('MSG_SAVE') }}
       </q-btn>
       <q-btn
         flat class='btn btn-alt full-width vertical-items-margin' no-caps
         @click='onDeleteClick'
         v-if='!network.preset && network.id !== undefined'
       >
-        Delete
+        {{ $t('MSG_DELETE') }}
       </q-btn>
     </div>
     <NetworkBridge ref='networkBridge' />

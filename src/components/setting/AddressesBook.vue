@@ -1,7 +1,7 @@
 <template>
   <div class='row flex items-center justify-center full-height'>
     <p class='text-center text-grey-6'>
-      Coming soon
+      {{ $t('MSG_COMING_SOON') }}
     </p>
   </div>
 </template>

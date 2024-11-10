@@ -1,7 +1,7 @@
 <template>
   <div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Token information
+      {{ $t('MSG_TOKEN_INFORMATION') }}
     </div>
     <div class='row vertical-items-margin'>
       <q-img :src='token.logo' width='128px' class='page-item-x-margin-left' />
@@ -32,14 +32,14 @@
       </div>
     </div>
     <div v-if='!token.native' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Token price
+      {{ $t('MSG_TOKEN_PRICE') }}
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Token details
+      {{ $t('MSG_TOKEN_DETAILS') }}
     </div>
     <div v-if='!token.native' :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Application ID
+        {{ $t('MSG_APPLICATION_ID') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -52,7 +52,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Token name
+        {{ $t('MSG_TOKEN_NAME') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -64,7 +64,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Token type
+        {{ $t('MSG_TOKEN_TYPE') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -76,7 +76,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Token symbol
+        {{ $t('MSG_TOKEN_SYMBOL') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -88,7 +88,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Token logo
+        {{ $t('MSG_TOKEN_LOGO') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -98,7 +98,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Total supply
+        {{ $t('MSG_TOTAL_SUPPLY') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -110,7 +110,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Github
+        {{ $t('MSG_GITHUB') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -123,7 +123,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Official website
+        {{ $t('MSG_OFFICIAL_WEBSITE') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -136,7 +136,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Telegram
+        {{ $t('MSG_TELEGRAM') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -149,7 +149,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        X
+        {{ $t('MSG_TWITTER') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -162,7 +162,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Discord
+        {{ $t('MSG_DISCORD') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>

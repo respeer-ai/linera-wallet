@@ -7,7 +7,7 @@
       <div class='selector-margin-x-left account-avatar'>
         <span class='text-bold text-grey-9'>{{ microchain.name || 'Microchain' }}</span>
         <div class='text-grey-8 selector-item-currency-sub'>
-          $ {{ (chainUsdBalance + accountUsdBalance).toFixed(4) }} USD
+          $ {{ (chainUsdBalance + accountUsdBalance).toFixed(4) }} {{ $t('MSG_USD') }}
         </div>
       </div>
       <q-space />

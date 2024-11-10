@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class='text-grey-6 vertical-sections-margin'>
-      Transfer
+      {{ $t('MSG_TRANSFER') }}
     </div>
     <div class='row flex items-center vertical-items-margin extra-margin-bottom'>
       <q-avatar>
@@ -18,7 +18,7 @@
     </div>
     <div class='page-y-padding'>
       <div class='text-grey-6'>
-        From <span class='like-link'>{{ fromChainBalance ? 'chain balance' : 'account balance' }}</span>
+        {{ $t('MSG_FROM') }} <span class='like-link'>{{ fromChainBalance ? 'chain balance' : 'account balance' }}</span>
       </div>
       <q-btn-dropdown
         flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
@@ -67,7 +67,7 @@
         </template>
       </q-btn-dropdown>
       <div class='text-grey-6 vertical-menus-margin'>
-        To <span class='like-link'>{{ toChainBalance ? 'chain balance' : 'account balance' }}</span>
+        {{ $t('MSG_TO') }} <span class='like-link'>{{ toChainBalance ? 'chain balance' : 'account balance' }}</span>
       </div>
       <q-btn-dropdown
         flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
@@ -127,14 +127,14 @@
     <div class='row info info-bg tip'>
       <q-icon name='bi-info-circle-fill' size='20px' color='green-6' />
       <div :style='{width: "calc(100% - 26px)", fontSize: "13px"}' class='page-item-x-margin-left text-grey-8'>
-        Small amount TLINERA will be deducted from sender as gas.
+        {{ $t('MSG_SMALL_AMOUNT_NATIVE_TOKEN_FOR_GAS') }}
       </div>
     </div>
     <div class='page-y-padding'>
       <q-btn
         flat
         rounded
-        label='Continue'
+        :label='$t("MSG_CONTINUE")'
         class='btn full-width extra-margin-bottom'
         @click='onTransferClick'
         no-caps

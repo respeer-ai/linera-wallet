@@ -6,7 +6,7 @@
         <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
         <q-space />
         <p class='text-center text-bold text-grey-9 selector-title'>
-          Transfer tokens
+          {{ $t('MSG_TRANSFER_TOKENS') }}
         </p>
         <q-space />
         <div v-show='false'>

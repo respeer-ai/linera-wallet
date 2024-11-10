@@ -8,13 +8,13 @@
       <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer' @click='onReceiveTokensClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-          Receive tokens
+          {{ $t('MSG_RECEIVE_TOKENS') }}
         </div>
       </div>
       <div class='row vertical-items-margin selector-margin-x-left cursor-pointer' @click='onImportTokenClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-          Import token
+          {{ $t('MSG_IMPORT_TOKEN') }}
         </div>
       </div>
     </div>
@@ -25,7 +25,7 @@
   <q-dialog v-model='importingToken'>
     <q-card class='dialog page-y-padding'>
       <h5 class='onboarding-page-title text-center page-title'>
-        Importing ERC20 compatible token
+        {{ $t('MSG_IMPORT_ERC20_COMPATIBLE_TOKEN') }}
       </h5>
       <ImportTokenView @imported='onTokenImported' @error='onImportTokenError' @canceled='onImportTokenCanceled' />
     </q-card>

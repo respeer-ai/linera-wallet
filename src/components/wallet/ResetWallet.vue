@@ -5,7 +5,7 @@
         <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
         <q-space />
         <p class='text-center text-bold text-grey-9 selector-title'>
-          Reset wallet
+          {{ $t('MSG_RESET_WALLET') }}
         </p>
         <q-space />
         <div :style='{ width: "24px" }' />
@@ -13,24 +13,24 @@
       <div class='full-width text-left vertical-items-margin'>
         <q-card class='bg-grey-2 page-x-padding selector-y-padding'>
           <q-checkbox v-model='passwordConfirmed'>
-            CheCko is decentralized wallet for Linera microchain. It never store user password or mnemonic outside of the wallet. That means we cannot find your lost password or mnemonic back.
+            {{ $t('MSG_RESET_WALLET_TIP_1') }}
           </q-checkbox>
         </q-card>
         <q-card class='bg-grey-2 page-x-padding selector-y-padding vertical-menus-margin'>
           <q-checkbox v-model='walletConfirmed'>
-            If you lost your password, you can import your wallet with mnemonic, then import your microchains again with creation materials. Your assets will still be in your wallet after that.
+            {{ $t('MSG_RESET_WALLET_TIP_2') }}
           </q-checkbox>
         </q-card>
         <q-card class='bg-grey-2 page-x-padding selector-y-padding vertical-menus-margin'>
           <q-checkbox v-model='mnemonicConfirmed'>
-            You MUST stored your mnemonic and microchains creation materials outside the wallet properly. If your reset the wallet without mentioned materials, you'll lose your assets permanently.
+            {{ $t('MSG_RESET_WALLET_TIP_3') }}
           </q-checkbox>
         </q-card>
       </div>
       <q-btn
         :loading='confirmedSeconds > 0 && confirmedSeconds < confirmSeconds'
         :percentage='confirmedSeconds * 100 / confirmSeconds'
-        flat class='btn btn-alt vertical-sections-margin full-width' label='Long press to reset wallet'
+        flat class='btn btn-alt vertical-sections-margin full-width' :label='$t("MSG_LONG_PRESS_RESET_WALLET")'
         no-caps
         v-touch-repeat.mouse='onConfirmClick'
         @mouseup='onConfirmCanceled'
@@ -38,7 +38,7 @@
       >
         <template #loading>
           <q-spinner-gears class='on-left' />
-          Confirming
+          {{ $t('MSG_CONFIRMING') }}
         </template>
       </q-btn>
     </div>

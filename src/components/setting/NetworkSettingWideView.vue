@@ -5,7 +5,7 @@
         <q-icon name='bi-plugin' size='16px' />
       </div>
       <div class='page-item-x-margin-left'>
-        Networks
+        {{ $t('MSG_NETWORKS') }}
       </div>
       <q-space />
       <q-btn

@@ -1,7 +1,7 @@
 <template>
   <div :class='[ "sidebar extra-large-margin-bottom", localStore.setting.extensionMode ? "full-width" : "" ]'>
     <div v-if='!localStore.setting.extensionMode' class='setting-label text-grey-9 text-bold'>
-      Settings
+      {{ $t('MSG_SETTINGS') }}
     </div>
     <q-tabs
       vertical no-caps inline-label v-model='localStore.setting.SelectedSettingMenu'

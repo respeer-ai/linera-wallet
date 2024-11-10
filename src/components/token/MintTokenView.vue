@@ -49,7 +49,7 @@
     </template>
   </q-btn-dropdown>
   <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
-    No usable microchain? <span class='like-link'>Create</span>
+    {{ $t('MSG_NO_USABLE_MICROCHAIN') }} <span class='like-link'>{{ $t('MSG_CREATE') }}</span>
   </div>
   <div class='vertical-menus-margin extra-large-margin-bottom'>
     <q-toggle
@@ -66,7 +66,7 @@
       autofocus type='number'
     />
     <div class='label-text-extra-large page-item-x-margin-left'>
-      TLINERA
+      {{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}
     </div>
     <q-space />
   </div>
@@ -84,12 +84,12 @@
         </div>
       </div>
       <div>
-        {{ deductFromChainBalance ? chainTokenBalance : accountTokenBalance }} TLINERA
+        {{ deductFromChainBalance ? chainTokenBalance : accountTokenBalance }} {{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}
       </div>
     </div>
     <q-space />
     <div class='cursor-pointer text-blue-6' @click='onMaxAmountClick'>
-      Max
+      {{ $t('MSG_MAX') }}
     </div>
     <div class='page-item-x-margin-left' />
   </div>

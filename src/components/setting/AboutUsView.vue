@@ -1,7 +1,7 @@
 <template>
   <div class='text-center'>
     <div class='vertical-items-margin slogan'>
-      Dedicated Linera microchain wallet.
+      {{ $t('MSG_DEDICATED_LINERA_MICROCHAIN_WALLET') }}
     </div>
     <div class='vertical-sections-margin extra-margin-bottom'>
       <q-img :src='cheCkoLogo' width='360px' />
@@ -11,21 +11,21 @@
       <div class='extra-large-margin-bottom software-info'>
         <div class='row line decorate-underline-dashed'>
           <div class='label'>
-            Version
+            {{ $t('MSG_VERSION') }}
           </div>
           <q-space />
-          <div>0.0.1</div>
+          <div>{{ $t('MSG_VERSION_NUMBER') }}</div>
         </div>
         <div class='row line'>
           <div class='label'>
-            Built by
+            {{ $t('MSG_BUILT_BY') }}
           </div>
           <q-space />
           <div><a href='https://respeer.ai'>respeer.ai</a></div>
         </div>
         <div class='row line'>
           <div class='label'>
-            Support
+            {{ $t('MSG_SUPPORT') }}
           </div>
           <q-space />
           <div>checko@respeer.ai</div>

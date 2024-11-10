@@ -1,6 +1,6 @@
 <template>
   <div class='vertical-menus-margin decorate-underline'>
-    Token
+    {{ $t('MSG_TOKEN') }}
   </div>
   <q-btn-dropdown
     flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-menus-margin'
@@ -30,7 +30,7 @@
     </template>
   </q-btn-dropdown>
   <div class='vertical-menus-margin decorate-underline'>
-    From
+    {{ $t('MSG_FROM') }}
   </div>
   <q-btn-dropdown
     flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-menus-margin'
@@ -82,25 +82,25 @@
     </template>
   </q-btn-dropdown>
   <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
-    No usable microchain? <span class='like-link'>Create</span>
+    {{ $t('MSG_NO_USABLE_MICROCHAIN') }} <span class='like-link'>{{ $t('MSG_CREATE') }}</span>
   </div>
   <div class='vertical-items-margin' v-if='fromMicrochains.length > 0'>
     <q-toggle
       dense
       rounded
-      label='Send from microchain balance'
+      :label='$t("MSG_SEND_FROM_MICROCHAIN_BALANCE")'
       v-model='fromChainBalance'
     />
   </div>
 
   <div class='vertical-sections-margin decorate-underline row'>
-    To
+    {{ $t('MSG_TO') }}
   </div>
   <div class='vertical-menus-margin'>
     <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input owner (not public key)'>
       <template #append>
         <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToAccountClick'>
-          Select
+          {{ $t('MSG_SELECT') }}
         </div>
       </template>
     </q-input>
@@ -141,7 +141,7 @@
     >
       <template #append>
         <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToMicrochainClick'>
-          Select
+          {{ $t('MSG_SELECT') }}
         </div>
       </template>
     </q-input>
@@ -179,7 +179,7 @@
     <q-toggle
       dense
       rounded
-      label='Send to microchain balance'
+      :label='$t("MSG_SEND_TO_MICROCHAIN_BALANCE")'
       v-model='toChainBalance'
     />
   </div>
@@ -188,7 +188,7 @@
     <q-btn
       flat
       rounded
-      label='Continue'
+      :label='$t("MSG_CONTINUE")'
       class='btn full-width extra-margin-bottom'
       @click='onTransferClick'
       no-caps

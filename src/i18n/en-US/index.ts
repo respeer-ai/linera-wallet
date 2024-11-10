@@ -149,5 +149,85 @@ export default {
   MSG_SELECT_A_NETWORK: 'Select a network',
   MSG_ADD_NETWORK: 'Add network',
   MSG_CREATE_OR_IMPORT_ACCOUNT: 'Create or import account',
-  MSG_SELECT_A_TOKEN: 'Select a token'
+  MSG_SELECT_A_TOKEN: 'Select a token',
+  MSG_DEDICATED_LINERA_MICROCHAIN_WALLET: 'Dedicated Linera microchain wallet.',
+  MSG_VERSION: 'Version',
+  MSG_VERSION_NUMBER: 'v0.0.1',
+  MSG_BUILT_BY: 'Build by',
+  MSG_SUPPORT: 'Support',
+  MSG_EXPORT_ACCOUNT: 'Export account',
+  MSG_ACCOUNTS: 'Accounts',
+  MSG_ADD_ACCOUNT: 'Add account',
+  MSG_EXPORT_ALL: 'Export all',
+  MSG_COMING_SOON: 'Coming soon',
+  MSG_UNDERSTAND_PRESS_WILL_CLEAR_ALL_DATA: 'You should understand when you click this button, it will clear all of the data in your ' +
+                                            'storage including the wallet configuration and accounts data!',
+  MSG_NETWORK_NAME: 'Network name',
+  MSG_FAUCET_URL: 'Faucet URL',
+  MSG_RPC_URL: 'RPC URL',
+  MSG_SUBSCRIPTION_URL: 'Subscription URL',
+  MSG_SAVE: 'Save',
+  MSG_DELETE: 'Delete',
+  MSG_NETWORKS: 'Networks',
+  MSG_SUGGEST_DONT_TOUCH_THIS_MENU: "I suggest you don't access this menu unless you know what you will do.",
+  MSG_SWAP_APPLICATION: 'Swap application',
+  MSG_APPLICATION_ID: 'Application ID',
+  MSG_WLINERA_APPLICATION: 'WTLINERA application',
+  MSG_TESTNET_MUST_READ: 'Testnet must read',
+  MSG_TESTNET_MUST_READ_CONTENT: '<p><strong>MUST READ</strong></p>' +
+                                 'CheCko is run with Linera DevNet currently. Token symbol' +
+                                 '<strong>TLINERA</strong> used in CheCko is only a placeholder to show' +
+                                 'the functionalities of Linera wallet work-flows. CheCko won"t DM' +
+                                 'anyone to get money for any reason. And, CheCko is only a third-party' +
+                                 'open source wallet solution for Linera devloped by consecutive Linera' +
+                                 "hackathon winner <a href='https://respeer.ai'>ResPeer</a>'s" +
+                                 '<strong>Microchain as a Service</strong> architecture. Community' +
+                                 'members should not think of CheCko is official Linera wallet. Official' +
+                                 'team will release browser wallet which integrates microchain to' +
+                                 'browser extension soon.',
+  MSG_CAN_IMPORT_ERC20_COMPATIBLE_TOKEN: 'You can import ERC20 compatible tokens then send and receive them with CheCko. ' +
+                                         "It doesn't mean that you can transfer your Linera ERC20 compatible tokens to " +
+                                         'Ethereum blockchain or EVM compatible chain. It just means that the imported ' +
+                                         'application has same interface definition as ERC20 spec. It you need to transfer ' +
+                                         'assets to other blockchains, you still need a bridge between Linera and your target blockchain.',
+  MSG_SHOULD_CONFIRM_IMPORT_RIGHT_APPLICATION: 'You should confirm you import the right application. You may lose your assets ' +
+                                               'if you interact with malfunction application.',
+  MSG_MAX: 'Max',
+  MSG_TOKEN_INFORMATION: 'Token information',
+  MSG_TOKEN_PRICE: 'Token price',
+  MSG_TOKEN_DETAILS: 'Token details',
+  MSG_TOKEN_NAME: 'Token name',
+  MSG_TOKEN_TYPE: 'Token type',
+  MSG_TOKEN_SYMBOL: 'Token symbol',
+  MSG_TOKEN_LOGO: 'Token logo',
+  MSG_TOTAL_SUPPLY: 'Total supply',
+  MSG_GITHUB: 'Github',
+  MSG_OFFICIAL_WEBSITE: 'Official website',
+  MSG_DISCORD: 'Discord',
+  MSG_TWITTER: 'X',
+  MSG_TELEGRAM: 'Telegram',
+  MSG_MINT: 'Mint',
+  MSG_RECEIVE_TOKENS: 'Receive tokens',
+  MSG_IMPORT_TOKEN: 'Import token',
+  MSG_IMPORT_ERC20_COMPATIBLE_TOKEN: 'Importing ERC20 compatible token',
+  MSG_FROM: 'From',
+  MSG_TO: 'To',
+  MSG_SMALL_AMOUNT_NATIVE_TOKEN_FOR_GAS: 'Small amount TLINERA will be deducted from sender as gas.',
+  MSG_TRANSFER_TOKENS: 'Transfer tokens',
+  MSG_TOKEN: 'Token',
+  MSG_SELECT: 'Select',
+  MSG_SEND_TO_MICROCHAIN_BALANCE: 'Send to microchain balance',
+  MSG_SEND_FROM_MICROCHAIN_BALANCE: 'Send from microchain balance',
+  MSG_SAVE_PASSWORD: 'Save password',
+  MSG_RESET_WALLET: 'Reset wallet',
+  MSG_RESET_WALLET_TIP_1: 'CheCko is decentralized wallet for Linera microchain. ' +
+                          'It never store user password or mnemonic outside of the wallet. ' +
+                          'That means we cannot find your lost password or mnemonic back.',
+  MSG_RESET_WALLET_TIP_2: 'If you lost your password, you can import your wallet with mnemonic, ' +
+                          'then import your microchains again with creation materials. ' +
+                          'Your assets will still be in your wallet after that.',
+  MSG_RESET_WALLET_TIP_3: 'You MUST stored your mnemonic and microchains creation materials ' +
+                          'outside the wallet properly. If your reset the wallet without ' +
+                          "mentioned materials, you'll lose your assets permanently.",
+  MSG_LONG_PRESS_RESET_WALLET: 'Long press to reset wallet'
 }

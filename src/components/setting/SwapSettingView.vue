@@ -4,14 +4,14 @@
       <q-icon name='bi-box-seam' size='16px' />
     </div>
     <div class='label-text-small page-item-x-margin-left'>
-      Swap application
+      {{ $t('MSG_SWAP_APPLICATION') }}
     </div>
     <div class='word-break-all vertical-menus-margin extra-margin-bottom'>
       <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
-        Swap application
+        {{ $t('MSG_SWAP_APPLICATION') }}
       </div>
       <div class='vertical-menus-margin text-grey-8 row flex items-center' :style='{ paddingBottom: "4px" }'>
-        <div>Application ID</div>
+        <div>{{ $t('MSG_APPLICATION_ID') }}</div>
         <q-space />
         <q-icon
           v-if='editingSwapApplication' name='bi-save' size='16px' class='page-item-x-margin-left cursor-pointer'

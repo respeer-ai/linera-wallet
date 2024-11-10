@@ -32,7 +32,7 @@
       </div>
       <q-space />
       <div class='cursor-pointer text-blue-6' @click='onMaxAmountClick'>
-        Max
+        {{ $t('MSG_MAX') }}
       </div>
       <div class='page-item-x-margin-left' />
     </div>
@@ -40,7 +40,7 @@
       <q-btn
         flat
         rounded
-        label='Continue'
+        :label='$t("MSG_CONTINUE")'
         class='btn full-width extra-margin-bottom'
         @click='onContinueClick'
         no-caps

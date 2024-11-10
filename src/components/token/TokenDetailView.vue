@@ -29,7 +29,7 @@
             <q-icon name='bi-arrow-up-right' size='24px' />
           </q-avatar>
           <div class='page-item-y-margin-top'>
-            Transfer
+            {{ $t('MSG_TRANSFER') }}
           </div>
         </div>
         <div class='home-token-action-btn cursor-pointer' disabled>
@@ -37,7 +37,7 @@
             <q-icon name='bi-arrow-repeat' size='24px' />
           </q-avatar>
           <div class='page-item-y-margin-top'>
-            Swap
+            {{ $t('MSG_SWAP') }}
           </div>
         </div>
         <div class='home-token-action-btn cursor-pointer' disabled>
@@ -45,7 +45,7 @@
             <q-icon name='bi-arrow-left-right' size='24px' />
           </q-avatar>
           <div class='page-item-y-margin-top'>
-            Bridge
+            {{ $t('MSG_BRIDGE') }}
           </div>
         </div>
         <div class='home-token-action-btn cursor-pointer' disabled>
@@ -53,7 +53,7 @@
             <q-icon name='bi-clock' size='24px' />
           </q-avatar>
           <div class='page-item-y-margin-top'>
-            Stake
+            {{ $t('MSG_STAKE') }}
           </div>
         </div>
         <!-- TODO: disabled should be reversed -->
@@ -62,7 +62,7 @@
             <q-icon name='bi-plus-circle' size='24px' />
           </q-avatar>
           <div class='page-item-y-margin-top'>
-            Mint
+            {{ $t('MSG_MINT') }}
           </div>
         </div>
         <q-space />
@@ -78,7 +78,7 @@
   <q-dialog v-model='minting'>
     <q-card class='dialog transfer-card page-x-padding'>
       <h5 class='onboarding-page-title text-center page-title'>
-        Mint {{ token.ticker }}
+        {{ $t('MSG_MINT') }} {{ token.ticker }}
       </h5>
       <MintTokenView @minted='onTokenMinted' :token='token' />
     </q-card>

@@ -13,14 +13,14 @@
         <div class='vertical-items-margin tip warn-bg warn row'>
           <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
           <div class='tip-text page-item-x-margin-left'>
-            I suggest you don't access this menu unless you know what you will do.
+            {{ $t('MSG_SUGGEST_DONT_TOUCH_THIS_MENU') }}
           </div>
         </div>
         <q-btn
           flat :class='[ "btn btn-alt vertical-menus-margin text-black", localStore.setting.extensionMode ? "full-width" : "" ]' no-caps
           @click='confirmed = true'
         >
-          I understand
+          {{ $t('MSG_I_UNDERSTAND') }}
         </q-btn>
       </div>
       <q-img

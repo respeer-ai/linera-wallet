@@ -3,7 +3,7 @@
     <div class='tip warn warn-bg text-left row'>
       <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
       <div class='tip-text page-item-x-margin-left'>
-        You should understand when you click this button, it will clear all of the data in your storage including the wallet configuration and accounts data!
+        {{ $t('MSG_UNDERSTAND_PRESS_WILL_CLEAR_ALL_DATA') }}
       </div>
     </div>
     <q-btn
@@ -16,7 +16,7 @@
     >
       <template #loading>
         <q-spinner-gears class='on-left' />
-        Confirming
+        {{ $t('MSG_CONFIRMING') }}
       </template>
     </q-btn>
   </div>

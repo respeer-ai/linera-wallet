@@ -23,7 +23,7 @@
           flat class='btn full-width vertical-sections-margin' no-caps
           @click='onAddNetworkClick'
         >
-          Add network
+          {{ $t('MSG_ADD_NETWORK') }}
         </q-btn>
       </div>
     </div>

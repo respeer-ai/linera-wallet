@@ -13,7 +13,7 @@
       >
         <q-step
           :name='1'
-          title='Create Password'
+          :title='$t("MSG_CREATE_PASSWORD")'
           :done='step > 1'
         >
           <div class='row'>
@@ -25,7 +25,7 @@
         </q-step>
         <q-step
           :name='2'
-          title='Import Account'
+          :title='$t("MSG_IMPORT_ACCOUNT")'
           :done='step > 2'
         >
           <div class='row'>
@@ -60,6 +60,7 @@
 import { ref, computed, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import NewPassword from '../password/NewPassword.vue'
 import ResetPassword from '../password/ResetPassword.vue'
@@ -67,6 +68,8 @@ import ImportMnemonicView from '../account/ImportMnemonicView.vue'
 import GenerateKey from '../account/GenerateKey.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface Props {
   reset?: boolean
@@ -104,11 +107,11 @@ const canGotoNext = () => {
 const btnText = computed(() => {
   switch (step.value) {
     case 1:
-      return 'Save password'
+      return t('MSG_SAVE_PASSWORD')
     case 2:
-      return 'Import account'
+      return t('MSG_IMPORT_ACCOUNT')
   }
-  return 'Next'
+  return t('MSG_NEXT')
 })
 
 const savePassword = () => {

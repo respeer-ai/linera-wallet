@@ -1,12 +1,10 @@
 <template>
   <div class='page-x-padding'>
     <div>
-      You can import ERC20 compatible tokens then send and receive them with CheCko. It doesn't mean that you can transfer your Linera ERC20
-      compatible tokens to Ethereum blockchain or EVM compatible chain. It just means that the imported application has same interface definition
-      as ERC20 spec. It you need to transfer assets to other blockchains, you still need a bridge between Linera and your target blockchain.
+      {{ $t('MSG_CAN_IMPORT_ERC20_COMPATIBLE_TOKEN') }}
     </div>
     <div class='text-bold vertical-sections-margin'>
-      Application ID
+      {{ $t('MSG_APPLICATION_ID') }}
     </div>
     <q-input
       outlined v-model='applicationId' type='textarea' :error='applicationIdError'
@@ -15,20 +13,20 @@
     <div class='vertical-sections-margin tip warn-bg warn row'>
       <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
       <div class='tip-text page-item-x-margin-left'>
-        You should confirm you import the right application. You may lose your assets if you interact with malfunction application.
+        {{ $t('MSG_SHOULD_CONFIRM_IMPORT_RIGHT_APPLICATION') }}
       </div>
     </div>
     <q-btn
       class='btn vertical-sections-margin full-width' flat no-caps
       @click='onImportClick' :disabled='!canImport'
     >
-      Import
+      {{ $t('MSG_IMPORT') }}
     </q-btn>
     <q-btn
       class='btn btn-alt vertical-items-margin extra-margin-bottom full-width' flat no-caps
       @click='onCancelClick'
     >
-      Cancel
+      {{ $t('MSG_CANCEL') }}
     </q-btn>
   </div>
   <RpcOperationBridge ref='rpcOperationBridge' />

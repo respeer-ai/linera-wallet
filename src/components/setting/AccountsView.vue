@@ -8,13 +8,13 @@
         <q-icon name='bi-chevron-right' size='12px' />
       </div>
       <div :class='[ "label-text-small cursor-pointer", step === 1 ? "" : "text-grey-8" ]' @click='onAccountsClick'>
-        Accounts
+        {{ $t('MSG_ACCOUNTS') }}
       </div>
       <div v-if='step >= 2' class='head-separator flex items-center justify-center'>
         <q-icon name='bi-chevron-right' size='12px' />
       </div>
       <div v-if='step >= 2' :class='[ "label-text-small cursor-pointer", step === 2 ? "" : "text-grey-8" ]' @click='onMicrochainsClick'>
-        Microchains
+        {{ $t('MSG_MICROCHAINS') }}
       </div>
       <div v-if='step === 3' class='head-separator flex items-center justify-center'>
         <q-icon name='bi-chevron-right' size='12px' />
@@ -29,13 +29,13 @@
         <div class='row vertical-sections-margin selectable-margin-left cursor-pointer' @click='onAddAccountClick'>
           <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
           <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-            Add account
+            {{ $t('MSG_ADD_ACCOUNT') }}
           </div>
         </div>
         <div class='row vertical-items-margin selectable-margin-left cursor-pointer' @click='onAddAccountClick'>
           <q-icon name='bi-save' size='20px' color='blue-10' />
           <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-            Export all
+            {{ $t('MSG_EXPORT_ALL') }}
           </div>
         </div>
       </div>
