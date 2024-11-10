@@ -16,7 +16,7 @@ const path = require('path')
 const { stringify } = require('flatted')
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/unbound-method
 const { resolve, dirname } = require('node:path')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
 const VueI18nPlugin = require('@intlify/unplugin-vue-i18n/vite')
 
 module.exports = configure(function (/* ctx */) {
@@ -107,6 +107,7 @@ module.exports = configure(function (/* ctx */) {
           },
           { server: false }
         ],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         VueI18nPlugin({
           include: resolve(dirname(__filename), './src/locales/**'),
           jitCompilation: true
