@@ -1,15 +1,13 @@
 <template>
   <div class='full-width text-center flex items-center justify-center'>
     <h5 class='onboarding-page-title'>
-      Create password
+      {{ $t('MSG_CREATE_PASSWORD') }}
     </h5>
     <p>
-      This password will unlock your CheCko wallet only on this device. CheCko can not recover this password.
+      {{ $t('MSG_THIS_PASSWORD_WILL_UNLOCK_CHECKO_ON_THIS_DEVICE') }}
     </p>
     <NewPasswordInputView v-model:password='password' v-model:error='error' />
-    <p class='text-center' :style='{margin: "24px 0 0 0"}'>
-      By continue you understand CheCko cannot recover this password. <a href='#'>Learn more</a>
-    </p>
+    <p class='text-center' :style='{margin: "24px 0 0 0"}' v-html='$t("MSG_BY_CONTINUE_YOU_UNDERSTAND_CHECKO_CANNOT_RECOVER_PASSWORD")' />
   </div>
 </template>
 

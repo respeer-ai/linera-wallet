@@ -13,7 +13,7 @@
       <q-btn
         flat
         class='btn full-width vertical-sections-margin'
-        label='Verify'
+        :label='$t("MSG_VERIFY")'
         @click='onVerifyClick'
         :disable='passwordError'
         no-caps
@@ -21,7 +21,7 @@
       <q-btn
         flat
         class='btn btn-alt full-width vertical-items-margin'
-        label='Cancel'
+        :label='$t("MSG_CANCEL")'
         @click='onCancelClick'
         no-caps
       />

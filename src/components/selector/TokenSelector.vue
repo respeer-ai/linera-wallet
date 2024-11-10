@@ -1,7 +1,7 @@
 <template>
   <q-card class='selector-card'>
     <p class='text-center text-bold text-grey-9 selector-title'>
-      Select a token
+      {{ $t('MSG_SELECT_A_TOKEN') }}
     </p>
     <div class='selector-search'>
       <q-input

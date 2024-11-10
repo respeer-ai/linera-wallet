@@ -1,7 +1,7 @@
 <template>
   <q-card class='selector-card'>
     <p class='text-center text-bold text-grey-9 selector-title'>
-      Select a network
+      {{ $t('MSG_SELECT_A_NETWORK') }}
     </p>
     <q-list class='selector-list'>
       <q-item
@@ -29,7 +29,7 @@
     </q-list>
     <div class='selector-action'>
       <q-btn
-        flat class='btn btn-alt full-width' label='Add network' no-caps
+        flat class='btn btn-alt full-width' :label='$t("MSG_ADD_NETWORK")' no-caps
         @click='onAddNetworkClick'
       />
     </div>

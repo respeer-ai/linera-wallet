@@ -117,5 +117,37 @@ export default {
   MSG_LEARN_HOW_TO_CREATE_ISSUE_WHEN_USING_CHECKO: 'Learn how to create an issue while using CheCko.',
   MSG_UNDERSTAND_OBEY_CHECKO_COMMUNITY_RULES_CREATING_ISSUE: 'When you start to create an issue to CheCko, we think of you understand ' +
                                                              'you shall obey CheCko community rules.',
-  MSG_I_UNDERSTAND: 'I understand'
+  MSG_I_UNDERSTAND: 'I understand',
+  MSG_LETS_GET_STARTED: "Let's get started",
+  MSG_CHECKO_SECURE_WALLET_MAKING_REAL_TIME_DAPPS_ON_LINERA_ACCESSIBLE_TO_ALL: 'CheCko is a secure wallet making the world of real time & ' +
+                                                                               'reactive dApps on Linera accessible to all.',
+  MSG_CHECKO_SECURE_WALLET_MAKING_REAL_TIME_DAPPS_ON_LINERA_ACCESSIBLE_TO_ALL_LINE_FEED: 'CheCko is a secure wallet making the world of<br>' +
+                                                                                         'real time & reactive dApps on Linera accessible to all.<br>',
+  MSG_EXPLORER_REAL_TIME_AND_REACTIVE_DAPPS: 'Explorer real time &<br>reactive dApps',
+  MSG_INTERACT_WITH_WEB3_DAPPS_LIKE_WEB2: 'Interact with web3 dApps like web2 with expectable<br>responsiveness and highly availability.',
+  MSG_LOGIN_WITH_YOUR_WALLET: 'Login with your wallet',
+  MSG_USE_YOUR_WALLET_TO_LOGIN_TO_DAPPS_LIKE_METAMASK: 'Use your CheCko to login to real time & reactive dApps, just like what you do with Metamask.',
+  MSG_BY_CONTINUE_YOU_AGREE_TO_CHECKO_TERM_OF_USE: "By continue you agree to CheCko's <a href='#'>Terms of use</a>",
+  MSG_IMPORTING_AN_EXISTING_WALLET: 'Importing an existing wallet',
+  MSG_PASSWORD: 'Password',
+  MSG_WELCOME_BACK: 'Welcome back',
+  MSG_THE_REAL_TIME_AND_REACTIVE_DWEB_AWAITS: 'The real time & reactive dWeb awaits.',
+  MSG_UNLOCK: 'Unlock',
+  MSG_FORGET_PASSWORD: 'Forget password?',
+  MSG_THIS_PASSWORD_WILL_UNLOCK_CHECKO_ON_THIS_DEVICE: 'This password will unlock your CheCko wallet only on this device. CheCko can not recover this password.',
+  MSG_BY_CONTINUE_YOU_UNDERSTAND_CHECKO_CANNOT_RECOVER_PASSWORD: "By continue you understand CheCko cannot recover this password. <a href='#'>Learn more</a>",
+  MSG_NEW_PASSWORD: 'New password',
+  MSG_AT_LEAST_8_LETTERS_WITH_BRACKETS: '(At least 8 letters)',
+  MSG_CONFIRM_PASSWORD: 'Confirm password',
+  MSG_RESET_PASSWORD: 'Reset password',
+  MSG_CHECKO_NEVER_STORE_YOUR_PASSWORD_OUTSIDE_WALLET: 'CheCko never store your password anywhere outside the wallet. ' +
+                                                       'If you really lose your password, the only way is to create a new password, ' +
+                                                       'then import your wallet with mnemonic or private keys.',
+  MSG_MAKE_SURE_STORED_ALL_BEFORE_CONTINUE: 'Before you continue, please make sure you have stored all of your account materials outside the wallet properly.',
+  MSG_VERIFY: 'Verify',
+  MSG_SELECT_A_MICROCHAIN: 'Select a microchain',
+  MSG_SELECT_A_NETWORK: 'Select a network',
+  MSG_ADD_NETWORK: 'Add network',
+  MSG_CREATE_OR_IMPORT_ACCOUNT: 'Create or import account',
+  MSG_SELECT_A_TOKEN: 'Select a token'
 }

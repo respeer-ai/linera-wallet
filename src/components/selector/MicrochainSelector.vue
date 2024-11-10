@@ -1,7 +1,7 @@
 <template>
   <q-card class='selector-card'>
     <p class='text-center text-bold text-grey-9 selector-title'>
-      Select a microchain
+      {{ $t('MSG_SELECT_A_MICROCHAIN') }}
     </p>
     <MicrochainsInnerView :owner='owner' :searchable='true' @selected='onMicrochainSelected' />
   </q-card>

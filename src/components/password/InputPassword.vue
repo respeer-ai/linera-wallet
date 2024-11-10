@@ -1,7 +1,7 @@
 <template>
   <div class='text-left full-width'>
     <div class='row'>
-      <span>Password</span>
+      <span>{{ $t('MSG_PASSWORD') }}</span>
       <q-space />
       <q-btn
         flat

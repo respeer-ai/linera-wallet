@@ -1,18 +1,16 @@
 <template>
   <div class='full-width text-center flex items-center justify-center onboarding-content'>
     <h5 class='onboarding-page-title'>
-      Reset password
+      {{ $t('MSG_RESET_PASSWORD') }}
     </h5>
     <p>
-      CheCko never store your password anywhere outside the wallet. If you really lose your password, the only way is to create a new password, then import your wallet with mnemonic or private keys.
+      {{ $t('MSG_CHECKO_NEVER_STORE_YOUR_PASSWORD_OUTSIDE_WALLET') }}
     </p>
     <p>
-      Before you continue, please make sure you have stored all of your account materials outside the wallet properly.
+      {{ $t('MSG_MAKE_SURE_STORED_ALL_BEFORE_CONTINUE') }}
     </p>
     <NewPasswordInputView v-model:password='password' v-model:error='error' />
-    <p class='text-center vertical-sections-margin text-grey-6'>
-      By continue you understand CheCko cannot recover this password. <a href='#'>Learn more</a>
-    </p>
+    <p class='text-center vertical-sections-margin text-grey-6' v-html='$t("MSG_BY_CONTINUE_YOU_UNDERSTAND_CHECKO_CANNOT_RECOVER_PASSWORD")' />
   </div>
 </template>
 

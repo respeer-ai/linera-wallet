@@ -19,7 +19,7 @@
     </q-stepper>
     <div class='selector-action' v-if='step===1 && creatable'>
       <q-btn
-        flat class='btn btn-alt full-width' label='Create or import account' no-caps
+        flat class='btn btn-alt full-width' :label='$t("MSG_CREATE_OR_IMPORT_ACCOUNT")' no-caps
         @click='step++'
       />
     </div>

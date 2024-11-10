@@ -1,10 +1,10 @@
 <template>
   <q-card flat class='full-width page-x-padding'>
     <h5 class='onboarding-page-title'>
-      Welcome back
+      {{ $t('MSG_WELCOME_BACK') }}
     </h5>
     <p :style='{marginTop: "-12px"}'>
-      The real time & reactive dWeb awaits.
+      {{ $t('MSG_THE_REAL_TIME_AND_REACTIVE_DWEB_AWAITS') }}
     </p>
     <div>
       <q-img :src='cheCkoLogo' width='240px' :style='{margin: "80px 0 0 0"}' />
@@ -18,7 +18,7 @@
         <q-btn
           flat
           class='btn full-width vertical-sections-margin'
-          label='Unlock'
+          :label='$t("MSG_UNLOCK")'
           @click='onUnlockClick'
           :disable='password.length < 8 || passwordError'
           no-caps
@@ -28,7 +28,7 @@
           dense
           rounded
           class='text-blue-6 full-width'
-          label='Forget password?'
+          :label='$t("MSG_FORGET_PASSWORD")'
           @click='onForgetPasswordClick'
           no-caps
         />

@@ -4,7 +4,7 @@
       <q-space />
       <div :style='{width: "400px"}' class='text-left'>
         <div :style='{margin: "4px 0", lineHeight: "32px"}' class='row'>
-          <span :style='{marginRight: "4px"}' class='text-bold'>New password</span> (At least 8 letters)
+          <span :style='{marginRight: "4px"}' class='text-bold'>{{ $t('MSG_NEW_PASSWORD') }}</span> {{ $t('MSG_AT_LEAST_8_LETTERS_WITH_BRACKETS') }}
           <q-space />
           <q-btn
             flat
@@ -27,7 +27,7 @@
           :type='display ? "text" : "password"'
         />
         <div :style='{margin: "4px 0", lineHeight: "32px"}' class='text-bold'>
-          Confirm password
+          {{ $t('MSG_CONFIRM_PASSWORD') }}
         </div>
         <q-input
           outlined
