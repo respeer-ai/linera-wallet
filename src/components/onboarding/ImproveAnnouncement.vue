@@ -2,22 +2,20 @@
   <div>
     <div :class='[ "onboarding-container", localStore.setting.extensionMode ? "page-x-padding" : "onboarding-padding" ]'>
       <h5 class='onboarding-page-title text-center'>
-        Help us improve CheCko
+        {{ $t('MSG_HELP_US_IMPROVE_CHECKO') }}
       </h5>
       <div :style='{ maxHeight: localStore.setting.extensionMode ? "456px" : "100%", overflow: "scroll" }'>
-        <div class='text-left'>
-          We'd like to gather user feed back to improve metamask. But we won't submit any user data to any centralized server. If you find any issue when you're using CheCko, you can create issue to our github repository, of contact CheCko team through discord or telegram.
-        </div>
+        <div class='text-left' v-html='$t("MSG_HELP_IMPROVING_CHECKO_BY_CREATE_GITHUB_ISSUE")' />
         <div class='row full-width vertical-sections-margin'>
           <q-space />
           <q-img :src='onboardingImproveBanner' width='100%' />
           <q-space />
         </div>
         <div class='text-left full-width vertical-sections-margin'>
-          <a href='https://github.com/respeer-ai/linera-wallet/README.md'>Learn how to create an issue while using CheCko.</a>
+          <a href='https://github.com/respeer-ai/linera-wallet/README.md'>{{ $t('MSG_LEARN_HOW_TO_CREATE_ISSUE_WHEN_USING_CHECKO') }}</a>
         </div>
         <div class='vertical-sections-margin'>
-          When you start to create an issue to CheCko, we think of you understand you shall obey CheCko community rules.
+          {{ $t('MSG_UNDERSTAND_OBEY_CHECKO_COMMUNITY_RULES_CREATING_ISSUE') }}
         </div>
       </div>
       <div class='row vertical-menus-margin'>
@@ -25,7 +23,7 @@
         <div class='onboarding-btns row'>
           <q-btn
             flat
-            label='I understand'
+            :label='$t("MSG_I_UNDERSTAND")'
             class='btn vertical-items-margin full-width'
             @click='onAnyBtnClick'
             no-caps

@@ -1,27 +1,25 @@
 <template>
   <div class='full-width'>
-    <div>
-      CheCko need to know the microchain ID, the message used to create microchain and the certificate hash in which the creation message is packed to rebuild microchain store on MaaS cluster.
-    </div>
+    <div v-html='$t("MSG_CHECKO_NEED_MICROCHAIN_CREATION_MATERIALS_TO_REBUILD_MICROCHAIN_STORE")' />
     <div class='vertical-sections-margin tip info'>
-      <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> Paste microchain creation information to input box to verify.
+      <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> {{ $t('MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_VERIFY') }}
     </div>
     <div class='text-bold vertical-sections-margin'>
-      Microchain ID
+      {{ $t('MSG_MICROCHAIN_ID') }}
     </div>
     <q-input
       outlined v-model='microchainId' type='textarea' :error='microchainIdError'
       autogrow hide-bottom-space class='vertical-items-margin'
     />
     <div class='text-bold vertical-menus-margin'>
-      Creation message
+      {{ $t('MSG_CREATION_MESSAGE') }}
     </div>
     <q-input
       outlined v-model='messageId' type='textarea' :error='messageIdError'
       autogrow hide-bottom-space class='vertical-items-margin'
     />
     <div class='text-bold vertical-menus-margin'>
-      Creation certificate
+      {{ $t('MSG_CREATION_CERTIFICATE') }}
     </div>
     <q-input
       outlined v-model='certificateHash' type='textarea' :error='certificateHashError'
@@ -31,7 +29,7 @@
       class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
       @click='onValidateClick' :disabled='!canValidate'
     >
-      Let's go
+      {{ $t('MSG_LETS_GO') }}
     </q-btn>
   </div>
 </template>

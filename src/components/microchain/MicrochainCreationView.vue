@@ -1,35 +1,33 @@
 <template>
   <div>
-    <div>
-      Please backup microchain ID, the message used to create microchain and certificate hash which contains the microchain creation message properly. You can import microchain with those data in future.
-    </div>
+    <div v-html='$t("MSG_PLEASE_BACKUP_MICROCHAIN_CREATION_MATERIALS")' />
     <div class='text-bold vertical-sections-margin decorate-underline'>
-      Microchain ID
+      {{ $t('MSG_MICROCHAIN_ID') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
       {{ microchain.microchain }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      Creation message
+      {{ $t('MSG_CREATION_MESSAGE') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
       {{ microchain.messageId }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      Creation certificate
+      {{ $t('MSG_CREATION_CERTIFICATE') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
       {{ microchain.certificateHash }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
     </div>
     <div class='vertical-sections-margin tip warn'>
-      <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginBottom: "4px"}' /> You <strong>must backup</strong> microchain creation materials for late recovery.
-      <span class='text-blue-8 cursor-pointer' @click='onBackupClick'>Backup</span>
+      <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginBottom: "4px"}' /> <span v-html='$t("MSG_YOU_MUST_BACKUP_MICROCHAIN_MATERIALS")' />
+      <span class='text-blue-8 cursor-pointer' @click='onBackupClick'>{{ $t('MSG_BACKUP') }}</span>
     </div>
     <q-btn
       class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
       @click='onValidateClick'
     >
-      Validate microchain
+      {{ $t('MSG_VALIDATE_MICROCHAIN') }}
     </q-btn>
   </div>
 </template>

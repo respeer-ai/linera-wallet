@@ -1,7 +1,7 @@
 <template>
   <div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Chain balance
+      {{ $t('MSG_CHAIN_BALANCE') }}
     </div>
     <div class='vertical-items-margin'>
       <MicrochainCardView
@@ -10,7 +10,7 @@
       />
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Account balance
+      {{ $t('MSG_ACCOUNT_BALANCE') }}
     </div>
     <div class='vertical-items-margin'>
       <MicrochainCardView
@@ -19,11 +19,11 @@
       />
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Chain details
+      {{ $t('MSG_CHAIN_DETAILS') }}
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Microchain ID
+        {{ $t('MSG_MICROCHAIN_ID') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -36,7 +36,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Creation message ID
+        {{ $t('MSG_CREATION_MESSAGE_ID') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -49,7 +49,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Creation certificate hash
+        {{ $t('MSG_CREATION_CERTIFICATE_HASH') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
@@ -62,7 +62,7 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        Default chain
+        {{ $t('MSG_DEFAULT_CHAIN') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value'>
@@ -72,7 +72,7 @@
       </div>
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      Chain activity
+      {{ $t('MSG_CHAIN_ACTIVITIES') }}
     </div>
     <div class='extra-large-bottom-margin'>
       <ActivitiesView x-padding='8px' />

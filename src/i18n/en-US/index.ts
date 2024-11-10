@@ -77,5 +77,45 @@ export default {
   MSG_TRANSFER: 'Transfer',
   MSG_SWAP: 'Swap',
   MSG_BRIDGE: 'Bridge',
-  MSG_STAKE: 'Stake'
+  MSG_STAKE: 'Stake',
+  MSG_CHECKO_NEED_TO_KNOW_MICROCHAIN_CREATION_MATERIAL_FOR_RECOVERY: 'CheCko need to know the microchain ID, the message used to create ' +
+                                                                     'microchain and the certificate hash in which the creation message is ' +
+                                                                     'packed to rebuild microchain store on MaaS cluster.',
+  MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_INPUT_BOX: 'Paste microchain creation information to input box.',
+  MSG_MICROCHAIN_ID: 'Microchain ID',
+  MSG_CREATION_MESSAGE: 'Creation message',
+  MSG_CREATION_CERTIFICATE: 'Creation certificate',
+  MSG_PLEASE_BACKUP_MICROCHAIN_CREATION_MATERIALS: 'Please backup microchain ID, the message used to create microchain ' +
+                                                   'and certificate hash which contains the microchain creation message ' +
+                                                   'properly. You can import microchain with those data in future.',
+  MSG_YOU_MUST_BACKUP_MICROCHAIN_MATERIALS: 'You <strong>must backup</strong> microchain creation materials for late recovery.',
+  MSG_BACKUP: 'Backup',
+  MSG_VALIDATE_MICROCHAIN: 'Validate microchain',
+  MSG_CHAIN_BALANCE: 'Chain balance',
+  MSG_ACCOUNT_BALANCE: 'Account balance',
+  MSG_CHAIN_DETAILS: 'Chain details',
+  MSG_CREATION_MESSAGE_ID: 'Creation message ID',
+  MSG_CREATION_CERTIFICATE_HASH: 'Creation certificate hash',
+  MSG_DEFAULT_CHAIN: 'Default chain',
+  MSG_CHAIN_ACTIVITIES: 'Chain activities',
+  MSG_VIEW_MORE_THREE_DOTS: 'View more ...',
+  MSG_NO_USABLE_MICROCHAIN: 'No usable microchain?',
+  MSG_OR_LOWER_CASE: 'or',
+  MSG_CREATE_MICROCHAIN: 'Create microchain',
+  MSG_IMPORT_MICROCHAIN: 'Import microchain',
+  MSG_SYNCHRONIZE_MICROCHAINS: 'Synchronize microchains',
+  MSG_CHECKO_NEED_MICROCHAIN_CREATION_MATERIALS_TO_REBUILD_MICROCHAIN_STORE: 'CheCko need to know the microchain ID, the message used ' +
+                                                                             'to create microchain and the certificate hash in which the ' +
+                                                                             'creation message is packed to rebuild microchain store on MaaS cluster.',
+  MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_VERIFY: 'Paste microchain creation information to input box to verify.',
+  MSG_LETS_GO: "Let's go",
+  MSG_HELP_US_IMPROVE_CHECKO: 'Help us improve CheCko',
+  MSG_HELP_IMPROVING_CHECKO_BY_CREATE_GITHUB_ISSUE: "We'd like to gather user feed back to improve CheCko. " +
+                                                    "But we won't submit any user data to any centralized server. " +
+                                                    "If you find any issue when you're using CheCko, you can create " +
+                                                    'issue to our github repository, of contact CheCko team through discord or telegram.',
+  MSG_LEARN_HOW_TO_CREATE_ISSUE_WHEN_USING_CHECKO: 'Learn how to create an issue while using CheCko.',
+  MSG_UNDERSTAND_OBEY_CHECKO_COMMUNITY_RULES_CREATING_ISSUE: 'When you start to create an issue to CheCko, we think of you understand ' +
+                                                             'you shall obey CheCko community rules.',
+  MSG_I_UNDERSTAND: 'I understand'
 }

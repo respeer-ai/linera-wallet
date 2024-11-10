@@ -17,35 +17,35 @@
         </div>
       </div>
       <div class='text-left' v-if='integratedMode'>
-        {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+        {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}</span>
       </div>
       <div class='text-left' v-else>
-        <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+        <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}</span>
       </div>
     </div>
     <q-space />
     <div v-if='integratedMode'>
       <div class='text-bold text-grey-9 text-right'>
-        {{ ownerTokenBalance }} <span class='selector-item-currency-sub'>TLINERA</span>
+        {{ ownerTokenBalance }} <span class='selector-item-currency-sub'>{{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}</span>
       </div>
       <div class='text-right'>
-        $ {{ chainUsdBalance + ownerUsdBalance }} <span class='text-grey-6 selector-item-currency-sub'>USD</span>
+        $ {{ chainUsdBalance + ownerUsdBalance }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
       </div>
     </div>
     <div v-else-if='showAccountBalance'>
       <div class='text-right text-bold'>
-        $ {{ ownerUsdBalance }} <span class='selector-item-currency-sub'>USD</span>
+        $ {{ ownerUsdBalance }} <span class='selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
       </div>
       <div class='text-grey-9 text-right'>
-        {{ ownerTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+        {{ ownerTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}</span>
       </div>
     </div>
     <div v-else>
       <div class='text-right text-bold'>
-        $ {{ chainUsdBalance }} <span class='selector-item-currency-sub'>USD</span>
+        $ {{ chainUsdBalance }} <span class='selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
       </div>
       <div class='text-grey-9 text-right'>
-        {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>TLINERA</span>
+        {{ chainTokenBalance }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}</span>
       </div>
     </div>
     <div v-if='showIndicator' :class='[ "selector-indicator selector-margin-x-left" ]' />

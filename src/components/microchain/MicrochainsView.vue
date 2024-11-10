@@ -11,7 +11,7 @@
           @click='onViewMoreClick'
           v-if='displayCount < microchains.length'
           color='grey-6'
-          label='View more...'
+          :label='$t("MSG_VIEW_MORE_THREE_DOTS")'
         />
       </div>
       <div v-else class='page-item-placeholder'>
@@ -19,27 +19,27 @@
           <q-icon name='bi-plus-circle' size='48px' color='grey-4' />
         </div>
         <div class='page-item-y-margin-top'>
-          No usable microchain?
-          <span class='cursor-pointer like-link' @click='onCreateMicrochainClick'>Create</span> or
-          <span class='cursor-pointer like-link' @click='onImportMicrochainClick'>Import</span>.
+          {{ $t('MSG_NO_USABLE_MICROCHAIN') }}
+          <span class='cursor-pointer like-link' @click='onCreateMicrochainClick'>{{ $t('MSG_CREATE') }}</span> {{ $t('MSG_OR_LOWER_CASE') }}
+          <span class='cursor-pointer like-link' @click='onImportMicrochainClick'>{{ $t('MSG_IMPORT') }}</span>.
         </div>
       </div>
       <div class='row vertical-sections-margin selector-margin-x-left cursor-pointer' @click='onCreateMicrochainClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-          Create microchain
+          {{ $t('MSG_CREATE_MICROCHAIN') }}
         </div>
       </div>
       <div class='row vertical-items-margin selector-margin-x-left cursor-pointer' @click='onImportMicrochainClick'>
         <q-icon name='bi-plus-lg' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-          Import microchain
+          {{ $t('MSG_IMPORT_MICROCHAIN') }}
         </div>
       </div>
       <div class='row vertical-items-margin selector-margin-x-left cursor-pointer' @click='onSynchronizeMicrochainsClick'>
         <q-icon name='bi-arrow-repeat' size='20px' color='blue-10' />
         <div class='text-left text-blue-8 text-bold page-item-x-margin-left'>
-          Synchronize microchains
+          {{ $t('MSG_SYNCHRONIZE_MICROCHAINS') }}
         </div>
       </div>
     </div>
