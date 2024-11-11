@@ -55,7 +55,7 @@ dbWallet.version(1).stores({
   applications:
     '++id, applicationId, creationMicrochain, creationHeight, applicationIndex',
   activities:
-    '++id, sourceChain, sourceAddress, targetChain, targetAddress, amount, blockHeight, timestamp, certificateHash, grant',
+    '++id, sourceChain, sourceAddress, targetChain, targetAddress, amount, blockHeight, timestamp, certificateHash, grant, tokenId',
   namedApplications: '++id, applicationType, name, applicationId, creatorChain',
   applicationCreatorChainSubscriptions: '++id, applicationId, microchain'
 })

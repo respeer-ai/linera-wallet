@@ -8,6 +8,7 @@ import githubLogo from './Github.svg'
 import discordLogo from './Discord.svg'
 import twitterLogo from './Twitter.svg'
 import telegramLogo from './Telegram.svg'
+import microchainLogo from './Microchain.svg'
 
 export {
   lineraLogo,
@@ -19,5 +20,6 @@ export {
   githubLogo,
   discordLogo,
   twitterLogo,
-  telegramLogo
+  telegramLogo,
+  microchainLogo
 }

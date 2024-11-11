@@ -2,7 +2,9 @@
   <div class='fill-parent text-center'>
     <q-space />
     <div v-if='activities.length > 0'>
-      <ActivityCardView v-for='activity in displayActivities' :key='activity.id' :activity='activity' :x-padding='xPadding' />
+      <div v-for='activity in displayActivities' :key='activity.id' @click='onActivityClick(activity)'>
+        <ActivityCardView :activity='activity' :x-padding='xPadding' />
+      </div>
     </div>
     <div v-else class='page-item-placeholder'>
       <div>
@@ -19,6 +21,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, toRef, watch } from 'vue'
 import { db } from 'src/model'
+import { localStore } from 'src/localstores'
 
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivityCardView from './ActivityCardView.vue'
@@ -61,5 +64,10 @@ onMounted(() => {
 watch(selectedOwner, () => {
   void loadActivities()
 })
+
+const onActivityClick = (activity: db.Activity) => {
+  localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_ACTIVITY
+  localStore.setting.HomeActionParams = activity
+}
 
 </script>

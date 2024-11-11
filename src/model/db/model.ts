@@ -259,6 +259,7 @@ export interface NFT {
 
 export interface Activity {
   id?: number
+  tokenId: number
   sourceChain: string
   sourceAddress?: string
   targetChain: string

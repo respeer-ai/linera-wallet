@@ -60,6 +60,10 @@ const tokensCount = async () => {
   return await dbBase.tokens.count()
 }
 
+const tokenWithId = async (id: number) => {
+  return (await dbBase.tokens.toArray()).find((el) => el.id === id)
+}
+
 defineExpose({
   createToken,
   deleteToken,
@@ -68,7 +72,8 @@ defineExpose({
   fungibleTokens,
   token,
   getTokens,
-  tokensCount
+  tokensCount,
+  tokenWithId
 })
 
 </script>

@@ -274,5 +274,15 @@ export default {
     'You MUST stored your mnemonic and microchains creation materials ' +
     'outside the wallet properly. If your reset the wallet without ' +
     "mentioned materials, you'll lose your assets permanently.",
-  MSG_LONG_PRESS_RESET_WALLET: 'Long press to reset wallet'
+  MSG_LONG_PRESS_RESET_WALLET: 'Long press to reset wallet',
+  MSG_STATUS: 'Status',
+  MSG_CONFIRMED: 'Confirmed',
+  MSG_TRANSACTION_ID: 'Transaction ID',
+  MSG_TRANSACTION: 'Transaction',
+  MSG_AMOUNT: 'Amount',
+  MSG_BLOCK_HEIGHT: 'Block height',
+  MSG_GRANT: 'Grant',
+  MSG_CERTIFICATE_HASH: 'Certificate hash',
+  MSG_DATE: 'Date',
+  MSG_ACTION: 'Action'
 }

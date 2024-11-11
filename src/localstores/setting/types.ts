@@ -14,7 +14,8 @@ export enum Menu {
 export enum HomeAction {
   SHOW_MAIN = 'ShowMain',
   SHOW_MICROCHAIN = 'ShowMicrochain',
-  SHOW_TOKEN = 'ShowToken'
+  SHOW_TOKEN = 'ShowToken',
+  SHOW_ACTIVITY = 'ShowActivity'
 }
 
 export interface Setting {
