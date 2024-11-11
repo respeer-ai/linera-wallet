@@ -84,7 +84,7 @@
       <q-space />
       <div>{{ action }}</div>
     </div>
-    <div class='row vertical-menus-margin decorate-underline-dashed'>
+    <div class='row vertical-items-margin decorate-underline-dashed'>
       <div>{{ $t('MSG_AMOUNT') }}</div>
       <q-space />
       <div><strong>{{ activity.amount }} {{ token?.ticker }}</strong></div>
