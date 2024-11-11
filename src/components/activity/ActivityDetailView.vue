@@ -9,14 +9,18 @@
       <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
     </div>
     <div class='row'>
-      <div><strong>{{ $t('MSG_STATUS') }}</strong></div>
+      <div class='text-grey-9'>
+        <strong>{{ $t('MSG_STATUS') }}</strong>
+      </div>
       <q-space />
       <div class='text-green-8'>
         <strong>{{ $t('MSG_CONFIRMED') }}</strong>
       </div>
     </div>
     <div class='row vertical-items-margin'>
-      <div><strong>{{ $t('MSG_TRANSACTION_ID') }}</strong></div>
+      <div class='text-grey-9'>
+        <strong>{{ $t('MSG_TRANSACTION_ID') }}</strong>
+      </div>
       <q-space />
       <div class='text-grey-6'>
         {{ shortid.shortId(activity.certificateHash, 8) }}
