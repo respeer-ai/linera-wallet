@@ -147,10 +147,10 @@ const parseActivities = async (microchain: db.Microchain, hash: string) => {
         await dbActivityBridge.value?.createActivity(
           tokenId,
           origin.sender,
-          _message?.System?.Credit?.source,
+          _message?.System?.Credit?.source, // TODO: use application operation data
           block.value.executedBlock?.block.chainId,
-          _message?.System?.Credit?.target,
-          _message?.System?.Credit?.amount,
+          _message?.System?.Credit?.target, // TODO: use application operation data
+          _message?.System?.Credit?.amount, // TODO: use application operation data
           block.value.executedBlock?.block.height,
           block.value.executedBlock?.block.timestamp,
           block.hash,
