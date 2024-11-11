@@ -66,6 +66,7 @@ const activitiesCount = async () => {
 }
 
 const createActivity = async (
+  tokenId: number,
   sourceChain: string,
   sourceAddress: string | undefined,
   targetChain: string,
@@ -87,6 +88,7 @@ const createActivity = async (
   })
   if (exist) return exist
   const activity = {
+    tokenId,
     sourceChain,
     sourceAddress,
     targetChain,

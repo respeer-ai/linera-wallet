@@ -118,13 +118,34 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
 const parseActivities = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
+  console.log(block)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 1
   for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
+    const origin = bundle.origin as rpc.Origin
     for (const message of bundle.bundle.messages) {
       const _message = message.message as rpc.Message
       if (_message?.System?.Credit) {
-        const origin = bundle.origin as rpc.Origin
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await dbActivityBridge.value?.createActivity(
+          nativeTokenId,
+          origin.sender,
+          _message?.System?.Credit?.source,
+          block.value.executedBlock?.block.chainId,
+          _message?.System?.Credit?.target,
+          _message?.System?.Credit?.amount,
+          block.value.executedBlock?.block.height,
+          block.value.executedBlock?.block.timestamp,
+          block.hash,
+          message.grant
+        )
+      } else if (_message?.User) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        const tokenId = (await dbTokenBridge.value?.token(_message.User.applicationId))?.id || 2
+        // TODO: get application operation information from executed block
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await dbActivityBridge.value?.createActivity(
+          tokenId,
           origin.sender,
           _message?.System?.Credit?.source,
           block.value.executedBlock?.block.chainId,
@@ -154,6 +175,7 @@ const parseActivities = async (microchain: db.Microchain, hash: string) => {
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbActivityBridge.value?.createActivity(
+        nativeTokenId,
         block.value.executedBlock?.block.chainId,
         _operation.System.Transfer.owner,
         _operation.System.Transfer.recipient.Account.chain_id,

@@ -31,6 +31,10 @@ export type Message = {
       source?: string
       target: string
     }
+  },
+  User: {
+    applicationId: string
+    bytes: Int8Array
   }
 }
 
