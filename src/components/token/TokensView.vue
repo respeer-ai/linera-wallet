@@ -20,7 +20,7 @@
     </div>
     <q-space />
   </div>
-  <DbTokenBridge v-model:tokens='tokens' />
+  <DbTokenBridge ref='dbTokenBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
   <q-dialog v-model='importingToken'>
     <q-card class='dialog page-y-padding'>
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 
@@ -48,6 +48,8 @@ import AccountDetailView from '../account/AccountDetailView.vue'
 
 const tokens = ref([] as db.Token[])
 const selectedOwner = ref(undefined as unknown as db.Owner)
+
+const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
 const displayingAccount = ref(false)
 const importingToken = ref(false)
@@ -84,5 +86,23 @@ const onTokenClick = (token: db.Token) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_TOKEN
   localStore.setting.HomeActionParams = token
 }
+
+const loadTokensRecursive = async (total: number, offset: number, limit: number) => {
+  if (offset >= total) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  tokens.value.push(...(await dbTokenBridge.value?.getTokens(offset, limit)) || [])
+  void loadTokensRecursive(total, offset + limit, limit)
+}
+
+const loadTokens = async () => {
+  tokens.value = []
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const count = (await dbTokenBridge.value?.tokensCount()) as number || 0
+  await loadTokensRecursive(count, 0, 10)
+}
+
+onMounted(() => {
+  void loadTokens()
+})
 
 </script>

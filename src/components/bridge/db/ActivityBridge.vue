@@ -50,19 +50,19 @@ const addressActivities = async (publicKey: string): Promise<db.Activity[]> => {
   return acts
 }
 
-const ownerActivities = async (owner: db.Owner): Promise<db.Activity[]> => {
+const ownerActivities = async (offset: number, limit: number, owner: db.Owner): Promise<db.Activity[]> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const microchainOwners = await microchainOwnerBridge.value?.ownerMicrochainOwners(owner.owner) || [] as db.MicrochainOwner[]
   if (!microchainOwners) return []
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const microchains = microchainOwners.reduce((ids: string[], a: db.MicrochainOwner): string[] => { ids.push(a.microchain); return ids }, []) || [] as string[]
   if (!microchains) return []
-  const acts = [] as db.Activity[]
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  acts.push(...await dbWallet.activities.where('targetChain').anyOf(microchains).toArray())
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  acts.push(...await dbWallet.activities.where('sourceChain').anyOf(microchains).toArray())
-  return acts
+  return await dbWallet.activities.where('targetChain').anyOf(microchains).or('sourceChain').anyOf(microchains).offset(offset).limit(limit).toArray()
+}
+
+const activitiesCount = async () => {
+  return await dbWallet.activities.count()
 }
 
 const createActivity = async (
@@ -104,7 +104,8 @@ const createActivity = async (
 defineExpose({
   addressActivities,
   ownerActivities,
-  createActivity
+  createActivity,
+  activitiesCount
 })
 
 </script>

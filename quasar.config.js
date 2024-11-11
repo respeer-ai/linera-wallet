@@ -109,13 +109,15 @@ module.exports = configure(function (ctx) {
           },
           { server: false }
         ],
-        ctx.mode.ssr || ctx.mode.bex ? [
-          '@intlify/unplugin-vue-i18n/vite',
-          {
-            include: [path.resolve(__dirname, './src/i18n/**')],
-            jit: true
-          }
-        ] : []
+        ctx.mode.ssr || ctx.mode.bex
+          ? [
+              '@intlify/unplugin-vue-i18n/vite',
+              {
+                include: [path.resolve(__dirname, './src/i18n/**')],
+                jit: true
+              }
+            ]
+          : []
       ]
     },
 

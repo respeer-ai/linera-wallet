@@ -52,13 +52,23 @@ const token = async (applicationId: string) => {
   return (await dbBase.tokens.toArray()).find((el) => el.applicationId === applicationId)
 }
 
+const getTokens = async (offset: number, limit: number): Promise<db.Token[]> => {
+  return (await dbBase.tokens.offset(offset).limit(limit).toArray())
+}
+
+const tokensCount = async () => {
+  return await dbBase.tokens.count()
+}
+
 defineExpose({
   createToken,
   deleteToken,
   updateToken,
   nativeToken,
   fungibleTokens,
-  token
+  token,
+  getTokens,
+  tokensCount
 })
 
 </script>

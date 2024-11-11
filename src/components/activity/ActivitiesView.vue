@@ -12,15 +12,17 @@
     </div>
     <q-space />
   </div>
-  <DbActivityBridge v-model:activities='activities' />
+  <DbOwnerBridge v-model:selected-owner='selectedOwner' />
+  <DbActivityBridge ref='dbActivityBridge' />
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue'
+import { computed, onMounted, ref, toRef, watch } from 'vue'
 import { db } from 'src/model'
 
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivityCardView from './ActivityCardView.vue'
+import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 interface Props {
   xPadding?: string
@@ -28,9 +30,36 @@ interface Props {
 const props = defineProps<Props>()
 const xPadding = toRef(props, 'xPadding')
 
+const selectedOwner = ref(undefined as unknown as db.Owner)
+
+const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
+
 const activities = ref([] as db.Activity[])
 const displayActivities = computed(() => {
   return [...activities.value].sort((a, b) => b.timestamp - a.timestamp)
+})
+
+const loadActivitiesRecursive = async (total: number, offset: number, limit: number) => {
+  if (offset >= total) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  activities.value.push(...(await dbActivityBridge.value?.ownerActivities(offset, limit, selectedOwner.value)) || [])
+  void loadActivitiesRecursive(total, offset + limit, limit)
+}
+
+const loadActivities = async () => {
+  if (!selectedOwner.value) return
+  activities.value = []
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const count = (await dbActivityBridge.value?.activitiesCount()) as number || 0
+  await loadActivitiesRecursive(count, 0, 10)
+}
+
+onMounted(() => {
+  void loadActivities()
+})
+
+watch(selectedOwner, () => {
+  void loadActivities()
 })
 
 </script>
