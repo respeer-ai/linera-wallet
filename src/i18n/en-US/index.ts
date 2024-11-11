@@ -34,7 +34,7 @@ export default {
   MSG_HIDE: 'Hide',
   MSG_MAKE_SURE_NOBODY_IS_LOOKING: 'Make sure nobody is looking.',
   MSG_SHOW_PRIVATE_KEY: 'Show private key',
-  MSG_VERIFY_PASSWORD: 'Verify Password',
+  MSG_VERIFY_PASSWORD: 'Verify password',
   MSG_WARNING_DO_NOT_LEAK_THIS_PRIVATE_KEY:
     'Warning: DO NOT leak this private key! People who have this private key can access any assets in this account.',
   MSG_PROTECT_PRIVATE_KEY: 'Protect private key',
