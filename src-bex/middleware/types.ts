@@ -44,6 +44,10 @@ export type MiddlewareImplHandler = (
   req: RpcRequest
 ) => Promise<string | undefined>
 
+export type MiddlewareInterceptorHandler = (
+  req: RpcRequest
+) => Promise<void>
+
 export enum PopupRequestType {
   CONFIRMATION = 'confirmation'
 }

@@ -37,6 +37,13 @@ export default bexBackground(
         })
     })
 
+    bridge.on('ping', () => {
+      // DO NOTHING
+    })
+    setInterval(() => {
+      void bridge.send('ping')
+    }, 3000)
+
     sentinel.Sentinel.run()
     void setupLineraSubscription()
   }
