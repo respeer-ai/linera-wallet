@@ -184,14 +184,16 @@ const onCloseClick = () => {
 
 onMounted(async () => {
   if (activity.value.sourceAddress?.length) {
+    const address = activity.value.sourceAddress.includes(':') ? activity.value.sourceAddress.split(':')[1] : activity.value.sourceAddress
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    sourceOwner.value = await dbOwnerBridge.value?.getOwner(activity.value.sourceAddress) as db.Owner
+    sourceOwner.value = await dbOwnerBridge.value?.getOwner(address) as db.Owner
   }
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   sourceMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(activity.value.sourceChain) as db.Microchain
   if (activity.value.targetAddress?.length) {
+    const address = activity.value.targetAddress.includes(':') ? activity.value.targetAddress.split(':')[1] : activity.value.targetAddress
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    targetOwner.value = await dbOwnerBridge.value?.getOwner(activity.value.targetAddress) as db.Owner
+    targetOwner.value = await dbOwnerBridge.value?.getOwner(address) as db.Owner
   }
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   targetMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(activity.value.targetChain) as db.Microchain
