@@ -2,3 +2,6 @@
 	path = wasm/linera-protocol
 	url = https://github.com/respeer-ai/linera-protocol.git
 	branch = feat/serialize-u64-to-string
+[submodule "wasm/linera-dapps"]
+	path = wasm/linera-dapps
+	url = https://github.com/linera-hacker/linera-dapps.git

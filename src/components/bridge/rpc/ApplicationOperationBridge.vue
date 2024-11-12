@@ -19,10 +19,12 @@ const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
 const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Int8Array | undefined> => {
+const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Uint8Array | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const network = await dbNetworkBridge.value?._selectedNetwork() as db.Network
   if (!network) return
+
+  // TODO: we can serialize locally
 
   variables = variables || {}
   variables.checko_query_only = true
@@ -35,7 +37,7 @@ const queryApplication = async (chainId: string, applicationId: string, query: D
       operationName
     }).then((res) => {
       const data = graphqlResult.data(res, 'data')
-      const bytes = graphqlResult.keyValue(data, operationName) as Int8Array
+      const bytes = graphqlResult.keyValue(data, operationName) as Uint8Array
       resolve(bytes)
     }).catch((e) => {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

@@ -1,3 +1,4 @@
+use anyhow::Chain;
 use bip39::Mnemonic;
 /**
 This module defines the client API for the Web extension.
@@ -13,12 +14,13 @@ use std::str::FromStr;
 
 use linera_base::{
     crypto::{CryptoHash, KeyPair, PublicKey},
-    data_types::{BlockHeight, OracleResponse, Round, Timestamp},
-    identifiers::{ApplicationId, ChainId},
+    data_types::{Amount, BlockHeight, OracleResponse, Round, Timestamp},
+    identifiers::{AccountOwner, ApplicationId, ChainId, Owner},
 };
 use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
+use spec::{account::ChainAccountOwner, erc20::{ERC20Operation, ERC20Message}};
 
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -279,6 +281,22 @@ pub async fn generate_key_pair_from_mnemonic(
     let key_str = format!("{}", serde_json::to_string(&key_pair)?);
     let key_str = key_str.replace("\"", "");
     Ok(key_str[..64].to_string())
+}
+
+#[wasm_bindgen]
+pub async fn bcs_deserialize_erc20_operation(bytes_str: &str) -> Result<String, JsError> {
+    let bytes: Vec<u8> = serde_json::from_str(bytes_str)?;
+    let operation: ERC20Operation = bcs::from_bytes(&bytes)?;
+    let operation_str = serde_json::to_string(&operation)?;
+    Ok(operation_str)
+}
+
+#[wasm_bindgen]
+pub async fn bcs_deserialize_erc20_message(bytes_str: &str) -> Result<String, JsError> {
+    let bytes: Vec<u8> = serde_json::from_str(bytes_str)?;
+    let message: ERC20Message = bcs::from_bytes(&bytes)?;
+    let message_str = serde_json::to_string(&message)?;
+    Ok(message_str)
 }
 
 #[wasm_bindgen(start)]

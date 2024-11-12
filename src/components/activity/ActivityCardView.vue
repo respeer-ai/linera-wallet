@@ -27,23 +27,25 @@
       <div class='header-items-margin-x-right row text-bold'>
         <q-icon :name='direction' color='black' size='12px' :style='{marginTop: "5px"}' />
         <div class='page-item-x-margin-left'>
-          {{ Number(activity.amount) }} {{ $t('MSG_TEST_LINERA_TOKEN_SYMBOL') }}
+          {{ Number(activity.amount) }} {{ token?.ticker }}
         </div>
       </div>
     </div>
   </q-item>
   <OwnerBridge v-model:selected-owner='owner' />
   <MicrochainOwnerBridge :owner='owner?.owner' v-model:microchain-owners='microchainOwners' />
+  <TokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
 import { db } from 'src/model'
 import { shortid } from 'src/utils'
-import { computed, ref, toRef } from 'vue'
+import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
+import TokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
 
@@ -57,6 +59,9 @@ const xPadding = toRef(props, 'xPadding')
 
 const owner = ref(undefined as unknown as db.Owner)
 const microchainOwners = ref([] as db.MicrochainOwner[])
+const token = ref(undefined as unknown as db.Token)
+
+const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
 const action = computed(() => {
   if (activity.value.sourceAddress === activity.value.targetAddress) {
@@ -148,6 +153,11 @@ const icon = computed(() => {
     return 'bi-box-arrow-in-right'
   }
   return 'bi-question-circle-fill'
+})
+
+onMounted(async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  token.value = await dbTokenBridge.value?.tokenWithId(activity.value.tokenId) as db.Token
 })
 
 </script>

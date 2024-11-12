@@ -118,7 +118,6 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
 const parseActivities = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
-  console.log(block)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 1
   for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
@@ -141,21 +140,27 @@ const parseActivities = async (microchain: db.Microchain, hash: string) => {
         )
       } else if (_message?.User) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const tokenId = (await dbTokenBridge.value?.token(_message.User.applicationId))?.id || 2
-        // TODO: get application operation information from executed block
+        const token = await dbTokenBridge.value?.token(_message.User.application_id) as db.Token
+        const tokenId = token?.id || 2
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(`[${_message.User.bytes.toString()}]`)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
+        if (erc20Message?.Transfer) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        await dbActivityBridge.value?.createActivity(
-          tokenId,
-          origin.sender,
-          _message?.System?.Credit?.source, // TODO: use application operation data
-          block.value.executedBlock?.block.chainId,
-          _message?.System?.Credit?.target, // TODO: use application operation data
-          _message?.System?.Credit?.amount, // TODO: use application operation data
-          block.value.executedBlock?.block.height,
-          block.value.executedBlock?.block.timestamp,
-          block.hash,
-          message.grant
-        )
+          await dbActivityBridge.value?.createActivity(
+            tokenId,
+            erc20Message.Transfer.origin.chain_id,
+            erc20Message.Transfer.origin.owner,
+            block.value.executedBlock?.block.chainId,
+            erc20Message.Transfer.to.owner,
+            erc20Message.Transfer.amount,
+            block.value.executedBlock?.block.height,
+            block.value.executedBlock?.block.timestamp,
+            block.hash,
+            message.grant
+          )
+        }
       }
     }
   }

@@ -154,6 +154,7 @@ const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAcc
       to,
       amount: amount.toString()
     })
+
     localStore.operation.operations.push({
       operationType: operationDef.OperationType.MINT,
       applicationType: db.ApplicationType.ERC20,
@@ -168,7 +169,8 @@ const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAcc
       } as rpc.Operation
     } as operationDef.ChainOperation)
     return true
-  } catch {
+  } catch (e) {
+    console.log('Error', e)
     return false
   }
 }

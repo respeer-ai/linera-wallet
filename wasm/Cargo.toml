@@ -26,6 +26,7 @@ tokio = "1.38.0"
 local-encoding = "0.2.0"
 rand_chacha = "0.3.1"
 serde_path_to_error = "0.1.16"
+bcs = "0.1.6"
 
 [dependencies.bip39]
 git = "https://github.com/rust-bitcoin/rust-bip39.git"
@@ -66,6 +67,12 @@ features = ["web"]
 [dependencies.linera-views]
 path = "./linera-protocol/linera-views"
 features = ["web", "indexeddb"]
+
+[dependencies.spec]
+path = "./linera-dapps/spec"
+
+[patch.'https://github.com/linera-io/linera-protocol.git'.linera-base]
+path = "./linera-protocol/linera-base"
 
 [dependencies.web-sys]
 version = "0.3"

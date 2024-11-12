@@ -33,8 +33,8 @@ export type Message = {
     }
   },
   User: {
-    applicationId: string
-    bytes: Int8Array
+    application_id: string
+    bytes: Uint8Array
   }
 }
 
@@ -50,7 +50,7 @@ export type Operation = {
       target_id: string
       recipient: Recipient
       amount: string
-      user_data: Int8Array | undefined
+      user_data: Uint8Array | undefined
     }
     // TODO: OpenChain
     // TODO: ChangeOwnership
@@ -69,8 +69,8 @@ export type Operation = {
     }
     CreateApplication: {
       bytecode_id: string
-      parameters: Int8Array
-      instantiation_argument: Int8Array
+      parameters: Uint8Array
+      instantiation_argument: Uint8Array
       required_application_ids: string[]
     }
     RequestApplication: {
@@ -81,13 +81,13 @@ export type Operation = {
   }
   User: {
     application_id: string
-    bytes: Int8Array
+    bytes: Uint8Array
   }
 }
 
 export type Destination = {
   Recipient: string
-  Subscribers: Int8Array
+  Subscribers: Uint8Array
 }
 
 export type ERC20Token = {
@@ -109,4 +109,19 @@ export type ERC20Token = {
 export type ChainAccountOwner = {
   chain_id: string
   owner?: string /* User:$owner or Application:$applicationId */
+}
+
+export type ERC20Operation = {
+  BaseOperation: {
+    SubscribeCreatorChain
+  },
+  Transfer: { to: ChainAccountOwner, amount: string }
+}
+
+export type ERC20Message = {
+  Transfer: {
+    origin: ChainAccountOwner,
+    to: ChainAccountOwner,
+    amount: string
+  }
 }
