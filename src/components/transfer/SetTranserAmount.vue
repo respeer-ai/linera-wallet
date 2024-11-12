@@ -27,7 +27,7 @@
           </div>
         </div>
         <div>
-          {{ fromChainBalance ? chainTokenBalance : accountTokenBalance }} TLINERA
+          {{ fromChainBalance ? chainTokenBalance : accountTokenBalance }} {{ token.ticker }}
         </div>
       </div>
       <q-space />
@@ -50,14 +50,14 @@
   </div>
   <TokenBridge ref='dbTokenBridge' />
   <MicrochainOwnerBalanceBridge
-    v-if='nativeTokenId !== undefined' :owner='fromOwner.owner' :microchain-id='fromMicrochain.microchain' :token-id='nativeTokenId'
+    :owner='fromOwner.owner' :microchain-id='fromMicrochain.microchain' :token-id='token.id'
     v-model:token-balance='accountTokenBalance'
   />
-  <MicrochainBalanceBridge v-if='nativeTokenId !== undefined' :microchain-id='fromMicrochain.microchain' :token-id='nativeTokenId' v-model:token-balance='chainTokenBalance' />
+  <MicrochainBalanceBridge :microchain-id='fromMicrochain.microchain' :token-id='token.id' v-model:token-balance='chainTokenBalance' />
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, toRef, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { db } from 'src/model'
 
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -93,16 +93,9 @@ const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().le
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)
 
-const nativeTokenId = ref(undefined as unknown as number)
-
 const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
 const emit = defineEmits<{(ev: 'next'): void}>()
-
-onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
-})
 
 const onChangeFromBalanceClick = () => {
   fromChainBalance.value = !fromChainBalance.value
