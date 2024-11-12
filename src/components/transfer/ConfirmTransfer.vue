@@ -5,7 +5,7 @@
     </div>
     <div class='row flex items-center vertical-items-margin extra-margin-bottom'>
       <q-avatar>
-        <q-img :src='lineraLogo' width='48px' height='48px' />
+        <q-img :src='token.logo' width='48px' height='48px' />
       </q-avatar>
       <div class='selector-margin-x-left'>
         <div class='label-text-extra-large'>
@@ -147,7 +147,6 @@
 import { db } from 'src/model'
 import { toRef } from 'vue'
 
-import { lineraLogo } from 'src/assets'
 import { shortid } from 'src/utils'
 
 interface Props {
