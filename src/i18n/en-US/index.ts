@@ -216,7 +216,7 @@ export default {
     '<p><strong>MUST READ</strong></p>' +
     'CheCko is currently run with Linera DevNet. Token symbol' +
     '<strong>TLINERA</strong> used in CheCko is only a placeholder to show' +
-    'the functionalities of Linera wallet workflows. CheCko won't DM' +
+    "the functionalities of Linera wallet workflows. CheCko won't DM" +
     'anyone to get money for any reason. And, CheCko is only a third-party' +
     'open source wallet solution for Linera developed by consecutive Linera' +
     "hackathon winner <a href='https://respeer.ai'>ResPeer</a>'s" +
