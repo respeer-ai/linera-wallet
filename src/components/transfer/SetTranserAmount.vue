@@ -15,7 +15,7 @@
     <div class='transfer-amount-space' />
     <div class='row tip info-bg vertical-sections-margin flax items-center justify-center'>
       <q-avatar>
-        <q-img :src='lineraLogo' width='36px' height='36px' />
+        <q-img :src='token.logo' width='36px' height='36px' />
       </q-avatar>
       <div class='page-item-x-margin-left'>
         <div class='row'>
@@ -63,8 +63,6 @@ import { db } from 'src/model'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import TokenBridge from '../bridge/db/TokenBridge.vue'
-
-import { lineraLogo } from 'src/assets'
 
 interface Props {
   fromOwner: db.Owner
