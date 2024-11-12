@@ -76,6 +76,10 @@ export const lineraGraphqlQueryApplicationId = (request: RpcRequest) => {
   return (request?.request?.params as unknown as RpcGraphqlQuery)?.applicationId
 }
 
+export const lineraGraphqlQueryPublicKey = (request: RpcRequest) => {
+  return (request?.request?.params as unknown as RpcGraphqlQuery)?.publicKey
+}
+
 export const lineraGraphqlMutationOperation = (request: RpcRequest) => {
   const patterns = (
     request?.request?.params as unknown as RpcGraphqlQuery

@@ -54,14 +54,13 @@ import { localStore } from 'src/localstores'
 import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
-import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId } from '../../../../src-bex/middleware/types'
+import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey } from '../../../../src-bex/middleware/types'
 
 import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
 import MutationInfoView from '../MutationInfoView.vue'
 
-const publicKey = ref('')
 const step = ref(1)
 const allowMutateWallet = ref(false)
 const persistAuthentication = ref(false)
@@ -73,6 +72,7 @@ const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.val
 const operation = computed(() => lineraGraphqlMutationOperation(request.value.request) as string)
 const graphqlQuery = computed(() => lineraGraphqlQuery(request.value.request).query)
 const graphqlVariables = computed(() => lineraGraphqlQuery(request.value.request).variables)
+const publicKey = computed(() => lineraGraphqlQueryPublicKey(request.value.request))
 const processing = ref(false)
 
 const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
