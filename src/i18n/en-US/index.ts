@@ -284,5 +284,7 @@ export default {
   MSG_GRANT: 'Grant',
   MSG_CERTIFICATE_HASH: 'Certificate hash',
   MSG_DATE: 'Date',
-  MSG_ACTION: 'Action'
+  MSG_ACTION: 'Action',
+  MSG_QUERY: 'Query',
+  MSG_VARIABLES: 'Variables'
 }

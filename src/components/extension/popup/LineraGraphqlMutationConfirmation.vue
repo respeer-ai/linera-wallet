@@ -1,15 +1,20 @@
 <template>
   <div class='text-center full-height'>
-    <div :style='{ height: "calc(100% - " + actionHeight + "px" + ")" }'>
-      <div v-if='step === 1' class='full-height page-x-padding'>
+    <div :style='{ height: "calc(100% - " + (step !== 2 ? actionHeight : 0) + "px" + ")" }'>
+      <div v-if='step === 1' class='full-height page-x-padding overflow-scroll'>
         <div class='selector-y-padding'>
           <CheckboxView
-            text='Change Linera account state (transfer, generate block, etc.)'
+            :text='operation'
             :caption='`Requested now for ${shortid.shortId(publicKey, 4)}`'
             v-model='allowMutateWallet'
           />
+          <MutationInfoView
+            :public-key='publicKey'
+            :application-id='applicationId'
+            :graphql-query='graphqlQuery'
+            :graphql-variables='graphqlVariables'
+          />
         </div>
-        <div>{{ localStore.popup }}</div>
       </div>
       <div v-if='step === 2' class='full-height'>
         <ProcessingView :processing='processing' />
@@ -45,10 +50,12 @@ import { localStore } from 'src/localstores'
 import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
+import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId } from '../../../../src-bex/middleware/types'
 
 import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
+import MutationInfoView from '../MutationInfoView.vue'
 
 const publicKey = ref('')
 const step = ref(1)
@@ -56,6 +63,11 @@ const allowMutateWallet = ref(false)
 const respond = computed(() => localStore.popup._popupRespond)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
+const request = computed(() => localStore.popup._popupPayload.data)
+const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.value.request) as string)
+const operation = computed(() => lineraGraphqlMutationOperation(request.value.request) as string)
+const graphqlQuery = computed(() => lineraGraphqlQuery(request.value.request).query)
+const graphqlVariables = computed(() => lineraGraphqlQuery(request.value.request).variables)
 const processing = ref(false)
 
 const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
@@ -72,7 +84,13 @@ const onNextStepClick = () => {
       try {
         localStore.popup.removeRequest(localStore.popup.popupRequestId)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
+        void rpcAuthBridge.value?.createRpcAuth(
+          origin.value,
+          publicKey.value,
+          method.value,
+          applicationId.value,
+          operation.value
+        )
         void _respond?.({
           approved: true
         } as commontypes.ConfirmationPopupResponse)

@@ -57,4 +57,33 @@ export interface OriginRpcAuth {
   publicKey: string
   chainId: string
   method: RpcMethod
+  applicationId?: string
+  operation?: string
+}
+
+export interface GraphqlQuery {
+  operationName: string
+  query: string
+  variables: Record<string, unknown>
+}
+
+export interface RpcGraphqlQuery {
+  publicKey: string
+  applicationId?: string
+  query: GraphqlQuery
+}
+
+export const lineraGraphqlQueryApplicationId = (request: RpcRequest) => {
+  return (request?.request?.params as unknown as RpcGraphqlQuery)?.applicationId
+}
+
+export const lineraGraphqlMutationOperation = (request: RpcRequest) => {
+  const patterns = ((request?.request?.params as unknown as RpcGraphqlQuery)?.query)?.query?.match(/\).*{\s+([a-zA-Z]+)[($]/)
+  if (!patterns) return undefined
+  if (patterns?.length < 2) return undefined
+  return patterns[1][0].toUpperCase() + patterns[1].slice(1)
+}
+
+export const lineraGraphqlQuery = (request: RpcRequest) => {
+  return (request?.request?.params as unknown as RpcGraphqlQuery)?.query
 }

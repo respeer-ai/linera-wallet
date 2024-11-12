@@ -26,9 +26,10 @@ export const getMicrochains = async (owner?: string) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const authenticated = async (origin: string, method: RpcMethod) => {
+export const authenticated = async (origin: string, method: RpcMethod, applicationId?: string, operation?: string) => {
+  if (method === RpcMethod.LINERA_GRAPHQL_MUTATION && !operation) return Promise.reject('Invalid operation')
   return (await dbBase.rpcAuths.toArray()).find(
-    (el) => el.origin === origin && el.method === method
+    (el) => el.origin === origin && el.method === method && (applicationId === undefined || el.applicationId === applicationId) && (operation === undefined || el.operation === operation)
   )
 }
 

@@ -16,7 +16,7 @@ const onRun = async () => {
   const accounts = await web3.eth.requestAccounts()
   if (!accounts.length) return console.log('Invalid account')
 
-  const hexContent = Web3.utils.utf8ToHex('Hello World!')
+  const hexContent = Web3.utils.utf8ToHex('Hello World! Hello World! Hello World! Hello World! Hello World! Hello World! Hello World! Hello World! Hello World! Hello World! Hello World! Hello World!')
   console.log('Sign', hexContent, accounts)
 
   web3.eth.sign(hexContent, '0x' + accounts[0].slice(0, 40))

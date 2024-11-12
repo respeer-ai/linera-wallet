@@ -18,14 +18,16 @@ watch(_rpcAuths, () => {
   rpcAuths.value = _rpcAuths.value
 })
 
-const createRpcAuth = async (origin: string, publicKey: string, method: RpcMethod) => {
+const createRpcAuth = async (origin: string, publicKey: string, method: RpcMethod, applicationId?: string, operation?: string) => {
   const microchain = (await dbBase.rpcMicrochains.toArray()).find((el) => el.publicKey === publicKey)?.microchain
   if (!microchain) return
   await dbBase.rpcAuths.add({
     origin,
     publicKey,
     chainId: microchain,
-    method
+    method,
+    applicationId,
+    operation
   })
 }
 

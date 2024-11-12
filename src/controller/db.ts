@@ -17,7 +17,7 @@ dbBase.version(1).stores({
   tokens:
     '++id, name, ticker, tokenType, description, applicationId, native, usdCurrency, mono, discord, telegram, twitter, website, github, totalSupply, mintable',
   lastLogin: '++id, timestamp',
-  rpcAuths: '++id, origin, publicKey, chainId, method',
+  rpcAuths: '++id, origin, publicKey, chainId, method, applicationId, operation',
   rpcMicrochains: '++id, origin, publicKey, microchain'
 })
 

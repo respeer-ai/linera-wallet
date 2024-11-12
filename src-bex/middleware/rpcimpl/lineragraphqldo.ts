@@ -1,22 +1,10 @@
 import { sharedStore } from '../../../src-bex/store'
 import axios from 'axios'
-import { RpcMethod, RpcRequest } from '../types'
+import { RpcMethod, RpcRequest, RpcGraphqlQuery } from '../types'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import { basebridge } from '../../../src-bex/event'
 import { subscription } from '../../subscription'
 import type { Json } from '@metamask/utils'
-
-interface GraphqlQuery {
-  operationName: string
-  query: string
-  variables: Record<string, unknown>
-}
-
-interface RpcGraphqlQuery {
-  publicKey: string
-  applicationId?: string
-  query: GraphqlQuery
-}
 
 interface RpcRequestAttr {
   needChainId: boolean
