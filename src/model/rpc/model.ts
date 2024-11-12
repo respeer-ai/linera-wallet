@@ -31,7 +31,7 @@ export type Message = {
       source?: string
       target: string
     }
-  },
+  }
   User: {
     application_id: string
     bytes: Uint8Array
@@ -114,14 +114,14 @@ export type ChainAccountOwner = {
 export type ERC20Operation = {
   BaseOperation: {
     SubscribeCreatorChain
-  },
-  Transfer: { to: ChainAccountOwner, amount: string }
+  }
+  Transfer: { to: ChainAccountOwner; amount: string }
 }
 
 export type ERC20Message = {
   Transfer: {
-    origin: ChainAccountOwner,
-    to: ChainAccountOwner,
+    origin: ChainAccountOwner
+    to: ChainAccountOwner
     amount: string
   }
 }

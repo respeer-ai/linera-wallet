@@ -18,7 +18,7 @@ watch(_rpcAuths, () => {
   rpcAuths.value = _rpcAuths.value
 })
 
-const createRpcAuth = async (origin: string, publicKey: string, method: RpcMethod, applicationId?: string, operation?: string) => {
+const createRpcAuth = async (origin: string, publicKey: string, method: RpcMethod, applicationId?: string, operation?: string, persistAuth?: boolean) => {
   const microchain = (await dbBase.rpcMicrochains.toArray()).find((el) => el.publicKey === publicKey)?.microchain
   if (!microchain) return
   await dbBase.rpcAuths.add({
@@ -27,7 +27,8 @@ const createRpcAuth = async (origin: string, publicKey: string, method: RpcMetho
     chainId: microchain,
     method,
     applicationId,
-    operation
+    operation,
+    expiredAt: persistAuth ? Date.now() + 24 * 3600 : 0
   })
 }
 

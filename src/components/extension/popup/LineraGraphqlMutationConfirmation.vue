@@ -8,6 +8,10 @@
             :caption='`Requested now for ${shortid.shortId(publicKey, 4)}`'
             v-model='allowMutateWallet'
           />
+          <CheckboxView
+            text='Use the same selection for future requests'
+            v-model='persistAuthentication'
+          />
           <MutationInfoView
             :public-key='publicKey'
             :application-id='applicationId'
@@ -60,6 +64,7 @@ import MutationInfoView from '../MutationInfoView.vue'
 const publicKey = ref('')
 const step = ref(1)
 const allowMutateWallet = ref(false)
+const persistAuthentication = ref(false)
 const respond = computed(() => localStore.popup._popupRespond)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
@@ -89,7 +94,8 @@ const onNextStepClick = () => {
           publicKey.value,
           method.value,
           applicationId.value,
-          operation.value
+          operation.value,
+          persistAuthentication.value
         )
         void _respond?.({
           approved: true

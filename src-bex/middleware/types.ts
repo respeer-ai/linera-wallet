@@ -44,9 +44,7 @@ export type MiddlewareImplHandler = (
   req: RpcRequest
 ) => Promise<string | undefined>
 
-export type MiddlewareInterceptorHandler = (
-  req: RpcRequest
-) => Promise<void>
+export type MiddlewareInterceptorHandler = (req: RpcRequest) => Promise<void>
 
 export enum PopupRequestType {
   CONFIRMATION = 'confirmation'
@@ -59,6 +57,7 @@ export interface OriginRpcAuth {
   method: RpcMethod
   applicationId?: string
   operation?: string
+  expiredAt: number
 }
 
 export interface GraphqlQuery {
@@ -78,7 +77,9 @@ export const lineraGraphqlQueryApplicationId = (request: RpcRequest) => {
 }
 
 export const lineraGraphqlMutationOperation = (request: RpcRequest) => {
-  const patterns = ((request?.request?.params as unknown as RpcGraphqlQuery)?.query)?.query?.match(/\).*{\s+([a-zA-Z]+)[($]/)
+  const patterns = (
+    request?.request?.params as unknown as RpcGraphqlQuery
+  )?.query?.query?.match(/\).*{\s+([a-zA-Z]+)[($]/)
   if (!patterns) return undefined
   if (patterns?.length < 2) return undefined
   return patterns[1][0].toUpperCase() + patterns[1].slice(1)

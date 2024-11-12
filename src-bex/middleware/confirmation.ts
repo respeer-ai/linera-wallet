@@ -1,6 +1,12 @@
 import NotificationManager from '../manager/notificationmanager'
 import { basebridge } from '../event'
-import { PopupRequestType, RpcRequest, RpcMethod, lineraGraphqlMutationOperation, lineraGraphqlQueryApplicationId } from './types'
+import {
+  PopupRequestType,
+  RpcRequest,
+  RpcMethod,
+  lineraGraphqlMutationOperation,
+  lineraGraphqlQueryApplicationId
+} from './types'
 import { commontypes } from '../../src/types'
 import { BexPayload } from '@quasar/app-vite'
 import { sharedStore } from '../store'
@@ -26,8 +32,12 @@ export const needConfirm = async (req: RpcRequest) => {
     shouldConfirm = !(await sharedStore.authenticated(
       req.origin,
       req.request.method as RpcMethod,
-      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION ? lineraGraphqlQueryApplicationId(req) : undefined,
-      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION ? lineraGraphqlMutationOperation(req) : undefined
+      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION
+        ? lineraGraphqlQueryApplicationId(req)
+        : undefined,
+      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION
+        ? lineraGraphqlMutationOperation(req)
+        : undefined
     ))
   }
   if (shouldConfirm === undefined) {
