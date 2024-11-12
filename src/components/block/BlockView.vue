@@ -142,7 +142,6 @@ const parseActivities = async (microchain: db.Microchain, hash: string) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const token = await dbTokenBridge.value?.token(_message.User.application_id) as db.Token
         const tokenId = token?.id || 2
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         const erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(`[${_message.User.bytes.toString()}]`)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
