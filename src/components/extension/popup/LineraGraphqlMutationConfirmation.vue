@@ -79,33 +79,37 @@ const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
 
 const title = defineModel<string>('title')
 
-const onNextStepClick = () => {
+const createRpcAuth = async () => {
+  const _respond = respond.value
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await rpcAuthBridge.value?.createRpcAuth(
+      origin.value,
+      publicKey.value,
+      method.value,
+      applicationId.value,
+      operation.value,
+      persistAuthentication.value
+    )
+    localStore.popup.removeRequest(localStore.popup.popupRequestId)
+    void _respond?.({
+      approved: true
+    } as commontypes.ConfirmationPopupResponse)
+  } catch (e) {
+    void _respond?.({
+      approved: false,
+      message: (e as Error).message
+    } as commontypes.ConfirmationPopupResponse)
+  }
+}
+
+const onNextStepClick = async () => {
   step.value += 1
   if (step.value === 2) {
     processing.value = true
-    setTimeout(() => {
+    await createRpcAuth()
+    window.setTimeout(() => {
       processing.value = false
-      const _respond = respond.value
-      try {
-        localStore.popup.removeRequest(localStore.popup.popupRequestId)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        void rpcAuthBridge.value?.createRpcAuth(
-          origin.value,
-          publicKey.value,
-          method.value,
-          applicationId.value,
-          operation.value,
-          persistAuthentication.value
-        )
-        void _respond?.({
-          approved: true
-        } as commontypes.ConfirmationPopupResponse)
-      } catch (e) {
-        void _respond?.({
-          approved: false,
-          message: (e as Error).message
-        } as commontypes.ConfirmationPopupResponse)
-      }
     }, 2000)
   }
 }

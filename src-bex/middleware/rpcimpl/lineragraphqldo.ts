@@ -30,9 +30,16 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!query || !query.query) {
     return await Promise.reject('Invalid query')
   }
+  let publicKey = query.publicKey
+  if (query.publicKey === undefined) {
+    const accounts = await sharedStore.getOriginPublicKeys(request.origin)
+    if (accounts.length > 0) {
+      publicKey = accounts[0]
+    }
+  }
   const microchain = await sharedStore.getRpcMicrochain(
     request.origin,
-    query.publicKey
+    publicKey
   )
   if (!microchain) {
     return Promise.reject(new Error('Invalid microchain'))
