@@ -22,10 +22,10 @@ const onRun = async () => {
     } as rpc.Recipient,
     amount: '12.6'
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-type-assertion
   const request = await lineraWasm.graphql_deserialize_operation(TRANSFER.loc?.source?.body as string, JSON.stringify(variables)) as string
   const operation = JSON.parse(request) as rpc.Operation
-  console.log(operation)
+  console.log(operation, TRANSFER.loc?.source?.body)
 
   const web3 = new Web3(window.linera)
   web3.eth.requestAccounts().then((accounts) => {

@@ -88,3 +88,8 @@ export const getSubscriptionEndpoint = async () => {
   if (!network) return ''
   return network.wsSchema + '://' + network.host + ':' + network.port.toString()
 }
+
+export const createChainOperation = async (operation: db.ChainOperation) => {
+  operation.state = db.OperationState.CREATED
+  await dbWallet.chainOperations.add(operation)
+}

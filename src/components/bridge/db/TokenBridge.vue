@@ -6,6 +6,8 @@ import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
 import { localStore } from 'src/localstores'
 
+import { lineraLogo } from 'src/assets'
+
 const tokens = defineModel<db.Token[]>('tokens')
 
 const _tokens = useObservable<db.Token[]>(
@@ -22,6 +24,7 @@ watch(_tokens, async () => {
   }
   localStore.setting.CreatingDefaultToken = true
   if (_tokens.value !== undefined && !await dbBase.tokens.count()) {
+    db.lineraToken.logo = lineraLogo
     await dbBase.tokens.add(db.lineraToken)
     localStore.setting.CreatingDefaultToken = false
   }

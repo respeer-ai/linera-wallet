@@ -302,15 +302,7 @@ export const TRANSFER_WITHOUT_BLOCK_PROPOSAL = gql`
 `
 
 export const TRANSFER = gql`
-  mutation transfer(
-    $owner: Owner
-    $recipient: Recipient!
-    $amount: Amount!
-  ) {
-    transfer(
-      owner: $owner
-      recipient: $recipient
-      amount: $amount
-    )
+  mutation transfer($owner: Owner, $recipient: Recipient!, $amount: Amount!) {
+    transfer(owner: $owner, recipient: $recipient, amount: $amount)
   }
 `

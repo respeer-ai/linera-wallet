@@ -2,10 +2,9 @@ import { UAParser } from 'ua-parser-js'
 import CryptoJS, { AES, enc } from 'crypto-js'
 import { sha3 } from 'hash-wasm'
 // TODO: replace with web3.js utils
-import { _hex } from 'src/utils'
+import { _hex } from '../../utils'
 import Identicon from 'identicon.js'
-import { lineraLogo } from 'src/assets'
-import { OriginRpcAuth } from 'app/src-bex/middleware/types'
+import { OriginRpcAuth } from '../../../src-bex/middleware/types'
 
 export interface MicrochainOwner {
   id?: number
@@ -222,7 +221,7 @@ export const lineraToken = {
   ticker: 'TLINERA',
   totalSupply: 2100000000,
   tokenType: TokenType.Native,
-  logo: lineraLogo,
+  logo: '',
   native: true,
   mono: true,
   discord: 'https://discord.com/invite/linera',
