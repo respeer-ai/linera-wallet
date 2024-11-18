@@ -1,4 +1,3 @@
-use anyhow::Chain;
 use bip39::Mnemonic;
 /**
 This module defines the client API for the Web extension.
@@ -14,17 +13,21 @@ use std::str::FromStr;
 
 use linera_base::{
     crypto::{CryptoHash, KeyPair, PublicKey},
-    data_types::{Amount, BlockHeight, OracleResponse, Round, Timestamp},
-    identifiers::{AccountOwner, ApplicationId, ChainId, Owner},
+    data_types::{BlockHeight, OracleResponse, Round, Timestamp},
+    identifiers::{ApplicationId, ChainId},
 };
 use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
-use spec::{account::ChainAccountOwner, erc20::{ERC20Operation, ERC20Message}};
+use spec::{erc20::{ERC20Operation, ERC20Message}};
+use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
 use web_sys::*;
+
+mod fake_service;
+use fake_service::{MutationRoot, QueryRoot};
 
 #[cfg(feature = "no-storage")]
 use linera_client::fake_wallet::FakeWallet;
@@ -297,6 +300,23 @@ pub async fn bcs_deserialize_erc20_message(bytes_str: &str) -> Result<String, Js
     let message: ERC20Message = bcs::from_bytes(&bytes)?;
     let message_str = serde_json::to_string(&message)?;
     Ok(message_str)
+}
+
+#[wasm_bindgen]
+pub async fn graphql_deserialize_operation(query: &str, variables: &str) -> Result<String, JsError> {
+    let request = parse_query_string(&format!("query={}&variables={}", query, variables))?;
+    let schema = Schema::new(QueryRoot, MutationRoot, EmptySubscription);
+    let value = schema.execute(request).await.into_result().unwrap().data;
+    let async_graphql::Value::Object(object) = value else {
+        todo!()
+    };
+    let values = object.values().collect::<Vec<&async_graphql::Value>>();
+    if values.len() == 0 {
+        todo!()
+    }
+    let operation: Operation = async_graphql::from_value(values[0].clone())?;
+    let operation_str = serde_json::to_string(&operation)?;
+    Ok(operation_str)
 }
 
 #[wasm_bindgen(start)]

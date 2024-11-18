@@ -27,6 +27,7 @@ local-encoding = "0.2.0"
 rand_chacha = "0.3.1"
 serde_path_to_error = "0.1.16"
 bcs = "0.1.6"
+async-graphql = "=7.0.2"
 
 [dependencies.bip39]
 git = "https://github.com/rust-bitcoin/rust-bip39.git"

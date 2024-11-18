@@ -283,8 +283,8 @@ export const PENDING_MESSAGES = gql`
   }
 `
 
-export const TRANSFER = gql`
-  mutation transfer(
+export const TRANSFER_WITHOUT_BLOCK_PROPOSAL = gql`
+  mutation transferWithoutBlockProposal(
     $fromPublicKey: PublicKey
     $fromChainId: ChainId!
     $toPublicKey: PublicKey
@@ -296,6 +296,20 @@ export const TRANSFER = gql`
       fromChainId: $fromChainId
       toPublicKey: $toPublicKey
       toChainId: $toChainId
+      amount: $amount
+    )
+  }
+`
+
+export const TRANSFER = gql`
+  mutation transfer(
+    $owner: Owner
+    $recipient: Recipient!
+    $amount: Amount!
+  ) {
+    transfer(
+      owner: $owner
+      recipient: $recipient
       amount: $amount
     )
   }
