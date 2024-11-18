@@ -12,7 +12,7 @@ const getChainOperation = async (operationId: string): Promise<db.ChainOperation
 }
 
 const getChainOperations = async (state?: db.OperationState): Promise<db.ChainOperation[]> => {
-  return (await dbWallet.chainOperations.toArray()).filter((op) => !state || op.state === state)
+  return (await dbWallet.chainOperations.toArray()).filter((op) => state === undefined || op.state === state)
 }
 
 const updateChainOperation = async (chainOperation: db.ChainOperation) => {

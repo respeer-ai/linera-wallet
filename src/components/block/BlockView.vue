@@ -447,6 +447,7 @@ const _handleOperations = async () => {
   // TODO: merge operations of the same microchain
   for (const operation of operations) {
     const _operation = JSON.parse(operation.operation) as rpc.Operation
+    console.log(_operation, operation)
     try {
       operation.state = db.OperationState.EXECUTING
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
