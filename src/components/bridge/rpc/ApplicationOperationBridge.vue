@@ -4,7 +4,6 @@
 </template>
 <script setup lang='ts'>
 import { DocumentNode } from 'graphql'
-import { localStore, operationDef } from 'src/localstores'
 import { rpc, db } from 'src/model'
 import { ref } from 'vue'
 import axios from 'axios'
@@ -14,9 +13,11 @@ import { uid } from 'quasar'
 
 import DbNetworkBridge from '../db/NetworkBridge.vue'
 import DbApplicationCreatorChainSubscriptionBridge from '../db/ApplicationCreatorChainSubscriptionBridge.vue'
+import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
 
 const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
 const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
+const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Uint8Array | undefined> => {
@@ -51,14 +52,14 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string, app
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   if (!force && await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return true
 
-  if (localStore.operation.operations.findIndex((el) => {
-    return el.operationType === operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
+  if (chainOperationBridge.value?.getChainOperations((el) => {
+    return el.operationType === db.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
   }) >= 0) return true
 
   try {
     const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
-    localStore.operation.operations.push({
-      operationType: operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN,
+    const operation = {
+      operationType: db.OperationType.SUBSCRIBE_CREATOR_CHAIN,
       applicationType,
       operationId: uid(),
       microchain: chainId,
@@ -68,7 +69,8 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string, app
           bytes: queryRespBytes
         }
       } as rpc.Operation
-    } as operationDef.ChainOperation)
+    } as db.ChainOperation
+    await chainOperationBridge.value?.createChainOperation({ ...operation })
     return true
   } catch {
     return false
@@ -78,8 +80,8 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string, app
 const requestSubscribe = async (chainId: string, applicationId: string) => {
   const queryRespBytes = await queryApplication(chainId, applicationId, LEGACY_REQUEST_SUBSCRIBE, 'requestSubscribe')
 
-  localStore.operation.operations.push({
-    operationType: operationDef.OperationType.LEGACY_REQUEST_SUBSCRIBE,
+  const operation = {
+    operationType: db.OperationType.LEGACY_REQUEST_SUBSCRIBE,
     operationId: uid(),
     microchain: chainId,
     operation: {
@@ -88,7 +90,8 @@ const requestSubscribe = async (chainId: string, applicationId: string) => {
         bytes: queryRespBytes || []
       }
     } as rpc.Operation
-  } as operationDef.ChainOperation)
+  } as db.ChainOperation
+  await chainOperationBridge.value?.createChainOperation({ ...operation })
 }
 
 defineExpose({

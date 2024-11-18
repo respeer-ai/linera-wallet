@@ -44,6 +44,7 @@ import ConstructBlock from './ConstructBlock.vue'
 import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 import DbApplicationCreatorChainSubscriptionBridge from '../bridge/db/ApplicationCreatorChainSubscriptionBridge.vue'
+import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -61,6 +62,7 @@ const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 const swapApplicationOperationBridge = ref<InstanceType<typeof SwapApplicationOperationBridge>>()
 const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
+const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
@@ -439,13 +441,15 @@ watch(microchainsImportState, async () => {
 const _unmounted = ref(false)
 
 const _handleOperations = async () => {
-  const operations = [...localStore.operation.operations]
+  const operations = await chainOperationBridge.value?.getChainOperations() as db.ChainOperation[]
+  // const operations = [...localStore.operation.operations]
   // TODO: merge operations of the same microchain
   for (const operation of operations) {
     try {
       await processNewIncomingBundle(operation.microchain, operation.operation)
-      const index = localStore.operation.operations.findIndex((el) => el.operationId === operation.operationId)
-      localStore.operation.operations.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
+      // const index = localStore.operation.operations.findIndex((el) => el.operationId === operation.operationId)
+      // localStore.operation.operations.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
+      await chainOperationBridge.value?.deleteChainOperation(operation.id as number)
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Failed process incoming bundle: ${error}`)

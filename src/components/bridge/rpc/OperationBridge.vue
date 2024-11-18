@@ -1,14 +1,17 @@
 <script setup lang='ts'>
 import { uid } from 'quasar'
-import { localStore, operationDef } from 'src/localstores'
 import { db, rpc } from 'src/model'
+import { ref} from 'vue'
+import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
+
+const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
 
 const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number) => {
   const fromOwner = fromPublicKey !== undefined ? await db.ownerFromPublicKey(fromPublicKey) : undefined
   const toOwner = toPublicKey !== undefined ? await db.ownerFromPublicKey(toPublicKey) : undefined
 
-  localStore.operation.operations.push({
-    operationType: operationDef.OperationType.TRANSFER,
+  const operation = {
+    operationType: db.OperationType.TRANSFER,
     operationId: uid(),
     microchain: fromChainId,
     operation: {
@@ -25,12 +28,13 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
         }
       }
     } as rpc.Operation
-  } as operationDef.ChainOperation)
+  } as db.ChainOperation
+  await chainOperationBridge.value?.createChainOperation({ ...operation })
 }
 
 const requestApplication = (requesterChainId: string, applicationId: string, targetChainId: string, applicationType: db.ApplicationType) => {
-  localStore.operation.operations.push({
-    operationType: operationDef.OperationType.REQUEST_APPLICATION,
+  const operation = {
+    operationType: db.OperationType.REQUEST_APPLICATION,
     applicationType,
     operationId: uid(),
     microchain: requesterChainId,
@@ -42,7 +46,8 @@ const requestApplication = (requesterChainId: string, applicationId: string, tar
         }
       }
     } as rpc.Operation
-  } as operationDef.ChainOperation)
+  } as db.ChainOperation
+  chainOperationBridge.value?.createNetwork({ ...operation })
 }
 
 defineExpose({

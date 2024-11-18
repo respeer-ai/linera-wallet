@@ -12,18 +12,20 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { BALANCE_OF, MINT, TOKEN_METADATA, TRANSFER_ERC20 } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
-import { localStore, operationDef } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { uid } from 'quasar'
 
 import MonoApplicationOperationBridge from './MonoApplicationOperationBridge.vue'
 import RpcOperationBridge from './OperationBridge.vue'
 import DbTokenBridge from '../db/TokenBridge.vue'
 import RpcApplicationOperationBridge from './ApplicationOperationBridge.vue'
+import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
 
 const monoApplicationOperationBridge = ref<InstanceType<typeof MonoApplicationOperationBridge>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 const rpcApplicationOperationBridge = ref<InstanceType<typeof RpcApplicationOperationBridge>>()
+const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
 
 const subscribeWLineraCreationChain = async (chainId: string, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
@@ -128,8 +130,9 @@ const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccount
       to,
       amount: amount.toString()
     })
-    localStore.operation.operations.push({
-      operationType: operationDef.OperationType.MINT,
+
+    const operation = {
+      operationType: db.OperationType.MINT,
       applicationType: db.ApplicationType.ERC20,
       operationId: uid(),
       microchain: chainId,
@@ -140,7 +143,8 @@ const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccount
           bytes: queryRespBytes
         }
       } as rpc.Operation
-    } as operationDef.ChainOperation)
+    } as db.ChainOperation
+    await chainOperationBridge.value?.createChainOperation({ ...operation })
     return true
   } catch {
     return false
@@ -155,8 +159,8 @@ const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAcc
       amount: amount.toString()
     })
 
-    localStore.operation.operations.push({
-      operationType: operationDef.OperationType.MINT,
+    const operation = {
+      operationType: db.OperationType.MINT,
       applicationType: db.ApplicationType.ERC20,
       operationId: uid(),
       microchain: chainId,
@@ -167,7 +171,8 @@ const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAcc
           bytes: queryRespBytes
         }
       } as rpc.Operation
-    } as operationDef.ChainOperation)
+    } as db.ChainOperation
+    await chainOperationBridge.value?.createChainOperation({ ...operation })
     return true
   } catch (e) {
     console.log('Error', e)
