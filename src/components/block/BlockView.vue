@@ -16,6 +16,7 @@
     <SwapApplicationOperationBridge ref='swapApplicationOperationBridge' />
     <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
     <DbApplicationCreatorChainSubscriptionBridge ref='dbApplicationCreatorChainSubscriptionBridge' />
+    <DbChainOperationBridge ref='dbChainOperationBridge' />
   </div>
 </template>
 
@@ -44,7 +45,7 @@ import ConstructBlock from './ConstructBlock.vue'
 import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 import DbApplicationCreatorChainSubscriptionBridge from '../bridge/db/ApplicationCreatorChainSubscriptionBridge.vue'
-import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
+import DbChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -62,7 +63,7 @@ const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 const swapApplicationOperationBridge = ref<InstanceType<typeof SwapApplicationOperationBridge>>()
 const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
-const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
+const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
@@ -441,15 +442,23 @@ watch(microchainsImportState, async () => {
 const _unmounted = ref(false)
 
 const _handleOperations = async () => {
-  const operations = await chainOperationBridge.value?.getChainOperations() as db.ChainOperation[]
-  // const operations = [...localStore.operation.operations]
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const operations = await dbChainOperationBridge.value?.getChainOperations(db.OperationState.CREATED) as db.ChainOperation[]
   // TODO: merge operations of the same microchain
   for (const operation of operations) {
+    const _operation = JSON.parse(operation.operation) as rpc.Operation
     try {
-      await processNewIncomingBundle(operation.microchain, operation.operation)
-      // const index = localStore.operation.operations.findIndex((el) => el.operationId === operation.operationId)
-      // localStore.operation.operations.splice(index >= 0 ? index : 0, index >= 0 ? 1 : 0)
-      await chainOperationBridge.value?.deleteChainOperation(operation.id as number)
+      operation.state = db.OperationState.EXECUTING
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await dbChainOperationBridge.value?.updateChainOperation(operation)
+      await processNewIncomingBundle(operation.microchain, _operation)
+      // TODO: get operation certificate hash
+      // We don't know the reason of the failure, so we let user to choose if retry
+      // TODO: processNewIncomingBundle return if retry
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      operation.state = db.OperationState.EXECUTED
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await dbChainOperationBridge.value?.updateChainOperation(operation)
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Failed process incoming bundle: ${error}`)
@@ -461,10 +470,10 @@ const _handleOperations = async () => {
         case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
           if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.WLINERA) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, operation.operation.User.application_id)
+            await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, _operation.User.application_id)
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-          await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, operation.operation.User.application_id)
+          await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, _operation.User.application_id)
           break
         case operationDef.OperationType.REQUEST_APPLICATION:
           if (operation.applicationType === db.ApplicationType.WLINERA)
@@ -472,7 +481,7 @@ const _handleOperations = async () => {
             await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)
           else if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.SWAP)
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, operation.operation.System.RequestApplication.application_id, true)
+            await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)
           break
       }
     } catch (error) {

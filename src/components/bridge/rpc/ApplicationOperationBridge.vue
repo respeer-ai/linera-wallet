@@ -1,6 +1,7 @@
 <template>
   <DbNetworkBridge ref='dbNetworkBridge' />
   <DbApplicationCreatorChainSubscriptionBridge ref='dbApplicationCreatorChainSubscriptionBridge' />
+  <DbChainOperationBridge ref='dbChainOperationBridge' />
 </template>
 <script setup lang='ts'>
 import { DocumentNode } from 'graphql'
@@ -13,11 +14,11 @@ import { uid } from 'quasar'
 
 import DbNetworkBridge from '../db/NetworkBridge.vue'
 import DbApplicationCreatorChainSubscriptionBridge from '../db/ApplicationCreatorChainSubscriptionBridge.vue'
-import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
+import DbChainOperationBridge from '../db/ChainOperationBridge.vue'
 
 const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
 const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
-const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
+const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Uint8Array | undefined> => {
@@ -52,25 +53,27 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string, app
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   if (!force && await dbApplicationCreatorChainSubscriptionBridge.value?.applicationCreatorChainSubscribed(chainId, applicationId)) return true
 
-  if (chainOperationBridge.value?.getChainOperations((el) => {
-    return el.operationType === db.OperationType.SUBSCRIBE_CREATOR_CHAIN && el.operation.User?.application_id === applicationId && el.microchain === chainId
-  }) >= 0) return true
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (await dbChainOperationBridge.value?.existChainOperation(chainId, db.OperationType.SUBSCRIBE_CREATOR_CHAIN, applicationId))
+    return true
 
   try {
     const queryRespBytes = await queryApplication(chainId, applicationId, SUBSCRIBE_CREATOR_CHAIN, 'subscribeCreatorChain')
     const operation = {
       operationType: db.OperationType.SUBSCRIBE_CREATOR_CHAIN,
-      applicationType,
       operationId: uid(),
       microchain: chainId,
-      operation: {
+      applicationId,
+      applicationType,
+      operation: JSON.stringify({
         User: {
           application_id: applicationId,
           bytes: queryRespBytes
         }
-      } as rpc.Operation
+      } as rpc.Operation)
     } as db.ChainOperation
-    await chainOperationBridge.value?.createChainOperation({ ...operation })
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await dbChainOperationBridge.value?.createChainOperation({ ...operation })
     return true
   } catch {
     return false
@@ -84,14 +87,17 @@ const requestSubscribe = async (chainId: string, applicationId: string) => {
     operationType: db.OperationType.LEGACY_REQUEST_SUBSCRIBE,
     operationId: uid(),
     microchain: chainId,
-    operation: {
+    applicationId,
+    applicationType: db.ApplicationType.ANONYMOUS,
+    operation: JSON.stringify({
       User: {
         application_id: applicationId,
         bytes: queryRespBytes || []
       }
-    } as rpc.Operation
+    } as rpc.Operation)
   } as db.ChainOperation
-  await chainOperationBridge.value?.createChainOperation({ ...operation })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await dbChainOperationBridge.value?.createChainOperation({ ...operation })
 }
 
 defineExpose({

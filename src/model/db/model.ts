@@ -6,7 +6,6 @@ import { _hex } from 'src/utils'
 import Identicon from 'identicon.js'
 import { lineraLogo } from 'src/assets'
 import { OriginRpcAuth } from 'app/src-bex/middleware/types'
-import { rpc } from '../'
 
 export interface MicrochainOwner {
   id?: number
@@ -291,7 +290,8 @@ export interface OriginRpcMicrochain {
 export enum ApplicationType {
   SWAP,
   WLINERA,
-  ERC20
+  ERC20,
+  ANONYMOUS
 }
 
 export interface NamedApplication {
@@ -332,14 +332,25 @@ export enum OperationType {
   SUBSCRIBE_CREATOR_CHAIN = 'subscribeCreatorChain',
   REQUEST_APPLICATION = 'requestApplication',
   TRANSFER = 'transfer',
-  MINT = 'mint'
+  MINT = 'mint',
+  ANONYMOUS = 'ANONYMOUS'
+}
+
+export enum OperationState {
+  CREATED,
+  EXECUTING,
+  EXECUTED,
+  CONFIRMED
 }
 
 export interface ChainOperation {
   id?: number
-  operationType?: OperationType
-  applicationType?: ApplicationType
   operationId: string
   microchain: string
-  operation: rpc.Operation
+  operationType?: OperationType
+  applicationId: string
+  applicationType?: ApplicationType
+  operation: string
+  certificateHash?: string
+  state: OperationState
 }

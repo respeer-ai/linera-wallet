@@ -3,6 +3,7 @@
   <RpcOperationBridge ref='rpcOperationBridge' />
   <DbTokenBridge ref='dbTokenBridge' />
   <RpcApplicationOperationBridge ref='rpcApplicationOperationBridge' />
+  <DbChainOperationBridge ref='dbChainOperationBridge' />
 </template>
 <script setup lang='ts'>
 import { db, rpc } from 'src/model'
@@ -19,13 +20,13 @@ import MonoApplicationOperationBridge from './MonoApplicationOperationBridge.vue
 import RpcOperationBridge from './OperationBridge.vue'
 import DbTokenBridge from '../db/TokenBridge.vue'
 import RpcApplicationOperationBridge from './ApplicationOperationBridge.vue'
-import ChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
+import DbChainOperationBridge from '../db/ChainOperationBridge.vue'
 
 const monoApplicationOperationBridge = ref<InstanceType<typeof MonoApplicationOperationBridge>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 const rpcApplicationOperationBridge = ref<InstanceType<typeof RpcApplicationOperationBridge>>()
-const chainOperationBridge = ref<InstanceType<typeof ChainOperationBridge>>()
+const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
 
 const subscribeWLineraCreationChain = async (chainId: string, force?: boolean): Promise<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
@@ -136,15 +137,16 @@ const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccount
       applicationType: db.ApplicationType.ERC20,
       operationId: uid(),
       microchain: chainId,
-      operation: {
+      operation: JSON.stringify({
         User: {
           application_id: applicationId,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           bytes: queryRespBytes
         }
-      } as rpc.Operation
+      } as rpc.Operation)
     } as db.ChainOperation
-    await chainOperationBridge.value?.createChainOperation({ ...operation })
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await dbChainOperationBridge.value?.createChainOperation({ ...operation })
     return true
   } catch {
     return false
@@ -164,15 +166,16 @@ const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAcc
       applicationType: db.ApplicationType.ERC20,
       operationId: uid(),
       microchain: chainId,
-      operation: {
+      operation: JSON.stringify({
         User: {
           application_id: applicationId,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           bytes: queryRespBytes
         }
-      } as rpc.Operation
+      } as rpc.Operation)
     } as db.ChainOperation
-    await chainOperationBridge.value?.createChainOperation({ ...operation })
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await dbChainOperationBridge.value?.createChainOperation({ ...operation })
     return true
   } catch (e) {
     console.log('Error', e)
