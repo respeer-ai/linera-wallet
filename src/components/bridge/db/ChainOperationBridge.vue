@@ -11,8 +11,8 @@ const getChainOperation = async (operationId: string): Promise<db.ChainOperation
   return await dbWallet.chainOperations.where('operationId').equals(operationId).first()
 }
 
-const getChainOperations = async (state?: db.OperationState): Promise<db.ChainOperation[]> => {
-  return (await dbWallet.chainOperations.toArray()).filter((op) => state === undefined || op.state === state)
+const getChainOperations = async (states?: db.OperationState[]): Promise<db.ChainOperation[]> => {
+  return (await dbWallet.chainOperations.toArray()).filter((op) => states === undefined || states.length === 0 || states.includes(op.state))
 }
 
 const updateChainOperation = async (chainOperation: db.ChainOperation) => {
