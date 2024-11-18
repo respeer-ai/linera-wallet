@@ -337,7 +337,7 @@ export enum OperationType {
 }
 
 export enum OperationState {
-  CREATED,
+  CREATED = 1,
   EXECUTING,
   EXECUTED,
   CONFIRMED
