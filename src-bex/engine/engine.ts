@@ -1,5 +1,6 @@
 import { confirmation, rpc, rpcPreInterceptor, types } from '../middleware'
-import { RpcMethod, RpcMethods, RpcRequest } from '../middleware/types'
+import { RpcGraphqlQuery, RpcMethod, RpcMethods, RpcRequest } from '../middleware/types'
+import { sharedStore } from '../store'
 
 export class Engine {
   middlewareHandlers = [] as Array<types.MiddlewareImplHandler>
@@ -47,9 +48,22 @@ export class Engine {
       })
   }
 
-  rpcExec(req: RpcRequest): Promise<unknown> {
+  async rpcExec(req: RpcRequest): Promise<unknown> {
     if (!RpcMethods.includes(req.request.method as RpcMethod)) {
       return Promise.reject(new Error('Invalid rpc method'))
+    }
+    switch (req.request.method) {
+      case RpcMethod.LINERA_GRAPHQL_MUTATION:
+      {
+        const query = req.request.params as unknown as RpcGraphqlQuery
+        if (query.publicKey === undefined) {
+          const accounts = await sharedStore.getOriginPublicKeys(req.origin)
+          if (accounts.length > 0) {
+            query.publicKey = accounts[0]
+          }
+        }
+        break
+      }
     }
     return new Promise((resolve, reject) => {
       this.rpcPreInterceptorExec(

@@ -36,9 +36,14 @@ const deleteRpcAuth = async (id: number) => {
   await dbBase.rpcAuths.delete(id)
 }
 
+const getRpcAuthsWithOrigin = async (origin: string) => {
+  return await dbBase.rpcMicrochains.where('origin').equals(origin).toArray()
+}
+
 defineExpose({
   createRpcAuth,
-  deleteRpcAuth
+  deleteRpcAuth,
+  getRpcAuthsWithOrigin
 })
 
 </script>

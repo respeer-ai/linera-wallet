@@ -255,7 +255,7 @@ const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => 
   return _sortedObject
 }
 
-const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<boolean> => {
+const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
@@ -359,7 +359,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             Type: localStore.notify.NotifyType.Info
           })
         }
-        resolve(true)
+        resolve(undefined)
       }).catch((error) => {
         localStore.notification.pushNotification({
           Title: 'Execute operation',

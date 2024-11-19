@@ -94,7 +94,7 @@ const onNextStepClick = async () => {
         approved: true
       } as commontypes.ConfirmationPopupResponse)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      void rpcAuthBridge.value?.createRpcAuth(origin.value, owner.value?.address, method.value)
+      void rpcAuthBridge.value?.createRpcAuth(origin.value, owner.value?.address, method.value, undefined, undefined, true)
       localStore.popup.removeRequest(localStore.popup.popupRequestId)
     }, 2000)
   }

@@ -72,7 +72,7 @@ const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.val
 const operation = computed(() => lineraGraphqlMutationOperation(request.value.request) as string)
 const graphqlQuery = computed(() => lineraGraphqlQuery(request.value.request).query)
 const graphqlVariables = computed(() => lineraGraphqlQuery(request.value.request).variables)
-const publicKey = computed(() => lineraGraphqlQueryPublicKey(request.value.request))
+const publicKey = ref(lineraGraphqlQueryPublicKey(request.value.request))
 const processing = ref(false)
 
 const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
@@ -124,7 +124,7 @@ const onCancelClick = () => {
 
 const forwardable = () => {
   if (step.value === 1) {
-    return publicKey.value.length > 0
+    return publicKey.value?.length > 0
   }
   if (step.value === 2) {
     return allowMutateWallet.value
@@ -143,8 +143,13 @@ const onActionResize = (size: Size) => {
   actionHeight.value = size.height
 }
 
-onMounted(() => {
+onMounted(async () => {
   title.value = 'Permissions'
+  publicKey.value = lineraGraphqlQueryPublicKey(request.value.request)
+  if (!publicKey.value?.length) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    publicKey.value = await rpcAuthBridge.value?.getRpcAuthsWithOrigin(origin.value)[0]
+  }
 })
 
 watch(step, () => {
