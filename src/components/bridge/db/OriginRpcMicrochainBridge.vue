@@ -17,8 +17,18 @@ watch(_rpcMicrochains, () => {
   rpcMicrochains.value = _rpcMicrochains.value
 })
 
+const formalizeOriginRpcMicrochain = async (origin: string) => {
+  const microchains = await dbBase.rpcMicrochains.where('origin').equals(origin).toArray()
+  if (microchains.length > 1) {
+    for (const microchain of microchains) {
+      await dbBase.rpcMicrochains.delete(microchain.id)
+    }
+  }
+}
+
 const createOriginRpcMicrochain = async (origin: string, publicKey: string, microchain: string) => {
-  const _microchain = (await dbBase.rpcMicrochains.toArray()).find((el) => el.publicKey === publicKey) as unknown as db.OriginRpcMicrochain || {
+  await formalizeOriginRpcMicrochain(origin)
+  const _microchain = await dbBase.rpcMicrochains.where('origin').equals(origin).first() || {
     origin,
     publicKey,
     microchain
@@ -33,9 +43,14 @@ const deleteOriginRpcMicrochain = async (id: number) => {
   await dbBase.rpcMicrochains.delete(id)
 }
 
+const getOriginRpcMicrochain = async (origin: string) => {
+  return await dbBase.rpcMicrochains.where('origin').equals(origin).first()
+}
+
 defineExpose({
   createOriginRpcMicrochain,
-  deleteOriginRpcMicrochain
+  deleteOriginRpcMicrochain,
+  getOriginRpcMicrochain
 })
 
 </script>

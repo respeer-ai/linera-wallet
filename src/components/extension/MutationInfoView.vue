@@ -14,6 +14,12 @@
     <div class='vertical-items-margin'>
       {{ applicationId }}
     </div>
+    <div class='text-black text-bold label-text-middle vertical-menus-margin'>
+      {{ $t('MSG_MICROCHAIN_ID') }}
+    </div>
+    <div class='vertical-items-margin'>
+      {{ microchainId }}
+    </div>
     <div class='text-black text-bold label-text-middle  vertical-menus-margin'>
       {{ $t('MSG_QUERY') }}
     </div>
@@ -35,12 +41,14 @@ import { toRef } from 'vue'
 interface Props {
   publicKey: string
   applicationId: string
+  microchainId: string
   graphqlQuery: string
   graphqlVariables: Record<string, unknown>
 }
 const props = defineProps<Props>()
 const publicKey = toRef(props, 'publicKey')
 const applicationId = toRef(props, 'applicationId')
+const microchainId = toRef(props, 'microchainId')
 const graphqlQuery = toRef(props, 'graphqlQuery')
 const graphqlVariables = toRef(props, 'graphqlVariables')
 

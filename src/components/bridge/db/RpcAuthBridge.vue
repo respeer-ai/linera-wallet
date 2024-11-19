@@ -19,7 +19,8 @@ watch(_rpcAuths, () => {
 })
 
 const createRpcAuth = async (origin: string, publicKey: string, method: RpcMethod, applicationId?: string, operation?: string, persistAuth?: boolean) => {
-  const microchain = (await dbBase.rpcMicrochains.toArray()).find((el) => el.publicKey === publicKey)?.microchain
+  // Each time we select microchain, we'll update it
+  const microchain = (await dbBase.rpcMicrochains.toArray()).find((el) => el.origin === origin)?.microchain
   if (!microchain) return
   await dbBase.rpcAuths.add({
     origin,
@@ -36,14 +37,9 @@ const deleteRpcAuth = async (id: number) => {
   await dbBase.rpcAuths.delete(id)
 }
 
-const getRpcAuthsWithOrigin = async (origin: string) => {
-  return await dbBase.rpcMicrochains.where('origin').equals(origin).toArray()
-}
-
 defineExpose({
   createRpcAuth,
-  deleteRpcAuth,
-  getRpcAuthsWithOrigin
+  deleteRpcAuth
 })
 
 </script>

@@ -44,6 +44,7 @@
   </div>
   <OriginRpcMicrochainBridge ref='originRpcMicrochainBridge' />
   <RpcAuthBridge ref='rpcAuthBridge' />
+  <DbMicrochainBridge ref='dbMicrochainBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -59,6 +60,7 @@ import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
 import OriginRpcMicrochainBridge from '../../bridge/db/OriginRpcMicrochainBridge.vue'
 import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
+import DbMicrochainBridge from '../../bridge/db/MicrochainBridge.vue'
 
 const step = ref(1)
 
@@ -75,6 +77,7 @@ const microchain = ref(undefined as unknown as db.Microchain)
 
 const originRpcMicrochainBridge = ref<InstanceType<typeof OriginRpcMicrochainBridge>>()
 const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
+const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
 const onNextStepClick = async () => {
   step.value += 1
@@ -132,8 +135,13 @@ const onActionResize = (size: Size) => {
   actionHeight.value = size.height
 }
 
-onMounted(() => {
+onMounted(async () => {
   title.value = 'Select Linera account'
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const rpcMicrochain = await originRpcMicrochainBridge.value?.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
+  if (!rpcMicrochain) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  microchain.value = await dbMicrochainBridge.value?.getMicrochain(rpcMicrochain.microchain) as db.Microchain
 })
 
 watch(step, () => {

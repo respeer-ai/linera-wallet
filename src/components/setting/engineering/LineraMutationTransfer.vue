@@ -10,7 +10,7 @@
 <script setup lang='ts'>
 import { TRANSFER } from 'src/graphql'
 import Web3 from 'web3'
-import { rpc } from 'src/model'
+import { db, rpc } from 'src/model'
 
 const onRun = async () => {
   try {
@@ -23,17 +23,19 @@ const onRun = async () => {
       method: 'metamask_getProviderState'
     }) as Record<string, string>
 
+    const owner = await db.ownerFromPublicKey(accounts[0])
+    console.log(accounts, state, owner)
+
     const result = await window.linera.request({
       method: 'linera_graphqlMutation',
       params: {
         query: {
           query: TRANSFER.loc?.source?.body,
           variables: {
-            owner: accounts[0],
             recipient: {
               Account: {
                 chain_id: state.chainId.replace('0x', ''),
-                owner: accounts[0]
+                owner
               }
             } as rpc.Recipient,
             amount: '0.01'

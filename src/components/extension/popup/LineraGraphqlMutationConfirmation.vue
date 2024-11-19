@@ -15,6 +15,7 @@
           <MutationInfoView
             :public-key='publicKey'
             :application-id='applicationId'
+            :microchain-id='microchain'
             :graphql-query='graphqlQuery'
             :graphql-variables='graphqlVariables'
           />
@@ -45,7 +46,8 @@
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
-    <RpcAuthBridge ref='rpcAuthBridge' />
+    <DbRpcAuthBridge ref='rpcAuthBridge' />
+    <DbOriginRpcMicrochainBridge ref='dbOriginRpcMicrochainBridge' />
   </div>
 </template>
 
@@ -56,10 +58,12 @@ import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey } from '../../../../src-bex/middleware/types'
 
-import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
+import DbRpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
 import MutationInfoView from '../MutationInfoView.vue'
+import DbOriginRpcMicrochainBridge from '../../bridge/db/OriginRpcMicrochainBridge.vue'
+import { db } from 'src/model'
 
 const step = ref(1)
 const allowMutateWallet = ref(false)
@@ -73,9 +77,11 @@ const operation = computed(() => lineraGraphqlMutationOperation(request.value.re
 const graphqlQuery = computed(() => lineraGraphqlQuery(request.value.request).query)
 const graphqlVariables = computed(() => lineraGraphqlQuery(request.value.request).variables)
 const publicKey = ref(lineraGraphqlQueryPublicKey(request.value.request))
+const microchain = ref(undefined as unknown as string)
 const processing = ref(false)
 
-const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
+const rpcAuthBridge = ref<InstanceType<typeof DbRpcAuthBridge>>()
+const dbOriginRpcMicrochainBridge = ref<InstanceType<typeof DbOriginRpcMicrochainBridge>>()
 
 const title = defineModel<string>('title')
 
@@ -146,9 +152,15 @@ const onActionResize = (size: Size) => {
 onMounted(async () => {
   title.value = 'Permissions'
   publicKey.value = lineraGraphqlQueryPublicKey(request.value.request)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const rpcMicrochain = await dbOriginRpcMicrochainBridge.value?.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
+  microchain.value = rpcMicrochain?.microchain
+  // TODO: here the public key should be the same as rpcMicrochain
   if (!publicKey.value?.length) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    publicKey.value = await rpcAuthBridge.value?.getRpcAuthsWithOrigin(origin.value)[0]
+    publicKey.value = rpcMicrochain?.publicKey
+  }
+  if (publicKey.value !== rpcMicrochain?.publicKey) {
+    console.log('Different public key may cause error when submit block')
   }
 })
 
