@@ -109,9 +109,6 @@ export class DataHandler {
   static running = false
 
   public static run(bridge: BexBridge) {
-    if (DataHandler.running) return
-    DataHandler.running = true
-
     basebridge.EventBus.instance.setBridge(bridge)
 
     const _engine = new Engine()
