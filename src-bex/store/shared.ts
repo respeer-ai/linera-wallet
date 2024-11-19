@@ -34,14 +34,14 @@ export const authenticated = async (
 ) => {
   if (method === RpcMethod.LINERA_GRAPHQL_MUTATION && !operation)
     return Promise.reject('Invalid operation')
-  return (await dbBase.rpcAuths.toArray()).find(
+  return (await dbBase.rpcAuths.toArray()).findIndex(
     (el) =>
       el.origin === origin &&
       el.method === method &&
       (applicationId === undefined || el.applicationId === applicationId) &&
       (operation === undefined || el.operation === operation) &&
       el.expiredAt > Date.now()
-  )
+  ) >= 0
 }
 
 export const getRpcMicrochain = async (

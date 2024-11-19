@@ -29,7 +29,7 @@ const createRpcAuth = async (origin: string, publicKey: string, method: RpcMetho
     method,
     applicationId,
     operation,
-    expiredAt: persistAuth ? Date.now() + 24 * 3600 : 0
+    expiredAt: persistAuth ? Date.now() + 24 * 3600 * 1000 : 0
   })
 }
 
