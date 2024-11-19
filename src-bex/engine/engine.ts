@@ -1,6 +1,9 @@
+import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { confirmation, rpc, rpcPreInterceptor, types } from '../middleware'
 import { RpcGraphqlQuery, RpcMethod, RpcMethods, RpcRequest } from '../middleware/types'
 import { sharedStore } from '../store'
+import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
+import { basebridge } from '../event'
 
 export class Engine {
   middlewareHandlers = [] as Array<types.MiddlewareImplHandler>
@@ -98,6 +101,35 @@ export class Engine {
           reject(e)
         }
       )
+    })
+  }
+}
+
+export class DataHandler {
+  static running = false
+
+  public static run(bridge: BexBridge) {
+    if (DataHandler.running) return
+    DataHandler.running = true
+
+    basebridge.EventBus.instance.setBridge(bridge)
+
+    const _engine = new Engine()
+    bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
+      const res = {} as PendingJsonRpcResponse<Json>
+      _engine
+        .rpcExec(payload.data)
+        .then((rc) => {
+          res.result = rc as Json
+          void payload.respond(res)
+        })
+        .catch((e: Error) => {
+          res.error = {
+            code: -1,
+            message: e.message
+          }
+          void payload.respond(res)
+        })
     })
   }
 }

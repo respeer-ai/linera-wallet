@@ -8,6 +8,10 @@ import {
 } from './rpcimpl'
 import { RpcMethod, RpcRequest } from './types'
 
+const dummyHandler = async () => {
+  // DO NOTHING
+}
+
 const handlers = new Map<RpcMethod, RpcImplHandler>([
   [RpcMethod.GET_PROVIDER_STATE, getProviderState.getProviderStateHandler],
   [
@@ -28,7 +32,9 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
     RpcMethod.LINERA_UNSUBSCRIBE,
     lineraGraphqlDo.lineraGraphqlUnsubscribeHandler
   ],
-  [RpcMethod.ETH_GET_BALANCE, ethGetBalance.ethGetBalanceHandler]
+  [RpcMethod.ETH_GET_BALANCE, ethGetBalance.ethGetBalanceHandler],
+
+  [RpcMethod.SEND_METADATA, dummyHandler]
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */

@@ -22,7 +22,9 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.LINERA_SUBSCRIBE, false],
   [RpcMethod.LINERA_UNSUBSCRIBE, false],
   [RpcMethod.ETH_GET_BALANCE, false],
-  [RpcMethod.ETH_SIGN, true]
+  [RpcMethod.ETH_SIGN, true],
+
+  [RpcMethod.SEND_METADATA, false]
 ])
 
 export const needConfirm = async (req: RpcRequest) => {
