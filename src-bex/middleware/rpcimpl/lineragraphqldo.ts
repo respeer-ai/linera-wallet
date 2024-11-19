@@ -160,6 +160,7 @@ const parseSystemMutation = async (
     operation,
     state: db.OperationState.CREATED
   } as db.ChainOperation)
+  return operation
 }
 
 const mutationDo = async (microchain: string, query: RpcGraphqlQuery) => {
