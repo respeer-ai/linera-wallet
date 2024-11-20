@@ -193,12 +193,5 @@ const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
 }
 
 export default bexContent((bridge: BexBridge) => {
-  setInterval(() => {
-    bridge.send('ping').then(() => {
-      // DO NOTHING
-    }).catch((e) => {
-      console.log('Failed ping', e)
-    })
-  }, 3000)
   setupRpcEngine(bridge, setupPageStream())
 })
