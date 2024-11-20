@@ -6,29 +6,22 @@ import { BexBridge } from '@quasar/app-vite'
 import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 import { sentinel, block } from './microchain'
 import InstallationManager from './manager/installationmanager'
-import { EventEmitter } from 'events'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
 
 const installationManager = new InstallationManager()
+let keepaliveInterval
 
 const keepalive = (bridge: BexBridge) => {
-  // We cannot use bridge to listen here due to bridge only respond to connections from application
-  const emitter = bridge as EventEmitter
-
-  emitter.on('ping', () => {
-    // We cannot send to bridge here due to quasar only send to app connections
-    bridge.emit('pong')
-  })
-
-  emitter.on('pong', () => {
-    // DO NOTHING: just let it live
-  })
-
-  setInterval(() => {
-    // We cannot send to bridge here due to quasar only send to app connections
-    bridge.emit('ping')
+  if (keepaliveInterval !== undefined) return
+  keepaliveInterval = setInterval(() => {
+    for (const key of Object.keys(bridge.getEvents())) {
+      if (key.startsWith('ping.') && key.endsWith('.result')) {
+        bridge.removeAllListeners(key)
+      }
+    }
+    void bridge.send('ping')
   }, 3000)
 }
 
