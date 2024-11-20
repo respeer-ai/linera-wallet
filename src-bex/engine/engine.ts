@@ -111,6 +111,9 @@ export class DataHandler {
   public static run(bridge: BexBridge) {
     basebridge.EventBus.instance.setBridge(bridge)
 
+    if (DataHandler.running) return
+    DataHandler.running = true
+
     const _engine = new Engine()
     bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
       const res = {} as PendingJsonRpcResponse<Json>
