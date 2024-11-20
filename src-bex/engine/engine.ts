@@ -110,13 +110,8 @@ export class Engine {
 }
 
 export class DataHandler {
-  static running = false
-
   public static run(bridge: BexBridge) {
     basebridge.EventBus.instance.setBridge(bridge)
-
-    if (DataHandler.running) return
-    DataHandler.running = true
 
     const _engine = new Engine()
     bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {

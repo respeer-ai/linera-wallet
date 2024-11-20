@@ -315,11 +315,11 @@ export class BlockSigner {
   static execute() {
     BlockSigner.processOperations()
       .then(() => {
-        setTimeout(() => BlockSigner.execute(), 10000)
+        setTimeout(() => BlockSigner.execute(), 1000)
       })
       .catch((e) => {
         console.log('Failed process operations', e)
-        setTimeout(() => BlockSigner.execute(), 10000)
+        setTimeout(() => BlockSigner.execute(), 1000)
       })
   }
 

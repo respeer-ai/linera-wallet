@@ -130,10 +130,7 @@ const onCancelClick = () => {
 
 const forwardable = () => {
   if (step.value === 1) {
-    return !publicKey.value?.length
-  }
-  if (step.value === 2) {
-    return allowMutateWallet.value
+    return publicKey.value?.length && allowMutateWallet.value
   }
   return false
 }
