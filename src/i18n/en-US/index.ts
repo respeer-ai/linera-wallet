@@ -158,7 +158,7 @@ export default {
   MSG_USE_YOUR_WALLET_TO_LOGIN_TO_DAPPS_LIKE_METAMASK:
     'Use your CheCko to login to real-time & reactive dApps, just like what you do with Metamask.',
   MSG_BY_CONTINUE_YOU_AGREE_TO_CHECKO_TERM_OF_USE:
-    "By continue you agree to CheCko's <a href='#'>Terms of use</a>",
+    "By continuing, you agree to CheCko's <a href='#'>Terms of use</a>",
   MSG_IMPORTING_AN_EXISTING_WALLET: 'Importing an existing wallet',
   MSG_PASSWORD: 'Password',
   MSG_WELCOME_BACK: 'Welcome back',
