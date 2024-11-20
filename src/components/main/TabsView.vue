@@ -27,7 +27,7 @@
         <ApplicationsView />
       </q-tab-panel>
       <q-tab-panel name='activities'>
-        <ActivitiesView />
+        <ActivitiesView x-padding='6px' />
       </q-tab-panel>
     </q-tab-panels>
   </div>

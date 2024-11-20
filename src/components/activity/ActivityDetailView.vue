@@ -8,7 +8,7 @@
       <q-space />
       <q-icon name='bi-x' size='24px' class='cursor-pointer' @click='onCloseClick' />
     </div>
-    <div class='row'>
+    <div class='row page-item-x-margin-left page-item-x-margin-right'>
       <div class='text-grey-9'>
         <strong>{{ $t('MSG_STATUS') }}</strong>
       </div>
@@ -17,7 +17,7 @@
         <strong>{{ $t('MSG_CONFIRMED') }}</strong>
       </div>
     </div>
-    <div class='row vertical-items-margin'>
+    <div class='row vertical-items-margin page-item-x-margin-left page-item-x-margin-right'>
       <div class='text-grey-9'>
         <strong>{{ $t('MSG_TRANSACTION_ID') }}</strong>
       </div>
@@ -30,81 +30,85 @@
       </div>
     </div>
     <q-separator class='vertical-menus-margin' />
-    <div class='vertical-menus-margin decorate-underline text-bold'>
+    <div class='vertical-menus-margin decorate-underline text-bold page-item-x-margin-left page-item-x-margin-right'>
       {{ $t('MSG_FROM') }}
     </div>
-    <div class='row vertical-menus-margin transfer-tip'>
+    <div class='row vertical-menus-margin transfer-tip page-item-x-margin-left page-item-x-margin-right'>
       <div>
         <q-img :src='microchainLogo' width='28px' height='28px' />
       </div>
       <q-avatar size='28px' class='page-item-x-margin-left'>
         <q-img v-if='sourceMicrochain' :src='db.microchainAvatar(sourceMicrochain)' width='28px' height='28px' />
       </q-avatar>
-      <div class='selector-margin-x-left setting-item'>
+      <div class='selector-margin-x-left setting-item word-break-all' :style='{width: "calc(100% - 80px)"}'>
         {{ activity.sourceChain }}
       </div>
     </div>
-    <div v-if='activity.sourceAddress?.length' class='row vertical-menus-margin transfer-tip'>
+    <div v-if='activity.sourceAddress?.length' class='row vertical-menus-margin transfer-tip page-item-x-margin-left page-item-x-margin-right'>
       <q-avatar size='28px'>
         <q-img v-if='sourceOwner' :src='db.ownerAvatar(sourceOwner)' width='28px' height='28px' />
       </q-avatar>
       <div class='setting-icon page-item-x-margin-left' />
-      <div class='selector-margin-x-left setting-item'>
+      <div class='selector-margin-x-left setting-item word-break-all' :style='{width: "calc(100% - 80px)"}'>
         {{ activity.sourceAddress }}
       </div>
     </div>
-    <div class='vertical-menus-margin decorate-underline text-bold'>
+    <div class='vertical-menus-margin decorate-underline text-bold page-item-x-margin-left page-item-x-margin-right'>
       {{ $t('MSG_TO') }}
     </div>
-    <div class='row vertical-menus-margin transfer-tip'>
+    <div class='row vertical-menus-margin transfer-tip page-item-x-margin-left page-item-x-margin-right'>
       <div>
         <q-img :src='microchainLogo' width='28px' height='28px' />
       </div>
       <q-avatar size='28px' class='page-item-x-margin-left'>
         <q-img v-if='targetMicrochain' :src='db.microchainAvatar(targetMicrochain)' width='28px' height='28px' />
       </q-avatar>
-      <div class='selector-margin-x-left setting-item'>
+      <div class='selector-margin-x-left setting-item word-break-all' :style='{width: "calc(100% - 80px)"}'>
         {{ activity.targetChain }}
       </div>
     </div>
-    <div v-if='activity.targetAddress?.length' class='row vertical-items-margin transfer-tip'>
+    <div v-if='activity.targetAddress?.length' class='row vertical-items-margin transfer-tip page-item-x-margin-left page-item-x-margin-right'>
       <q-avatar size='28px'>
         <q-img v-if='targetOwner' :src='db.ownerAvatar(targetOwner)' width='28px' height='28px' />
       </q-avatar>
       <div class='setting-icon page-item-x-margin-left' />
-      <div class='selector-margin-x-left setting-item'>
+      <div class='selector-margin-x-left setting-item word-break-all' :style='{width: "calc(100% - 80px)"}'>
         {{ activity.targetAddress }}
       </div>
     </div>
-    <div class='vertical-menus-margin decorate-underline text-bold'>
+    <div class='vertical-menus-margin decorate-underline text-bold page-item-x-margin-left page-item-x-margin-right'>
       {{ $t('MSG_TRANSACTION') }}
     </div>
-    <div class='row vertical-menus-margin decorate-underline-dashed'>
+    <div class='row vertical-menus-margin decorate-underline-dashed page-item-x-margin-left page-item-x-margin-right'>
       <div>{{ $t('MSG_ACTION') }}</div>
       <q-space />
       <div>{{ action }}</div>
     </div>
-    <div class='row vertical-items-margin decorate-underline-dashed'>
+    <div class='row vertical-items-margin decorate-underline-dashed page-item-x-margin-left page-item-x-margin-right'>
       <div>{{ $t('MSG_AMOUNT') }}</div>
       <q-space />
       <div><strong>{{ activity.amount }} {{ token?.ticker }}</strong></div>
     </div>
-    <div class='row vertical-items-margin decorate-underline-dashed'>
+    <div class='row vertical-items-margin decorate-underline-dashed page-item-x-margin-left page-item-x-margin-right'>
       <div>{{ $t('MSG_BLOCK_HEIGHT') }}</div>
       <q-space />
       <div>{{ activity.blockHeight }}</div>
     </div>
-    <div class='row vertical-items-margin decorate-underline-dashed'>
+    <div class='row vertical-items-margin decorate-underline-dashed page-item-x-margin-left page-item-x-margin-right'>
       <div>{{ $t('MSG_GRANT') }}</div>
       <q-space />
       <div>{{ activity.grant }} {{ token?.ticker }}</div>
     </div>
-    <div class='row vertical-items-margin decorate-underline-dashed'>
-      <div>{{ $t('MSG_CERTIFICATE_HASH') }}</div>
+    <div class='row vertical-items-margin decorate-underline-dashed word-break-all page-item-x-margin-left page-item-x-margin-right'>
+      <div :style='{width: "80px"}'>
+        {{ $t('MSG_CERTIFICATE_HASH') }}
+      </div>
       <q-space />
-      <div>{{ activity.certificateHash }}</div>
+      <div class='page-item-x-margin-left page-item-x-margin-right' :style='{width: "calc(100% - 92px)"}'>
+        {{ activity.certificateHash }}
+      </div>
     </div>
-    <div class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed'>
+    <div class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed page-item-x-margin-left page-item-x-margin-right'>
       <div>{{ $t('MSG_DATE') }}</div>
       <q-space />
       <div>{{ date.formatDate(activity.timestamp / 1000, 'YYYY/MM/DD HH:mm:ss') }}</div>

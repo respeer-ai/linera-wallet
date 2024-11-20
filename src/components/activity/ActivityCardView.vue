@@ -6,7 +6,7 @@
         <q-img :src='lineraLogo' width='14px' height='14px' />
       </q-badge>
     </q-avatar>
-    <div class='selector-margin-x-left row' :style='{width: "calc(100% - 28px - 12px)"}'>
+    <div class='selector-margin-x-left row' :style='{width: "calc(100% - 32px - " + xPadding + " - " + xPadding + ")"}'>
       <div>
         <div class='text-bold text-left'>
           {{ action }}
@@ -24,7 +24,7 @@
         </div>
       </div>
       <q-space />
-      <div class='header-items-margin-x-right row text-bold'>
+      <div class='row text-bold'>
         <q-icon :name='direction' color='black' size='12px' :style='{marginTop: "5px"}' />
         <div class='page-item-x-margin-left'>
           {{ Number(activity.amount) }} {{ token?.ticker }}
