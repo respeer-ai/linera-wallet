@@ -6,6 +6,7 @@
     </div>
     <PasswordBridge />
     <LoginTimestampBridge ref='loginTimestampBridge' />
+    <DeviceFingerPrintBridge ref='deviceFingerPrintBridge' />
   </div>
 </template>
 
@@ -18,6 +19,7 @@ import { localStore } from 'src/localstores'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
 import ProcessingView from '../processing/ProcessingView.vue'
+import DeviceFingerPrintBridge from '../bridge/db/DeviceFingerPrintBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
 
@@ -27,8 +29,11 @@ const route = useRoute()
 const loading = ref(true)
 
 const loginTimestampBridge = ref<InstanceType<typeof LoginTimestampBridge>>()
+const deviceFingerPrintBridge = ref<InstanceType<typeof DeviceFingerPrintBridge>>()
 
-onMounted(() => {
+onMounted(async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await deviceFingerPrintBridge.value?.initialize()
   const basePath = localStore.setting.basePath
   dbBase.passwords.toArray().then(async (passwords) => {
     loading.value = false

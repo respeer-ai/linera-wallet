@@ -24,10 +24,8 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { db, rpc } from 'src/model'
 import { localStore, operationDef } from 'src/localstores'
-import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-import { toSnake } from 'ts-case-convert'
-import { type HashedCertificateValue, type CandidateBlockMaterial, type ExecutedBlockMaterial } from 'src/__generated__/graphql/service/graphql'
+import { type HashedCertificateValue } from 'src/__generated__/graphql/service/graphql'
 
 import RpcBlockBridge from '../bridge/rpc/BlockBridge.vue'
 import RpcAccountBridge from '../bridge/rpc/AccountBridge.vue'
@@ -240,144 +238,6 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   }
 }
 
-const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => {
-  const sortedKeys = Object.keys(obj).sort()
-  const _sortedObject: Record<string, unknown> = {}
-  for (const key of sortedKeys) {
-    const value = obj[key]
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      _sortedObject[key] = sortedObject(value as Record<string, unknown>)
-    } else {
-      _sortedObject[key] = value
-    }
-  }
-
-  return _sortedObject
-}
-
-const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      const executedBlockMaterial = await rpcExecuteBlockBridge.value?.executeBlockWithFullMaterials(
-        microchain,
-        operation ? [operation] : [],
-        blockMaterial.incomingBundles,
-        blockMaterial.localTime
-      ) as ExecutedBlockMaterial
-
-      const executedBlock = executedBlockMaterial?.executedBlock
-      const validatedBlockCertificateHash = executedBlockMaterial?.validatedBlockCertificateHash as string
-      const isRetryBlock = executedBlockMaterial?.retry
-
-      if (!executedBlock) return reject('Failed execute block')
-
-      if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
-      if (operation && !isRetryBlock) {
-        const executedOperation = executedBlock.block.operations[0] as rpc.Operation
-        const operationHash = await sha3(JSON.stringify(sortedObject(operation), (key, value) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          if (value !== null) return value
-        }))
-        const executedOperationHash = await sha3(JSON.stringify(sortedObject(executedOperation), (key, value) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          if (value !== null) return value
-        }))
-        if (operationHash !== executedOperationHash) {
-          return reject('Invalid operation payload')
-        }
-      }
-
-      // TODO: we actually should construct block with local rust code but it's too hard now, so we just validate executed block calculated by node service
-      //       It has the same security level as local rust code
-      // TODO: construct block locally and compare with block in executed block
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      // const stateHash1 = await constructBlock.value?.constructBlock(microchain, operation, blockMaterial.incomingBundles, blockMaterial.localTime)
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const block = JSON.parse(JSON.stringify(executedBlock.block), function (this: Record<string, unknown>, key: string, value: unknown) {
-        if (value === null) return
-        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
-          const _key = toSnake(key)
-          if (!_key.includes('_') || _key === key) return value
-          if (this) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            this[_key] = value
-          }
-          return
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return value
-      })
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      const payload = await lineraWasm.executed_block_payload(
-        JSON.stringify(block, null, 2),
-        JSON.stringify(blockMaterial.round),
-        ''
-      )
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      const owner = await dbMicrochainBridge.value?.microchainOwner(microchain) as db.Owner
-      if (!owner) reject('Invalid owner')
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      const signature = await rpcBlockBridge.value?.signPayload(owner, JSON.parse(payload)) as string
-      if (!signature) reject('Failed generate signature')
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const _executedBlock = JSON.parse(JSON.stringify(executedBlock), function (this: Record<string, unknown>, key: string, value: unknown) {
-        if (value === null) return
-        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
-          const _key = toSnake(key)
-          if (!_key.includes('_') || _key === key) return value
-          if (this) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            this[_key] = value
-          }
-          return
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return value
-      })
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcBlockBridge.value?.submitBlockAndSignature(
-        microchain,
-        executedBlock.block.height,
-        _executedBlock,
-        blockMaterial.round,
-        signature,
-        isRetryBlock,
-        validatedBlockCertificateHash
-      ).then(() => {
-        if (operation) {
-          localStore.notification.pushNotification({
-            Title: 'Execute operation',
-            Message: 'Success execute operation.',
-            Popup: true,
-            Type: localStore.notify.NotifyType.Info
-          })
-        }
-        resolve(undefined)
-      }).catch((error) => {
-        localStore.notification.pushNotification({
-          Title: 'Execute operation',
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          Message: `Failed execute operation: ${error}.`,
-          Popup: true,
-          Type: localStore.notify.NotifyType.Error
-        })
-        reject(error)
-      })
-    }).catch((error) => {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Fail process incoming bundle: ${error}`)
-      reject(error)
-    })
-  })
-}
-
 const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => void> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
@@ -404,12 +264,7 @@ const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => voi
         console.log(`Fail process new block: ${error}`)
       }
     }, async () => {
-      try {
-        await processNewIncomingBundle(microchain.microchain)
-      } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Fail process incoming bundle: ${error}`)
-      }
+      // DO NOTHING: it's processed in background
     }) as () => void
 }
 
@@ -443,28 +298,9 @@ const _unmounted = ref(false)
 
 const _handleOperations = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const operations = await dbChainOperationBridge.value?.getChainOperations([db.OperationState.CREATED, db.OperationState.EXECUTING]) as db.ChainOperation[]
-  // TODO: merge operations of the same microchain
+  const operations = await dbChainOperationBridge.value?.getChainOperations([db.OperationState.CONFIRMED]) as db.ChainOperation[]
   for (const operation of operations) {
     const _operation = JSON.parse(operation.operation) as rpc.Operation
-    try {
-      operation.state = db.OperationState.EXECUTING
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbChainOperationBridge.value?.updateChainOperation(operation)
-      await processNewIncomingBundle(operation.microchain, _operation)
-      // TODO: get operation certificate hash
-      // We don't know the reason of the failure, so we let user to choose if retry
-      // TODO: processNewIncomingBundle return if retry
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      operation.state = db.OperationState.EXECUTED
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbChainOperationBridge.value?.updateChainOperation(operation)
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Failed process incoming bundle: ${error}`)
-      // When fail, don't continue
-      continue
-    }
     try {
       switch (operation.operationType) {
         case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
@@ -484,6 +320,9 @@ const _handleOperations = async () => {
             await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)
           break
       }
+      operation.state = db.OperationState.POST_PROCESSED
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await dbChainOperationBridge.value?.updateChainOperation(operation)
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Failed post process operation: ${error}`)

@@ -3,8 +3,7 @@ import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
 import { onMounted, toRef } from 'vue'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-import { dbBase, dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbWallet } from 'src/controller'
 
 interface Props {
   password?: string
@@ -32,13 +31,9 @@ const createAccount = () => {
 }
 
 const createAccountWithMnemonic = async (mnemonic: string[], _password?: string) => {
-  if (!_password) {
-    const passwd = (await dbBase.passwords.toArray()).find((el) => el.active) as db.Password
-    if (passwd) _password = db.decryptPassword(passwd)
-  }
   return new Promise((resolve, reject) => {
     if (!_password?.length) reject(new Error('Invalid password'))
-    lineraWasm.generate_key_pair_from_mnemonic(mnemonic.join(' '), _password as string).then((val) => {
+    lineraWasm.generate_key_pair_from_mnemonic(mnemonic.join(' '), '').then((val) => {
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(val)))
       const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
       resolve({ publicKey: _publicKey, privateKey: val })

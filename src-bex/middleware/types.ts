@@ -67,7 +67,7 @@ export interface GraphqlQuery {
 }
 
 export interface RpcGraphqlQuery {
-  publicKey: string
+  publicKey?: string
   applicationId?: string
   query: GraphqlQuery
 }

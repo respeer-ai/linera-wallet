@@ -27,9 +27,12 @@ const openMicrochain = async (): Promise<db.Microchain> => {
   const resp = await rpcMicrochainBridge.value?.openChain(owner?.address) as ClaimOutcome
   if (!resp) return Promise.reject(new Error('Invalid open chain'))
 
+  const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+  if (!fingerPrint) return Promise.reject(new Error('Invalid fingerprint'))
+
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!password) return Promise.reject(new Error('Invalid password'))
-  const _password = db.decryptPassword(password)
+  const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
   const privateKey = db.privateKey(owner, _password)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
 
@@ -47,9 +50,12 @@ const importMicrochain = async (chainId: string, messageId: string, certificateH
   const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
   if (!owner) return Promise.reject(new Error('Invalid owner'))
 
+  const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+  if (!fingerPrint) return Promise.reject(new Error('Invalid fingerprint'))
+
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!password) return Promise.reject(new Error('Invalid password'))
-  const _password = db.decryptPassword(password)
+  const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
   const privateKey = db.privateKey(owner, _password)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
 

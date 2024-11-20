@@ -8,6 +8,7 @@ export const dbBase = new Dexie('CheCkoBaseDatabase') as Dexie & {
   lastLogin: EntityTable<dbModel.LoginTimestamp, 'id'>
   rpcAuths: EntityTable<dbModel.RpcAuth, 'id'>
   rpcMicrochains: EntityTable<dbModel.OriginRpcMicrochain, 'id'>
+  deviceFingerPrint: EntityTable<dbModel.DeviceFingerPrint, 'id'>
 }
 
 dbBase.version(1).stores({
@@ -19,7 +20,8 @@ dbBase.version(1).stores({
   lastLogin: '++id, timestamp',
   rpcAuths:
     '++id, origin, publicKey, chainId, method, applicationId, operation, expiredAt',
-  rpcMicrochains: '++id, origin, publicKey, microchain'
+  rpcMicrochains: '++id, origin, publicKey, microchain',
+  deviceFingerPrint: '++id, fingerPrint'
 })
 
 export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
@@ -61,5 +63,5 @@ dbWallet.version(1).stores({
   namedApplications: '++id, applicationType, name, applicationId, creatorChain',
   applicationCreatorChainSubscriptions: '++id, applicationId, microchain',
   chainOperations:
-    '++id, operationType, applicationType, operationId, microchain, operation'
+    '++id, operationType, applicationType, operationId, microchain, operation, state, certificateHash, createdAt, failedAt, failReason'
 })

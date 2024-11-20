@@ -39,14 +39,9 @@ const _owners = useObservable<db.Owner[]>(
   }) as never
 )
 
-watch(_owners, async () => {
+watch(_owners, () => {
   owners.value = _owners.value
   selectedOwner.value = _owners.value?.find((el) => el.selected)
-
-  if (!selectedOwner.value) return
-
-  const owner1 = await db.buildOwner(selectedOwner.value?.address, '37c3859da70f8f28d1b35ebcd75be6ef142f6589123fc84c6ae5157aa819ad', password.value, 'AAA')
-  db.privateKey(owner1, password.value)
 })
 
 const resetSelected = async () => {
@@ -58,8 +53,10 @@ const resetSelected = async () => {
 
 const createOwner = async (publicKey: string, privateKey: string, name?: string, _password?: string) => {
   if (!_password) {
+    const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+    if (!fingerPrint) return Promise.reject('Invalid fingerprint')
     const passwd = (await dbBase.passwords.toArray()).find((el) => el.active) as db.Password
-    if (passwd) _password = db.decryptPassword(passwd)
+    if (passwd) _password = db.decryptPassword(passwd, fingerPrint.fingerPrint)
   }
   if (!publicKey.length || !privateKey.length || !_password?.length) {
     throw Error('Invalid owner materials')

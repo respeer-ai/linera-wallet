@@ -1,5 +1,6 @@
 import wasmModuleUrl from '../wasm/linera_wasm_bg.wasm?url'
 import initWasm from '../wasm/linera_wasm'
+import { Berith } from '@hazae41/berith'
 
 export class Sentinel {
   static running = false
@@ -16,5 +17,7 @@ export class Sentinel {
       .catch(() => {
         // TODO
       })
+
+    void Berith.initBundledOnce()
   }
 }

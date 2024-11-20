@@ -85,7 +85,6 @@
     "ts-case-convert": "^2.1.0",
     "ts-node": "^10.9.2",
     "tsconfck": "^3.1.0",
-    "ua-parser-js": "^1.0.38",
     "uuid": "^11.0.3",
     "vue": "^3.4.0",
     "vue-demi": "^0.14.5",

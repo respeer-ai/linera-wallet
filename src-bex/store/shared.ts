@@ -14,7 +14,7 @@ export const getAccountWithPrefix = async (prefix: string) => {
 
 export const getMicrochains = async (owner?: string) => {
   const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter(
-    (el) => el.owner === owner
+    (el) => !owner || el.owner === owner
   )
   return (await dbWallet.microchains.toArray())
     .filter(
@@ -23,6 +23,12 @@ export const getMicrochains = async (owner?: string) => {
         0
     )
     .map((el) => el.microchain)
+}
+
+export const microchainOwner = async (microchain: string) => {
+  const microchainOwners = await dbWallet.microchainOwners.where('microchain').equals(microchain).toArray()
+  const owners = microchainOwners.map((el) => el.owner)
+  return await dbWallet.owners.where('owner').anyOf(owners).first()
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -86,10 +92,18 @@ export const getSubscriptionEndpoint = async () => {
     (el) => el.selected
   ) as db.Network
   if (!network) return ''
-  return network.wsSchema + '://' + network.host + ':' + network.port.toString()
+  return network.wsSchema + '://' + network.host + ':' + network.port.toString() + '/ws'
 }
 
 export const createChainOperation = async (operation: db.ChainOperation) => {
   operation.state = db.OperationState.CREATED
   await dbWallet.chainOperations.add(operation)
+}
+
+export const getChainOperations = async (states: db.OperationState[]) => {
+  return await dbWallet.chainOperations.where('state').anyOf(states).toArray()
+}
+
+export const updateChainOperation = async (operation: db.ChainOperation) => {
+  await dbWallet.chainOperations.update(operation.id, operation)
 }

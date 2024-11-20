@@ -11,7 +11,9 @@ const _password = useObservable<string | undefined>(
   liveQuery(async () => {
     const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!passwd) return undefined
-    return db.decryptPassword(passwd)
+    const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+    if (!fingerPrint) return undefined
+    return db.decryptPassword(passwd, fingerPrint.fingerPrint)
   }) as never
 )
 
@@ -30,7 +32,9 @@ const savePassword = async (passwd?: string) => {
     throw Error('Invalid password')
   }
   await resetActive()
-  const _passwd = db.buildPassword(passwd || password.value || '')
+  const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+  if (!fingerPrint) return Promise.reject('Invalid finterprint')
+  const _passwd = db.buildPassword(passwd || password.value || '', fingerPrint.fingerPrint)
   if (_passwd) {
     await dbBase.passwords.add(_passwd)
   }
@@ -39,13 +43,17 @@ const savePassword = async (passwd?: string) => {
 const verifyPassword = async (passwd: string) => {
   const pwd = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!pwd) return false
-  return db.decryptPassword(pwd) === passwd
+  const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+  if (!fingerPrint) return Promise.reject('Invalid finterprint')
+  return db.decryptPassword(pwd, fingerPrint.fingerPrint) === passwd
 }
 
 const getPassword = async () => {
   const passwd = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!passwd) return
-  return db.decryptPassword(passwd)
+  const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+  if (!fingerPrint) return Promise.reject('Invalid finterprint')
+  return db.decryptPassword(passwd, fingerPrint.fingerPrint)
 }
 
 defineExpose({

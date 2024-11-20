@@ -1,4 +1,3 @@
-import { UAParser } from 'ua-parser-js'
 import CryptoJS, { AES, enc } from 'crypto-js'
 import { sha3 } from 'hash-wasm'
 // TODO: replace with web3.js utils
@@ -66,6 +65,7 @@ export const buildOwner = async (
   const salt = CryptoJS.lib.WordArray.random(16).toString(enc.Base64)
   const key = CryptoJS.SHA256(salt + password + salt).toString()
   const _privateKey = AES.encrypt(privateKey, key).toString()
+
   return {
     address: publicKey,
     owner,
@@ -146,6 +146,11 @@ export const wsUrl = (network: Network) => {
   }`
 }
 
+export interface DeviceFingerPrint {
+  id?: number
+  fingerPrint: string
+}
+
 export interface Password {
   id?: number
   password: string
@@ -154,19 +159,7 @@ export interface Password {
   active: boolean
 }
 
-const deviceFingerPrint = (): string => {
-  const parser = new UAParser()
-  return `${parser.getBrowser().name || ''},
-          ${parser.getCPU().architecture || ''},
-          ${parser.getDevice().model || ''},
-          ${parser.getDevice().type || ''},
-          ${parser.getDevice().vendor || ''},
-          ${parser.getEngine().name || ''},
-          ${parser.getOS().name || ''}`
-}
-
-export const decryptPassword = (password: Password): string => {
-  const fingerPrint = deviceFingerPrint()
+export const decryptPassword = (password: Password, fingerPrint: string): string => {
   const now = password.createdAt
   const salt = password.salt
   const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt).toString()
@@ -174,8 +167,7 @@ export const decryptPassword = (password: Password): string => {
   return decrypted
 }
 
-export const buildPassword = (password: string): Password | undefined => {
-  const fingerPrint = deviceFingerPrint()
+export const buildPassword = (password: string, fingerPrint: string): Password | undefined => {
   const now = Date.now()
   const salt = CryptoJS.lib.WordArray.random(16).toString()
   const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt).toString()
@@ -339,7 +331,9 @@ export enum OperationState {
   CREATED = 1,
   EXECUTING,
   EXECUTED,
-  CONFIRMED
+  CONFIRMED,
+  POST_PROCESSED,
+  FAILED
 }
 
 export interface ChainOperation {
@@ -351,5 +345,8 @@ export interface ChainOperation {
   applicationType?: ApplicationType
   operation: string
   certificateHash?: string
-  state: OperationState
+  state: OperationState,
+  createdAt: number
+  failedAt?: number
+  failReason?: string
 }

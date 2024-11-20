@@ -5,7 +5,7 @@
         <div class='selector-y-padding'>
           <CheckboxView
             :text='operation'
-            :caption='`Requested now for ${shortid.shortId(publicKey, 4)}`'
+            :caption='`Requested now for ${shortid.shortId(publicKey || "", 4)}`'
             v-model='allowMutateWallet'
           />
           <CheckboxView
@@ -13,7 +13,7 @@
             v-model='persistAuthentication'
           />
           <MutationInfoView
-            :public-key='publicKey'
+            :public-key='(publicKey as string)'
             :application-id='applicationId'
             :microchain-id='microchain'
             :graphql-query='graphqlQuery'
@@ -91,7 +91,7 @@ const createRpcAuth = async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await rpcAuthBridge.value?.createRpcAuth(
       origin.value,
-      publicKey.value,
+      publicKey.value as string,
       method.value,
       applicationId.value,
       operation.value,
@@ -130,7 +130,7 @@ const onCancelClick = () => {
 
 const forwardable = () => {
   if (step.value === 1) {
-    return publicKey.value?.length > 0
+    return !publicKey.value?.length
   }
   if (step.value === 2) {
     return allowMutateWallet.value

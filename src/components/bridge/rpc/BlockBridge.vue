@@ -74,7 +74,9 @@ const signNewBlock = async (chainId: string, notifiedHeight: number, keyPair: Ed
 const signPayload = async (owner: db.Owner, payload: Uint8Array): Promise<string> => {
   const password = (await dbBase.passwords.toArray()).find((el) => el.active)
   if (!password) return Promise.reject('Invalid password')
-  const _password = db.decryptPassword(password)
+  const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
+  if (!fingerPrint) return Promise.reject('Invalid fingerprint')
+  const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
   const privateKey = db.privateKey(owner, _password)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
   return _hex.toHex(keyPair.sign(new Memory(payload)).to_bytes().bytes)

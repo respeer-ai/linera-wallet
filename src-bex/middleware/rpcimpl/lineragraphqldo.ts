@@ -48,30 +48,19 @@ const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   return graphqlUrl
 }
 
-const queryDo = async (microchain: string, query: RpcGraphqlQuery) => {
+export const queryDo = async (microchain: string, query: RpcGraphqlQuery) => {
   const graphqlUrl = await queryUrl(microchain, query)
-  return new Promise((resolve, reject) => {
-    axios({
-      method: 'post',
-      url: graphqlUrl,
-      data: query.query
-    })
-      .then((res) => {
-        if (!res.data) {
-          return reject('Invalid response')
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        if ((res.data.errors as unknown[])?.length) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          return reject(new Error(JSON.stringify(res.data.errors)))
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        resolve(res.data.data)
-      })
-      .catch((e) => {
-        reject(e)
-      })
+  const res = await axios({
+    method: 'post',
+    url: graphqlUrl,
+    data: query.query
   })
+  const errors = graphqlResponseData(res, 'errors') as unknown[]
+  if (errors?.length) {
+    return Promise.reject(new Error(JSON.stringify(errors)))
+  }
+  const data = graphqlResponseData(res, 'data') as Record<string, unknown>
+  return data
 }
 
 const graphqlResponseKeyValue = (data: unknown, key: string) => {
@@ -84,35 +73,31 @@ const graphqlResponseData = (result: unknown, key: string) => {
   ]
 }
 
-const queryApplication = async (microchain: string, query: RpcGraphqlQuery) => {
+export const queryApplication = async (microchain: string, query: RpcGraphqlQuery) => {
   const graphqlUrl = await queryUrl(microchain, query)
 
   // TODO: we can serialize locally
 
   const variables = query.query.variables || {}
-  variables.checko_query_only = true
-
-  return new Promise((resolve, reject) => {
-    axios
-      .post(graphqlUrl, {
-        query: query.query.query,
-        variables,
-        operationName: query.query.operationName
-      })
-      .then((res) => {
-        const data = graphqlResponseData(res, 'data')
-        const bytes = graphqlResponseKeyValue(
-          data,
-          query.query.operationName
-        ) as Uint8Array
-        resolve(bytes)
-      })
-      .catch((e) => {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Failed query application: ${e}`)
-        reject(e)
-      })
-  })
+  if (query.applicationId) {
+    variables.checko_query_only = true
+  }
+  const res = await axios
+    .post(graphqlUrl, {
+      query: query.query.query,
+      variables,
+      operationName: query.query.operationName
+    })
+  const errors = graphqlResponseData(res, 'errors') as unknown[]
+  if (errors?.length) {
+    return Promise.reject(new Error(JSON.stringify(errors)))
+  }
+  const data = graphqlResponseData(res, 'data') as Record<string, unknown>
+  const bytes = graphqlResponseKeyValue(
+    data,
+    query.query.operationName
+  )
+  return bytes
 }
 
 const queryApplicationMutation = async (
@@ -185,7 +170,7 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   const publicKey = query.publicKey
   const microchain = await sharedStore.getRpcMicrochain(
     request.origin,
-    publicKey
+    publicKey as string
   )
   if (!microchain) {
     return Promise.reject(new Error('Invalid microchain'))
@@ -271,21 +256,31 @@ export const setupLineraSubscription = async () => {
       }
     }
   })
-  const microchains = await sharedStore.getMicrochains()
-  microchains.forEach((microchain) => {
-    client
-      .request({
-        query: `subscription notifications($chainId: String!) {
-        notifications(chainId: $chainId)
-      }`,
-        variables: {
-          chainId: microchain
-        }
+
+  const subscribed = [] as string[]
+
+  setInterval(() => {
+    sharedStore.getMicrochains().then((microchains) => {
+      microchains.forEach((microchain) => {
+        if (subscribed.includes(microchain)) return
+        subscribed.push(microchain)
+        client
+          .request({
+            query: `subscription notifications($chainId: String!) {
+            notifications(chainId: $chainId)
+          }`,
+            variables: {
+              chainId: microchain
+            }
+          })
+          .subscribe({
+            next(data: unknown) {
+              subscription.Subscription.handle(data)
+            }
+          })
       })
-      .subscribe({
-        next(data: unknown) {
-          subscription.Subscription.handle(data)
-        }
-      })
-  })
+    }).catch((e) => {
+      console.log('Failed get microchains', e)
+    })
+  }, 1000)
 }
