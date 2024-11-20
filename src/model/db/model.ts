@@ -159,7 +159,10 @@ export interface Password {
   active: boolean
 }
 
-export const decryptPassword = (password: Password, fingerPrint: string): string => {
+export const decryptPassword = (
+  password: Password,
+  fingerPrint: string
+): string => {
   const now = password.createdAt
   const salt = password.salt
   const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt).toString()
@@ -167,7 +170,10 @@ export const decryptPassword = (password: Password, fingerPrint: string): string
   return decrypted
 }
 
-export const buildPassword = (password: string, fingerPrint: string): Password | undefined => {
+export const buildPassword = (
+  password: string,
+  fingerPrint: string
+): Password | undefined => {
   const now = Date.now()
   const salt = CryptoJS.lib.WordArray.random(16).toString()
   const key = CryptoJS.SHA256(fingerPrint + now.toString() + salt).toString()
@@ -345,7 +351,7 @@ export interface ChainOperation {
   applicationType?: ApplicationType
   operation: string
   certificateHash?: string
-  state: OperationState,
+  state: OperationState
   createdAt: number
   failedAt?: number
   failReason?: string

@@ -1,6 +1,11 @@
 import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { confirmation, rpc, rpcPreInterceptor, types } from '../middleware'
-import { RpcGraphqlQuery, RpcMethod, RpcMethods, RpcRequest } from '../middleware/types'
+import {
+  RpcGraphqlQuery,
+  RpcMethod,
+  RpcMethods,
+  RpcRequest
+} from '../middleware/types'
 import { sharedStore } from '../store'
 import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { basebridge } from '../event'
@@ -56,8 +61,7 @@ export class Engine {
       return Promise.reject(new Error('Invalid rpc method'))
     }
     switch (req.request.method) {
-      case RpcMethod.LINERA_GRAPHQL_MUTATION:
-      {
+      case RpcMethod.LINERA_GRAPHQL_MUTATION: {
         const query = req.request.params as unknown as RpcGraphqlQuery
         if (query.publicKey === undefined) {
           const accounts = await sharedStore.getOriginPublicKeys(req.origin)

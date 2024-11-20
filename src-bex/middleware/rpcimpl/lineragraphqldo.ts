@@ -73,7 +73,10 @@ const graphqlResponseData = (result: unknown, key: string) => {
   ]
 }
 
-export const queryApplication = async (microchain: string, query: RpcGraphqlQuery) => {
+export const queryApplication = async (
+  microchain: string,
+  query: RpcGraphqlQuery
+) => {
   const graphqlUrl = await queryUrl(microchain, query)
 
   // TODO: we can serialize locally
@@ -82,21 +85,17 @@ export const queryApplication = async (microchain: string, query: RpcGraphqlQuer
   if (query.applicationId) {
     variables.checko_query_only = true
   }
-  const res = await axios
-    .post(graphqlUrl, {
-      query: query.query.query,
-      variables,
-      operationName: query.query.operationName
-    })
+  const res = await axios.post(graphqlUrl, {
+    query: query.query.query,
+    variables,
+    operationName: query.query.operationName
+  })
   const errors = graphqlResponseData(res, 'errors') as unknown[]
   if (errors?.length) {
     return Promise.reject(new Error(JSON.stringify(errors)))
   }
   const data = graphqlResponseData(res, 'data') as Record<string, unknown>
-  const bytes = graphqlResponseKeyValue(
-    data,
-    query.query.operationName
-  )
+  const bytes = graphqlResponseKeyValue(data, query.query.operationName)
   return bytes
 }
 
@@ -260,27 +259,30 @@ export const setupLineraSubscription = async () => {
   const subscribed = [] as string[]
 
   setInterval(() => {
-    sharedStore.getMicrochains().then((microchains) => {
-      microchains.forEach((microchain) => {
-        if (subscribed.includes(microchain)) return
-        subscribed.push(microchain)
-        client
-          .request({
-            query: `subscription notifications($chainId: String!) {
+    sharedStore
+      .getMicrochains()
+      .then((microchains) => {
+        microchains.forEach((microchain) => {
+          if (subscribed.includes(microchain)) return
+          subscribed.push(microchain)
+          client
+            .request({
+              query: `subscription notifications($chainId: String!) {
             notifications(chainId: $chainId)
           }`,
-            variables: {
-              chainId: microchain
-            }
-          })
-          .subscribe({
-            next(data: unknown) {
-              subscription.Subscription.handle(data)
-            }
-          })
+              variables: {
+                chainId: microchain
+              }
+            })
+            .subscribe({
+              next(data: unknown) {
+                subscription.Subscription.handle(data)
+              }
+            })
+        })
       })
-    }).catch((e) => {
-      console.log('Failed get microchains', e)
-    })
+      .catch((e) => {
+        console.log('Failed get microchains', e)
+      })
   }, 1000)
 }

@@ -13,12 +13,15 @@ globalThis.process = process
 const installationManager = new InstallationManager()
 let keepaliveInterval
 
-const keepalive = (bridge: BexBridge, allActiveConnections: {
-  [connectionId: string]: {
-    app?: BexConnection;
-    contentScript?: BexConnection;
+const keepalive = (
+  bridge: BexBridge,
+  allActiveConnections: {
+    [connectionId: string]: {
+      app?: BexConnection
+      contentScript?: BexConnection
+    }
   }
-}) => {
+) => {
   if (keepaliveInterval !== undefined) return
   keepaliveInterval = setInterval(() => {
     Object.keys(allActiveConnections).forEach((key) => {
@@ -37,12 +40,15 @@ const keepalive = (bridge: BexBridge, allActiveConnections: {
 }
 
 export default bexBackground(
-  (bridge: BexBridge, allActiveConnections: {
-    [connectionId: string]: {
-      app?: BexConnection;
-      contentScript?: BexConnection;
+  (
+    bridge: BexBridge,
+    allActiveConnections: {
+      [connectionId: string]: {
+        app?: BexConnection
+        contentScript?: BexConnection
+      }
     }
-  }) => {
+  ) => {
     engine.DataHandler.run(bridge)
     keepalive(bridge, allActiveConnections)
   }

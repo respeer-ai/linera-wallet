@@ -26,7 +26,10 @@ export const getMicrochains = async (owner?: string) => {
 }
 
 export const microchainOwner = async (microchain: string) => {
-  const microchainOwners = await dbWallet.microchainOwners.where('microchain').equals(microchain).toArray()
+  const microchainOwners = await dbWallet.microchainOwners
+    .where('microchain')
+    .equals(microchain)
+    .toArray()
   const owners = microchainOwners.map((el) => el.owner)
   return await dbWallet.owners.where('owner').anyOf(owners).first()
 }
@@ -40,14 +43,16 @@ export const authenticated = async (
 ) => {
   if (method === RpcMethod.LINERA_GRAPHQL_MUTATION && !operation)
     return Promise.reject('Invalid operation')
-  return (await dbBase.rpcAuths.toArray()).findIndex(
-    (el) =>
-      el.origin === origin &&
-      el.method === method &&
-      (applicationId === undefined || el.applicationId === applicationId) &&
-      (operation === undefined || el.operation === operation) &&
-      el.expiredAt > Date.now()
-  ) >= 0
+  return (
+    (await dbBase.rpcAuths.toArray()).findIndex(
+      (el) =>
+        el.origin === origin &&
+        el.method === method &&
+        (applicationId === undefined || el.applicationId === applicationId) &&
+        (operation === undefined || el.operation === operation) &&
+        el.expiredAt > Date.now()
+    ) >= 0
+  )
 }
 
 export const getRpcMicrochain = async (
@@ -92,11 +97,19 @@ export const getSubscriptionEndpoint = async () => {
     (el) => el.selected
   ) as db.Network
   if (!network) return ''
-  return network.wsSchema + '://' + network.host + ':' + network.port.toString() + '/ws'
+  return (
+    network.wsSchema +
+    '://' +
+    network.host +
+    ':' +
+    network.port.toString() +
+    '/ws'
+  )
 }
 
 export const createChainOperation = async (operation: db.ChainOperation) => {
   operation.state = db.OperationState.CREATED
+  operation.createdAt = Date.now()
   await dbWallet.chainOperations.add(operation)
 }
 
