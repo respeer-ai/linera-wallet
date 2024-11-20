@@ -286,5 +286,6 @@ export default {
   MSG_DATE: 'Date',
   MSG_ACTION: 'Action',
   MSG_QUERY: 'Query',
-  MSG_VARIABLES: 'Variables'
+  MSG_VARIABLES: 'Variables',
+  MSG_IMPORT_ACCOUNT: 'Import account'
 }
