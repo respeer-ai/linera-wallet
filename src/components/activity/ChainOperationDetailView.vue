@@ -128,7 +128,22 @@ const microchainOwners = ref([] as db.MicrochainOwner[])
 const token = ref(undefined as unknown as db.Token)
 const transferAmount = ref(0)
 
-const operationType = computed(() => operation.value.operationType ? operation.value.operationType[0].toUpperCase() + operation.value.operationType.slice(1) : 'UNKNOWN')
+const operationType = computed(() => {
+  if (operation.value.operationType && operation.value.operationType !== db.OperationType.ANONYMOUS) {
+    return operation.value.operationType[0].toUpperCase() + operation.value.operationType.slice(1)
+  }
+  const _operation = JSON.parse(operation.value.operation) as rpc.Operation
+  if (_operation.System) {
+    return 'System:' + Object.keys(_operation.System)[0]
+  }
+  if (_operation.User) {
+    const patterns = operation.value.graphqlQuery?.match(/\).*{\s+([a-zA-Z]+)[($]/)
+    if (!patterns) return 'User:Unknown'
+    if (patterns?.length < 2) return 'User:Unknown'
+    return 'User:' + patterns[1][0].toUpperCase() + patterns[1].slice(1)
+  }
+  return 'Unknown'
+})
 
 const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()

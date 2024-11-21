@@ -63,5 +63,5 @@ dbWallet.version(1).stores({
   namedApplications: '++id, applicationType, name, applicationId, creatorChain',
   applicationCreatorChainSubscriptions: '++id, applicationId, microchain',
   chainOperations:
-    '++id, operationType, applicationType, operationId, microchain, operation, state, certificateHash, createdAt, failedAt, failReason'
+    '++id, operationType, applicationType, operationId, microchain, operation, state, certificateHash, createdAt, failedAt, failReason, graphqlQuery, graphqlVariables'
 })

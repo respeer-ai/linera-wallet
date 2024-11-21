@@ -118,9 +118,7 @@ const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys:
   }
 }
 
-const parseActivities = async (microchain: db.Microchain, hash: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
+const parseActivities = async (microchain: db.Microchain, block: HashedCertificateValue) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 1
   for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
@@ -214,6 +212,18 @@ const updateFungibleBalances = async (microchain: db.Microchain, publicKeys: str
   }
 }
 
+const updateChainOperations = async (microchain: db.Microchain, block: HashedCertificateValue) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const operations = (await dbChainOperationBridge.value?.getChainOperations(0, 0, microchain.microchain, [db.OperationState.EXECUTED]) || []) as db.ChainOperation[]
+  for (const operation of operations) {
+    if (operation.certificateHash === block.hash) {
+      operation.state = db.OperationState.CONFIRMED
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await dbChainOperationBridge.value?.updateChainOperation(operation)
+    }
+  }
+}
+
 const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const owners = await dbMicrochainOwnerBridge.value?.getMicrochainOwners(microchain.microchain) as db.Owner[]
@@ -226,7 +236,12 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   } catch (error) {
     console.log('Failed update chain account balances', error)
   }
-  await parseActivities(microchain, hash)
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
+
+  await parseActivities(microchain, block)
+  await updateChainOperations(microchain, block)
 
   // Here we don't care about the result. If ticker run think they need to run again when fail, they should append themselves again
   const tickerRuns = localStore.operation.tickerRuns
@@ -404,11 +419,13 @@ const subscribeMicrochain = async (microchain: db.Microchain): Promise<() => voi
         console.log(`Fail process new block: ${error}`)
       }
     }, async () => {
-      try {
-        await processNewIncomingBundle(microchain.microchain)
-      } catch (error) {
+      if (window.location.origin.startsWith('http')) {
+        try {
+          await processNewIncomingBundle(microchain.microchain)
+        } catch (error) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Fail process incoming bundle: ${error}`)
+          console.log(`Fail process incoming bundle: ${error}`)
+        }
       }
     }) as () => void
 }

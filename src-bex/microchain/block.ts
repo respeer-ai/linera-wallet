@@ -301,7 +301,7 @@ export class BlockSigner {
         operation.certificateHash = certificateHash
         await sharedStore.updateChainOperation(operation)
       } catch (e) {
-        if (operation.createdAt + 4 * 3600 * 1000 < Date.now()) {
+        if ((operation.createdAt || 0) + 4 * 3600 * 1000 < Date.now()) {
           operation.state = db.OperationState.FAILED
           operation.failedAt = Date.now()
           operation.failReason = JSON.stringify(e)

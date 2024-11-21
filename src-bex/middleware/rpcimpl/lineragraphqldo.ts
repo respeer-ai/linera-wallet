@@ -120,6 +120,8 @@ const queryApplicationMutation = async (
     applicationId: query.applicationId,
     applicationType: db.ApplicationType.ANONYMOUS,
     operation: JSON.stringify(operation),
+    graphqlQuery: query.query.query,
+    graphqlVariables: JSON.stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
 
@@ -142,6 +144,8 @@ const parseSystemMutation = async (
     applicationId: query.applicationId,
     applicationType: db.ApplicationType.ANONYMOUS,
     operation,
+    graphqlQuery: query.query.query,
+    graphqlVariables: JSON.stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
   return operation

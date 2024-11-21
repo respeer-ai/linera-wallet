@@ -70,7 +70,8 @@ const subscribeCreatorChain = async (chainId: string, applicationId: string, app
           application_id: applicationId,
           bytes: queryRespBytes
         }
-      } as rpc.Operation)
+      } as rpc.Operation),
+      graphqlQuery: SUBSCRIBE_CREATOR_CHAIN.loc?.source?.body
     } as db.ChainOperation
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await dbChainOperationBridge.value?.createChainOperation({ ...operation })
@@ -94,7 +95,8 @@ const requestSubscribe = async (chainId: string, applicationId: string) => {
         application_id: applicationId,
         bytes: queryRespBytes || []
       }
-    } as rpc.Operation)
+    } as rpc.Operation),
+    graphqlQuery: LEGACY_REQUEST_SUBSCRIBE.loc?.source?.body
   } as db.ChainOperation
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await dbChainOperationBridge.value?.createChainOperation({ ...operation })

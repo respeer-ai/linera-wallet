@@ -350,9 +350,11 @@ export interface ChainOperation {
   applicationId: string
   applicationType?: ApplicationType
   operation: string
+  graphqlQuery?: string
+  graphqlVariables?: string
   certificateHash?: string
   state: OperationState
-  createdAt: number
+  createdAt?: number
   failedAt?: number
   failReason?: string
 }

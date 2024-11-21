@@ -126,11 +126,12 @@ const balanceOf = async (chainId: string, applicationId: string, publicKey?: str
 
 const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccountOwner | undefined, amount: number) => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const queryRespBytes = await rpcApplicationOperationBridge.value?.queryApplication(chainId, applicationId, MINT, 'mint', {
+    const variables = {
       to,
       amount: amount.toString()
-    })
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const queryRespBytes = await rpcApplicationOperationBridge.value?.queryApplication(chainId, applicationId, MINT, 'mint', variables)
 
     const operation = {
       operationType: db.OperationType.MINT,
@@ -143,7 +144,9 @@ const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccount
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           bytes: queryRespBytes
         }
-      } as rpc.Operation)
+      } as rpc.Operation),
+      graphqlQuery: MINT.loc?.source?.body,
+      graphqlVariables: JSON.stringify(variables)
     } as db.ChainOperation
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await dbChainOperationBridge.value?.createChainOperation({ ...operation })
@@ -155,11 +158,12 @@ const mint = async (chainId: string, applicationId: string, to: rpc.ChainAccount
 
 const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAccountOwner | undefined, amount: number) => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const queryRespBytes = await rpcApplicationOperationBridge.value?.queryApplication(chainId, applicationId, TRANSFER_ERC20, 'transfer', {
+    const variables = {
       to,
       amount: amount.toString()
-    })
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const queryRespBytes = await rpcApplicationOperationBridge.value?.queryApplication(chainId, applicationId, TRANSFER_ERC20, 'transfer', variables)
 
     const operation = {
       operationType: db.OperationType.MINT,
@@ -172,7 +176,9 @@ const transfer = async (chainId: string, applicationId: string, to: rpc.ChainAcc
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           bytes: queryRespBytes
         }
-      } as rpc.Operation)
+      } as rpc.Operation),
+      graphqlQuery: TRANSFER_ERC20.loc?.source?.body,
+      graphqlVariables: JSON.stringify(variables)
     } as db.ChainOperation
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await dbChainOperationBridge.value?.createChainOperation({ ...operation })
