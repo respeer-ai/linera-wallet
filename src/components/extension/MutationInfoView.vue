@@ -23,13 +23,13 @@
     <div class='text-black text-bold label-text-middle  vertical-menus-margin'>
       {{ $t('MSG_QUERY') }}
     </div>
-    <div class='vertical-items-margin'>
+    <div class='vertical-items-margin word-break-all'>
       <pre v-html='graphqlQuery' />
     </div>
     <div class='text-black text-bold label-text-middle  vertical-menus-margin'>
       {{ $t('MSG_VARIABLES') }}
     </div>
-    <div class='vertical-items-margin'>
+    <div class='vertical-items-margin word-break-all'>
       <pre v-html='JSON.stringify(graphqlVariables, null, 2)' />'
     </div>
   </q-card>
