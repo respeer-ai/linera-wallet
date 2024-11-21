@@ -128,6 +128,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
       if (_message?.System?.Credit) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await dbActivityBridge.value?.createActivity(
+          microchain.microchain,
           nativeTokenId,
           origin.sender,
           _message?.System?.Credit?.source,
@@ -149,6 +150,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
         if (erc20Message?.Transfer) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           await dbActivityBridge.value?.createActivity(
+            microchain.microchain,
             tokenId,
             erc20Message.Transfer.origin.chain_id,
             erc20Message.Transfer.origin.owner,
@@ -180,6 +182,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbActivityBridge.value?.createActivity(
+        microchain.microchain,
         nativeTokenId,
         block.value.executedBlock?.block.chainId,
         _operation.System.Transfer.owner,

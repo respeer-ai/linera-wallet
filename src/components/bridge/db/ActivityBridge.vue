@@ -66,6 +66,7 @@ const activitiesCount = async () => {
 }
 
 const createActivity = async (
+  microchain: string,
   tokenId: number,
   sourceChain: string,
   sourceAddress: string | undefined,
@@ -88,6 +89,7 @@ const createActivity = async (
   })
   if (exist) return exist
   const activity = {
+    microchain,
     tokenId,
     sourceChain,
     sourceAddress,

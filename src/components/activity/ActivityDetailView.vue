@@ -156,6 +156,12 @@ const action = computed(() => {
   if (activity.value.sourceAddress === activity.value.targetAddress) {
     return 'Move'
   }
+  if (activity.value.microchain === activity.value.sourceChain) {
+    return 'Send'
+  }
+  if (activity.value.microchain === activity.value.targetChain) {
+    return 'Receive'
+  }
   if (microchainOwners.value.findIndex((el) => el.microchain === activity.value.sourceChain) >= 0 &&
       microchainOwners.value.findIndex((el) => el.microchain === activity.value.targetChain) >= 0) {
     return 'Move'
