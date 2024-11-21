@@ -27,7 +27,7 @@
       <div class='row text-bold'>
         <q-icon :name='direction' color='black' size='12px' :style='{marginTop: "5px"}' />
         <div class='page-item-x-margin-left'>
-          {{ Number(activity.amount) }} {{ token?.ticker }}
+          {{ Number(activity.amount).toFixed(4) }} {{ token?.ticker }}
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@
       <q-space />
       <div>
         <div v-if='operation.operationType === db.OperationType.TRANSFER' class='page-item-x-margin-left text-bold'>
-          {{ transferAmount }} {{ token?.ticker }}
+          {{ transferAmount.toFixed(4) }} {{ token?.ticker }}
         </div>
         <div class='row'>
           <q-space />
