@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-btn
-      label='Linera Transfer' no-caps class='btn full-width' flat
+      label='Linera transfer' no-caps class='btn full-width' flat
       @click='onRun'
     />
   </div>
@@ -32,6 +32,7 @@ const onRun = async () => {
         query: {
           query: TRANSFER.loc?.source?.body,
           variables: {
+            chainId: state.chainId.replace('0x', ''),
             recipient: {
               Account: {
                 chain_id: state.chainId.replace('0x', ''),

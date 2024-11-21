@@ -302,7 +302,13 @@ export const TRANSFER_WITHOUT_BLOCK_PROPOSAL = gql`
 `
 
 export const TRANSFER = gql`
-  mutation transfer($owner: Owner, $recipient: Recipient!, $amount: Amount!) {
-    transfer(owner: $owner, recipient: $recipient, amount: $amount)
+  mutation transfer($chainId: ChainId!, $owner: Owner, $recipient: Recipient!, $amount: Amount!) {
+    transfer(chainId: $chainId, owner: $owner, recipient: $recipient, amount: $amount)
+  }
+`
+
+export const REQUEST_APPLICATION = gql`
+  mutation requestApplication($chainId: ChainId!, $applicationId: ApplicationId!) {
+    requestApplication(chainId: $chainId, applicationId: $applicationId)
   }
 `
