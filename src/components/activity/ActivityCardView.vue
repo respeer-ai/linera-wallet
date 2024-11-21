@@ -64,7 +64,6 @@ const token = ref(undefined as unknown as db.Token)
 const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
 const action = computed(() => {
-  console.log(activity.value, owner.value)
   if (activity.value.sourceAddress === activity.value.targetAddress) {
     return 'Move'
   }
