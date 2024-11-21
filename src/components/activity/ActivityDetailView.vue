@@ -109,7 +109,7 @@
       <div :style='{width: "128px"}'>
         {{ $t('MSG_CERTIFICATE_HASH') }}
       </div>
-      <div class='items-x-margin' :style='{width: "calc(100% - 148px)"}'>
+      <div class='text-right' :style='{width: "calc(100% - 148px)"}'>
         {{ activity.certificateHash }}
       </div>
     </div>
