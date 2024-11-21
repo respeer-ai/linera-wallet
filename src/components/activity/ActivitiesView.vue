@@ -5,6 +5,13 @@
       <div v-for='activity in displayActivities' :key='activity.id' @click='onActivityClick(activity)'>
         <ActivityCardView :activity='activity' :x-padding='xPadding' />
       </div>
+      <q-btn
+        rounded flat no-caps class='full-width bg-grey-1'
+        @click='onViewMoreClick'
+        v-if='displayCount < activities.length'
+        color='grey-6'
+        :label='$t("MSG_VIEW_MORE_THREE_DOTS")'
+      />
     </div>
     <div v-else class='page-item-placeholder'>
       <div>
@@ -38,15 +45,20 @@ const selectedOwner = ref(undefined as unknown as db.Owner)
 const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
 
 const activities = ref([] as db.Activity[])
+const displayCount = ref(5)
+
 const displayActivities = computed(() => {
-  return [...activities.value].sort((a, b) => b.timestamp - a.timestamp)
+  return [...activities.value].sort((a, b) => b.timestamp - a.timestamp).slice(0, displayCount.value)
 })
 
-const loadActivitiesRecursive = async (total: number, offset: number, limit: number) => {
-  if (offset >= total) return
+const loadActivitiesRecursive = async (total: number, offset: number, limit: number, _activities: db.Activity[]) => {
+  if (offset >= total) {
+    activities.value = _activities
+    return
+  }
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  activities.value.push(...(await dbActivityBridge.value?.ownerActivities(offset, limit, selectedOwner.value)) || [])
-  void loadActivitiesRecursive(total, offset + limit, limit)
+  _activities.push(...(await dbActivityBridge.value?.ownerActivities(offset, limit, selectedOwner.value)) || [])
+  void loadActivitiesRecursive(total, offset + limit, limit, _activities)
 }
 
 const loadActivities = async () => {
@@ -54,7 +66,7 @@ const loadActivities = async () => {
   activities.value = []
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const count = (await dbActivityBridge.value?.activitiesCount()) as number || 0
-  await loadActivitiesRecursive(count, 0, 10)
+  await loadActivitiesRecursive(count, 0, 10, [])
 }
 
 onMounted(() => {
@@ -68,6 +80,11 @@ watch(selectedOwner, () => {
 const onActivityClick = (activity: db.Activity) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_ACTIVITY
   localStore.setting.HomeActionParams = activity
+}
+
+const onViewMoreClick = () => {
+  displayCount.value += 4
+  displayCount.value = Math.min(displayCount.value, activities.value.length)
 }
 
 </script>
