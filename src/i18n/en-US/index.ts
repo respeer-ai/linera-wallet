@@ -288,5 +288,11 @@ export default {
   MSG_QUERY: 'Query',
   MSG_VARIABLES: 'Variables',
   MSG_IMPORT_ACCOUNT: 'Import account',
-  MSG_CHAIN_OPERATIONS: 'Chain operations'
+  MSG_CHAIN_OPERATIONS: 'Chain operations',
+  MSG_MICROCHAIN: 'Microchain',
+  MSG_FAILED_AT: 'Failed at',
+  MSG_CREATED_AT: 'Created at',
+  MSG_REASON: 'Reason',
+  MSG_CODE: 'Code',
+  MSG_APPLICATION_TYPE: 'Application type'
 }
