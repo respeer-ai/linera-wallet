@@ -21,9 +21,6 @@
     <q-tab-panel :name='localStore.settingDef.Menu.ADDRESSES_BOOK'>
       <AddressesBook />
     </q-tab-panel>
-    <q-tab-panel :name='localStore.settingDef.Menu.ENGINEERING'>
-      <EngineeringView />
-    </q-tab-panel>
   </q-tab-panels>
 </template>
 
@@ -36,7 +33,6 @@ import AboutUsView from './AboutUsView.vue'
 import StorageOperationView from './StorageOperationView.vue'
 import AccountsView from './AccountsView.vue'
 import AddressesBook from './AddressesBook.vue'
-import EngineeringView from './EngineeringView.vue'
 import SwapSettingView from './SwapSettingView.vue'
 import WLineraSettingView from './WLineraSettingView.vue'
 
