@@ -15,7 +15,8 @@ export enum HomeAction {
   SHOW_MAIN = 'ShowMain',
   SHOW_MICROCHAIN = 'ShowMicrochain',
   SHOW_TOKEN = 'ShowToken',
-  SHOW_ACTIVITY = 'ShowActivity'
+  SHOW_ACTIVITY = 'ShowActivity',
+  SHOW_OPERATION = 'ShowOperation'
 }
 
 export interface Setting {

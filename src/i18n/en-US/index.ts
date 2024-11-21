@@ -287,5 +287,6 @@ export default {
   MSG_ACTION: 'Action',
   MSG_QUERY: 'Query',
   MSG_VARIABLES: 'Variables',
-  MSG_IMPORT_ACCOUNT: 'Import account'
+  MSG_IMPORT_ACCOUNT: 'Import account',
+  MSG_CHAIN_OPERATIONS: 'Chain operations'
 }

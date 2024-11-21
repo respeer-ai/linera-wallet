@@ -72,6 +72,12 @@
       </div>
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+      {{ $t('MSG_CHAIN_OPERATIONS') }}
+    </div>
+    <div class='extra-large-bottom-margin'>
+      <ChainOperationsView x-padding='8px' />
+    </div>
+    <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       {{ $t('MSG_CHAIN_ACTIVITIES') }}
     </div>
     <div class='extra-large-bottom-margin'>
@@ -100,6 +106,7 @@ import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
 import ActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
+import ChainOperationsView from '../activity/ChainOperationsView.vue'
 
 interface Props {
   microchain: db.Microchain

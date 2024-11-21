@@ -255,7 +255,7 @@ const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => 
   return _sortedObject
 }
 
-const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<void> => {
+const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<string> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
@@ -350,7 +350,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         signature,
         isRetryBlock,
         validatedBlockCertificateHash
-      ).then(() => {
+      ).then((certificateHash: string) => {
         if (operation) {
           localStore.notification.pushNotification({
             Title: 'Execute operation',
@@ -359,7 +359,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             Type: localStore.notify.NotifyType.Info
           })
         }
-        resolve(undefined)
+        resolve(certificateHash)
       }).catch((error) => {
         localStore.notification.pushNotification({
           Title: 'Execute operation',
@@ -443,7 +443,7 @@ const _unmounted = ref(false)
 
 const _handleOperations = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const operations = await dbChainOperationBridge.value?.getChainOperations([db.OperationState.CREATED, db.OperationState.EXECUTING]) as db.ChainOperation[]
+  const operations = await dbChainOperationBridge.value?.getChainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING]) as db.ChainOperation[]
   // TODO: merge operations of the same microchain
   for (const operation of operations) {
     const _operation = JSON.parse(operation.operation) as rpc.Operation
@@ -451,12 +451,13 @@ const _handleOperations = async () => {
       operation.state = db.OperationState.EXECUTING
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbChainOperationBridge.value?.updateChainOperation(operation)
-      await processNewIncomingBundle(operation.microchain, _operation)
+      const certificateHash = await processNewIncomingBundle(operation.microchain, _operation)
       // TODO: get operation certificate hash
       // We don't know the reason of the failure, so we let user to choose if retry
       // TODO: processNewIncomingBundle return if retry
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       operation.state = db.OperationState.EXECUTED
+      operation.certificateHash = certificateHash
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbChainOperationBridge.value?.updateChainOperation(operation)
     } catch (error) {

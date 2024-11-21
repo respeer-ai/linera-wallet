@@ -4,6 +4,7 @@ import { dbWallet } from '../../../controller'
 
 const createChainOperation = async (chainOperation: db.ChainOperation) => {
   chainOperation.state = db.OperationState.CREATED
+  chainOperation.createdAt = Date.now()
   await dbWallet.chainOperations.add(chainOperation)
 }
 
@@ -11,8 +12,12 @@ const getChainOperation = async (operationId: string): Promise<db.ChainOperation
   return await dbWallet.chainOperations.where('operationId').equals(operationId).first()
 }
 
-const getChainOperations = async (states?: db.OperationState[]): Promise<db.ChainOperation[]> => {
-  return (await dbWallet.chainOperations.toArray()).filter((op) => states === undefined || states.length === 0 || states.includes(op.state))
+const chainOperationsCount = async (microchain?: string, states?: db.OperationState[]) => {
+  return await dbWallet.chainOperations.filter((op) => (!microchain || op.microchain === microchain) && (states === undefined || states.length === 0 || states.includes(op.state))).count()
+}
+
+const getChainOperations = async (offset: number, limit: number, microchain?: string, states?: db.OperationState[]): Promise<db.ChainOperation[]> => {
+  return await dbWallet.chainOperations.filter((op) => (!microchain || op.microchain === microchain) && (states === undefined || states.length === 0 || states.includes(op.state))).offset(offset).limit(limit || 9999).toArray()
 }
 
 const updateChainOperation = async (chainOperation: db.ChainOperation) => {
@@ -33,7 +38,8 @@ defineExpose({
   updateChainOperation,
   getChainOperation,
   getChainOperations,
-  existChainOperation
+  existChainOperation,
+  chainOperationsCount
 })
 
 </script>

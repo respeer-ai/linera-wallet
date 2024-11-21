@@ -45,13 +45,13 @@ const submitBlockSignature = async (chainId: string, height: number, signature: 
   })
 }
 
-const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: ExecutedBlock, round: rpc.Round, signature: string, retry: boolean, validatedBlockCertificateHash?: string) => {
+const submitBlockAndSignature = async (chainId: string, height: number, executedBlock: ExecutedBlock, round: rpc.Round, signature: string, retry: boolean, validatedBlockCertificateHash?: string): Promise<string> => {
   const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
   const apolloClient = new ApolloClient(options)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const { mutate } = provideApolloClient(apolloClient)(() => useMutation(SUBMIT_BLOCK_AND_SIGNATURE))
-  return await mutate({
+  const res = await mutate({
     chainId,
     height,
     executedBlock,
@@ -60,6 +60,7 @@ const submitBlockAndSignature = async (chainId: string, height: number, executed
     retry,
     validatedBlockCertificateHash
   })
+  return graphqlResult.data(res, 'submitBlockAndSignature') as string
 }
 
 const signNewBlock = async (chainId: string, notifiedHeight: number, keyPair: Ed25519SigningKey) => {
