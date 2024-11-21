@@ -273,7 +273,7 @@ const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => 
   return _sortedObject
 }
 
-const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<string> => {
+const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<{ certificateHash: string, isRetryBlock: boolean }> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     rpcBlockMaterialBridge.value?.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
@@ -377,7 +377,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             Type: localStore.notify.NotifyType.Info
           })
         }
-        resolve(certificateHash)
+        resolve({ certificateHash, isRetryBlock })
       }).catch((error) => {
         localStore.notification.pushNotification({
           Title: 'Execute operation',
@@ -471,11 +471,12 @@ const _handleOperations = async () => {
       operation.state = db.OperationState.EXECUTING
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbChainOperationBridge.value?.updateChainOperation(operation)
-      const certificateHash = await processNewIncomingBundle(operation.microchain, _operation)
+      const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, _operation)
       // TODO: get operation certificate hash
       // We don't know the reason of the failure, so we let user to choose if retry
       // TODO: processNewIncomingBundle return if retry
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (isRetryBlock) continue
       operation.state = db.OperationState.EXECUTED
       operation.certificateHash = certificateHash
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

@@ -205,7 +205,7 @@ export class BlockSigner {
     signature: string,
     retry: boolean,
     validatedBlockCertificateHash?: string
-  ) {
+  ): Promise<string> {
     const submitBlockAndSignatureQuery = {
       query: {
         operationName: 'submitBlockAndSignature',
@@ -230,7 +230,7 @@ export class BlockSigner {
   static async processNewIncomingMessageWithOperation(
     microchain: string,
     operation?: rpc.Operation
-  ): Promise<string> {
+  ): Promise<{ certificateHash: string, isRetryBlock: boolean }> {
     const blockMaterial = await BlockSigner.getBlockMaterial(microchain)
     const executedBlockMaterial =
       await BlockSigner.executeBlockWithFullMaterials(
@@ -269,7 +269,7 @@ export class BlockSigner {
 
     const _executedBlock = BlockSigner.formalizeExecutedBlock(executedBlock)
 
-    return await BlockSigner.submitBlockAndSignature(
+    const certificateHash = await BlockSigner.submitBlockAndSignature(
       microchain,
       executedBlock.block.height as number,
       _executedBlock,
@@ -278,6 +278,8 @@ export class BlockSigner {
       isRetryBlock,
       validatedBlockCertificateHash
     )
+
+    return { certificateHash, isRetryBlock }
   }
 
   static async processOperations() {
@@ -292,12 +294,13 @@ export class BlockSigner {
       await sharedStore.updateChainOperation(operation)
 
       try {
-        const certificateHash =
+        const { certificateHash, isRetryBlock } =
           await BlockSigner.processNewIncomingMessageWithOperation(
             operation.microchain,
             _operation
           )
         operation.state = db.OperationState.EXECUTED
+        if (isRetryBlock) continue
         operation.certificateHash = certificateHash
         await sharedStore.updateChainOperation(operation)
       } catch (e) {
