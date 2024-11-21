@@ -1,7 +1,6 @@
 import { sharedStore } from '../../../src-bex/store'
 import axios from 'axios'
 import {
-  RpcMethod,
   RpcRequest,
   RpcGraphqlQuery,
   lineraGraphqlOperation,
@@ -14,22 +13,6 @@ import type { Json } from '@metamask/utils'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { db, rpc } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
-
-interface RpcRequestAttr {
-  needChainId: boolean
-}
-
-const RpcRequestAttrs: Map<RpcMethod, RpcRequestAttr> = new Map<
-  RpcMethod,
-  RpcRequestAttr
->([
-  [
-    RpcMethod.ETH_SIGN,
-    {
-      needChainId: false
-    }
-  ]
-])
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
@@ -180,10 +163,6 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   }
   if (!query.query.variables) {
     query.query.variables = {}
-  }
-  const attr = RpcRequestAttrs.get(request.request.method as RpcMethod)
-  if (!attr || attr.needChainId) {
-    query.query.variables.chainId = microchain
   }
 
   // If it's query, just query from endpoint
