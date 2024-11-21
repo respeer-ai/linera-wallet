@@ -5,6 +5,7 @@
     <EthSignView class='vertical-items-margin' />
     <LineraMutationTransfer class='vertical-items-margin' />
     <RequestApplication class='vertical-items-margin' />
+    <SubscribeCreatorChain class='vertical-items-margin' />
   </div>
 </template>
 
@@ -15,5 +16,6 @@ import GetProviderStateView from './engineering/GetProviderStateView.vue'
 import EthSignView from './engineering/EthSignView.vue'
 import LineraMutationTransfer from './engineering/LineraMutationTransfer.vue'
 import RequestApplication from './engineering/RequestApplication.vue'
+import SubscribeCreatorChain from './engineering/SubscribeCreatorChain.vue'
 
 </script>

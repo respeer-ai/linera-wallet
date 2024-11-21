@@ -81,9 +81,10 @@ export const lineraGraphqlQueryPublicKey = (request: RpcRequest) => {
 }
 
 export const lineraGraphqlMutationOperation = (request: RpcRequest) => {
-  const patterns = (
+  const query = (
     request?.request?.params as unknown as RpcGraphqlQuery
-  )?.query?.query?.match(/\).*{\s+([a-zA-Z]+)[($]/)
+  )?.query?.query?.replace('\n', '')
+  const patterns = query?.match(/[)\s].*{\s+([a-zA-Z]+)[($\s]/)
   if (!patterns) return undefined
   if (patterns?.length < 2) return undefined
   return patterns[1][0].toUpperCase() + patterns[1].slice(1)
@@ -95,9 +96,10 @@ export enum GraphqlOperation {
 }
 
 export const lineraGraphqlOperation = (request: RpcRequest) => {
-  const patterns = (
+  const query = (
     request?.request?.params as unknown as RpcGraphqlQuery
-  )?.query?.query?.match(/\s+([a-zA-Z]+)\s+/)
+  )?.query?.query?.replace('\n', '')
+  const patterns = query?.match(/\s+([a-zA-Z]+)\s+/)
   if (!patterns) return undefined
   if (patterns?.length < 2) return undefined
   if (patterns[1] === 'query') return GraphqlOperation.QUERY
