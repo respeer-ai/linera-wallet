@@ -9,7 +9,7 @@ callable from all Web pages to which the Web client has been
 connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
-use std::str::FromStr;
+use std::{str::FromStr, num::NonZeroUsize};
 
 use linera_base::{
     crypto::{CryptoHash, KeyPair, PublicKey},
@@ -19,7 +19,7 @@ use linera_base::{
 use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
-use spec::{erc20::{ERC20Operation, ERC20Message}};
+use spec::erc20::{ERC20Operation, ERC20Message};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 
 use serde::Serialize;
@@ -59,6 +59,8 @@ type ClientContext = linera_client::client_context::ClientContext<WebStorage, Pe
 type MemoryFakeWallet = linera_client::persistent::Memory<FakeWallet>;
 #[cfg(feature = "no-storage")]
 type SignClientContext = linera_client::client_context::ClientContext<WebStorage, MemoryFakeWallet>;
+
+const MAX_LOADED_CHAINS: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(20) };
 
 // TODO get from config
 pub const OPTIONS: ClientOptions = ClientOptions {
@@ -104,6 +106,8 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     long_lived_services: false,
 
     tokio_threads: Some(1),
+
+    max_loaded_chains: MAX_LOADED_CHAINS,
 };
 
 #[cfg(not(feature = "no-storage"))]

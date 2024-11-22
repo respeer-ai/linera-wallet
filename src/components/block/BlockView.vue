@@ -523,7 +523,7 @@ const delay = async (ms: number) => {
 const handleOperations = async () => {
   while (!_unmounted.value) {
     await _handleOperations()
-    await delay(1000)
+    await delay(100000)
   }
 }
 
