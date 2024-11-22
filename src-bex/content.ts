@@ -84,7 +84,7 @@ const rpcHandler = (
       console.log('CheCko inpage dispatcher', req, e)
       res.error = {
         code: -2,
-        message: e.message
+        message: e.message || JSON.stringify(e)
       }
       end()
     })
@@ -121,7 +121,7 @@ const subscriptionHandler = (
           console.log('CheCko inpage subscription', req, e)
           res.error = {
             code: -2,
-            message: e.message
+            message: e.message || JSON.stringify(e)
           }
           console.log('Fail subscription', e)
         })
@@ -151,7 +151,7 @@ const subscriptionHandler = (
           console.log('CheCko inpage unsubscription', req, e)
           res.error = {
             code: -2,
-            message: e.message
+            message: e.message || JSON.stringify(e)
           }
           console.log('Fail subscription', e)
         })

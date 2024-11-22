@@ -290,6 +290,15 @@ export class BlockSigner {
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
       const _operation = JSON.parse(operation.operation) as rpc.Operation
+
+      if (_operation.User && !_operation.User.bytes) {
+        operation.state = db.OperationState.FAILED
+        operation.failReason = 'Invalid operation'
+        operation.failedAt = Date.now()
+        await sharedStore.updateChainOperation(operation)
+        continue
+      }
+
       operation.state = db.OperationState.EXECUTING
       await sharedStore.updateChainOperation(operation)
 

@@ -145,6 +145,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
         const token = await dbTokenBridge.value?.token(_message.User.application_id) as db.Token
         const tokenId = token?.id || 2
         const erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(`[${_message.User.bytes.toString()}]`)
+        // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
         if (erc20Message?.Transfer) {

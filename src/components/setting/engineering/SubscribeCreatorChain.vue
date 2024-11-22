@@ -44,7 +44,7 @@ const onRun = async () => {
           query: SUBSCRIBE_CREATOR_CHAIN.loc?.source?.body,
           variables: {}
         },
-        operationName: 'requestApplication'
+        operationName: 'subscribeCreatorChain'
       }
     })
     console.log(result)

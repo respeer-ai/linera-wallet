@@ -4,7 +4,8 @@ import {
   RpcRequest,
   RpcGraphqlQuery,
   lineraGraphqlOperation,
-  GraphqlOperation
+  GraphqlOperation,
+  lineraGraphqlMutationQueryWithQuery
 } from '../types'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import { basebridge } from '../../../src-bex/event'
@@ -26,7 +27,7 @@ const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   }
   if (query.applicationId) {
     graphqlUrl +=
-      '/checko/chains/' + microchain + '/applications/' + query.applicationId
+      '/chains/' + microchain + '/applications/' + query.applicationId
   }
   return graphqlUrl
 }
@@ -60,6 +61,9 @@ export const queryApplication = async (
   microchain: string,
   query: RpcGraphqlQuery
 ) => {
+  const operationName = lineraGraphqlMutationQueryWithQuery(query.query.query)
+  if (!operationName) return Promise.reject('Invalid operation')
+
   const graphqlUrl = await queryUrl(microchain, query)
 
   // TODO: we can serialize locally
@@ -78,7 +82,7 @@ export const queryApplication = async (
     return Promise.reject(new Error(JSON.stringify(errors)))
   }
   const data = graphqlResponseData(res, 'data') as Record<string, unknown>
-  const bytes = graphqlResponseKeyValue(data, query.query.operationName)
+  const bytes = graphqlResponseKeyValue(data, operationName[0].toLowerCase() + operationName.slice(1))
   return bytes
 }
 
@@ -95,6 +99,8 @@ const queryApplicationMutation = async (
     }
   } as rpc.Operation
   const operationId = uuidv4()
+
+  // TODO: parse application operation
 
   await sharedStore.createChainOperation({
     operationId,

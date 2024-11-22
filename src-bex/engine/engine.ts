@@ -125,7 +125,7 @@ export class DataHandler {
         .catch((e: Error) => {
           res.error = {
             code: -1,
-            message: e.message
+            message: e.message || JSON.stringify(e)
           }
           void payload.respond(res)
         })

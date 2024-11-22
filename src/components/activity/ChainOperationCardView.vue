@@ -49,6 +49,7 @@ import { lineraLogo } from 'src/assets'
 
 import TokenBridge from '../bridge/db/TokenBridge.vue'
 import { shortid } from 'src/utils'
+import { lineraGraphqlMutationQueryWithQuery } from 'app/src-bex/middleware/types'
 
 interface Props {
   operation: db.ChainOperation
@@ -67,10 +68,7 @@ const operationType = computed(() => {
     return 'System:' + Object.keys(_operation.System)[0]
   }
   if (_operation.User) {
-    const patterns = operation.value.graphqlQuery?.match(/\).*{\s+([a-zA-Z]+)[($]/)
-    if (!patterns) return 'User:Unknown'
-    if (patterns?.length < 2) return 'User:Unknown'
-    return 'User:' + patterns[1][0].toUpperCase() + patterns[1].slice(1)
+    return 'User:' + (lineraGraphqlMutationQueryWithQuery(operation.value.graphqlQuery || '') || 'Unknown')
   }
   return 'Unknown'
 })
