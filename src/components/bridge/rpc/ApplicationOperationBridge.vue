@@ -20,7 +20,21 @@ const dbNetworkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
 const dbApplicationCreatorChainSubscriptionBridge = ref<InstanceType<typeof DbApplicationCreatorChainSubscriptionBridge>>()
 const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const existChainApplication = async (chainId: string, applicationId: string): Promise<boolean> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const network = await dbNetworkBridge.value?._selectedNetwork() as db.Network
+  if (!network) return false
+
+  const applicationUrl = `http://${network?.host}:${network?.port}/chains/${chainId}/applications/${applicationId}`
+  return new Promise((resolve, reject) => {
+    axios.get(applicationUrl).then(() => {
+      resolve(true)
+    }).catch((e) => {
+      reject(e)
+    })
+  })
+}
+
 const queryApplication = async (chainId: string, applicationId: string, query: DocumentNode, operationName: string, variables?: Record<string, unknown>): Promise<Uint8Array | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const network = await dbNetworkBridge.value?._selectedNetwork() as db.Network
@@ -105,7 +119,8 @@ const requestSubscribe = async (chainId: string, applicationId: string) => {
 defineExpose({
   queryApplication,
   subscribeCreatorChain,
-  requestSubscribe
+  requestSubscribe,
+  existChainApplication
 })
 
 </script>

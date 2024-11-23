@@ -84,10 +84,12 @@ const persistApplication = async (chainId: string, applicationId: string) => {
   })
 
   onError((error) => {
-    // Add to ticker run let block subscription run it
-    localStore.operation.tickerRuns.set(uid(), () => {
-      void persistApplication(chainId, applicationId)
-    })
+    if (error.graphQLErrors?.length === 0) {
+      // Add to ticker run let block subscription run it
+      localStore.operation.tickerRuns.set(uid(), () => {
+        void persistApplication(chainId, applicationId)
+      })
+    }
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Query token metadata: ${error}`)
   })

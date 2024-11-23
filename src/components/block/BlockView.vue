@@ -506,14 +506,24 @@ const _handleOperations = async () => {
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
           await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, _operation.User.application_id)
+          operation.state = db.OperationState.POST_PROCESSED
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          await dbChainOperationBridge.value?.updateChainOperation(operation)
           break
         case operationDef.OperationType.REQUEST_APPLICATION:
-          if (operation.applicationType === db.ApplicationType.WLINERA)
+          if (operation.applicationType === db.ApplicationType.WLINERA) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)
-          else if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.SWAP)
+            operation.state = db.OperationState.POST_PROCESSED
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await dbChainOperationBridge.value?.updateChainOperation(operation)
+          } else if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.SWAP) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)
+            operation.state = db.OperationState.POST_PROCESSED
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await dbChainOperationBridge.value?.updateChainOperation(operation)
+          }
           break
       }
     } catch (error) {

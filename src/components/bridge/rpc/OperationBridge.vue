@@ -1,5 +1,6 @@
 <template>
   <DbChainOperationBridge ref='dbChainOperationBridge' />
+  <RpcApplicationOperationBridge ref='rpcApplicationOperationBridge' />
 </template>
 <script setup lang='ts'>
 import { uid } from 'quasar'
@@ -7,8 +8,10 @@ import { db, rpc } from 'src/model'
 import { ref } from 'vue'
 
 import DbChainOperationBridge from '../db/ChainOperationBridge.vue'
+import RpcApplicationOperationBridge from './ApplicationOperationBridge.vue'
 
 const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
+const rpcApplicationOperationBridge = ref<InstanceType<typeof RpcApplicationOperationBridge>>()
 
 const transfer = async (fromPublicKey: string | undefined, fromChainId: string, toPublicKey: string | undefined, toChainId: string, amount: number) => {
   const fromOwner = fromPublicKey !== undefined ? await db.ownerFromPublicKey(fromPublicKey) : undefined
@@ -38,6 +41,10 @@ const transfer = async (fromPublicKey: string | undefined, fromChainId: string, 
 }
 
 const requestApplication = async (requesterChainId: string, applicationId: string, targetChainId: string, applicationType: db.ApplicationType) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const exist = await rpcApplicationOperationBridge.value?.existChainApplication(targetChainId, applicationId)
+  if (!exist) return
+
   const operation = {
     operationType: db.OperationType.REQUEST_APPLICATION,
     applicationType,
