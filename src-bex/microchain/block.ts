@@ -2,6 +2,7 @@ import { subscription } from '../subscription'
 import { sharedStore } from '../store'
 import { db, rpc } from '../../src/model'
 import {
+  BLOCK,
   BLOCK_MATERIAL,
   EXECUTE_BLOCK_WITH_FULL_MATERIALS,
   SUBMIT_BLOCK_AND_SIGNATURE
@@ -21,6 +22,7 @@ import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbBase } from '../../src/controller'
 import { _hex, graphqlResult } from '../../src/utils'
+import { HashedCertificateValue } from 'src/__generated__/graphql/sdk/graphql'
 
 export class BlockSigner {
   static running = false
@@ -42,6 +44,43 @@ export class BlockSigner {
         console.log('Failed process incoming message', e)
       }
     }
+  }
+
+  static updateChainOperations = async (microchain: string, block: HashedCertificateValue) => {
+    console.log(microchain, block)
+    return Promise.resolve(undefined)
+  }
+
+  static updateActivities = async (microchain: string, block: HashedCertificateValue) => {
+    console.log(microchain, block)
+    return Promise.resolve(undefined)
+  }
+
+  static async onNewBlock(subscriptionId: string, data: unknown) {
+    const notifications = (
+      graphqlResult.rootData(data) as NotificationsSubscription
+    ).notifications as Record<string, unknown>
+    const microchain = notifications.chain_id as string
+    const reason = graphqlResult.keyValue(notifications, 'reason')
+    const newBlock = graphqlResult.keyValue(
+      reason,
+      'NewBlock'
+    )
+    const hash = graphqlResult.keyValue(newBlock, 'hash') as string
+    // TODO: get block here
+    const blockQuery = {
+      query: {
+        operationName: 'block',
+        query: BLOCK.loc?.source?.body,
+        variables: {
+          chainId: microchain,
+          hash
+        }
+      }
+    } as RpcGraphqlQuery
+    const block = await queryApplication(microchain, blockQuery) as HashedCertificateValue
+    await BlockSigner.updateChainOperations(microchain, block)
+    await BlockSigner.updateActivities(microchain, block)
   }
 
   static async getBlockMaterial(microchain: string) {
@@ -347,6 +386,13 @@ export class BlockSigner {
       ['NewIncomingMessage'],
       (subscriptionId: string, data: unknown) =>
         BlockSigner.onNewIncomingMessage(subscriptionId, data)
+    )
+
+    // Subscribe message and block
+    subscription.Subscription.subscribe(
+      ['NewBlock'],
+      (subscriptionId: string, data: unknown) =>
+        BlockSigner.onNewBlock(subscriptionId, data)
     )
   }
 }

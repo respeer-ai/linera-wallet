@@ -265,7 +265,11 @@ export const setupLineraSubscription = async () => {
             })
             .subscribe({
               next(data: unknown) {
-                subscription.Subscription.handle(data)
+                try {
+                  subscription.Subscription.handle(data)
+                } catch (e) {
+                  console.log('Failed process data', e, data)
+                }
               }
             })
         })
