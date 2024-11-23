@@ -113,10 +113,65 @@ export const createChainOperation = async (operation: db.ChainOperation) => {
   await dbWallet.chainOperations.add(operation)
 }
 
-export const getChainOperations = async (states: db.OperationState[]) => {
-  return await dbWallet.chainOperations.where('state').anyOf(states).toArray()
+export const getChainOperations = async (microchain: string | undefined, certificateHash: string | undefined, states: db.OperationState[]) => {
+  let query = dbWallet.chainOperations.where('state').anyOf(states)
+  if (microchain) {
+    query = query.and((op) => op.microchain === microchain)
+  }
+  if (certificateHash) {
+    query = query.and((op) => op.certificateHash === certificateHash)
+  }
+  return await query.toArray()
 }
 
 export const updateChainOperation = async (operation: db.ChainOperation) => {
   await dbWallet.chainOperations.update(operation.id, operation)
+}
+
+export const nativeToken = async () => {
+  return (await dbBase.tokens.toArray()).find((el) => el.native)
+}
+
+export const token = async (applicationId: string) => {
+  return (await dbBase.tokens.toArray()).find((el) => el.applicationId === applicationId)
+}
+
+export const createActivity = async (
+  microchain: string,
+  tokenId: number,
+  sourceChain: string,
+  sourceAddress: string | undefined,
+  targetChain: string,
+  targetAddress: string | undefined,
+  amount: string,
+  blockHeight: number,
+  timestamp: number,
+  certificateHash: string,
+  grant: string
+): Promise<db.Activity> => {
+  const exist = (await dbWallet.activities.toArray()).find((el) => {
+    return el.sourceChain === sourceChain &&
+    el.sourceAddress === sourceAddress &&
+    el.targetChain === targetChain &&
+    el.targetAddress === targetAddress &&
+    el.timestamp === timestamp &&
+    el.blockHeight === blockHeight &&
+    el.certificateHash === certificateHash
+  })
+  if (exist) return exist
+  const activity = {
+    microchain,
+    tokenId,
+    sourceChain,
+    sourceAddress,
+    targetChain,
+    targetAddress,
+    amount,
+    blockHeight,
+    timestamp,
+    certificateHash,
+    grant
+  } as db.Activity
+  await dbWallet.activities.add(activity)
+  return activity
 }

@@ -20,7 +20,7 @@ import { sha3 } from 'hash-wasm'
 import { toSnake } from 'ts-case-convert'
 import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
-import { dbBase } from '../../src/controller'
+import { dbBase, dbWallet } from '../../src/controller'
 import { _hex, graphqlResult } from '../../src/utils'
 import { HashedCertificateValue } from 'src/__generated__/graphql/sdk/graphql'
 
@@ -47,13 +47,95 @@ export class BlockSigner {
   }
 
   static updateChainOperations = async (microchain: string, block: HashedCertificateValue) => {
-    console.log(microchain, block)
-    return Promise.resolve(undefined)
+    const operations = await sharedStore.getChainOperations(microchain, block.hash as string, [
+      db.OperationState.CREATED,
+      db.OperationState.EXECUTING
+    ])
+    for (const operation of operations) {
+      operation.state = db.OperationState.CONFIRMED
+      await dbWallet.chainOperations.update(operation.id, operation)
+    }
   }
 
   static updateActivities = async (microchain: string, block: HashedCertificateValue) => {
-    console.log(microchain, block)
-    return Promise.resolve(undefined)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const nativeTokenId = (await sharedStore.nativeToken())?.id || 1
+    for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
+      const origin = bundle.origin as rpc.Origin
+      for (const message of bundle.bundle.messages) {
+        const _message = message.message as rpc.Message
+        if (_message?.System?.Credit) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          await sharedStore.createActivity(
+            microchain,
+            nativeTokenId,
+            origin.sender,
+            _message?.System?.Credit?.source,
+            block.value.executedBlock?.block.chainId as string,
+            _message?.System?.Credit?.target,
+            _message?.System?.Credit?.amount,
+            block.value.executedBlock?.block.height as number,
+            block.value.executedBlock?.block.timestamp as number,
+            block.hash as string,
+            message.grant as string
+          )
+        } else if (_message?.User) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          const token = await sharedStore.token(_message.User.application_id) as db.Token
+          const tokenId = token?.id || 2
+          const erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(`[${_message.User.bytes.toString()}]`)
+          // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
+          if (erc20Message?.Transfer) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await sharedStore.createActivity(
+              microchain,
+              tokenId,
+              erc20Message.Transfer.origin.chain_id,
+              erc20Message.Transfer.origin.owner,
+              block.value.executedBlock?.block.chainId as string,
+              erc20Message.Transfer.to.owner,
+              erc20Message.Transfer.amount,
+              block.value.executedBlock?.block.height as number,
+              block.value.executedBlock?.block.timestamp as number,
+              block.hash as string,
+              message.grant as string
+            )
+          }
+        }
+      }
+    }
+    for (const operation of block?.value?.executedBlock?.block.operations || []) {
+      const _operation = operation as rpc.Operation
+      if (_operation.System?.Transfer) {
+        let grant = undefined as unknown as string | undefined
+        for (const messages of block?.value?.executedBlock?.outcome?.messages || []) {
+          grant = messages.find((el) => {
+            const destination = el.destination as rpc.Destination
+            const message = el.message as rpc.Message
+            return destination?.Recipient === _operation.System?.Transfer.recipient.Account?.chain_id &&
+                     message?.System?.Credit?.source === _operation.System?.Transfer.owner &&
+                     message?.System?.Credit?.target === _operation?.System.Transfer.recipient?.Account?.owner
+          })?.grant as string
+          if (grant?.length) break
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await sharedStore.createActivity(
+          microchain,
+          nativeTokenId,
+          block.value.executedBlock?.block.chainId as string,
+          _operation.System.Transfer.owner,
+          _operation.System.Transfer.recipient.Account.chain_id,
+          _operation.System.Transfer.recipient.Account.owner,
+          _operation.System.Transfer.amount,
+          block.value.executedBlock?.block.height as number,
+          block.value.executedBlock?.block.timestamp as number,
+          block.hash as string,
+          grant as string
+        )
+      }
+    }
   }
 
   static async onNewBlock(subscriptionId: string, data: unknown) {
@@ -67,7 +149,6 @@ export class BlockSigner {
       'NewBlock'
     )
     const hash = graphqlResult.keyValue(newBlock, 'hash') as string
-    // TODO: get block here
     const blockQuery = {
       query: {
         operationName: 'block',
@@ -322,7 +403,7 @@ export class BlockSigner {
   }
 
   static async processOperations() {
-    const operations = await sharedStore.getChainOperations([
+    const operations = await sharedStore.getChainOperations(undefined, undefined, [
       db.OperationState.CREATED,
       db.OperationState.EXECUTING
     ])

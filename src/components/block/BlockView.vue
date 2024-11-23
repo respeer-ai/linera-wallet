@@ -244,7 +244,9 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
 
-  await parseActivities(microchain, block)
+  if (window.location.origin.startsWith('http')) {
+    await parseActivities(microchain, block)
+  }
   await updateChainOperations(microchain, block)
 
   // Here we don't care about the result. If ticker run think they need to run again when fail, they should append themselves again
@@ -463,31 +465,38 @@ watch(microchainsImportState, async () => {
 const _unmounted = ref(false)
 
 const _handleOperations = async () => {
+  if (window.location.origin.startsWith('http')) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const operations = await dbChainOperationBridge.value?.getChainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING]) as db.ChainOperation[]
-  // TODO: merge operations of the same microchain
+    const operations = await dbChainOperationBridge.value?.getChainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING]) as db.ChainOperation[]
+    // TODO: merge operations of the same microchain
+    for (const operation of operations) {
+      const _operation = JSON.parse(operation.operation) as rpc.Operation
+      try {
+        operation.state = db.OperationState.EXECUTING
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await dbChainOperationBridge.value?.updateChainOperation(operation)
+        const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, _operation)
+        // TODO: get operation certificate hash
+        // We don't know the reason of the failure, so we let user to choose if retry
+        // TODO: processNewIncomingBundle return if retry
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        if (isRetryBlock) continue
+        operation.state = db.OperationState.EXECUTED
+        operation.certificateHash = certificateHash
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await dbChainOperationBridge.value?.updateChainOperation(operation)
+      } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed process incoming bundle: ${error}`)
+        // When fail, don't continue
+        continue
+      }
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const operations = await dbChainOperationBridge.value?.getChainOperations(0, 0, undefined, [db.OperationState.CONFIRMED]) as db.ChainOperation[]
   for (const operation of operations) {
     const _operation = JSON.parse(operation.operation) as rpc.Operation
-    try {
-      operation.state = db.OperationState.EXECUTING
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbChainOperationBridge.value?.updateChainOperation(operation)
-      const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, _operation)
-      // TODO: get operation certificate hash
-      // We don't know the reason of the failure, so we let user to choose if retry
-      // TODO: processNewIncomingBundle return if retry
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (isRetryBlock) continue
-      operation.state = db.OperationState.EXECUTED
-      operation.certificateHash = certificateHash
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbChainOperationBridge.value?.updateChainOperation(operation)
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Failed process incoming bundle: ${error}`)
-      // When fail, don't continue
-      continue
-    }
     try {
       switch (operation.operationType) {
         case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
@@ -529,9 +538,7 @@ const handleOperations = async () => {
 
 onMounted(async () => {
   await subscribeMicrochains()
-  if (window.location.origin.startsWith('http')) {
-    void handleOperations()
-  }
+  void handleOperations()
 })
 
 onUnmounted(() => {
