@@ -31,9 +31,9 @@ const onRun = async () => {
     }) as Record<string, string>
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const wlinera = await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA) as db.NamedApplication
-    const creationChainId = await lineraWasm.application_creation_chain_id(wlinera.applicationId)
-    const applicationId = wlinera.applicationId
+    // const wlinera = await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA) as db.NamedApplication
+    const applicationId = 'c5181ff1b536479e5eb38e4e95716e3fd69dd2a9c15fa9271a09659faf382539bc83233ffc6e696f8cffd4c4780da8e99088306b4544061d555df2c6017df360feeeed172c74027e2675311c4ec3239dbe8e4b4fcf46b12e6f775523a002d64e010000000000000000000000'
+    const creationChainId = await lineraWasm.application_creation_chain_id(applicationId)
 
     const owner = await db.ownerFromPublicKey(accounts[0])
     console.log(accounts, state, owner)
