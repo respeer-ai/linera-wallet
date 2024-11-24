@@ -148,20 +148,22 @@ export class BlockSigner {
       reason,
       'NewBlock'
     )
-    const hash = graphqlResult.keyValue(newBlock, 'hash') as string
-    const blockQuery = {
-      query: {
-        operationName: 'block',
-        query: BLOCK.loc?.source?.body,
-        variables: {
-          chainId: microchain,
-          hash
+    if (newBlock) {
+      const hash = graphqlResult.keyValue(newBlock, 'hash') as string
+      const blockQuery = {
+        query: {
+          operationName: 'block',
+          query: BLOCK.loc?.source?.body,
+          variables: {
+            chainId: microchain,
+            hash
+          }
         }
-      }
-    } as RpcGraphqlQuery
-    const block = await queryApplication(microchain, blockQuery) as HashedCertificateValue
-    await BlockSigner.updateChainOperations(microchain, block)
-    await BlockSigner.updateActivities(microchain, block)
+      } as RpcGraphqlQuery
+      const block = await queryApplication(microchain, blockQuery) as HashedCertificateValue
+      await BlockSigner.updateChainOperations(microchain, block)
+      await BlockSigner.updateActivities(microchain, block)
+    }
   }
 
   static async getBlockMaterial(microchain: string) {
