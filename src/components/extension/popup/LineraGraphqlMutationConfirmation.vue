@@ -109,13 +109,13 @@ const createRpcAuth = async () => {
   }
 }
 
-const onNextStepClick = async () => {
+const onNextStepClick = () => {
   step.value += 1
   if (step.value === 2) {
     processing.value = true
-    await createRpcAuth()
     window.setTimeout(() => {
       processing.value = false
+      void createRpcAuth()
     }, 2000)
   }
 }

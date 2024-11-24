@@ -428,8 +428,8 @@ export class BlockSigner {
             operation.microchain,
             _operation
           )
-        operation.state = db.OperationState.EXECUTED
         if (isRetryBlock) continue
+        operation.state = db.OperationState.EXECUTED
         operation.certificateHash = certificateHash
         await sharedStore.updateChainOperation(operation)
       } catch (e) {
