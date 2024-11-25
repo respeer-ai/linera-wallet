@@ -126,6 +126,7 @@ import { computed, onMounted, ref, toRef, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
+import { useI18n } from 'vue-i18n'
 
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
@@ -137,6 +138,8 @@ import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface Props {
   token: db.Token
@@ -213,17 +216,17 @@ const onMintNowClick = async () => {
       token.value.applicationId as string,
       chainAccountOwner, amount.value)
     localStore.notification.pushNotification({
-      Title: 'Mint token',
-      Message: 'Success mint token.',
+      Title: t('MSG_MINT_TOKEN'),
+      Message: t('MSG_SUCCESS_MINT_TOKEN'),
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
     emit('minted')
   } catch (error) {
     localStore.notification.pushNotification({
-      Title: 'Mint token',
+      Title: t('MSG_MINT_TOKEN'),
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed mint token: ${error}.`,
+      Message: t('MSG_FAILED_MINT_TOKEN', { ERROR: error }),
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })

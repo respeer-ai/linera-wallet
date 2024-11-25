@@ -35,6 +35,7 @@
 import { onMounted, ref } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
+import { useI18n } from 'vue-i18n'
 
 import OpenChain from './OpenChain.vue'
 import MicrochainCreationView from './MicrochainCreationView.vue'
@@ -42,6 +43,8 @@ import ValidateMicrochainView from './ValidateMicrochainView.vue'
 import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
 import DbNamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const openChain = ref<InstanceType<typeof OpenChain>>()
 const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
@@ -60,8 +63,8 @@ const createMicrochain = async (): Promise<db.Microchain> => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     openChain.value?.openMicrochain().then(async (microchain: db.Microchain) => {
       localStore.notification.pushNotification({
-        Title: 'Open chain',
-        Message: 'Success open microchain.',
+        Title: t('MSG_OPEN_CHAIN'),
+        Message: t('MSG_SUCCESS_OPEN_MICROCHAIN'),
         Popup: true,
         Type: localStore.notify.NotifyType.Info
       })
@@ -84,9 +87,8 @@ const createMicrochain = async (): Promise<db.Microchain> => {
     }).catch((error) => {
       console.log(error)
       localStore.notification.pushNotification({
-        Title: 'Open chain',
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        Message: `Failed open microchain: ${error}.`,
+        Title: t('MSG_OPEN_CHAIN'),
+        Message: t('MSG_FAILED_OPEN_MICROCHAIN', { ERROR: error }),
         Popup: true,
         Type: localStore.notify.NotifyType.Error
       })

@@ -43,11 +43,14 @@
 import { ref } from 'vue'
 import { localStore } from 'src/localstores'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const password = defineModel<string>('password', { default: '' })
 const decryptedPassword = ref('')
@@ -58,8 +61,8 @@ const passwordError = ref(false)
 const unlock = () => {
   if (password.value === decryptedPassword.value) return emit('unlocked')
   localStore.notification.pushNotification({
-    Title: 'Restore Wallet',
-    Message: 'Fail to restore wallet. Please confirm you input correct password.',
+    Title: t('MSG_RESTORE_WALLET'),
+    Message: t('MSG_FAILED_RESTORE_WALLET'),
     Popup: true,
     Type: localStore.notify.NotifyType.Error
   })

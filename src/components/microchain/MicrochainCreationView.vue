@@ -37,12 +37,15 @@ import { copyToClipboard } from 'quasar'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 import { toRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   microchain: db.Microchain
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{(ev: 'backuped'): void}>()
 const onValidateClick = () => {
@@ -52,8 +55,8 @@ const onValidateClick = () => {
 const onBackupClick = () => {
   copyToClipboard(JSON.stringify(microchain.value)).then(() => {
     localStore.notification.pushNotification({
-      Title: 'Copy Address',
-      Message: 'Success copy microchain creation information to clipboard.',
+      Title: t('MSG_COPY_MICROCHAIN'),
+      Message: t('MSG_SUCCESS_COPY_MICROCHAIN_CREATION_INFORMATION'),
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })

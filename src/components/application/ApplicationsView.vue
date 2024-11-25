@@ -30,11 +30,14 @@ import { computed, ref } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 import { type ApplicationOverview } from 'src/__generated__/graphql/service/graphql'
+import { useI18n } from 'vue-i18n'
 
 import RpcApplicationBridge from '../bridge/rpc/ApplicationBridge.vue'
 import DbApplicationBridge from '../bridge/db/ApplicationBridge.vue'
 import ApplicationCardView from './ApplicationCardView.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const rpcApplicationBridge = ref<InstanceType<typeof RpcApplicationBridge>>()
 const dbApplicationBridge = ref<InstanceType<typeof DbApplicationBridge>>()
@@ -52,16 +55,15 @@ const onSynchronizeApplicationsClick = () => {
       await dbApplicationBridge.value?.addApplication(resp.id, resp.description?.creation?.chainId, resp.description?.creation?.height, resp.description?.creation?.index)
     }
     localStore.notification.pushNotification({
-      Title: 'Synchronize applications',
-      Message: 'Success synchronize applications.',
+      Title: t('MSG_SYNCHRONIZE_APPLICATIONS'),
+      Message: t('MSG_SUCCESS_SYNCHRONIZE_APPLICATIONS'),
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
   }).catch((error) => {
     localStore.notification.pushNotification({
-      Title: 'Synchronize applications',
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed synchronize applications: ${error}.`,
+      Title: t('MSG_SYNCHRONIZE_APPLICATIONS'),
+      Message: t('MSG_FAILED_SYNCHRONIZE_APPLICATIONS', { ERROR: error }),
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })

@@ -72,6 +72,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 import { type Chains } from 'src/__generated__/graphql/service/graphql'
+import { useI18n } from 'vue-i18n'
 
 import DbMicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
@@ -80,6 +81,8 @@ import MicrochainCardView from './MicrochainCardView.vue'
 import CreateMicrochainView from './CreateMicrochainView.vue'
 import RpcMicrochainBridge from '../bridge/rpc/MicrochainBridge.vue'
 import ImportMicrochainView from './ImportMicrochainView.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const microchainOwners = ref([] as db.MicrochainOwner[])
 const microchains = ref([] as db.Microchain[])
@@ -139,16 +142,16 @@ const onSynchronizeMicrochainsClick = () => {
       await dbMicrochainBridge.value?.createMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, chains.default === microchain)
     }
     localStore.notification.pushNotification({
-      Title: 'Synchronize microchains',
-      Message: 'Success synchronize microchains.',
+      Title: t('MSG_SYNCHRONIZE_MICROCHAINS'),
+      Message: t('MSG_SUCCESS_SYNCHRONIZE_MICROCHAINS'),
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
   }).catch((error) => {
     localStore.notification.pushNotification({
-      Title: 'Synchronize microchains',
+      Title: t('MSG_SYNCHRONIZE_MICROCHAINS'),
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed synchronize microchains: ${error}.`,
+      Message: t('MSG_FAILED_SYNCHRONIZE_MICROCHAINS', { ERROR: error }),
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })

@@ -28,6 +28,7 @@ import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { toSnake } from 'ts-case-convert'
 import { type HashedCertificateValue, type CandidateBlockMaterial, type ExecutedBlockMaterial } from 'src/__generated__/graphql/service/graphql'
+import { useI18n } from 'vue-i18n'
 
 import RpcBlockBridge from '../bridge/rpc/BlockBridge.vue'
 import RpcAccountBridge from '../bridge/rpc/AccountBridge.vue'
@@ -46,6 +47,8 @@ import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperati
 import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 import DbApplicationCreatorChainSubscriptionBridge from '../bridge/db/ApplicationCreatorChainSubscriptionBridge.vue'
 import DbChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const rpcBlockBridge = ref<InstanceType<typeof RpcBlockBridge>>()
 const rpcAccountBridge = ref<InstanceType<typeof RpcAccountBridge>>()
@@ -374,8 +377,8 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       ).then((certificateHash: string) => {
         if (operation) {
           localStore.notification.pushNotification({
-            Title: 'Execute operation',
-            Message: 'Success execute operation.',
+            Title: t('MSG_EXECUTE_OPERATION'),
+            Message: t('MSG_SUCCESS_EXECUTE_OPERATION'),
             Popup: true,
             Type: localStore.notify.NotifyType.Info
           })
@@ -383,9 +386,8 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         resolve({ certificateHash, isRetryBlock })
       }).catch((error) => {
         localStore.notification.pushNotification({
-          Title: 'Execute operation',
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          Message: `Failed execute operation: ${error}.`,
+          Title: t('MSG_EXECUTE_OPERATION'),
+          Message: t('MSG_FAILED_EXECUTE_OPERATION', { ERROR: error }),
           Popup: true,
           Type: localStore.notify.NotifyType.Error
         })

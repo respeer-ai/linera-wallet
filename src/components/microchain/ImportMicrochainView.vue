@@ -44,8 +44,11 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import { localStore } from 'src/localstores'
+import { useI18n } from 'vue-i18n'
 
 import OpenChain from './OpenChain.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const microchainId = ref('')
 const messageId = ref('')
@@ -77,17 +80,16 @@ const onImportClick = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   openChain.value?.importMicrochain(microchainId.value, messageId.value, certificateHash.value).then(() => {
     localStore.notification.pushNotification({
-      Title: 'Import chain',
-      Message: 'Success import microchain.',
+      Title: t('MSG_IMPORT_MICROCHAIN'),
+      Message: t('MSG_SUCCESS_IMPORT_MICROCHAIN'),
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
     emit('imported')
   }).catch((error) => {
     localStore.notification.pushNotification({
-      Title: 'Open chain',
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed open microchain: ${error}.`,
+      Title: t('MSG_IMPORT_MICROCHAIN'),
+      Message: t('MSG_FAILED_IMPORT_MICROCHAIN', { ERROR: error }),
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })

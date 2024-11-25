@@ -35,10 +35,13 @@
 <script setup lang='ts'>
 import { onMounted, ref, toRef, watch } from 'vue'
 import { localStore } from 'src/localstores'
+import { useI18n } from 'vue-i18n'
 
 import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface Props {
   title?: string
@@ -77,8 +80,8 @@ const onVerifyClick = async () => {
   } else {
     emit('error')
     localStore.notification.pushNotification({
-      Title: 'Verify assword',
-      Message: 'Fail to verify password',
+      Title: t('MSG_VERIFY_PASSWORD'),
+      Message: t('MSG_FAILED_VERIFY_PASSWORD'),
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })
