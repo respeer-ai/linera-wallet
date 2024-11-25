@@ -11,7 +11,7 @@
     <div class='row vertical-sections-margin'>
       <div
         v-for='(word, i) in mnemonic'
-        :key='word'
+        :key='i'
         :class='[ "mnemonic-grid", i % 5 === 0 ? "mnemonic-grid-start" : "", i < 5 ? "mnemonic-grid-top" : "" ]'
       >
         <q-input
@@ -19,7 +19,7 @@
           hide-bottom-space
           v-model='mnemonic[i]'
           :autofocus='i === focusIndex'
-          @paste='onPaste'
+          @paste='(evt) => onPaste(i, evt)'
           @focus='() => onFocus(i)'
         />
       </div>
@@ -42,17 +42,19 @@ const onFocus = (index: number) => {
   focusIndex.value = index
 }
 
-const onPaste = (evt: {
+const onPaste = (index: number, evt: {
   preventDefault(): unknown; clipboardData: { getData: (arg0: string) => string; };
 }) => {
   evt.preventDefault()
-  const _mnemonic = [
-    '', '', '', '', '', '', '', '', '', '', '', '',
-    '', '', '', '', '', '', '', '', '', '', '', ''
-  ] as string[]
-  evt.clipboardData.getData('text').split(/(\s+)/).filter((v) => v.trim().length > 0).forEach((v, i) => {
-    if (i < _mnemonic.length) _mnemonic[i] = v
-  })
+  const _mnemonic = mnemonic.value
+  const copied = evt.clipboardData.getData('text').split(/(\s+)/).filter((v) => v.trim().length > 0)
+  if (copied.length === 1) {
+    _mnemonic[index] = copied[0]
+  } else {
+    copied.forEach((v, i) => {
+      if (i < _mnemonic.length) _mnemonic[i] = v
+    })
+  }
   mnemonic.value = [..._mnemonic]
 }
 
