@@ -1,7 +1,15 @@
+<template>
+  <DbOwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
+</template>
+
 <script setup lang='ts'>
 import { dbBase, dbWallet } from 'src/controller'
 import { db } from 'src/model'
-import { onMounted, toRef } from 'vue'
+import { onMounted, ref, toRef, watch } from 'vue'
+
+import DbOwnerBridge from './OwnerBridge.vue'
+
+const selectedOwner = ref(undefined as unknown as db.Owner)
 
 interface Props {
   tokenId?: number
@@ -69,6 +77,13 @@ const getUsdBalance = async (owner?: db.Owner, tokenId?: number) => {
 }
 
 onMounted(async () => {
+  const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
+  if (!owner) return
+  tokenBalance.value = await getTokenBalance(owner, tokenId.value)
+  usdBalance.value = await getUsdBalance(owner, tokenId.value)
+})
+
+watch(selectedOwner, async () => {
   const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
   if (!owner) return
   tokenBalance.value = await getTokenBalance(owner, tokenId.value)
