@@ -29,23 +29,23 @@ const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 const _microchains = useObservable<db.Microchain[]>(
   liveQuery(async () => {
     if (owner.value !== undefined) {
-      const microchainOwners = await dbWallet.microchainOwners.where('owner').equals(owner.value).toArray()
-      const microchainIds = microchainOwners.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, [])
-      return (await dbWallet.microchains.where('microchain').anyOf(microchainIds).toArray()).filter((el) => el.imported)
+      return await ownerMicrochains(0, 1000, owner.value)
     }
     return (await dbWallet.microchains.toArray()).filter((el) => el.imported)
   }) as never
 )
 
+const updateMicrochains = (__microchains: db.Microchain[]) => {
+  // TODO: there is some bug here to update defaultMicrochain
+  microchains.value = [...__microchains || []]
+  defaultMicrochain.value = microchains.value.find((el) => el.default)
+  if (defaultMicrochain.value === undefined && microchains.value.length > 0) {
+    defaultMicrochain.value = microchains.value[0]
+  }
+}
+
 watch(_microchains, () => {
-  microchains.value = [..._microchains.value || []]
-  if (defaultMicrochain.value) return
-  if (owner.value !== undefined) {
-    defaultMicrochain.value = _microchains.value?.find((el) => el.default)
-  }
-  if (defaultMicrochain.value === undefined && _microchains.value?.length) {
-    defaultMicrochain.value = _microchains.value[0]
-  }
+  updateMicrochains(_microchains.value ? _microchains.value : [])
 })
 
 const getMicrochains = async (offset: number, limit: number, imported?: boolean): Promise<db.Microchain[]> => {
@@ -66,6 +66,12 @@ const ownerMicrochains = async (offset: number, limit: number, owner: string, im
     return microchainOwners.findIndex((el) => el.owner === owner && el.microchain === microchain.microchain) >= 0 && (!imported || microchain.imported)
   })
 }
+
+watch(owner, async () => {
+  if (owner.value === undefined) return
+  const __microchains = await ownerMicrochains(0, 1000, owner.value)
+  updateMicrochains(__microchains)
+})
 
 const microchainOwner = async (microchain: string): Promise<db.Owner | undefined> => {
   const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter((el) => el.microchain === microchain)

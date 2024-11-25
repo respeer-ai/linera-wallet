@@ -3,7 +3,7 @@
     <p class='text-center text-bold text-grey-9 selector-title'>
       {{ $t('MSG_SELECT_AN_ACCOUNT') }}
     </p>
-    <AccountsInnerView :persistent='persistent' :searchable='true' @selected='onOwnerSelected' />
+    <AccountsInnerView :persistent='persistent' :searchable='true' @selected='onOwnerSelected' v-model='owner' />
   </div>
 </template>
 

@@ -50,7 +50,7 @@
       </q-item>
     </q-list>
   </div>
-  <OwnerBridge ref='ownerBridge' v-model:owners='owners' v-model:selected-owner='owner' />
+  <OwnerBridge ref='ownerBridge' v-model:owners='owners' />
   <TokenBridge ref='tokenBridge' />
 </template>
 

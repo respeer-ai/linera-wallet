@@ -114,6 +114,10 @@ const publicKey2Owner = async (publicKey: string): Promise<string | undefined> =
   return (await dbWallet.owners.toArray()).find((el) => el.address === publicKey)?.owner
 }
 
+const _selectedOwner = async () => {
+  return (await dbWallet.owners.toArray()).find((el) => el.selected)
+}
+
 defineExpose({
   createOwner,
   updateOwner,
@@ -122,7 +126,8 @@ defineExpose({
   publicKey2Owner,
   getOwnerWithPublicKey,
   getOwnerWithPublicKeyPrefix,
-  getOwner
+  getOwner,
+  _selectedOwner
 })
 
 </script>

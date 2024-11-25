@@ -195,11 +195,10 @@
       :disable='!canGotoNext'
     />
   </div>
-  <DbOwnerBridge v-model:selected-owner='selectedFromOwner' />
-  <DbMicrochainBridge v-if='selectedFromOwner' :owner='selectedFromOwner?.owner' v-model:default-microchain='selectedFromMicrochain' v-model:microchains='fromMicrochains' />
-  <DbMicrochainBridge v-if='selectedToOwner' :owner='selectedToOwner?.owner' v-model:default-microchain='selectedToMicrochain' />
+  <DbOwnerBridge ref='dbOwnerBridge' />
+  <DbMicrochainBridge ref='dbMicrochainBridge' />
   <q-dialog v-model='selectingFromOwner'>
-    <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='true' />
+    <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='false' />
   </q-dialog>
   <q-dialog v-model='selectingFromMicrochain'>
     <MicrochainSelector :owner='selectedFromOwner?.owner' v-model='selectedFromMicrochain' @selected='onFromMicrochainSelected' />
@@ -216,7 +215,7 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { db } from 'src/model'
 
@@ -239,6 +238,9 @@ const fromChainBalance = defineModel<boolean>('fromChainBalance')
 const toChainBalance = defineModel<boolean>('toChainBalance')
 
 const selectedToken = defineModel<db.Token>('selectedToken')
+
+const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
+const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 
 const selectingFromOwner = ref(false)
 const selectingFromMicrochain = ref(false)
@@ -320,10 +322,42 @@ const canGotoNext = computed(() => {
          toMicrochain.value.length > 0
 })
 
+watch(selectedFromOwner, async () => {
+  if (!selectedFromOwner.value) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  fromMicrochains.value = await dbMicrochainBridge.value?.ownerMicrochains(0, 1000, selectedFromOwner.value?.owner) as db.Microchain[]
+  selectedFromMicrochain.value = fromMicrochains.value.find((el) => el.default) || fromMicrochains.value[0]
+})
+
+watch(selectedToOwner, async () => {
+  if (!selectedToOwner.value) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const microchains = await dbMicrochainBridge.value?.ownerMicrochains(0, 1000, selectedToOwner.value?.owner) as db.Microchain[]
+  selectedToMicrochain.value = microchains.find((el) => el.default) || microchains[0]
+})
+
 const emit = defineEmits<{(ev: 'next'): void}>()
 
 const onTransferClick = () => {
   emit('next')
 }
+
+onMounted(async () => {
+  if (!selectedFromOwner.value) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    selectedFromOwner.value = await dbOwnerBridge.value?._selectedOwner()
+  }
+  if (selectedFromOwner.value) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    fromMicrochains.value = await dbMicrochainBridge.value?.ownerMicrochains(0, 1000, selectedFromOwner.value?.owner) as db.Microchain[]
+    selectedFromMicrochain.value = fromMicrochains.value.find((el) => el.default) || fromMicrochains.value[0]
+  }
+
+  if (selectedToOwner.value) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const microchains = await dbMicrochainBridge.value?.ownerMicrochains(0, 1000, selectedToOwner.value?.owner) as db.Microchain[]
+    selectedFromMicrochain.value = microchains.find((el) => el.default) || microchains[0]
+  }
+})
 
 </script>
