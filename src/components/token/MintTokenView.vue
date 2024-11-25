@@ -24,7 +24,7 @@
     </template>
   </q-btn-dropdown>
   <q-btn-dropdown
-    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
+    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin extra-large-margin-bottom'
     no-caps dense
     dropdown-icon='bi-chevron-down'
     menu-anchor='bottom left'
@@ -48,16 +48,8 @@
       </div>
     </template>
   </q-btn-dropdown>
-  <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
+  <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer extra-large-margin-bottom'>
     {{ $t('MSG_NO_USABLE_MICROCHAIN') }} <span class='like-link'>{{ $t('MSG_CREATE') }}</span>
-  </div>
-  <div class='vertical-menus-margin extra-large-margin-bottom'>
-    <q-toggle
-      dense
-      rounded
-      label='Mint to microchain balance'
-      v-model='mintToChainBalance'
-    />
   </div>
   <div class='row text-center extra-large-margin-bottom'>
     <q-space />
@@ -152,7 +144,6 @@ const selectedMicrochain = defineModel<db.Microchain>('selectedMicrochain')
 const microchains = ref([] as db.Microchain[])
 
 const deductFromChainBalance = defineModel<boolean>('deductFromChainBalance')
-const mintToChainBalance = defineModel<boolean>('mintToChainBalance')
 
 const selectingOwner = ref(false)
 const selectingMicrochain = ref(false)
