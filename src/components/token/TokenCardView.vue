@@ -68,9 +68,7 @@ const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
 const getBalance = async () => {
   if (!selectedOwner.value) return
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 0
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const balance = await dbOwnerBridge.value?.ownerBalance(selectedOwner.value, nativeTokenId)
+  const balance = await dbOwnerBridge.value?.ownerBalance(selectedOwner.value, token.value.id as number)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   tokenBalance.value = balance?.tokenBalance || 0
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
