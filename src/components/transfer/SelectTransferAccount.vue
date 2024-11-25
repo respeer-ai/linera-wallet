@@ -84,7 +84,7 @@
   <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
     {{ $t('MSG_NO_USABLE_MICROCHAIN') }} <span class='like-link'>{{ $t('MSG_CREATE') }}</span>
   </div>
-  <div class='vertical-items-margin' v-if='fromMicrochains.length > 0'>
+  <div class='vertical-items-margin' v-if='fromMicrochains.length > 0 && selectedToken?.native'>
     <q-toggle
       dense
       rounded
@@ -175,7 +175,7 @@
       </template>
     </q-btn-dropdown>
   </div>
-  <div class='vertical-items-margin' v-if='toMicrochain && toMicrochain.length > 0'>
+  <div class='vertical-items-margin' v-if='toMicrochain && toMicrochain.length > 0 && selectedToken?.native'>
     <q-toggle
       dense
       rounded

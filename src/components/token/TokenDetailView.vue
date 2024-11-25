@@ -56,8 +56,7 @@
             {{ $t('MSG_STAKE') }}
           </div>
         </div>
-        <!-- TODO: disabled should be reversed -->
-        <div v-if='!token.native' class='home-token-action-btn cursor-pointer' :disabled='token.mintable' @click='onMintClick'>
+        <div v-if='!token.native && token.mintable' class='home-token-action-btn cursor-pointer' @click='onMintClick'>
           <q-avatar color='red-2' size='36px'>
             <q-icon name='bi-plus-circle' size='24px' />
           </q-avatar>

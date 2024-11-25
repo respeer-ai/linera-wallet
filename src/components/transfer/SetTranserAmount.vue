@@ -18,7 +18,7 @@
         <q-img :src='token.logo' width='36px' height='36px' />
       </q-avatar>
       <div class='page-item-x-margin-left'>
-        <div class='row'>
+        <div v-if='token.native' class='row'>
           <div class='text-grey-8'>
             {{ fromChainBalance ? 'Chain balance' : 'Account balance' }}
           </div>
