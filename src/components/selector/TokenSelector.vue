@@ -37,7 +37,7 @@ const emit = defineEmits<{(ev: 'selected', value?: db.Token): void}>()
 
 const tokens = ref([] as db.Token[])
 const searchText = ref('')
-const displayTokens = computed(() => tokens.value.filter((el) => el.name.includes(searchText.value)))
+const displayTokens = computed(() => tokens.value.filter((el) => el.name.toLowerCase().includes(searchText.value.toLowerCase())))
 
 const onTokenClick = (_token: db.Token) => {
   token.value = _token
