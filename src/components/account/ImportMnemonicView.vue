@@ -18,8 +18,9 @@
           borderless dense
           hide-bottom-space
           v-model='mnemonic[i]'
-          :autofocus='i === 0'
+          :autofocus='i === focusIndex'
           @paste='onPaste'
+          @focus='() => onFocus(i)'
         />
       </div>
     </div>
@@ -27,6 +28,7 @@
 </template>
 
 <script setup lang='ts'>
+import { ref } from 'vue'
 
 const mnemonic = defineModel<string[]>({
   default: [
@@ -34,6 +36,11 @@ const mnemonic = defineModel<string[]>({
     '', '', '', '', '', '', '', '', '', '', '', ''
   ] as string[]
 })
+const focusIndex = ref(0)
+
+const onFocus = (index: number) => {
+  focusIndex.value = index
+}
 
 const onPaste = (evt: {
   preventDefault(): unknown; clipboardData: { getData: (arg0: string) => string; };
