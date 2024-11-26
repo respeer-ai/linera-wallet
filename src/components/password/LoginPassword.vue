@@ -20,7 +20,7 @@
           class='btn full-width vertical-sections-margin'
           :label='$t("MSG_UNLOCK")'
           @click='onUnlockClick'
-          :disable='verify.validatePassword(password) || passwordError'
+          :disable='!verify.validatePassword(password) || passwordError'
           no-caps
         />
         <q-btn

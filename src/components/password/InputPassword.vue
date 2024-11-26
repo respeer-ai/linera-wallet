@@ -40,7 +40,7 @@ watch(display, () => {
 })
 
 const onPasswordBlur = () => {
-  error.value = password.value === undefined || verify.validatePassword(password.value)
+  error.value = password.value === undefined || !verify.validatePassword(password.value)
 }
 
 const resetError = () => {
