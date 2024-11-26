@@ -27,7 +27,7 @@
     />
     <q-btn
       class='btn vertical-sections-margin full-width' flat no-caps
-      @click='onImportClick' :disabled='!canImport'
+      @click='onImportClick' :disabled='!canImport' :loading='importing'
     >
       {{ $t('MSG_IMPORT') }}
     </q-btn>
@@ -53,6 +53,7 @@ const { t } = useI18n({ useScope: 'global' })
 const microchainId = ref('')
 const messageId = ref('')
 const certificateHash = ref('')
+const importing = ref(false)
 
 const microchainIdError = ref(false)
 const messageIdError = ref(false)
@@ -77,8 +78,11 @@ const onImportClick = () => {
   certificateHashError.value = certificateHash.value.length === 0
   if (microchainIdError.value || messageIdError.value || certificateHashError.value) return
 
+  importing.value = true
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   openChain.value?.importMicrochain(microchainId.value, messageId.value, certificateHash.value).then(() => {
+    importing.value = false
     localStore.notification.pushNotification({
       Title: t('MSG_IMPORT_MICROCHAIN'),
       Message: t('MSG_SUCCESS_IMPORT_MICROCHAIN'),
@@ -87,6 +91,7 @@ const onImportClick = () => {
     })
     emit('imported')
   }).catch((error) => {
+    importing.value = false
     localStore.notification.pushNotification({
       Title: t('MSG_IMPORT_MICROCHAIN'),
       Message: t('MSG_FAILED_IMPORT_MICROCHAIN', { ERROR: error }),
