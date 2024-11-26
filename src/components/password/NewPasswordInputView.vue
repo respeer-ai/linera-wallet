@@ -52,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+import { verify } from 'src/utils'
 import { ref, watch } from 'vue'
 
 const password = defineModel<string>('password', { default: '' })
@@ -94,39 +95,9 @@ const onConfirmPasswordFocus = () => {
   resetError()
 }
 
-const validatePassword = (password: string): boolean => {
-  if (password.length < 8 || password.length > 20) {
-    return false
-  }
-
-  const reg1 = /^[A-Za-z0-9!@#$%^&*()_+]+$/
-  if (!reg1.test(password)) {
-    return false
-  }
-
-  const reg2 = /[A-Za-z]+/
-  if (!reg2.test(password)) {
-    return false
-  }
-
-  const reg3 = /[0-9]+/
-  if (!reg3.test(password)) {
-    return false
-  }
-
-  /*
-  const reg4 = /[!@#$%^&*()_+]+/
-  if (!reg4.test(password)) {
-    return false
-  }
-  */
-
-  return true
-}
-
 watch([password, confirmPassword], () => {
-  passwordError.value = password.value === undefined || !validatePassword(password.value)
-  confirmPasswordError.value = confirmPassword.value === undefined || !validatePassword(confirmPassword.value)
+  passwordError.value = password.value === undefined || !verify.validatePassword(password.value)
+  confirmPasswordError.value = confirmPassword.value === undefined || !verify.validatePassword(confirmPassword.value)
   error.value = password.value !== confirmPassword.value
 })
 

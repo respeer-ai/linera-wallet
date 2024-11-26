@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { verify } from 'src/utils'
 import { ref, watch } from 'vue'
 
 const password = defineModel<string>('password', { default: '' })
@@ -39,7 +40,7 @@ watch(display, () => {
 })
 
 const onPasswordBlur = () => {
-  error.value = password.value === undefined || password.value.length < 8
+  error.value = password.value === undefined || verify.validatePassword(password.value)
 }
 
 const resetError = () => {

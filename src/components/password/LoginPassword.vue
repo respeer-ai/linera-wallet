@@ -20,7 +20,7 @@
           class='btn full-width vertical-sections-margin'
           :label='$t("MSG_UNLOCK")'
           @click='onUnlockClick'
-          :disable='password.length < 8 || passwordError'
+          :disable='verify.validatePassword(password) || passwordError'
           no-caps
         />
         <q-btn
@@ -49,6 +49,7 @@ import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 import cheCkoLogo from 'src/assets/CheCko.png'
+import { verify } from 'src/utils'
 
 const { t } = useI18n({ useScope: 'global' })
 
