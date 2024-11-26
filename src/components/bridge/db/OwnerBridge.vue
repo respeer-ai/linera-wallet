@@ -52,6 +52,8 @@ const resetSelected = async () => {
 }
 
 const createOwner = async (publicKey: string, privateKey: string, name?: string, _password?: string) => {
+  if (name && await existOwner(name)) return Promise.reject('Already exist')
+
   if (!_password) {
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid fingerprint')
@@ -72,6 +74,8 @@ const createOwner = async (publicKey: string, privateKey: string, name?: string,
 }
 
 const updateOwner = async (owner: db.Owner) => {
+  if (await existOwner(owner.name) && !await existOwner(owner.name, owner.id)) return Promise.reject('Already exists')
+
   if (owner.selected) await resetSelected()
   await dbWallet.owners.update(owner.id, owner)
 }
@@ -118,6 +122,10 @@ const _selectedOwner = async () => {
   return (await dbWallet.owners.toArray()).find((el) => el.selected)
 }
 
+const existOwner = async (name: string, id?: number) => {
+  return await dbWallet.owners.where('name').equals(name).and((owner) => id === undefined || owner.id === id).count() > 0
+}
+
 defineExpose({
   createOwner,
   updateOwner,
@@ -127,7 +135,8 @@ defineExpose({
   getOwnerWithPublicKey,
   getOwnerWithPublicKeyPrefix,
   getOwner,
-  _selectedOwner
+  _selectedOwner,
+  existOwner
 })
 
 </script>
