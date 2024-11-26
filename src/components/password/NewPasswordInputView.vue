@@ -98,7 +98,7 @@ const onConfirmPasswordFocus = () => {
 watch([password, confirmPassword], () => {
   passwordError.value = password.value === undefined || !verify.validatePassword(password.value)
   confirmPasswordError.value = confirmPassword.value === undefined || !verify.validatePassword(confirmPassword.value)
-  error.value = password.value !== confirmPassword.value
+  error.value = password.value !== confirmPassword.value || passwordError.value || confirmPasswordError.value
 })
 
 </script>
