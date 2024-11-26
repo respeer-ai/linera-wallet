@@ -35,7 +35,7 @@
       <q-btn
         flat class='btn btn-alt full-width vertical-items-margin' no-caps
         @click='onDeleteClick'
-        v-if='!network.preset && network.id !== undefined'
+        v-if='!network.preset && network.id !== undefined && !network.selected'
       >
         {{ $t('MSG_DELETE') }}
       </q-btn>
