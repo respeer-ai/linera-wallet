@@ -171,7 +171,7 @@ export default {
   MSG_BY_CONTINUE_YOU_UNDERSTAND_CHECKO_CANNOT_RECOVER_PASSWORD:
     "By continuing, you understand CheCko cannot recover this password. <a href='#'>Learn more</a>",
   MSG_NEW_PASSWORD: 'New password',
-  MSG_AT_LEAST_8_LETTERS_WITH_BRACKETS: '(At least 8 letters)',
+  MSG_AT_LEAST_8_LETTERS_WITH_BRACKETS: 'At least 8 letters contain A-Za-z0-9!@#$%^&*()_+',
   MSG_CONFIRM_PASSWORD: 'Confirm password',
   MSG_RESET_PASSWORD: 'Reset password',
   MSG_CHECKO_NEVER_STORE_YOUR_PASSWORD_OUTSIDE_WALLET:

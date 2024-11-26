@@ -4,7 +4,13 @@
       <q-space />
       <div :style='{width: "400px"}' class='text-left'>
         <div :style='{margin: "4px 0", lineHeight: "32px"}' class='row'>
-          <span :style='{marginRight: "4px"}' class='text-bold'>{{ $t('MSG_NEW_PASSWORD') }}</span> {{ $t('MSG_AT_LEAST_8_LETTERS_WITH_BRACKETS') }}
+          <span :style='{marginRight: "4px"}' class='text-bold'>{{ $t('MSG_NEW_PASSWORD') }}</span>
+          <q-icon
+            name='bi-question-circle-fill' size='12px' class='cursor-pointer' color='grey-6'
+            :style='{marginTop: "10px", marginLeft: "2px"}'
+          >
+            <q-tooltip>{{ $t('MSG_AT_LEAST_8_LETTERS_WITH_BRACKETS') }}</q-tooltip>
+          </q-icon>
           <q-space />
           <q-btn
             flat
@@ -88,9 +94,39 @@ const onConfirmPasswordFocus = () => {
   resetError()
 }
 
+const validatePassword = (password: string): boolean => {
+  if (password.length < 8 || password.length > 20) {
+    return false
+  }
+
+  const reg1 = /^[A-Za-z0-9!@#$%^&*()_+]+$/
+  if (!reg1.test(password)) {
+    return false
+  }
+
+  const reg2 = /[A-Za-z]+/
+  if (!reg2.test(password)) {
+    return false
+  }
+
+  const reg3 = /[0-9]+/
+  if (!reg3.test(password)) {
+    return false
+  }
+
+  /*
+  const reg4 = /[!@#$%^&*()_+]+/
+  if (!reg4.test(password)) {
+    return false
+  }
+  */
+
+  return true
+}
+
 watch([password, confirmPassword], () => {
-  passwordError.value = password.value === undefined || password.value.length < 8
-  confirmPasswordError.value = confirmPassword.value?.length < 8
+  passwordError.value = password.value === undefined || !validatePassword(password.value)
+  confirmPasswordError.value = confirmPassword.value === undefined || !validatePassword(confirmPassword.value)
   error.value = password.value !== confirmPassword.value
 })
 
