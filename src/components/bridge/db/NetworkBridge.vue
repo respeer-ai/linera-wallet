@@ -35,11 +35,13 @@ const resetSelected = async () => {
 }
 
 const createNetwork = async (network: db.Network) => {
+  if (await existNetwork(network.name)) return Promise.reject('Already exists')
   if (network.selected) await resetSelected()
   await dbBase.networks.add(network)
 }
 
 const updateNetwork = async (network: db.Network) => {
+  if (await existNetwork(network.name) && !await existNetwork(network.name, network.id)) return Promise.reject('Already exists')
   if (network.selected) await resetSelected()
   await dbBase.networks.update(network.id, network)
 }
@@ -52,11 +54,16 @@ const _selectedNetwork = async () => {
   return (await dbBase.networks.toArray()).find((el) => el.selected)
 }
 
+const existNetwork = async (name: string, id?: number) => {
+  return await dbBase.networks.where('name').equals(name).and((network) => id === undefined || network.id === id).count() > 0
+}
+
 defineExpose({
   createNetwork,
   deleteNetwork,
   updateNetwork,
-  _selectedNetwork
+  _selectedNetwork,
+  existNetwork
 })
 
 </script>
