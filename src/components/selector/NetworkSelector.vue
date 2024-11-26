@@ -22,7 +22,7 @@
           </div>
         </div>
         <q-space />
-        <div v-if='!_network.preset' class='selector-delete-btn'>
+        <div v-if='!_network.preset && !_network.selected' class='selector-delete-btn'>
           <q-icon name='bi-trash3' size='16px' @click='onDeleteNetworkClick(_network)' />
         </div>
       </q-item>
