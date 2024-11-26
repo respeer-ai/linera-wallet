@@ -1,0 +1,61 @@
+body {
+  font-size: 20px;
+  padding: 24px;
+}
+
+.sidebar {
+  width: 340px;
+}
+
+.sidebar .sidebar-nav {
+  padding: 0 24px 0 24px;
+}
+
+.sidebar-nav p {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.sidebar-nav ul li a {
+  font-size: 20px;
+}
+
+.sidebar-toggle {
+  padding: 10px;
+  border: 0;
+  outline: none;
+  bottom: 1000px;
+  position: absolute;
+  top: 0;
+  left: 350px;
+  text-align: center;
+  transition: opacity .3s;
+  width: 50px;
+}
+
+.sidebar-toggle .sidebar-toggle-button:hover {
+  opacity: .4;
+}
+
+.sidebar-toggle span {
+  display: block;
+  margin-bottom: 4px;
+  width: 16px;
+  height: 2px
+}
+
+body.sticky .sidebar,
+body.sticky .sidebar-toggle {
+  position: fixed;
+  transition: transform .25s ease;
+}
+
+body.close .sidebar {
+  transform: translateX(-340px)
+}
+
+body.close .sidebar-toggle {
+  transform: translateX(-340px);
+  transition: transform .25s ease;
+  width: 50px;
+}
