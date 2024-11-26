@@ -29,6 +29,7 @@
         flat class='btn full-width vertical-menus-margin' no-caps
         @click='onSaveClick'
         v-if='!network.preset'
+        :disable='!network.faucetUrl || !network.host || !network.name || !network.port || !network.rpcSchema || !network.wsSchema'
       >
         {{ $t('MSG_SAVE') }}
       </q-btn>
