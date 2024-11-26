@@ -3,11 +3,11 @@
     <div class='page-x-padding'>
       <AccountDetailAvatarView v-if='owner' :owner='owner' :editable='true' />
       <div class='text-center vertical-sections-margin'>
-        <QrcodeVue :value='owner.owner' :size='160' />
+        <QrcodeVue :value='owner.address' :size='160' />
       </div>
       <div class='row bg-red-1 tip vertical-sections-margin flex justify-center items-center cursor-pointer'>
         <div class='word-break-all' :style='{width: "calc(100% - 16px)"}'>
-          0x{{ owner.owner }}
+          0x{{ owner.address }}
         </div>
         <q-icon name='bi-copy' size='16px' />
       </div>
