@@ -141,6 +141,7 @@ const onSynchronizeMicrochainsClick = () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await dbMicrochainBridge.value?.createMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, chains.default === microchain)
     }
+    await loadMicrochains()
     localStore.notification.pushNotification({
       Title: t('MSG_SYNCHRONIZE_MICROCHAINS'),
       Message: t('MSG_SUCCESS_SYNCHRONIZE_MICROCHAINS'),
