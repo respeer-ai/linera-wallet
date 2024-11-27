@@ -24,8 +24,11 @@
       <div v-if='step === 2' class='full-height'>
         <ProcessingView :processing='processing' />
       </div>
+      <div v-if='step === 3' class='full-height'>
+        <div>Executing {{ popupOperation }}</div>
+      </div>
     </div>
-    <div v-if='step < 3 && step !== 2' class='page-x-padding'>
+    <div v-if='step < 4 && step !== 2' class='page-x-padding'>
       <q-btn
         flat
         rounded
@@ -56,7 +59,7 @@ import { localStore } from 'src/localstores'
 import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
-import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey } from '../../../../src-bex/middleware/types'
+import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey, LineraOperation } from '../../../../src-bex/middleware/types'
 
 import DbRpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 import CheckboxView from '../CheckboxView.vue'
@@ -77,6 +80,7 @@ const operation = computed(() => lineraGraphqlMutationOperation(request.value.re
 const graphqlQuery = computed(() => lineraGraphqlQuery(request.value.request).query)
 const graphqlVariables = computed(() => lineraGraphqlQuery(request.value.request).variables)
 const publicKey = ref(lineraGraphqlQueryPublicKey(request.value.request))
+const popupOperation = computed(() => localStore.popup._popupPrivData as LineraOperation)
 const microchain = ref(undefined as unknown as string)
 const processing = ref(false)
 
@@ -99,32 +103,33 @@ const createRpcAuth = async () => {
     )
     localStore.popup.removeRequest(localStore.popup.popupRequestId)
     void _respond?.({
-      approved: true
-    } as commontypes.ConfirmationPopupResponse)
+      code: 0
+    } as commontypes.PopupResponse)
   } catch (e) {
     void _respond?.({
-      approved: false,
+      code: 0,
       message: (e as Error).message
-    } as commontypes.ConfirmationPopupResponse)
+    } as commontypes.PopupResponse)
   }
 }
 
-const onNextStepClick = () => {
+const onNextStepClick = async () => {
   step.value += 1
   if (step.value === 2) {
     processing.value = true
+    await createRpcAuth()
     window.setTimeout(() => {
       processing.value = false
-      void createRpcAuth()
+      step.value += 1
     }, 2000)
   }
 }
 
 const onCancelClick = () => {
   void respond.value?.({
-    approved: false,
+    code: -1,
     message: 'Canceled by user'
-  } as commontypes.ConfirmationPopupResponse)
+  } as commontypes.PopupResponse)
   localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
@@ -164,7 +169,8 @@ onMounted(async () => {
 watch(step, () => {
   switch (step.value) {
     case 1: title.value = 'Permissions'; return
-    case 2: title.value = 'Authenticating'
+    case 2: title.value = 'Authenticating'; return
+    case 3: title.value = 'Executing'
   }
 })
 

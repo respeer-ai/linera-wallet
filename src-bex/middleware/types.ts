@@ -47,7 +47,8 @@ export type MiddlewareImplHandler = (
 export type MiddlewareInterceptorHandler = (req: RpcRequest) => Promise<void>
 
 export enum PopupRequestType {
-  CONFIRMATION = 'confirmation'
+  CONFIRMATION = 'confirmation',
+  EXECUTION = 'execution'
 }
 
 export interface OriginRpcAuth {
@@ -70,6 +71,11 @@ export interface RpcGraphqlQuery {
   publicKey?: string
   applicationId?: string
   query: GraphqlQuery
+}
+
+export interface LineraOperation {
+  operationId: string
+  operation?: string
 }
 
 export const lineraGraphqlQueryApplicationId = (request: RpcRequest) => {

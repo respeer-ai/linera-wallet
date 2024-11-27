@@ -69,9 +69,9 @@ const confirmationWithExistPopup = (
       })
       .then(
         (
-          payload: BexPayload<commontypes.ConfirmationPopupResponse, unknown>
+          payload: BexPayload<commontypes.PopupResponse, unknown>
         ) => {
-          if (!payload.data.approved) {
+          if (payload.data.code !== 0) {
             return reject(new Error(payload.data.message))
           }
           resolve(payload.data.message)

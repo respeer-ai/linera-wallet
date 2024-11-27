@@ -1,6 +1,7 @@
 import { BexBridge, BexPayload } from '@quasar/app-vite'
 import { confirmation, rpc, rpcPreInterceptor, types } from '../middleware'
 import {
+  PopupRequestType,
   RpcGraphqlQuery,
   RpcMethod,
   RpcMethods,
@@ -89,6 +90,18 @@ export class Engine {
               rpc
                 .rpcHandler(req)
                 .then((res) => {
+                  if (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method) {
+                    basebridge.EventBus.bridge?.send('popup.update', {
+                      type: PopupRequestType.EXECUTION,
+                      request: req,
+                      privData: res
+                    }).then(() => {
+                      resolve(res)
+                    }).catch((e: Error) => {
+                      reject(e)
+                    })
+                    return
+                  }
                   resolve(res)
                 })
                 .catch((e: Error) => {

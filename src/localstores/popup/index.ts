@@ -11,7 +11,8 @@ export const usePopupStore = defineStore('popups', {
     popupType: middlewaretypes.PopupRequestType.CONFIRMATION,
     popupOrigin: '',
     popupRequest: middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS,
-    popupRequestId: 0
+    popupRequestId: 0,
+    popupPrivData: undefined as unknown
   }),
   getters: {
     requestIds(): Array<number> {
@@ -45,6 +46,9 @@ export const usePopupStore = defineStore('popups', {
         unknown
       >
       return popup?.respond
+    },
+    _popupPrivData(): unknown {
+      return this.popupPrivData
     }
   },
   actions: {
@@ -54,6 +58,13 @@ export const usePopupStore = defineStore('popups', {
         .method as middlewaretypes.RpcMethod
       this.popupRequestId = Number(payload.data.request.request.id)
       this.popups.set(Number(payload.data.request.request.id), payload)
+    },
+    updateRequest(payload: BexPayload<commontypes.PopupRequest, unknown>, privData?: unknown) {
+      if (this.popupRequestId !== Number(payload.data.request.request.id)) {
+        return
+      }
+      this.popups.set(Number(payload.data.request.request.id), payload)
+      this.popupPrivData = privData
     },
     removeRequest(requestId: number) {
       this.popups.delete(requestId)

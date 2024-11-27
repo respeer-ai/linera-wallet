@@ -114,7 +114,7 @@ const queryApplicationMutation = async (
     state: db.OperationState.CREATED
   } as db.ChainOperation)
 
-  return operationId
+  return { operationId }
 }
 
 const parseSystemMutation = async (
@@ -126,8 +126,11 @@ const parseSystemMutation = async (
     query.query.query,
     JSON.stringify(query.query.variables)
   )) as string
+
+  const operationId = uuidv4()
+
   await sharedStore.createChainOperation({
-    operationId: uuidv4(),
+    operationId,
     microchain,
     operationType: db.OperationType.ANONYMOUS,
     applicationId: query.applicationId,
@@ -137,7 +140,8 @@ const parseSystemMutation = async (
     graphqlVariables: JSON.stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
-  return operation
+
+  return { operationId, operation }
 }
 
 const mutationDo = async (microchain: string, query: RpcGraphqlQuery) => {

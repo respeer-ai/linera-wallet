@@ -96,9 +96,9 @@ const signResponse = async () => {
   setTimeout(() => {
     processing.value = false
     void respond.value?.({
-      approved: true,
+      code: 0,
       message: signature
-    } as commontypes.ConfirmationPopupResponse)
+    } as commontypes.PopupResponse)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
     localStore.popup.removeRequest(localStore.popup.popupRequestId)
@@ -118,9 +118,9 @@ const onNextStepClick = () => {
 
 const onCancelClick = () => {
   void respond.value?.({
-    approved: false,
+    code: -1,
     message: 'Canceled by user'
-  } as commontypes.ConfirmationPopupResponse)
+  } as commontypes.PopupResponse)
   localStore.popup.removeRequest(localStore.popup.popupRequestId)
 }
 
