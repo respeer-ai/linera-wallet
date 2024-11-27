@@ -135,7 +135,7 @@ const createRpcAuth = async () => {
 const checkOperationState = async (): Promise<{ operation: db.ChainOperation | undefined, executed: boolean }> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    dbChainOperationBridge.value?.getChainOperation(popupOperation.value.operationId).then((operation: db.ChainOperation | undefined) => {
+    dbChainOperationBridge.value?.getChainOperation(popupOperation.value?.operationId).then((operation: db.ChainOperation | undefined) => {
       if (!operation) {
         return resolve({ operation, executed: false })
       }
@@ -152,8 +152,8 @@ const checkOperationState = async (): Promise<{ operation: db.ChainOperation | u
 
 const checkOperation = () => {
   const _respond = respond.value
-  checkOperationState().then(({ executed }) => {
-    if (executed) {
+  checkOperationState().then(({ operation, executed }) => {
+    if (!operation || executed) {
       processing.value = false
       return
     }
