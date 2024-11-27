@@ -32,6 +32,7 @@
     </q-footer>
     <BlockView />
     <StoreLoader />
+    <PopupListener />
   </q-layout>
 </template>
 
@@ -47,6 +48,7 @@ import MainHeaderView from 'src/components/header/MainHeaderView.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
 import BlockView from 'src/components/block/BlockView.vue'
 import StoreLoader from 'src/components/loader/StoreLoader.vue'
+import PopupListener from 'src/pages/extension/PopupListener.vue'
 
 const showFooterMenu = computed(() => localStore.setting.showFooterMenu)
 const showHeaderMenu = computed(() => localStore.setting.showHeaderMenu)

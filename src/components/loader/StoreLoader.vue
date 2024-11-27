@@ -41,14 +41,18 @@ onMounted(async () => {
     if (password) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       const timeout = await loginTimestampBridge.value?.loginTimeout()
+      const targetPath = route.path === basePath
+        ? localStore.setting.formalizePath('/home')
+        : localStore.setting.formalizePath(route.path)
       if (timeout) {
-        return void router.push({ path: localStore.setting.formalizePath('/recovery') })
+        return void router.push({
+          path: localStore.setting.formalizePath('/recovery'),
+          query: {
+            target: targetPath
+          }
+        })
       }
-      return void router.push({
-        path: route.path === basePath
-          ? localStore.setting.formalizePath('/home')
-          : localStore.setting.formalizePath(route.path)
-      })
+      return void router.push({ path: targetPath })
     }
     void router.push({ path: localStore.setting.formalizePath('/onboarding') })
   }).catch(() => {

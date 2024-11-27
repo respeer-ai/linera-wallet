@@ -316,5 +316,6 @@ export default {
   MSG_FAILED_VERIFY_PASSWORD: 'Failed verify password.',
   MSG_MINT_TOKEN: 'Mint token',
   MSG_SUCCESS_MINT_TOKEN: 'Success mint token.',
-  MSG_FAILED_MINT_TOKEN: 'Failed mint token: { ERROR }'
+  MSG_FAILED_MINT_TOKEN: 'Failed mint token: { ERROR }',
+  MSG_ONLY_APPROVE_TRUSTED_APPLICATIONS: 'Only approve trusted applications'
 }
