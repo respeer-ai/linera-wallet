@@ -83,6 +83,13 @@ const createMicrochain = async (): Promise<db.Microchain> => {
       erc20ApplicationOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
       // Subscribe creation chain will be done when next block is signed
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+      namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.AMS)) as db.NamedApplication
+      if (!namedApplication) return
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.AMS)
+      // Subscribe creation chain will be done when next block is signed
+
       resolve(microchain)
     }).catch((error) => {
       console.log(error)

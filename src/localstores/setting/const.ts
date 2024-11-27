@@ -27,6 +27,13 @@ export const SettingMenus = [
     label: 'WTLinera',
     menu: Menu.WLINERA,
     disable: false,
+    separator: false
+  },
+  {
+    icon: 'bi-box-seam',
+    label: 'AMS',
+    menu: Menu.AMS,
+    disable: false,
     separator: true
   },
   {

@@ -320,5 +320,7 @@ export default {
   MSG_ONLY_APPROVE_TRUSTED_APPLICATIONS: 'Only approve trusted applications',
   MSG_GENESIS: 'Genesis',
   MSG_ADMIN_CHAIN: 'Admin chain',
-  MSG_VALIDATORS: 'Validators'
+  MSG_VALIDATORS: 'Validators',
+  MSG_APPLICATION_MANAGEMENT_SERVICE: 'Application management service',
+  MSG_AMS_APPLICATION: 'AMS Application'
 }

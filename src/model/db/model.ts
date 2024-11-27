@@ -289,7 +289,8 @@ export enum ApplicationType {
   SWAP,
   WLINERA,
   ERC20,
-  ANONYMOUS
+  ANONYMOUS,
+  AMS
 }
 
 export interface NamedApplication {
@@ -316,6 +317,14 @@ export const defaultNamedApplications = [
       '7f5f35725a130873e8d8a3aa1e1c596e9bd2482961ac6046564b7670449630fa98886d18b99722f4e4c74ee7e9ee53defea69f1f7b62f63933c38b745c30b0d1717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3010000000000000000000000',
     creatorChain:
       '717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3'
+  },
+  {
+    applicationType: ApplicationType.AMS,
+    name: 'ams',
+    applicationId:
+      '8f5f35725a130873e8d8a3aa1e1c596e9bd2482961ac6046564b7670449630fa98886d18b99722f4e4c74ee7e9ee53defea69f1f7b62f63933c38b745c30b0d1717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3010000000000000000000000',
+    creatorChain:
+      '817b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3'
   }
 ] as NamedApplication[]
 

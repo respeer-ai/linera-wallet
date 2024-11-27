@@ -5,6 +5,7 @@ export enum Menu {
   GENESIS = 'Genesis',
   SWAP = 'Swap',
   WLINERA = 'WLinera',
+  AMS = 'AMS',
   ABOUT_US = 'AboutUs',
   STORAGE = 'Storage',
   ACCOUNTS = 'Accounts',

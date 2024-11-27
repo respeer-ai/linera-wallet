@@ -519,7 +519,7 @@ const _handleOperations = async () => {
             operation.state = db.OperationState.POST_PROCESSED
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await dbChainOperationBridge.value?.updateChainOperation(operation)
-          } else if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.SWAP) {
+          } else if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.SWAP || operation.applicationType === db.ApplicationType.AMS) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)
             operation.state = db.OperationState.POST_PROCESSED

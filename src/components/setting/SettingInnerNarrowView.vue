@@ -12,6 +12,9 @@
     <q-tab-panel :name='localStore.settingDef.Menu.WLINERA'>
       <WLineraSettingView />
     </q-tab-panel>
+    <q-tab-panel :name='localStore.settingDef.Menu.AMS'>
+      <AMSSettingView />
+    </q-tab-panel>
     <q-tab-panel :name='localStore.settingDef.Menu.ABOUT_US'>
       <AboutUsView />
     </q-tab-panel>
@@ -39,6 +42,7 @@ import AddressesBook from './AddressesBook.vue'
 import SwapSettingView from './SwapSettingView.vue'
 import WLineraSettingView from './WLineraSettingView.vue'
 import GenesisInfoView from './GenesisInfoView.vue'
+import AMSSettingView from './AMSSettingView.vue'
 
 const accountsView = ref<InstanceType<typeof AccountsView>>()
 const networkSettingView = ref<InstanceType<typeof NetworkSettingNarrowView>>()
