@@ -1,3 +1,7 @@
+<template>
+  <!--You must keep it here, or vite will be error -->
+  <div />
+</template>
 <script setup lang='ts'>
 import { useQuasar } from 'quasar'
 import { onMounted, onUnmounted } from 'vue'
