@@ -308,7 +308,7 @@ export const TRANSFER = gql`
 `
 
 export const REQUEST_APPLICATION = gql`
-  mutation requestApplication($chainId: ChainId!, $applicationId: ApplicationId!) {
-    requestApplication(chainId: $chainId, applicationId: $applicationId)
+  mutation requestApplication($chainId: ChainId!, $applicationId: ApplicationId!, $targetChainId: ChainId!) {
+    requestApplication(chainId: $chainId, applicationId: $applicationId, targetChainId: $targetChainId)
   }
 `

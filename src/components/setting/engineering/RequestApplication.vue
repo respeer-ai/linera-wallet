@@ -44,8 +44,9 @@ const onRun = async () => {
         query: {
           query: REQUEST_APPLICATION.loc?.source?.body,
           variables: {
-            chainId: creationChainId,
-            applicationId
+            chainId: state.chainId.replace('0x', ''),
+            applicationId,
+            targetChainId: creationChainId
           }
         },
         operationName: 'requestApplication'

@@ -23,6 +23,7 @@ impl MutationRoot {
 
     async fn transfer(
         &self,
+        _chain_id: ChainId,
         owner: Option<Owner>,
         recipient: Recipient,
         amount: Amount,
@@ -32,14 +33,16 @@ impl MutationRoot {
 
     async fn request_application(
         &self,
-        chain_id: ChainId,
+        _chain_id: ChainId,
         application_id: ApplicationId,
+        target_chain_id: ChainId,
     ) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::RequestApplication { chain_id, application_id }))
+        Ok(Operation::System(SystemOperation::RequestApplication { chain_id: target_chain_id, application_id }))
     }
 
     async fn create_application(
         &self,
+        _chain_id: ChainId,
         bytecode_id: BytecodeId,
         parameters: String,
         instantiation_argument: String,
