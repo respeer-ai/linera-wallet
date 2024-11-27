@@ -90,7 +90,7 @@ export class Engine {
               rpc
                 .rpcHandler(req)
                 .then((res) => {
-                  if (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method) {
+                  if (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method && !req.silent) {
                     basebridge.EventBus.bridge?.send('popup.update', {
                       type: PopupRequestType.EXECUTION,
                       request: req,

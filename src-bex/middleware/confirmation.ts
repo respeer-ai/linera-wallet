@@ -87,6 +87,7 @@ export const confirmationHandler = async (
   req: RpcRequest
 ): Promise<string | undefined> => {
   if (!(await needConfirm(req))) {
+    req.silent = true
     return await Promise.resolve(undefined)
   }
 

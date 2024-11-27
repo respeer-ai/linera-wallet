@@ -38,6 +38,7 @@ export interface RpcRequest {
   name: string
   favicon: string
   request: JsonRpcRequest<JsonRpcParams>
+  silent?: boolean
 }
 
 export type MiddlewareImplHandler = (
