@@ -67,16 +67,12 @@ const confirmationWithExistPopup = (
         type: PopupRequestType.CONFIRMATION,
         request: req
       })
-      .then(
-        (
-          payload: BexPayload<commontypes.PopupResponse, unknown>
-        ) => {
-          if (payload.data.code !== 0) {
-            return reject(new Error(payload.data.message))
-          }
-          resolve(payload.data.message)
+      .then((payload: BexPayload<commontypes.PopupResponse, unknown>) => {
+        if (payload.data.code !== 0) {
+          return reject(new Error(payload.data.message))
         }
-      )
+        resolve(payload.data.message)
+      })
       .catch((e: Error) => {
         reject(e)
       })

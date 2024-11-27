@@ -46,26 +46,34 @@ export class BlockSigner {
     }
   }
 
-  static updateChainOperations = async (microchain: string, block: HashedCertificateValue) => {
-    const operations = await sharedStore.getChainOperations(microchain, block.hash as string, [
-      db.OperationState.CREATED,
-      db.OperationState.EXECUTING
-    ])
+  static updateChainOperations = async (
+    microchain: string,
+    block: HashedCertificateValue
+  ) => {
+    const operations = await sharedStore.getChainOperations(
+      microchain,
+      block.hash as string,
+      [db.OperationState.CREATED, db.OperationState.EXECUTING]
+    )
     for (const operation of operations) {
       operation.state = db.OperationState.CONFIRMED
       await dbWallet.chainOperations.update(operation.id, operation)
     }
   }
 
-  static updateActivities = async (microchain: string, block: HashedCertificateValue) => {
+  static updateActivities = async (
+    microchain: string,
+    block: HashedCertificateValue
+  ) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const nativeTokenId = (await sharedStore.nativeToken())?.id || 1
-    for (const bundle of block?.value?.executedBlock?.block?.incomingBundles || []) {
+    for (const bundle of block?.value?.executedBlock?.block?.incomingBundles ||
+      []) {
       const origin = bundle.origin as rpc.Origin
       for (const message of bundle.bundle.messages) {
         const _message = message.message as rpc.Message
         if (_message?.System?.Credit) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           await sharedStore.createActivity(
             microchain,
             nativeTokenId,
@@ -80,10 +88,15 @@ export class BlockSigner {
             message.grant as string
           )
         } else if (_message?.User) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          const token = await sharedStore.token(_message.User.application_id) as db.Token
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          const token = (await sharedStore.token(
+            _message.User.application_id
+          )) as db.Token
           const tokenId = token?.id || 2
-          const erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(`[${_message.User.bytes.toString()}]`)
+          const erc20MessageStr =
+            await lineraWasm.bcs_deserialize_erc20_message(
+              `[${_message.User.bytes.toString()}]`
+            )
           // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
@@ -106,17 +119,24 @@ export class BlockSigner {
         }
       }
     }
-    for (const operation of block?.value?.executedBlock?.block.operations || []) {
+    for (const operation of block?.value?.executedBlock?.block.operations ||
+      []) {
       const _operation = operation as rpc.Operation
       if (_operation.System?.Transfer) {
         let grant = undefined as unknown as string | undefined
-        for (const messages of block?.value?.executedBlock?.outcome?.messages || []) {
+        for (const messages of block?.value?.executedBlock?.outcome?.messages ||
+          []) {
           grant = messages.find((el) => {
             const destination = el.destination as rpc.Destination
             const message = el.message as rpc.Message
-            return destination?.Recipient === _operation.System?.Transfer.recipient.Account?.chain_id &&
-                     message?.System?.Credit?.source === _operation.System?.Transfer.owner &&
-                     message?.System?.Credit?.target === _operation?.System.Transfer.recipient?.Account?.owner
+            return (
+              destination?.Recipient ===
+                _operation.System?.Transfer.recipient.Account?.chain_id &&
+              message?.System?.Credit?.source ===
+                _operation.System?.Transfer.owner &&
+              message?.System?.Credit?.target ===
+                _operation?.System.Transfer.recipient?.Account?.owner
+            )
           })?.grant as string
           if (grant?.length) break
         }
@@ -144,10 +164,7 @@ export class BlockSigner {
     ).notifications as Record<string, unknown>
     const microchain = notifications.chain_id as string
     const reason = graphqlResult.keyValue(notifications, 'reason')
-    const newBlock = graphqlResult.keyValue(
-      reason,
-      'NewBlock'
-    )
+    const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
     if (newBlock) {
       const hash = graphqlResult.keyValue(newBlock, 'hash') as string
       const blockQuery = {
@@ -160,7 +177,10 @@ export class BlockSigner {
           }
         }
       } as RpcGraphqlQuery
-      const block = await queryApplication(microchain, blockQuery) as HashedCertificateValue
+      const block = (await queryApplication(
+        microchain,
+        blockQuery
+      )) as HashedCertificateValue
       await BlockSigner.updateChainOperations(microchain, block)
       await BlockSigner.updateActivities(microchain, block)
     }
@@ -352,7 +372,7 @@ export class BlockSigner {
   static async processNewIncomingMessageWithOperation(
     microchain: string,
     operation?: rpc.Operation
-  ): Promise<{ certificateHash: string, isRetryBlock: boolean }> {
+  ): Promise<{ certificateHash: string; isRetryBlock: boolean }> {
     const blockMaterial = await BlockSigner.getBlockMaterial(microchain)
     const executedBlockMaterial =
       await BlockSigner.executeBlockWithFullMaterials(
@@ -405,10 +425,11 @@ export class BlockSigner {
   }
 
   static async processOperations() {
-    const operations = await sharedStore.getChainOperations(undefined, undefined, [
-      db.OperationState.CREATED,
-      db.OperationState.EXECUTING
-    ])
+    const operations = await sharedStore.getChainOperations(
+      undefined,
+      undefined,
+      [db.OperationState.CREATED, db.OperationState.EXECUTING]
+    )
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
       const _operation = JSON.parse(operation.operation) as rpc.Operation

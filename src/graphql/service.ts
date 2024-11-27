@@ -302,13 +302,31 @@ export const TRANSFER_WITHOUT_BLOCK_PROPOSAL = gql`
 `
 
 export const TRANSFER = gql`
-  mutation transfer($chainId: ChainId!, $owner: Owner, $recipient: Recipient!, $amount: Amount!) {
-    transfer(chainId: $chainId, owner: $owner, recipient: $recipient, amount: $amount)
+  mutation transfer(
+    $chainId: ChainId!
+    $owner: Owner
+    $recipient: Recipient!
+    $amount: Amount!
+  ) {
+    transfer(
+      chainId: $chainId
+      owner: $owner
+      recipient: $recipient
+      amount: $amount
+    )
   }
 `
 
 export const REQUEST_APPLICATION = gql`
-  mutation requestApplication($chainId: ChainId!, $applicationId: ApplicationId!, $targetChainId: ChainId!) {
-    requestApplication(chainId: $chainId, applicationId: $applicationId, targetChainId: $targetChainId)
+  mutation requestApplication(
+    $chainId: ChainId!
+    $applicationId: ApplicationId!
+    $targetChainId: ChainId!
+  ) {
+    requestApplication(
+      chainId: $chainId
+      applicationId: $applicationId
+      targetChainId: $targetChainId
+    )
   }
 `

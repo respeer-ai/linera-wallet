@@ -113,7 +113,11 @@ export const createChainOperation = async (operation: db.ChainOperation) => {
   await dbWallet.chainOperations.add(operation)
 }
 
-export const getChainOperations = async (microchain: string | undefined, certificateHash: string | undefined, states: db.OperationState[]) => {
+export const getChainOperations = async (
+  microchain: string | undefined,
+  certificateHash: string | undefined,
+  states: db.OperationState[]
+) => {
   let query = dbWallet.chainOperations.where('state').anyOf(states)
   if (microchain) {
     query = query.and((op) => op.microchain === microchain)
@@ -133,7 +137,9 @@ export const nativeToken = async () => {
 }
 
 export const token = async (applicationId: string) => {
-  return (await dbBase.tokens.toArray()).find((el) => el.applicationId === applicationId)
+  return (await dbBase.tokens.toArray()).find(
+    (el) => el.applicationId === applicationId
+  )
 }
 
 export const createActivity = async (
@@ -150,13 +156,15 @@ export const createActivity = async (
   grant: string
 ): Promise<db.Activity> => {
   const exist = (await dbWallet.activities.toArray()).find((el) => {
-    return el.sourceChain === sourceChain &&
-    el.sourceAddress === sourceAddress &&
-    el.targetChain === targetChain &&
-    el.targetAddress === targetAddress &&
-    el.timestamp === timestamp &&
-    el.blockHeight === blockHeight &&
-    el.certificateHash === certificateHash
+    return (
+      el.sourceChain === sourceChain &&
+      el.sourceAddress === sourceAddress &&
+      el.targetChain === targetChain &&
+      el.targetAddress === targetAddress &&
+      el.timestamp === timestamp &&
+      el.blockHeight === blockHeight &&
+      el.certificateHash === certificateHash
+    )
   })
   if (exist) return exist
   const activity = {

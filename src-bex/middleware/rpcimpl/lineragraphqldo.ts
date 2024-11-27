@@ -82,7 +82,10 @@ export const queryApplication = async (
     return Promise.reject(new Error(JSON.stringify(errors)))
   }
   const data = graphqlResponseData(res, 'data') as Record<string, unknown>
-  const bytes = graphqlResponseKeyValue(data, operationName[0].toLowerCase() + operationName.slice(1))
+  const bytes = graphqlResponseKeyValue(
+    data,
+    operationName[0].toLowerCase() + operationName.slice(1)
+  )
   return bytes
 }
 
@@ -245,55 +248,58 @@ export const setupLineraSubscription = () => {
   const subscribed = new Map<string, unsubscribeFunc>()
 
   setInterval(() => {
-    sharedStore.getSubscriptionEndpoint().then((endpoint) => {
-      if (!endpoint?.length) return
-      if (subscriptionEndpoint !== endpoint) {
-        subscriptionEndpoint = endpoint
-        client = new SubscriptionClient(subscriptionEndpoint, {
-          reconnect: true,
-          lazy: true,
-          connectionCallback: (e) => {
-            if (e) {
-              console.log('Connection error', e)
+    sharedStore
+      .getSubscriptionEndpoint()
+      .then((endpoint) => {
+        if (!endpoint?.length) return
+        if (subscriptionEndpoint !== endpoint) {
+          subscriptionEndpoint = endpoint
+          client = new SubscriptionClient(subscriptionEndpoint, {
+            reconnect: true,
+            lazy: true,
+            connectionCallback: (e) => {
+              if (e) {
+                console.log('Connection error', e)
+              }
             }
-          }
-        })
-        subscribed.forEach((unsubscribe) => {
-          unsubscribe()
-        })
-        subscribed.clear()
-      }
-      sharedStore
-        .getMicrochains()
-        .then((microchains) => {
-          microchains.forEach((microchain) => {
-            if (subscribed.has(microchain)) return
-            const _subscribed = client
-              .request({
-                query: `subscription notifications($chainId: String!) {
+          })
+          subscribed.forEach((unsubscribe) => {
+            unsubscribe()
+          })
+          subscribed.clear()
+        }
+        sharedStore
+          .getMicrochains()
+          .then((microchains) => {
+            microchains.forEach((microchain) => {
+              if (subscribed.has(microchain)) return
+              const _subscribed = client
+                .request({
+                  query: `subscription notifications($chainId: String!) {
                   notifications(chainId: $chainId)
                 }`,
-                variables: {
-                  chainId: microchain
-                }
-              })
-              .subscribe({
-                next(data: unknown) {
-                  try {
-                    subscription.Subscription.handle(data)
-                  } catch (e) {
-                    console.log('Failed process data', e, data)
+                  variables: {
+                    chainId: microchain
                   }
-                }
-              })
-            subscribed.set(microchain, _subscribed.unsubscribe)
+                })
+                .subscribe({
+                  next(data: unknown) {
+                    try {
+                      subscription.Subscription.handle(data)
+                    } catch (e) {
+                      console.log('Failed process data', e, data)
+                    }
+                  }
+                })
+              subscribed.set(microchain, _subscribed.unsubscribe)
+            })
           })
-        })
-        .catch((e) => {
-          console.log('Failed get microchains', e)
-        })
-    }).catch((e) => {
-      console.log('Failed get subscription endpoint', e)
-    })
+          .catch((e) => {
+            console.log('Failed get microchains', e)
+          })
+      })
+      .catch((e) => {
+        console.log('Failed get subscription endpoint', e)
+      })
   }, 1000)
 }

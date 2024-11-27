@@ -90,30 +90,42 @@ export class Engine {
               rpc
                 .rpcHandler(req)
                 .then((res) => {
-                  if (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method && !req.silent) {
-                    basebridge.EventBus.bridge?.send('popup.update', {
-                      type: PopupRequestType.EXECUTION,
-                      request: req,
-                      privData: res
-                    }).then(() => {
-                      resolve(res)
-                    }).catch((e: Error) => {
-                      reject(e)
-                    })
+                  if (
+                    RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method &&
+                    !req.silent
+                  ) {
+                    basebridge.EventBus.bridge
+                      ?.send('popup.update', {
+                        type: PopupRequestType.EXECUTION,
+                        request: req,
+                        privData: res
+                      })
+                      .then(() => {
+                        resolve(res)
+                      })
+                      .catch((e: Error) => {
+                        reject(e)
+                      })
                     return
                   }
                   resolve(res)
                 })
                 .catch((e: Error) => {
-                  if (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method && !req.silent) {
-                    basebridge.EventBus.bridge?.send('popup.update', {
-                      type: PopupRequestType.EXECUTION,
-                      request: req
-                    }).then(() => {
-                      reject(e)
-                    }).catch((e: Error) => {
-                      reject(e)
-                    })
+                  if (
+                    RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method &&
+                    !req.silent
+                  ) {
+                    basebridge.EventBus.bridge
+                      ?.send('popup.update', {
+                        type: PopupRequestType.EXECUTION,
+                        request: req
+                      })
+                      .then(() => {
+                        reject(e)
+                      })
+                      .catch((e: Error) => {
+                        reject(e)
+                      })
                     return
                   }
                   reject(e)
