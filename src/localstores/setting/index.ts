@@ -66,6 +66,9 @@ export const useSettingStore = defineStore('settings', {
     },
     microchainsImportState(): MicrochainsImportState {
       return this.MicrochainsImportState
+    },
+    _networkInfo(): unknown {
+      return this.NetworkInfo
     }
   },
   actions: {}

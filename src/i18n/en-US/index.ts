@@ -317,5 +317,8 @@ export default {
   MSG_MINT_TOKEN: 'Mint token',
   MSG_SUCCESS_MINT_TOKEN: 'Success mint token.',
   MSG_FAILED_MINT_TOKEN: 'Failed mint token: { ERROR }',
-  MSG_ONLY_APPROVE_TRUSTED_APPLICATIONS: 'Only approve trusted applications'
+  MSG_ONLY_APPROVE_TRUSTED_APPLICATIONS: 'Only approve trusted applications',
+  MSG_GENESIS: 'Genesis',
+  MSG_ADMIN_CHAIN: 'Admin chain',
+  MSG_VALIDATORS: 'Validators'
 }

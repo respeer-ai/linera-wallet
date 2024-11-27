@@ -34,7 +34,8 @@
       />
     </div>
   </q-card>
-  <NetworkBridge ref='networkBridge' v-model:networks='networks' />
+  <DbNetworkBridge ref='networkBridge' v-model:networks='networks' />
+  <RpcNetworkInfoBridge ref='rpcNetworkInfoBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -42,11 +43,13 @@ import { ref } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 
-import NetworkBridge from '../bridge/db/NetworkBridge.vue'
+import DbNetworkBridge from '../bridge/db/NetworkBridge.vue'
+import RpcNetworkInfoBridge from '../bridge/rpc/NetworkInfoBridge.vue'
 
 const networks = ref([] as db.Network[])
 
-const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
+const networkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
+const rpcNetworkInfoBridge = ref<InstanceType<typeof RpcNetworkInfoBridge>>()
 
 const network = defineModel<db.Network>()
 const emit = defineEmits<{(ev: 'selected', value: db.Network): void,
@@ -63,6 +66,8 @@ const onNetworkSelected = async (_network: db.Network) => {
   network.value = _network
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   await networkBridge.value?.updateNetwork(_network)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  localStore.setting.NetworkInfo = await rpcNetworkInfoBridge.value?.getNetworkInfo()
   emit('selected', _network)
 }
 

@@ -9,3 +9,21 @@ export const OPEN_CHAIN = gql`
     }
   }
 `
+
+export const NETWORK_INFO = gql`
+  query networkInfo {
+    genesisConfig
+    version {
+      crateVersion
+      gitCommit
+      gitDirty
+      rpcHash
+      graphqlHash
+      witHash
+    }
+    currentValidators {
+      name
+      networkAddress
+    }
+  }
+`

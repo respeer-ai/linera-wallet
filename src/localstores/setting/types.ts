@@ -2,6 +2,7 @@ import { MicrochainsImportState } from './const'
 
 export enum Menu {
   NETWORKS = 'Networks',
+  GENESIS = 'Genesis',
   SWAP = 'Swap',
   WLINERA = 'WLinera',
   ABOUT_US = 'AboutUs',
@@ -39,6 +40,8 @@ export interface Setting {
   InPopupContext: boolean
 
   MicrochainsImportState: MicrochainsImportState
+
+  NetworkInfo: unknown
 }
 
 export interface MenuItem {

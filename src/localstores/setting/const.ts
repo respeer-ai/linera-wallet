@@ -6,6 +6,13 @@ export const SettingMenus = [
     label: 'Networks',
     menu: Menu.NETWORKS,
     disable: false,
+    separator: false
+  },
+  {
+    icon: 'bi-plugin',
+    label: 'Genesis',
+    menu: Menu.GENESIS,
+    disable: false,
     separator: true
   },
   {

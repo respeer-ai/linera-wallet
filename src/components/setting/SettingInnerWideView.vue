@@ -3,6 +3,9 @@
     <q-tab-panel :name='localStore.settingDef.Menu.NETWORKS'>
       <NetworkSettingWideView />
     </q-tab-panel>
+    <q-tab-panel :name='localStore.settingDef.Menu.GENESIS'>
+      <GenesisInfoView />
+    </q-tab-panel>
     <q-tab-panel :name='localStore.settingDef.Menu.SWAP'>
       <SwapSettingView />
     </q-tab-panel>
@@ -39,6 +42,7 @@ import AddressesBook from './AddressesBook.vue'
 import EngineeringView from './EngineeringView.vue'
 import SwapSettingView from './SwapSettingView.vue'
 import WLineraSettingView from './WLineraSettingView.vue'
+import GenesisInfoView from './GenesisInfoView.vue'
 
 const accountsView = ref<InstanceType<typeof AccountsView>>()
 
