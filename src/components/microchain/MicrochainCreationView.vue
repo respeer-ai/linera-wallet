@@ -19,9 +19,12 @@
     <div class='word-break-all vertical-items-margin cursor-pointer'>
       {{ microchain.certificateHash }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(microchain.certificateHash, evt)' /></span>
     </div>
-    <div class='vertical-sections-margin tip warn'>
-      <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginBottom: "4px"}' /> <span v-html='$t("MSG_YOU_MUST_BACKUP_MICROCHAIN_MATERIALS")' />
-      <span class='text-blue-8 cursor-pointer' @click='onBackupClick'>{{ $t('MSG_BACKUP') }}</span>
+    <div class='row vertical-sections-margin tip warn'>
+      <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginTop: "4px"}' />
+      <div :style='{width: "calc(100% - 20px)"}' class='page-item-x-margin-left'>
+        <span v-html='$t("MSG_YOU_MUST_BACKUP_MICROCHAIN_MATERIALS")' />
+        <span class='text-blue-8 cursor-pointer page-item-x-margin-left' @click='onBackupClick'>{{ $t('MSG_BACKUP') }}</span>
+      </div>
     </div>
     <q-btn
       class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
