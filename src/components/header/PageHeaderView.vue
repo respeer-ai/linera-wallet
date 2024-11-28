@@ -40,7 +40,7 @@
           0x{{ shortid.shortId(selectedOwner?.address, 6) }}
         </div>
         <div class='header-items-margin-x-left cursor-pointer'>
-          <q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(selectedOwner?.address as string, evt)' />
+          <q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(selectedOwner?.address as string, evt)' />
         </div>
         <q-space />
       </div>

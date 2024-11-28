@@ -47,7 +47,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           {{ token.applicationId }}
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(token.applicationId as string, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(token.applicationId as string, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -118,7 +118,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           <a :href='token.github'>{{ token.github }}</a>
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(token.github as string, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(token.github as string, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -131,7 +131,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           <a :href='token.website'>{{ token.website }}</a>
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(token.website as string, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(token.website as string, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -144,7 +144,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           <a :href='token.telegram'>{{ token.telegram }}</a>
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(token.telegram as string, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(token.telegram as string, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -157,7 +157,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           <a :href='token.twitter'>{{ token.twitter }}</a>
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(token.twitter as string, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(token.twitter as string, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -170,7 +170,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           <a :href='token.discord'>{{ token.discord }}</a>
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(token.discord as string, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(token.discord as string, evt)' />
       </div>
     </div>
   </div>

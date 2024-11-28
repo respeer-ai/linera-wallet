@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class='[localStore.setting.extensionMode ? "setting-item-inner-padding" : ""]'>
     <div class='row setting-header'>
       <div class='flex items-center justify-center'>
         <q-icon name='bi-plugin' size='16px' />
@@ -11,19 +11,19 @@
     <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
       {{ $t('MSG_ADMIN_CHAIN') }}
     </div>
-    <p class='vertical-items-margin text-grey-6'>
+    <p class='vertical-items-margin text-grey-6 word-break-all'>
       {{ networkInfo?.genesisConfig?.admin_id }}
     </p>
     <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
       {{ $t('MSG_VERSION') }}
     </div>
-    <p class='vertical-items-margin text-grey-6'>
+    <p class='vertical-items-margin text-grey-6 word-break-all'>
       {{ networkInfo?.version?.crateVersion }}
     </p>
     <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
       {{ $t('MSG_VALIDATORS') }}
     </div>
-    <div class='vertical-items-margin text-grey-6'>
+    <div class='vertical-items-margin text-grey-6 word-break-all'>
       <div v-for='validator in networkInfo?.currentValidators' :key='validator.name'>
         {{ validator.name }}
       </div>

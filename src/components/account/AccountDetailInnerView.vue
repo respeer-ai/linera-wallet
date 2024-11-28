@@ -9,7 +9,7 @@
         <div class='word-break-all' :style='{width: "calc(100% - 16px)"}'>
           0x{{ owner.address }}
         </div>
-        <q-icon name='bi-copy' size='16px' @click='(evt) => _copyToClipboard(owner.address, evt)' />
+        <q-icon name='bi-copy' size='16px' @click.stop='(evt) => _copyToClipboard(owner.address, evt)' />
       </div>
       <q-btn
         flat no-caps class='btn btn-alt full-width vertical-sections-margin'

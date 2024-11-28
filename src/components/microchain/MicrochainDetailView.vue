@@ -15,7 +15,7 @@
           0x{{ shortid.shortId(microchain.microchain, 10) }}
         </div>
         <div class='page-item-x-margin-left'>
-          <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click='(evt) => _copyToClipboard(microchain.microchain, evt)' />
+          <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click.stop='(evt) => _copyToClipboard(microchain.microchain, evt)' />
         </div>
       </div>
       <q-space />

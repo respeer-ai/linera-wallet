@@ -14,7 +14,7 @@
         <div class='word-break-all' :style='{width: "calc(100% - 16px)", padding: "8px"}'>
           {{ db.privateKey(owner, password) }}
         </div>
-        <q-icon name='bi-copy' size='16px' @click='(evt) => _copyToClipboard(db.privateKey(owner, password), evt)' />
+        <q-icon name='bi-copy' size='16px' @click.stop='(evt) => _copyToClipboard(db.privateKey(owner, password), evt)' />
       </div>
       <div class='row warn vertical-sections-margin private-key-warn'>
         <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />

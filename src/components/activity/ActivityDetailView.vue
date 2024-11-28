@@ -26,7 +26,7 @@
         {{ shortid.shortId(activity.certificateHash, 8) }}
       </div>
       <div class='page-item-x-margin-left'>
-        <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click='(evt) => _copyToClipboard(activity.certificateHash, evt)' />
+        <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click.stop='(evt) => _copyToClipboard(activity.certificateHash, evt)' />
       </div>
     </div>
     <q-separator class='vertical-menus-margin' />

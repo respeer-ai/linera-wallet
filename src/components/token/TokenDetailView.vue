@@ -15,7 +15,7 @@
           0x{{ shortid.shortId(token?.applicationId as string, 16) }}
         </div>
         <div class='page-item-x-margin-left'>
-          <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click='(evt) => _copyToClipboard(token.applicationId as string, evt)' />
+          <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click.stop='(evt) => _copyToClipboard(token.applicationId as string, evt)' />
         </div>
       </div>
       <q-space />
