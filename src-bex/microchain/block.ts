@@ -28,6 +28,7 @@ export class BlockSigner {
   static running = false
 
   static async onNewIncomingMessage(subscriptionId: string, data: unknown) {
+    if (!data || !graphqlResult.rootData(data)) return
     const notifications = (
       graphqlResult.rootData(data) as NotificationsSubscription
     ).notifications as Record<string, unknown>
@@ -159,6 +160,7 @@ export class BlockSigner {
   }
 
   static async onNewBlock(subscriptionId: string, data: unknown) {
+    if (!data || !graphqlResult.rootData(data)) return
     const notifications = (
       graphqlResult.rootData(data) as NotificationsSubscription
     ).notifications as Record<string, unknown>

@@ -50,7 +50,7 @@ export const authenticated = async (
         el.method === method &&
         (applicationId === undefined || el.applicationId === applicationId) &&
         (operation === undefined || el.operation === operation) &&
-        el.expiredAt > Date.now()
+        el.expiredAt > Date.now() + 24 * 3600 * 1000
     ) >= 0
   )
 }
