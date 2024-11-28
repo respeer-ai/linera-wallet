@@ -251,9 +251,17 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   const block = await rpcBlockBridge.value?.getBlockWithHash(microchain.microchain, hash) as HashedCertificateValue
 
   if (window.location.origin.startsWith('http')) {
-    await parseActivities(microchain, block)
+    try {
+      await parseActivities(microchain, block)
+    } catch (e) {
+      console.log('Failed parse activities', e)
+    }
   }
-  await updateChainOperations(microchain, block)
+  try {
+    await updateChainOperations(microchain, block)
+  } catch (e) {
+    console.log('Failed update chain operations', e)
+  }
 
   // Here we don't care about the result. If ticker run think they need to run again when fail, they should append themselves again
   const tickerRuns = localStore.operation.tickerRuns
