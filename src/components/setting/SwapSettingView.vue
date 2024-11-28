@@ -113,9 +113,21 @@ const onRefresh = async () => {
         rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
       }
     }
-  } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Failed refresh swap application: ${error}`)
+
+    localStore.notification.pushNotification({
+      Title: 'Refresh Swap application',
+      Message: 'Success refresh swap application.',
+      Popup: true,
+      Type: localStore.notify.NotifyType.Info
+    })
+  } catch (e) {
+    localStore.notification.pushNotification({
+      Title: 'Refresh Swap application',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Failed refresh swap application: ${e}.`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
   }
 }
 

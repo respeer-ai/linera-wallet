@@ -113,9 +113,21 @@ const onRefresh = async () => {
         rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
       }
     }
-  } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Failed refresh ams application: ${error}`)
+
+    localStore.notification.pushNotification({
+      Title: 'Refresh AMS application',
+      Message: 'Success refresh ams application.',
+      Popup: true,
+      Type: localStore.notify.NotifyType.Info
+    })
+  } catch (e) {
+    localStore.notification.pushNotification({
+      Title: 'Refresh AMS application',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Failed refresh ams application: ${e}.`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
   }
 }
 

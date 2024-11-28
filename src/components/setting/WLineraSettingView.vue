@@ -115,9 +115,21 @@ const onRefresh = async () => {
         rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
       }
     }
-  } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Failed refresh wlinera application: ${error}`)
+
+    localStore.notification.pushNotification({
+      Title: 'Refresh WLinera application',
+      Message: 'Success refresh wlinera application.',
+      Popup: true,
+      Type: localStore.notify.NotifyType.Info
+    })
+  } catch (e) {
+    localStore.notification.pushNotification({
+      Title: 'Refresh WLinera application',
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      Message: `Failed refresh wlinera application: ${e}.`,
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
   }
 }
 
