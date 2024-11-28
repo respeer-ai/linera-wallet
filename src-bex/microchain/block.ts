@@ -413,17 +413,26 @@ export class BlockSigner {
 
     const _executedBlock = BlockSigner.formalizeExecutedBlock(executedBlock)
 
-    const certificateHash = await BlockSigner.submitBlockAndSignature(
-      microchain,
-      executedBlock.block.height as number,
-      _executedBlock,
-      blockMaterial.round as rpc.Round,
-      signature,
-      isRetryBlock,
-      validatedBlockCertificateHash
-    )
+    try {
+      const certificateHash = await BlockSigner.submitBlockAndSignature(
+        microchain,
+        executedBlock.block.height as number,
+        _executedBlock,
+        blockMaterial.round as rpc.Round,
+        signature,
+        isRetryBlock,
+        validatedBlockCertificateHash
+      )
 
-    return { certificateHash, isRetryBlock }
+      return { certificateHash, isRetryBlock }
+    } catch (e) {
+      if (blockMaterial.incomingBundles.length > 0) {
+        setTimeout(() => {
+          void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+        }, 1000)
+      }
+      return { certificateHash: undefined as unknown as string, isRetryBlock: false }
+    }
   }
 
   static async processOperations() {

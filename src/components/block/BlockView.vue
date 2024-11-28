@@ -396,6 +396,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             void processNewIncomingBundle(microchain)
           }, 1000)
         }
+        reject(error)
       })
     }).catch((error) => {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
