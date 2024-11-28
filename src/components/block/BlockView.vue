@@ -512,36 +512,41 @@ const _handleOperations = async () => {
             await erc20ApplicationOperationBridge.value?.persistApplication(operation.microchain, _operation.User.application_id)
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-          await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, _operation.User.application_id)
-          operation.state = db.OperationState.POST_PROCESSED
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await dbChainOperationBridge.value?.updateChainOperation(operation)
+          if (await dbApplicationCreatorChainSubscriptionBridge.value?.createApplicationCreatorChainSubscription(operation.microchain, _operation.User.application_id)) {
+            operation.state = db.OperationState.POST_PROCESSED
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await dbChainOperationBridge.value?.updateChainOperation(operation)
+          }
           break
         case operationDef.OperationType.REQUEST_APPLICATION:
           if (operation.applicationType === db.ApplicationType.WLINERA) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)
-            operation.state = db.OperationState.POST_PROCESSED
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await dbChainOperationBridge.value?.updateChainOperation(operation)
+            if (await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(operation.microchain, true)) {
+              operation.state = db.OperationState.POST_PROCESSED
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              await dbChainOperationBridge.value?.updateChainOperation(operation)
+            }
           } else if (operation.applicationType === db.ApplicationType.ERC20) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)
-            operation.state = db.OperationState.POST_PROCESSED
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await dbChainOperationBridge.value?.updateChainOperation(operation)
+            if (await erc20ApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)) {
+              operation.state = db.OperationState.POST_PROCESSED
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              await dbChainOperationBridge.value?.updateChainOperation(operation)
+            }
           } else if (operation.applicationType === db.ApplicationType.SWAP) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await swapApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, true)
-            operation.state = db.OperationState.POST_PROCESSED
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await dbChainOperationBridge.value?.updateChainOperation(operation)
+            if (await swapApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, true)) {
+              operation.state = db.OperationState.POST_PROCESSED
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              await dbChainOperationBridge.value?.updateChainOperation(operation)
+            }
           } else if (operation.applicationType === db.ApplicationType.AMS) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await amsApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, true)
-            operation.state = db.OperationState.POST_PROCESSED
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await dbChainOperationBridge.value?.updateChainOperation(operation)
+            if (await amsApplicationOperationBridge.value?.subscribeCreationChain(operation.microchain, true)) {
+              operation.state = db.OperationState.POST_PROCESSED
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              await dbChainOperationBridge.value?.updateChainOperation(operation)
+            }
           }
           break
       }
