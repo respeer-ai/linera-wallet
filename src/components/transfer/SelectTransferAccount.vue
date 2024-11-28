@@ -137,7 +137,7 @@
   <div class='vertical-items-margin'>
     <q-input
       v-if='selectedToMicrochain === undefined' outlined v-model='toMicrochain' placeholder='Input microchain ID'
-      :disable='!selectedToOwner'
+      :disable='!selectedToOwner && !toAddress'
     >
       <template #append>
         <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToMicrochainClick'>
