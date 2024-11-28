@@ -18,7 +18,7 @@
             0x{{ shortid.shortId(owner.owner, 10) }}
           </div>
           <div class='page-item-x-margin-left'>
-            <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' />
+            <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click='(evt) => _copyToClipboard(owner.address, evt)' />
           </div>
         </div>
         <q-space />
@@ -58,6 +58,7 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'

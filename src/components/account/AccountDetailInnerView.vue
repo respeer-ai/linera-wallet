@@ -9,7 +9,7 @@
         <div class='word-break-all' :style='{width: "calc(100% - 16px)"}'>
           0x{{ owner.address }}
         </div>
-        <q-icon name='bi-copy' size='16px' />
+        <q-icon name='bi-copy' size='16px' @click='(evt) => _copyToClipboard(owner.address, evt)' />
       </div>
       <q-btn
         flat no-caps class='btn btn-alt full-width vertical-sections-margin'
@@ -27,6 +27,7 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import QrcodeVue from 'qrcode.vue'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'

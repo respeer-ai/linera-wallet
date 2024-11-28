@@ -5,19 +5,19 @@
       {{ $t('MSG_MICROCHAIN_ID') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
-      {{ microchain.microchain }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
+      {{ microchain.microchain }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(microchain.microchain, evt)' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
       {{ $t('MSG_CREATION_MESSAGE') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
-      {{ microchain.messageId }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
+      {{ microchain.messageId }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(microchain.messageId, evt)' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
       {{ $t('MSG_CREATION_CERTIFICATE') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
-      {{ microchain.certificateHash }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' /></span>
+      {{ microchain.certificateHash }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(microchain.certificateHash, evt)' /></span>
     </div>
     <div class='vertical-sections-margin tip warn'>
       <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginBottom: "4px"}' /> <span v-html='$t("MSG_YOU_MUST_BACKUP_MICROCHAIN_MATERIALS")' />
@@ -36,6 +36,7 @@
 import { copyToClipboard } from 'quasar'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
+import { _copyToClipboard } from 'src/utils/copycontent'
 import { toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

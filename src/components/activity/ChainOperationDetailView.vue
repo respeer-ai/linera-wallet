@@ -26,7 +26,7 @@
         {{ shortid.shortId(operation.certificateHash || '', 8) }}
       </div>
       <div class='page-item-x-margin-left'>
-        <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' />
+        <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click='(evt) => _copyToClipboard(operation.certificateHash as string, evt)' />
       </div>
     </div>
     <q-separator class='vertical-menus-margin' />
@@ -109,6 +109,7 @@ import { db, rpc } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { date } from 'quasar'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'

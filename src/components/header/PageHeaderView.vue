@@ -40,7 +40,7 @@
           0x{{ shortid.shortId(selectedOwner?.address, 6) }}
         </div>
         <div class='header-items-margin-x-left cursor-pointer'>
-          <q-icon name='bi-copy' size='12px' />
+          <q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(selectedOwner?.address as string, evt)' />
         </div>
         <q-space />
       </div>
@@ -126,6 +126,7 @@ import { ref } from 'vue'
 import { db } from 'src/model'
 import { shortid } from 'src/utils'
 import { localStore } from 'src/localstores'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'

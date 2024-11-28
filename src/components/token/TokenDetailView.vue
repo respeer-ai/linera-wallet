@@ -15,7 +15,7 @@
           0x{{ shortid.shortId(token?.applicationId as string, 16) }}
         </div>
         <div class='page-item-x-margin-left'>
-          <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' />
+          <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click='(evt) => _copyToClipboard(token.applicationId as string, evt)' />
         </div>
       </div>
       <q-space />
@@ -90,6 +90,7 @@ import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'

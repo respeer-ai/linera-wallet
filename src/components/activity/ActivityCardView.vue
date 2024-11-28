@@ -16,7 +16,7 @@
             0x{{ shortid.shortId(address, 8) }}
           </div>
           <div class='page-item-x-margin-left cursor-pointer'>
-            <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' />
+            <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' @click='(evt) => _copyToClipboard(address, evt)' />
           </div>
         </div>
         <div class='text-left label-text-small text-grey-6'>
@@ -42,6 +42,7 @@ import { db } from 'src/model'
 import { shortid } from 'src/utils'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'

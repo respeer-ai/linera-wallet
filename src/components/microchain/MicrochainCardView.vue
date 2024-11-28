@@ -13,7 +13,7 @@
           0x{{ shortid.shortId(microchain.microchain, 5) }}
         </div>
         <div class='page-item-x-margin-left cursor-pointer'>
-          <q-icon name='bi-copy' size='12px' />
+          <q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(microchain.microchain, evt)' />
         </div>
       </div>
       <div class='text-left' v-if='integratedMode'>
@@ -67,6 +67,7 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import DbMicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import DbMicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'

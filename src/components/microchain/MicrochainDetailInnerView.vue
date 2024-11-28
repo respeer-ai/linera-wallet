@@ -31,7 +31,7 @@
         <div class='word-break-all microchain-detail-value-text text-right'>
           {{ microchain.microchain }}
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(microchain.microchain, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -44,7 +44,7 @@
         <div class='microchain-detail-value-text  text-right'>
           {{ microchain.messageId }}
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(microchain.messageId, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -57,7 +57,7 @@
         <div class='microchain-detail-value-text text-right'>
           {{ microchain.certificateHash }}
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click='(evt) => _copyToClipboard(microchain.certificateHash, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -98,6 +98,7 @@
 import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'

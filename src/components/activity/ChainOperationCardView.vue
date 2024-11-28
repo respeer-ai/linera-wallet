@@ -16,7 +16,7 @@
             0x{{ shortid.shortId(operation.certificateHash || '', 8) }}
           </div>
           <div class='page-item-x-margin-left cursor-pointer'>
-            <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' />
+            <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' @click='(evt) => _copyToClipboard(operation.certificateHash as string, evt)' />
           </div>
         </div>
         <div class='text-left label-text-small text-grey-6'>
@@ -44,6 +44,7 @@
 import { db, rpc } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
+import { _copyToClipboard } from 'src/utils/copycontent'
 
 import { lineraLogo } from 'src/assets'
 
