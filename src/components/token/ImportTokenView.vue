@@ -69,7 +69,7 @@ const onImportClick = async () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (!await erc20ApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, applicationId.value, false)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChain, db.ApplicationType.WLINERA)
+        rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChain, db.ApplicationType.ERC20)
       }
     }
 
