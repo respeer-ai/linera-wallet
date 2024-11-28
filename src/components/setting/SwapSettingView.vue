@@ -80,10 +80,14 @@ const onSaveSwapApplicationId = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, false)) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        if (!await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, false)) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        }
+      } catch (e) {
+        console.log('Faled refresh swap application', e)
       }
     }
 
@@ -107,10 +111,14 @@ const onRefresh = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, true)) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        if (!await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, true)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          await rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        }
+      } catch (e) {
+        console.log('Faled refresh swap application', e)
       }
     }
 

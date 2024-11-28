@@ -80,10 +80,14 @@ const onSaveAMSApplicationId = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await amsApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, false)) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        if (!await amsApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, false)) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        }
+      } catch (e) {
+        console.log('Faled save ams application', e)
       }
     }
 
@@ -107,10 +111,14 @@ const onRefresh = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await amsApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, true)) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        if (!await amsApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, true)) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        }
+      } catch (e) {
+        console.log('Faled refresh ams application', e)
       }
     }
 

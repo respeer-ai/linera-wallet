@@ -89,10 +89,14 @@ const onSaveWlineraApplicationId = async () => {
     } as db.NamedApplication)
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, false)) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, false)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        }
+      } catch (e) {
+        console.log('Faled refresh swap application', e)
       }
     }
   } catch (error) {
@@ -109,10 +113,14 @@ const onRefresh = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, true)) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, true)) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        }
+      } catch (e) {
+        console.log('Faled refresh wlinera application', e)
       }
     }
 

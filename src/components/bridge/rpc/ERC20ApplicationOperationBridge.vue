@@ -38,9 +38,9 @@ const subscribeCreationChain = async (chainId: string, applicationId: string, fo
   return await monoApplicationOperationBridge.value?.subscribeCreationChainWithId(chainId, applicationId, db.ApplicationType.ERC20, force) || false
 }
 
-const requestApplication = (chainId: string, applicationId: string, creationChainId: string) => {
+const requestApplication = async (chainId: string, applicationId: string, creationChainId: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcOperationBridge.value?.requestApplication(chainId, applicationId, creationChainId, db.ApplicationType.ERC20)
+  await rpcOperationBridge.value?.requestApplication(chainId, applicationId, creationChainId, db.ApplicationType.ERC20)
 }
 
 const persistApplication = async (chainId: string, applicationId: string) => {

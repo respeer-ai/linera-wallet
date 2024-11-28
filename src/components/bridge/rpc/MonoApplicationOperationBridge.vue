@@ -22,7 +22,7 @@ const subscribeCreationChainWithId = async (chainId: string, applicationId: stri
   if (!applications) return false
   if (applications?.findIndex((el: ApplicationOverview) => el.id === applicationId) < 0) return false
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-  return await rpcApplicationOperationBridge.value?.subscribeCreatorChain(chainId, applicationId, applicationType, force) || false
+  return await rpcApplicationOperationBridge.value?.subscribeCreatorChain(chainId, applicationId, applicationType, force) === true
 }
 
 const subscribeCreationChainWithType = async (chainId: string, applicationType: db.ApplicationType, force?: boolean): Promise<boolean> => {

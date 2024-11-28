@@ -73,26 +73,25 @@ const createMicrochain = async (): Promise<db.Microchain> => {
       let namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.SWAP)
+      await rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.SWAP)
       // Subscribe creation chain will be done when next block is signed
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      erc20ApplicationOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain)
+      await rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.WLINERA)
       // Subscribe creation chain will be done when next block is signed
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       namedApplication = (await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.AMS)) as db.NamedApplication
       if (!namedApplication) return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.AMS)
+      await rpcOperationBridge.value?.requestApplication(microchain.microchain, namedApplication.applicationId, namedApplication.creatorChain, db.ApplicationType.AMS)
       // Subscribe creation chain will be done when next block is signed
 
       resolve(microchain)
     }).catch((error) => {
-      console.log(error)
       localStore.notification.pushNotification({
         Title: t('MSG_OPEN_CHAIN'),
         Message: t('MSG_FAILED_OPEN_MICROCHAIN', { ERROR: error }),
