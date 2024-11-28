@@ -391,18 +391,13 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         resolve({ certificateHash, isRetryBlock })
       }).catch((error) => {
         console.log('Failed submit block', error)
-        if (!operation) {
+        if (blockMaterial.incomingBundles.length > 0) {
           setTimeout(() => {
             void processNewIncomingBundle(microchain)
           }, 1000)
         }
       })
     }).catch((error) => {
-      if (!operation) {
-        setTimeout(() => {
-          void processNewIncomingBundle(microchain)
-        }, 1000)
-      }
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Fail process incoming bundle: ${error}`)
       reject(error)
