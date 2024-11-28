@@ -19,11 +19,11 @@ import { localStore } from 'src/localstores'
 import TestnetTip from '../testnet/TestnetTip.vue'
 
 const onPolicyClick = () => {
-  window.open('https://testnet.respeer.ai/policy')
+  window.open('https://testnet.linerachecko.fun/policy')
 }
 
 const onTermOfUseClick = () => {
-  window.open('https://testnet.respeer.ai/terms')
+  window.open('https://testnet.linerachecko.fun/terms')
 }
 
 </script>
