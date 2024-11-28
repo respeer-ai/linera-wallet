@@ -13,7 +13,7 @@
           0x{{ shortid.shortId(microchain.microchain, 5) }}
         </div>
         <div class='page-item-x-margin-left cursor-pointer'>
-          <q-icon name='bi-copy' size='12px' @click='(evt) => _copyToClipboard(microchain.microchain, evt)' />
+          <q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(microchain.microchain, evt)' />
         </div>
       </div>
       <div class='text-left' v-if='integratedMode'>

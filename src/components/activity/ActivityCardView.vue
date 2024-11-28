@@ -16,7 +16,7 @@
             0x{{ shortid.shortId(address, 8) }}
           </div>
           <div class='page-item-x-margin-left cursor-pointer'>
-            <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' @click='(evt) => _copyToClipboard(address, evt)' />
+            <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' @click.stop='(evt) => _copyToClipboard(address, evt)' />
           </div>
         </div>
         <div class='text-left label-text-small text-grey-6'>
