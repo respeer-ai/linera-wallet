@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class='row setting-header'>
+    <div :class='[ "row setting-header", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='flex items-center justify-center'>
         <q-icon name='bi-plugin' size='16px' />
       </div>
