@@ -21,7 +21,7 @@
     <q-space />
   </div>
   <OwnerBridge v-model:selected-owner='selectedOwner' />
-  <TokenBridge />
+  <TokenBridge v-model:count='count' />
   <q-dialog v-model='importingToken'>
     <q-card class='dialog page-y-padding'>
       <h5 class='onboarding-page-title text-center page-title'>
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 import { dbBridge } from 'src/bridge'
@@ -48,6 +48,7 @@ import AccountDetailView from '../account/AccountDetailView.vue'
 import TokenBridge from '../bridge/db/TokenBridge.vue'
 
 const tokens = ref([] as db.Token[])
+const count = ref(0)
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const displayingAccount = ref(false)
@@ -86,17 +87,23 @@ const onTokenClick = (token: db.Token) => {
   localStore.setting.HomeActionParams = token
 }
 
-const loadTokensRecursive = async (total: number, offset: number, limit: number) => {
-  if (offset >= total) return
-  tokens.value.push(...await dbBridge.Token.tokens(offset, limit))
-  void loadTokensRecursive(total, offset + limit, limit)
+const loadTokensRecursive = async (total: number, offset: number, limit: number, _tokens: db.Token[]) => {
+  if (offset >= total) {
+    tokens.value = _tokens
+    return
+  }
+  _tokens.push(...await dbBridge.Token.tokens(offset, limit))
+  void loadTokensRecursive(total, offset + limit, limit, _tokens)
 }
 
 const loadTokens = async () => {
-  tokens.value = []
   const count = await dbBridge.Token.count()
-  await loadTokensRecursive(count, 0, 10)
+  await loadTokensRecursive(count, 0, 10, [])
 }
+
+watch(count, async () => {
+  await loadTokens()
+})
 
 onMounted(() => {
   void loadTokens()

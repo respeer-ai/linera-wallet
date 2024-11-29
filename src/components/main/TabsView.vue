@@ -34,19 +34,28 @@
 </template>
 
 <script setup lang='ts'>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { localStore } from 'src/localstores'
+import { dbBridge } from 'src/bridge'
 
 import TokensView from '../token/TokensView.vue'
 import MicrochainsView from '../microchain/MicrochainsView.vue'
 import ApplicationsView from '../application/ApplicationsView.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 
+import { lineraLogo } from 'src/assets'
+
 const tab = computed({
   get: () => localStore.setting.homeTab || 'microchains',
   set: (v: string) => {
     localStore.setting.HomeTab = v
   }
+})
+
+onMounted(async () => {
+  await dbBridge.Token.initialize(lineraLogo)
+  await dbBridge.Network.initialize()
+  await dbBridge.NamedApplication.initialize()
 })
 
 </script>

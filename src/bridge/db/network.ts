@@ -2,6 +2,11 @@ import { dbBase } from 'src/controller'
 import { db } from 'src/model'
 
 export class Network {
+  static initialize = async () => {
+    if (await Network.selected()) return
+    await dbBase.networks.add(db.defaultNetwork)
+  }
+
   static resetSelected = async () => {
     const networks = await dbBase.networks.filter((network) => network.selected).toArray()
     for (const network of networks) {

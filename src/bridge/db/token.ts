@@ -2,6 +2,12 @@ import { dbBase } from 'src/controller'
 import { db } from 'src/model'
 
 export class Token {
+  static initialize = async (nativeLogo: string) => {
+    if (await Token.native()) return
+    db.lineraToken.logo = nativeLogo
+    await dbBase.tokens.add(db.lineraToken)
+  }
+
   static create = async (token: db.Token) => {
     if ((await dbBase.tokens.toArray()).findIndex((el) => el.applicationId === token.applicationId) >= 0) return
     await dbBase.tokens.add(token)

@@ -15,12 +15,21 @@ export const GET_CHAIN_ACCOUNT_BALANCES = gql`
   }
 `
 
-export const APPLICATIONS = gql`
+export const APPLICATION_WITH_DESCRIPTIONS = gql`
   query applications($chainId: ChainId!) {
     applications(chainId: $chainId) {
       id
       link
       description
+    }
+  }
+`
+
+export const APPLICATIONS = gql`
+  query applications($chainId: ChainId!) {
+    applications(chainId: $chainId) {
+      id
+      link
     }
   }
 `

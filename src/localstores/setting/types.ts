@@ -34,10 +34,6 @@ export interface Setting {
   HomeActionParams: unknown
   HomeTab: string
 
-  CreatingDefaultNetwork: boolean
-  CreatingDefaultToken: boolean
-  CreatingDefaultNamedApplication: boolean
-
   InPopupContext: boolean
 
   MicrochainsImportState: MicrochainsImportState

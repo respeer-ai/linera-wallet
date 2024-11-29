@@ -1,8 +1,7 @@
 <script setup lang='ts'>
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
-import { localStore } from '../../../localstores'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
 
@@ -16,18 +15,6 @@ const _namedApplications = useObservable<db.NamedApplication[]>(
 
 watch(_namedApplications, () => {
   namedApplications.value = _namedApplications.value
-})
-
-onMounted(async () => {
-  if (localStore.setting.creatingDefaultNamedApplication) {
-    return
-  }
-  localStore.setting.CreatingDefaultNamedApplication = true
-  if (!await dbWallet.namedApplications.count()) {
-    for (const namedApplication of db.defaultNamedApplications) {
-      await dbWallet.namedApplications.add(namedApplication)
-    }
-  }
 })
 
 </script>

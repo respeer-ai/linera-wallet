@@ -2,6 +2,13 @@ import { dbWallet } from 'src/controller'
 import { db } from 'src/model'
 
 export class NamedApplication {
+  static initialize = async () => {
+    if (await dbWallet.namedApplications.count() > 0) return
+    for (const namedApplication of db.defaultNamedApplications) {
+      await dbWallet.namedApplications.add(namedApplication)
+    }
+  }
+
   static create = async (namedApplication: db.NamedApplication) => {
     await dbWallet.namedApplications.add(namedApplication)
   }

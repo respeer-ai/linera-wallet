@@ -26,6 +26,7 @@ import { HashedCertificateValue } from 'src/__generated__/graphql/sdk/graphql'
 
 export class BlockSigner {
   static running = false
+  static messageCompensates = new Map<string, number>()
 
   static async onNewIncomingMessage(subscriptionId: string, data: unknown) {
     if (!data || !graphqlResult.rootData(data)) return
@@ -380,7 +381,20 @@ export class BlockSigner {
     microchain: string,
     operation?: rpc.Operation
   ): Promise<{ certificateHash: string; isRetryBlock: boolean }> {
-    const blockMaterial = await BlockSigner.getBlockMaterial(microchain)
+    if (BlockSigner.messageCompensates.has(microchain)) {
+      clearTimeout(BlockSigner.messageCompensates.get(microchain))
+      BlockSigner.messageCompensates.delete(microchain)
+    }
+
+    const _blockMaterial = await BlockSigner.getBlockMaterial(microchain)
+
+    if (!operation && _blockMaterial.incomingBundles.length === 0) return Promise.resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
+
+    const maxProcessBundles = 2
+    const blockMaterial = { ..._blockMaterial }
+    const continueProcess = blockMaterial.incomingBundles.length > maxProcessBundles
+    blockMaterial.incomingBundles = blockMaterial.incomingBundles.slice(0, maxProcessBundles)
+
     const executedBlockMaterial =
       await BlockSigner.executeBlockWithFullMaterials(
         microchain,
@@ -429,12 +443,22 @@ export class BlockSigner {
         validatedBlockCertificateHash
       )
 
+      if (continueProcess) {
+        BlockSigner.messageCompensates.set(microchain, setTimeout(() => {
+          void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+        }, 1000) as unknown as number)
+      }
+
       return { certificateHash, isRetryBlock }
     } catch (e) {
       if (blockMaterial.incomingBundles.length > 0) {
-        setTimeout(() => {
+        if (BlockSigner.messageCompensates.has(microchain)) {
+          clearTimeout(BlockSigner.messageCompensates.get(microchain))
+          BlockSigner.messageCompensates.delete(microchain)
+        }
+        BlockSigner.messageCompensates.set(microchain, setTimeout(() => {
           void BlockSigner.processNewIncomingMessageWithOperation(microchain)
-        }, 1000)
+        }, 1000) as unknown as number)
       }
       return { certificateHash: undefined as unknown as string, isRetryBlock: false }
     }
