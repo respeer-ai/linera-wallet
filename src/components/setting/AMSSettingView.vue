@@ -40,8 +40,6 @@
     </div>
   </div>
   <NamedApplicationBridge ref='namedApplicationBridge' v-model:named-applications='nameApplications' />
-  <RpcOperationBridge ref='rpcOperationBridge' />
-  <AMSApplicationOperationBridge ref='amsApplicationOperationBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -50,12 +48,9 @@ import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 import { dbWallet } from 'src/controller'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
-import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
-import AMSApplicationOperationBridge from '../bridge/rpc/AMSApplicationOperationBridge.vue'
-
-const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 
 const nameApplications = ref([] as db.NamedApplication[])
 
@@ -69,7 +64,6 @@ watch(amsApplication, () => {
 })
 
 const namedApplicationBridge = ref<InstanceType<typeof NamedApplicationBridge>>()
-const amsApplicationOperationBridge = ref<InstanceType<typeof AMSApplicationOperationBridge>>()
 
 const onSaveAMSApplicationId = async () => {
   if (!amsApplicationId.value?.length) return
@@ -81,18 +75,15 @@ const onSaveAMSApplicationId = async () => {
 
     for (const microchain of microchains) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (!await amsApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, false)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        if (!await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain, false)) {
+          await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
         }
       } catch (e) {
         console.log('Faled save ams application', e)
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await namedApplicationBridge.value?.updateNamedApplication({
+    await dbBridge.NamedApplication.update({
       ...amsApplication.value,
       applicationId: amsApplicationId.value,
       creatorChain: creationChain
@@ -112,10 +103,8 @@ const onRefresh = async () => {
 
     for (const microchain of microchains) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (!await amsApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, true)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          rpcOperationBridge.value?.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        if (!await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain, true)) {
+          await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
         }
       } catch (e) {
         console.log('Faled refresh ams application', e)

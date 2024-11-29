@@ -18,9 +18,7 @@
       />
     </div>
   </q-card>
-  <OwnerBridge ref='ownerBridge' />
   <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='nativeTokenId' />
-  <DbTokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -28,10 +26,9 @@ import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 import { _copyToClipboard } from 'src/utils/copycontent'
+import { dbBridge } from 'src/bridge'
 
-import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
-import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import AccountDetailAvatarView from './AccountDetailAvatarView.vue'
 
 interface Props {
@@ -40,9 +37,6 @@ interface Props {
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
 
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
-const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
-
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
 const nativeTokenId = ref(0)
@@ -50,8 +44,7 @@ const nativeTokenId = ref(0)
 const emit = defineEmits<{(ev: 'showPrivateKey'): void}>()
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
 })
 
 const onShowPrivateKeyClick = () => {

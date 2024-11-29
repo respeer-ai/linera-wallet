@@ -4,7 +4,6 @@
       label='Subscribe creator chain' no-caps class='btn full-width' flat
       @click='onRun'
     />
-    <DbNamedApplicationBridge ref='dbNamedApplicationBridge' />
   </div>
 </template>
 
@@ -12,11 +11,7 @@
 import { SUBSCRIBE_CREATOR_CHAIN } from 'src/graphql'
 import Web3 from 'web3'
 import { db } from 'src/model'
-import { ref } from 'vue'
-
-import DbNamedApplicationBridge from '../../bridge/db/NamedApplicationBridge.vue'
-
-const dbNamedApplicationBridge = ref<InstanceType<typeof DbNamedApplicationBridge>>()
+import { dbBridge } from 'src/bridge'
 
 const onRun = async () => {
   try {
@@ -29,8 +24,7 @@ const onRun = async () => {
       method: 'metamask_getProviderState'
     }) as Record<string, string>
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const wlinera = await dbNamedApplicationBridge.value?.getNamedApplicationWithType(db.ApplicationType.WLINERA) as db.NamedApplication
+    const wlinera = await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.WLINERA) as db.NamedApplication
     const applicationId = wlinera.applicationId
 
     const owner = await db.ownerFromPublicKey(accounts[0])

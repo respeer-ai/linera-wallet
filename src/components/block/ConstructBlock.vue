@@ -1,16 +1,12 @@
 <template>
-  <DbMicrochainBridge ref='dbMicrochainBridge' />
+  <div />
 </template>
 
 <script setup lang='ts'>
 import { rpc } from 'src/model'
-import { ref } from 'vue'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { type IncomingBundle } from 'src/__generated__/graphql/service/graphql'
-
-import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
-
-const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
+import { dbBridge } from 'src/bridge'
 
 const constructBlock = async (
   microchain: string,
@@ -20,7 +16,7 @@ const constructBlock = async (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    dbMicrochainBridge.value?.microchainOwner(microchain).then((owner) => {
+    dbBridge.Microchain.microchainOwner(microchain).then((owner) => {
       if (!owner) reject('Invalid owner')
 
       lineraWasm.construct_block(

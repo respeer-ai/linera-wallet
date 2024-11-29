@@ -33,6 +33,7 @@ import { localStore } from 'src/localstores'
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivityCardView from './ActivityCardView.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   xPadding?: string
@@ -56,16 +57,14 @@ const loadActivitiesRecursive = async (total: number, offset: number, limit: num
     activities.value = _activities
     return
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  _activities.push(...(await dbActivityBridge.value?.ownerActivities(offset, limit, selectedOwner.value)) || [])
+  _activities.push(...await dbBridge.Activity.ownerActivities(offset, limit, selectedOwner.value))
   void loadActivitiesRecursive(total, offset + limit, limit, _activities)
 }
 
 const loadActivities = async () => {
   if (!selectedOwner.value) return
   activities.value = []
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const count = (await dbActivityBridge.value?.activitiesCount()) as number || 0
+  const count = await dbBridge.Activity.count()
   await loadActivitiesRecursive(count, 0, 10, [])
 }
 

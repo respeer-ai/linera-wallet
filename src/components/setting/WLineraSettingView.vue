@@ -42,8 +42,6 @@
     </div>
   </div>
   <NamedApplicationBridge ref='namedApplicationBridge' v-model:named-applications='nameApplications' />
-  <RpcOperationBridge ref='rpcOperationBridge' />
-  <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -52,13 +50,9 @@ import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 import { dbWallet } from 'src/controller'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
-import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
-import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
-
-const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
-const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 
 const nameApplications = ref([] as db.NamedApplication[])
 
@@ -81,8 +75,7 @@ const onSaveWlineraApplicationId = async () => {
     const creationChain = await lineraWasm.application_creation_chain_id(wlineraApplicationId.value)
     const microchains = await dbWallet.microchains.toArray()
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await namedApplicationBridge.value?.updateNamedApplication({
+    await dbBridge.NamedApplication.update({
       ...wlineraApplication.value,
       creatorChain: creationChain,
       applicationId: wlineraApplicationId.value
@@ -90,10 +83,8 @@ const onSaveWlineraApplicationId = async () => {
 
     for (const microchain of microchains) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, false)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        if (!await rpcBridge.ERC20ApplicationOperation.subscribeWLineraCreationChain(microchain.microchain, false)) {
+          await rpcBridge.Operation.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
         }
       } catch (e) {
         console.log('Faled refresh swap application', e)
@@ -114,10 +105,8 @@ const onRefresh = async () => {
 
     for (const microchain of microchains) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (!await erc20ApplicationOperationBridge.value?.subscribeWLineraCreationChain(microchain.microchain, true)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          rpcOperationBridge.value?.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        if (!await rpcBridge.ERC20ApplicationOperation.subscribeWLineraCreationChain(microchain.microchain, true)) {
+          await rpcBridge.Operation.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
         }
       } catch (e) {
         console.log('Faled refresh wlinera application', e)

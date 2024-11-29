@@ -104,13 +104,11 @@
   <q-dialog v-model='selectingMicrochain'>
     <MicrochainSelector :owner='selectedOwner?.owner' v-model='selectedMicrochain' @selected='onMicrochainSelected' />
   </q-dialog>
-  <RpcERC20ApplicationOperationBridge ref='rpcERC20ApplicationOperationBridge' />
   <MicrochainOwnerBalanceBridge
     v-if='selectedOwner !== undefined && selectedMicrochain !== undefined' :owner='selectedOwner.owner' :microchain-id='selectedMicrochain.microchain' :token-id='nativeTokenId'
     v-model:token-balance='accountTokenBalance'
   />
   <MicrochainBalanceBridge v-if='selectedOwner !== undefined && selectedMicrochain !== undefined' :microchain-id='selectedMicrochain.microchain' :token-id='nativeTokenId' v-model:token-balance='chainTokenBalance' />
-  <DbTokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -124,12 +122,11 @@ import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import MicrochainSelector from '../selector/MicrochainSelector.vue'
-import RpcERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
-import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -147,9 +144,6 @@ const deductFromChainBalance = defineModel<boolean>('deductFromChainBalance')
 
 const selectingOwner = ref(false)
 const selectingMicrochain = ref(false)
-
-const rpcERC20ApplicationOperationBridge = ref<InstanceType<typeof RpcERC20ApplicationOperationBridge>>()
-const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
 const amount = defineModel<number>({ default: 0 })
 const chainTokenBalance = ref(0)
@@ -201,8 +195,7 @@ const onMintNowClick = async () => {
     chainAccountOwner.owner = `User:${selectedOwner.value.owner}`
   }
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcERC20ApplicationOperationBridge.value?.mint(
+    await rpcBridge.ERC20ApplicationOperation.mint(
       selectedMicrochain.value?.microchain,
       token.value.applicationId as string,
       chainAccountOwner, amount.value)
@@ -228,8 +221,7 @@ const onMintNowClick = async () => {
 const nativeTokenId = ref(undefined as unknown as number)
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
 })
 
 const onChangeFromBalanceClick = () => {

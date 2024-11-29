@@ -52,8 +52,6 @@
     </div>
   </div>
   <GenerateKey ref='generateKey' />
-  <OwnerBridge ref='ownerBridge' />
-  <PasswordBridge ref='passwordBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -66,8 +64,7 @@ import NewPassword from '../password/NewPassword.vue'
 import ResetPassword from '../password/ResetPassword.vue'
 import ImportMnemonicView from '../account/ImportMnemonicView.vue'
 import GenerateKey from '../account/GenerateKey.vue'
-import OwnerBridge from '../bridge/db/OwnerBridge.vue'
-import PasswordBridge from '../bridge/db/PasswordBridge.vue'
+import { dbBridge } from 'src/bridge'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -90,8 +87,6 @@ const mnemonic = ref([
 const router = useRouter()
 
 const generateKey = ref<InstanceType<typeof GenerateKey>>()
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
-const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
 
 const canGotoNext = () => {
   switch (step.value) {
@@ -115,8 +110,7 @@ const btnText = computed(() => {
 })
 
 const savePassword = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  passwordBridge.value?.savePassword(password.value).then(() => {
+  dbBridge.Password.save(password.value).then(() => {
     // DO NOTHING
   }).catch((error) => {
     localStore.notification.pushNotification({
@@ -133,8 +127,7 @@ const validateAccount = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   generateKey.value?.createAccountWithMnemonic(mnemonic.value, password.value).then(async (val: unknown) => {
     const v = val as Record<string, string>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await ownerBridge.value?.createOwner(v.publicKey, v.privateKey, undefined, password.value)
+    await dbBridge.Owner.create(v.publicKey, v.privateKey, undefined, password.value)
     void router.push({ path: localStore.setting.formalizePath('/home') })
   }).catch((error) => {
     localStore.notification.pushNotification({

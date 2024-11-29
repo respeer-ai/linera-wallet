@@ -72,7 +72,6 @@
     </div>
   </div>
   <OwnerBalanceBridge :token-id='token?.id' v-model:token-balance='accountTokenBalance' v-model:usd-balance='accountUsdBalance' />
-  <TokenBridge ref='dbTokenBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
   <q-dialog v-model='minting'>
     <q-card class='dialog transfer-card page-x-padding'>
@@ -92,11 +91,11 @@ import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
 
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import TokenDetailInnerView from './TokenDetailInnerView.vue'
 import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import MintTokenView from './MintTokenView.vue'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
@@ -109,8 +108,6 @@ const accountUsdBalance = ref(0)
 const minting = ref(false)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
-
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
 const emit = defineEmits<{(ev: 'back'): void,
   (ev: 'close'): void
@@ -127,8 +124,7 @@ const onCloseClick = () => {
 const nativeTokenId = ref(undefined as unknown as number)
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
 })
 
 const router = useRouter()

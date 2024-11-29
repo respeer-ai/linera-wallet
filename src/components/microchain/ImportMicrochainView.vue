@@ -38,15 +38,13 @@
       {{ $t('MSG_CANCEL') }}
     </q-btn>
   </div>
-  <OpenChain ref='openChain' />
 </template>
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import { localStore } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
-
-import OpenChain from './OpenChain.vue'
+import { rpcBridge } from 'src/bridge'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -58,8 +56,6 @@ const importing = ref(false)
 const microchainIdError = ref(false)
 const messageIdError = ref(false)
 const certificateHashError = ref(false)
-
-const openChain = ref<InstanceType<typeof OpenChain>>()
 
 const emit = defineEmits<{(ev: 'imported'): void,
   (ev: 'error'): void,
@@ -81,7 +77,7 @@ const onImportClick = () => {
   importing.value = true
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  openChain.value?.importMicrochain(microchainId.value, messageId.value, certificateHash.value).then(() => {
+  rpcBridge.Microchain.importMicrochain(microchainId.value, messageId.value, certificateHash.value).then(() => {
     importing.value = false
     localStore.notification.pushNotification({
       Title: t('MSG_IMPORT_MICROCHAIN'),

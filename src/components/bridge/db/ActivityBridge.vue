@@ -1,14 +1,12 @@
 <template>
-  <MicrochainOwnerBridge ref='microchainOwnerBridge' />
+  <div />
 </template>
 <script setup lang='ts'>
-import { ref, toRef, watch } from 'vue'
+import { toRef, watch } from 'vue'
 import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
-
-import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
 interface Props {
   publicKey?: string
@@ -20,8 +18,6 @@ const publicKey = toRef(props, 'publicKey')
 const microchain = toRef(props, 'microchain')
 
 const activities = defineModel<db.Activity[]>('activities')
-
-const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const _activities = useObservable<db.Activity[]>(
   liveQuery(async () => {
@@ -41,75 +37,6 @@ const _activities = useObservable<db.Activity[]>(
 
 watch(_activities, () => {
   activities.value = _activities.value
-})
-
-const addressActivities = async (publicKey: string): Promise<db.Activity[]> => {
-  const acts = [] as db.Activity[]
-  acts.push(...await dbWallet.activities.where('targetAddress').equalsIgnoreCase(publicKey).toArray())
-  acts.push(...await dbWallet.activities.where('sourceAddress').equalsIgnoreCase(publicKey).toArray())
-  return acts
-}
-
-const ownerActivities = async (offset: number, limit: number, owner: db.Owner): Promise<db.Activity[]> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const microchainOwners = await microchainOwnerBridge.value?.ownerMicrochainOwners(owner.owner) || [] as db.MicrochainOwner[]
-  if (!microchainOwners) return []
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const microchains = microchainOwners.reduce((ids: string[], a: db.MicrochainOwner): string[] => { ids.push(a.microchain); return ids }, []) || [] as string[]
-  if (!microchains) return []
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return await dbWallet.activities.where('targetChain').anyOf(microchains).or('sourceChain').anyOf(microchains).offset(offset).limit(limit).toArray()
-}
-
-const activitiesCount = async () => {
-  return await dbWallet.activities.count()
-}
-
-const createActivity = async (
-  microchain: string,
-  tokenId: number,
-  sourceChain: string,
-  sourceAddress: string | undefined,
-  targetChain: string,
-  targetAddress: string | undefined,
-  amount: string,
-  blockHeight: number,
-  timestamp: number,
-  certificateHash: string,
-  grant: string
-): Promise<db.Activity> => {
-  const exist = activities.value?.find((el) => {
-    return el.sourceChain === sourceChain &&
-    el.sourceAddress === sourceAddress &&
-    el.targetChain === targetChain &&
-    el.targetAddress === targetAddress &&
-    el.timestamp === timestamp &&
-    el.blockHeight === blockHeight &&
-    el.certificateHash === certificateHash
-  })
-  if (exist) return exist
-  const activity = {
-    microchain,
-    tokenId,
-    sourceChain,
-    sourceAddress,
-    targetChain,
-    targetAddress,
-    amount,
-    blockHeight,
-    timestamp,
-    certificateHash,
-    grant
-  } as db.Activity
-  await dbWallet.activities.add(activity)
-  return activity
-}
-
-defineExpose({
-  addressActivities,
-  ownerActivities,
-  createActivity,
-  activitiesCount
 })
 
 </script>

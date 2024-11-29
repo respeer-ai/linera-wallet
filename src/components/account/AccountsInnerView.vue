@@ -51,7 +51,6 @@
     </q-list>
   </div>
   <OwnerBridge ref='ownerBridge' v-model:owners='owners' />
-  <TokenBridge ref='tokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -60,9 +59,9 @@ import { db } from 'src/model'
 import { shortid } from 'src/utils'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   persistent?: boolean
@@ -91,9 +90,6 @@ const displayOwners = computed(() => owners.value.filter((el) => {
 const ownerBalances = ref(new Map<string, number>())
 const ownerUsdBalances = ref(new Map<string, number>())
 
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
-const tokenBridge = ref<InstanceType<typeof TokenBridge>>()
-
 const onActionClick = (owner: db.Owner) => {
   // TODO
   console.log(owner)
@@ -103,21 +99,16 @@ const onOwnerSelected = async (_owner: db.Owner) => {
   owner.value = _owner
   if (persistent.value) {
     _owner.selected = true
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await ownerBridge.value?.updateOwner(_owner)
+    await dbBridge.Owner.update(_owner)
   }
   emit('selected', _owner)
 }
 
 watch(owners, async () => {
   for (const _owner of owners.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const token = await tokenBridge.value?.nativeToken() as db.Token
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
-    const balance = await ownerBridge.value?.ownerBalance(_owner, token?.id || 0)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    const token = await dbBridge.Token.native() as db.Token
+    const balance = await dbBridge.Owner.ownerBalance(_owner, token?.id || 0)
     ownerBalances.value.set(_owner.address, balance?.tokenBalance || 0)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     ownerUsdBalances.value.set(_owner.address, balance?.usdBalance || 0)
   }
 })

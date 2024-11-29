@@ -174,7 +174,6 @@
       </div>
     </div>
   </div>
-  <TokenBridge ref='dbTokenBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
 </template>
 
@@ -184,11 +183,9 @@ import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
 
-// import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
-// import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import { discordLogo, githubLogo, telegramLogo, twitterLogo } from 'src/assets'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
@@ -196,20 +193,11 @@ interface Props {
 const props = defineProps<Props>()
 const token = toRef(props, 'token')
 
-// const chainTokenBalance = ref(0)
-// const chainUsdBalance = ref(0)
-// const accountTokenBalance = ref(0)
-// const accountUsdBalance = ref(0)
-
 const selectedOwner = ref(undefined as unknown as db.Owner)
-
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
-
 const nativeTokenId = ref(undefined as unknown as number)
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
 })
 
 </script>

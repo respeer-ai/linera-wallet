@@ -21,7 +21,6 @@
     <q-space />
   </div>
   <DbApplicationBridge ref='dbApplicationBridge' v-model:applications='applications' />
-  <RpcApplicationBridge ref='rpcApplicationBridge' />
   <DbMicrochainBridge v-model:microchains='microchains' />
 </template>
 
@@ -31,15 +30,14 @@ import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 import { type ApplicationOverview } from 'src/__generated__/graphql/service/graphql'
 import { useI18n } from 'vue-i18n'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
-import RpcApplicationBridge from '../bridge/rpc/ApplicationBridge.vue'
 import DbApplicationBridge from '../bridge/db/ApplicationBridge.vue'
 import ApplicationCardView from './ApplicationCardView.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
-const rpcApplicationBridge = ref<InstanceType<typeof RpcApplicationBridge>>()
 const dbApplicationBridge = ref<InstanceType<typeof DbApplicationBridge>>()
 
 const applications = ref([] as db.Application[])
@@ -48,11 +46,11 @@ const microchains = ref([] as db.Microchain[])
 const microchainIds = computed(() => microchains.value.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, []))
 
 const onSynchronizeApplicationsClick = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcApplicationBridge.value?.applications(microchainIds.value).then(async (resps: ApplicationOverview[]) => {
+  rpcBridge.Application.applications(microchainIds.value).then(async (resps: ApplicationOverview[]) => {
     for (const resp of resps) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbApplicationBridge.value?.addApplication(resp.id, resp.description?.creation?.chainId, resp.description?.creation?.height, resp.description?.creation?.index)
+      const description = resp.description as Record<string, unknown>
+      const creation = description?.creation as Record<string, unknown>
+      await dbBridge.Application.create(resp.id as string, creation?.chainId as string, creation?.height as number, creation?.index as number)
     }
     localStore.notification.pushNotification({
       Title: t('MSG_SYNCHRONIZE_APPLICATIONS'),

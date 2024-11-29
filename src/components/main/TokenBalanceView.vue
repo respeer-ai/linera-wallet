@@ -50,7 +50,6 @@
       </div>
       <q-space />
     </div>
-    <DbTokenBridge ref='dbTokenBridge' />
     <DbOwnerBridge v-model:selected-owner='selectedOwner' ref='dbOwnerBridge' />
   </div>
 </template>
@@ -61,11 +60,8 @@ import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 
-import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
-
-const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
-const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
+import { dbBridge } from 'src/bridge'
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
@@ -79,13 +75,9 @@ const onTransferClick = () => {
 
 const getBalance = async () => {
   if (!selectedOwner.value) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const nativeTokenId = (await dbTokenBridge.value?.nativeToken())?.id || 0
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const balance = await dbOwnerBridge.value?.ownerBalance(selectedOwner.value, nativeTokenId)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const nativeTokenId = (await dbBridge.Token.native())?.id || 0
+  const balance = await dbBridge.Owner.ownerBalance(selectedOwner.value, nativeTokenId)
   tokenBalance.value = balance?.tokenBalance || 0
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   usdBalance.value = balance?.usdBalance || 0
 }
 

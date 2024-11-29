@@ -58,10 +58,6 @@
     </div>
     <q-space />
   </q-card>
-  <RpcOperationBridge ref='rpcOperationBridge' />
-  <DbMicrochainBridge ref='dbMicrochainBridge' />
-  <RpcERC20ApplicationOperationBridge ref='rpcERC20ApplicationOperationBridge' />
-  <DbTokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -69,13 +65,10 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { db, rpc } from 'src/model'
 
-import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
 import ConfirmTransfer from './ConfirmTransfer.vue'
-import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
-import RpcERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
-import DbTokenBridge from '../bridge/db/TokenBridge.vue'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 interface Query {
   fromMicrochainId: string
@@ -100,10 +93,6 @@ const toChainBalance = ref(false)
 const amount = ref(0)
 
 const router = useRouter()
-const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
-const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
-const rpcERC20ApplicationOperationBridge = ref<InstanceType<typeof RpcERC20ApplicationOperationBridge>>()
-const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
 
 const onSelectTransferAccountNext = () => {
   step.value++
@@ -124,14 +113,12 @@ const onTransferConfirmed = async () => {
       chain_id: selectedToMicrochain.value?.microchain,
       owner: `User:${selectedToOwner.value?.owner}`
     } as rpc.ChainAccountOwner
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcERC20ApplicationOperationBridge.value?.transfer(
+    await rpcBridge.ERC20ApplicationOperation.transfer(
       selectedFromMicrochain.value?.microchain,
       selectedToken.value.applicationId as string,
       chainAccountOwner, amount.value)
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcOperationBridge.value?.transfer(
+    await rpcBridge.Operation.transfer(
       fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
       selectedFromMicrochain.value?.microchain,
       toChainBalance.value ? undefined : selectedToOwner.value?.address,
@@ -144,15 +131,13 @@ const onTransferConfirmed = async () => {
 
 onMounted(async () => {
   if (fromMicrochainId.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    selectedFromMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(fromMicrochainId.value) as db.Microchain
+    selectedFromMicrochain.value = await dbBridge.Microchain.microchain(fromMicrochainId.value) as db.Microchain
   }
   if (applicationId.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    selectedToken.value = await dbTokenBridge.value?.token(applicationId.value) as db.Token
+    selectedToken.value = await dbBridge.Token.token(applicationId.value) as db.Token
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    selectedToken.value = await dbTokenBridge.value?.nativeToken() as db.Token
+    selectedToken.value = await dbBridge.Token.native() as db.Token
   }
 })
 

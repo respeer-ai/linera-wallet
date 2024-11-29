@@ -35,21 +35,17 @@
     </div>
   </q-card>
   <DbNetworkBridge ref='networkBridge' v-model:networks='networks' />
-  <RpcNetworkInfoBridge ref='rpcNetworkInfoBridge' />
 </template>
 
 <script setup lang='ts'>
 import { ref } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 import DbNetworkBridge from '../bridge/db/NetworkBridge.vue'
-import RpcNetworkInfoBridge from '../bridge/rpc/NetworkInfoBridge.vue'
 
 const networks = ref([] as db.Network[])
-
-const networkBridge = ref<InstanceType<typeof DbNetworkBridge>>()
-const rpcNetworkInfoBridge = ref<InstanceType<typeof RpcNetworkInfoBridge>>()
 
 const network = defineModel<db.Network>()
 const emit = defineEmits<{(ev: 'selected', value: db.Network): void,
@@ -57,17 +53,14 @@ const emit = defineEmits<{(ev: 'selected', value: db.Network): void,
 }>()
 
 const onDeleteNetworkClick = async (network: db.Network) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await (networkBridge.value)?.deleteNetwork(network.id as number)
+  await dbBridge.Network.delete(network.id as number)
 }
 
 const onNetworkSelected = async (_network: db.Network) => {
   _network.selected = true
   network.value = _network
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await networkBridge.value?.updateNetwork(_network)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  localStore.setting.NetworkInfo = await rpcNetworkInfoBridge.value?.getNetworkInfo()
+  await dbBridge.Network.update(_network)
+  localStore.setting.NetworkInfo = await rpcBridge.GenesisInfo.getNetworkInfo()
   emit('selected', _network)
 }
 

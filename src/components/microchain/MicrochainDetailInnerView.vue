@@ -89,7 +89,6 @@
     :token-id='nativeTokenId' v-model:token-balance='accountTokenBalance' v-model:usd-balance='accountUsdBalance' :owner='selectedOwner?.owner'
     :microchain-id='microchain.microchain'
   />
-  <TokenBridge ref='dbTokenBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
   <ActivityBridge v-model:activities='activities' :microchain='microchain.microchain' />
 </template>
@@ -102,12 +101,12 @@ import { _copyToClipboard } from 'src/utils/copycontent'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
 import ActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 import ChainOperationsView from '../activity/ChainOperationsView.vue'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   microchain: db.Microchain
@@ -123,13 +122,10 @@ const activities = ref([] as db.Activity[])
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
-
 const nativeTokenId = ref(undefined as unknown as number)
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
 })
 
 </script>

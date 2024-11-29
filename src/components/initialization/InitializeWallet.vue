@@ -48,8 +48,6 @@
       <q-space />
     </div>
     <PasswordBridge ref='passwordBridge' v-model:password='password' />
-    <OwnerBridge ref='ownerBridge' />
-    <LoginTimestampBridge ref='loginTimestampBridge' />
   </div>
 </template>
 
@@ -60,12 +58,11 @@ import { localStore } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
-import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 import NewPassword from 'src/components/password/NewPassword.vue'
 import InitializeAccount from 'src/components/account/InitializeAccount.vue'
 import ValidateAccount from 'src/components/account/ValidateAccount.vue'
-import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
+import { dbBridge } from 'src/bridge'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n({ useScope: 'global' })
@@ -80,8 +77,6 @@ const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
 
 const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
-const loginTimestampBridge = ref<InstanceType<typeof LoginTimestampBridge>>()
 
 const router = useRouter()
 
@@ -109,15 +104,13 @@ const btnText = computed(() => {
 })
 
 const savePassword = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  await passwordBridge.value?.savePassword(password.value)
+  await dbBridge.Password.save(password.value)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await loginTimestampBridge.value?.saveLoginTimestamp()
+  await dbBridge.LoginTimestamp.save()
 }
 
 const saveAccount = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await ownerBridge.value?.createOwner(publicKey.value, privateKey.value)
+  await dbBridge.Owner.create(publicKey.value, privateKey.value)
   void router.push({ path: localStore.setting.formalizePath('/home') })
 }
 

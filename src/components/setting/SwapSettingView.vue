@@ -40,8 +40,6 @@
     </div>
   </div>
   <NamedApplicationBridge ref='namedApplicationBridge' v-model:named-applications='nameApplications' />
-  <RpcOperationBridge ref='rpcOperationBridge' />
-  <SwapApplicationOperationBridge ref='swapApplicationOperationBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -50,12 +48,9 @@ import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 import { dbWallet } from 'src/controller'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
-import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
-import SwapApplicationOperationBridge from '../bridge/rpc/SwapApplicationOperationBridge.vue'
-
-const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
 
 const nameApplications = ref([] as db.NamedApplication[])
 
@@ -68,9 +63,6 @@ watch(swapApplication, () => {
   swapApplicationId.value = swapApplication.value?.applicationId
 })
 
-const namedApplicationBridge = ref<InstanceType<typeof NamedApplicationBridge>>()
-const swapApplicationOperationBridge = ref<InstanceType<typeof SwapApplicationOperationBridge>>()
-
 const onSaveSwapApplicationId = async () => {
   if (!swapApplicationId.value?.length) return
   editingSwapApplication.value = false
@@ -81,18 +73,15 @@ const onSaveSwapApplicationId = async () => {
 
     for (const microchain of microchains) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (!await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, false)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        if (!await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, false)) {
+          await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
         }
       } catch (e) {
         console.log('Faled refresh swap application', e)
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await namedApplicationBridge.value?.updateNamedApplication({
+    await dbBridge.NamedApplication.update({
       ...swapApplication.value,
       applicationId: swapApplicationId.value,
       creatorChain: creationChain
@@ -112,10 +101,8 @@ const onRefresh = async () => {
 
     for (const microchain of microchains) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (!await swapApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, true)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          await rpcOperationBridge.value?.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        if (!await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, true)) {
+          await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
         }
       } catch (e) {
         console.log('Faled refresh swap application', e)

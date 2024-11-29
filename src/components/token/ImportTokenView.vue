@@ -29,8 +29,6 @@
       {{ $t('MSG_CANCEL') }}
     </q-btn>
   </div>
-  <RpcOperationBridge ref='rpcOperationBridge' />
-  <ERC20ApplicationOperationBridge ref='erc20ApplicationOperationBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -38,9 +36,7 @@ import { computed, ref } from 'vue'
 import { dbWallet } from 'src/controller'
 import { db } from 'src/model'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-
-import RpcOperationBridge from '../bridge/rpc/OperationBridge.vue'
-import ERC20ApplicationOperationBridge from '../bridge/rpc/ERC20ApplicationOperationBridge.vue'
+import { rpcBridge } from 'src/bridge'
 
 const applicationId = ref('')
 const applicationIdError = ref(false)
@@ -48,9 +44,6 @@ const applicationIdError = ref(false)
 const canImport = computed(() => {
   return applicationId.value.length > 0
 })
-
-const rpcOperationBridge = ref<InstanceType<typeof RpcOperationBridge>>()
-const erc20ApplicationOperationBridge = ref<InstanceType<typeof ERC20ApplicationOperationBridge>>()
 
 const emit = defineEmits<{(ev: 'imported'): void,
   (ev: 'error'): void,
@@ -66,10 +59,8 @@ const onImportClick = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (!await erc20ApplicationOperationBridge.value?.subscribeCreationChain(microchain.microchain, applicationId.value, false)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        rpcOperationBridge.value?.requestApplication(microchain.microchain, applicationId.value, creationChain, db.ApplicationType.ERC20)
+      if (!await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(microchain.microchain, applicationId.value, false)) {
+        await rpcBridge.Operation.requestApplication(microchain.microchain, applicationId.value, creationChain, db.ApplicationType.ERC20)
       }
     }
 

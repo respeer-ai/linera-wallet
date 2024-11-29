@@ -31,7 +31,6 @@
     </q-btn>
     <PasswordBridge ref='passwordBridge' v-model:password='password' />
     <GenerateKey ref='generateKey' />
-    <OwnerBridge ref='ownerBridge' />
   </div>
 </template>
 
@@ -40,9 +39,9 @@ import { onMounted, ref } from 'vue'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
 import { localStore } from 'src/localstores'
+import { dbBridge } from 'src/bridge'
 
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
-import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import GenerateKey from './GenerateKey.vue'
 
 const privateKey = ref('')
@@ -51,7 +50,6 @@ const accountName = ref('')
 const showPlainText = ref(false)
 const password = ref(undefined as unknown as string)
 
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
 const generateKey = ref<InstanceType<typeof GenerateKey>>()
 
 const emit = defineEmits<{(ev: 'imported'): void,
@@ -62,8 +60,7 @@ const onImportClick = async () => {
   try {
     const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey.value)))
     const publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await ownerBridge.value?.createOwner(publicKey, privateKey.value)
+    await dbBridge.Owner.create(publicKey, privateKey.value)
   } catch (error) {
     localStore.notification.pushNotification({
       Title: 'Import account',

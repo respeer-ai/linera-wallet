@@ -50,26 +50,4 @@ watch(_usdBalance, () => {
   usdBalance.value = _usdBalance.value
 })
 
-const createMicrochainFungibleTokenBalance = async (microchain: db.Microchain, tokenId: number, balance: number) => {
-  await dbWallet.microchainFungibleTokenBalances.add({
-    microchain: microchain.microchain,
-    tokenId,
-    balance
-  })
-}
-
-const updateMicrochainFungibleTokenBalance = async (balance: db.MicrochainFungibleTokenBalance) => {
-  await dbWallet.microchainFungibleTokenBalances.update(balance.id, balance)
-}
-
-const microchainFungibleTokenBalance = async (microchain: db.Microchain, tokenId: number): Promise<db.MicrochainFungibleTokenBalance | undefined> => {
-  return (await dbWallet.microchainFungibleTokenBalances.toArray()).find((el) => el.microchain === microchain.microchain && el.tokenId === tokenId)
-}
-
-defineExpose({
-  createMicrochainFungibleTokenBalance,
-  microchainFungibleTokenBalance,
-  updateMicrochainFungibleTokenBalance
-})
-
 </script>

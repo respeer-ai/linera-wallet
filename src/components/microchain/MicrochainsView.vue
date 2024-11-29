@@ -46,9 +46,7 @@
     <q-space />
   </div>
   <DbMicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
-  <DbMicrochainBridge ref='dbMicrochainBridge' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
-  <RpcMicrochainBridge ref='rpcMicrochainBridge' />
   <q-dialog v-model='creatingMicrochain'>
     <q-card class='dialog'>
       <h5 class='onboarding-page-title text-center page-title'>
@@ -73,13 +71,12 @@ import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 import { type Chains } from 'src/__generated__/graphql/service/graphql'
 import { useI18n } from 'vue-i18n'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 import DbMicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
-import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
 import CreateMicrochainView from './CreateMicrochainView.vue'
-import RpcMicrochainBridge from '../bridge/rpc/MicrochainBridge.vue'
 import ImportMicrochainView from './ImportMicrochainView.vue'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -93,9 +90,6 @@ const displayMicrochains = computed(() => microchains.value.slice(0, displayCoun
 
 const creatingMicrochain = ref(false)
 const importingMicrochain = ref(false)
-
-const rpcMicrochainBridge = ref<InstanceType<typeof RpcMicrochainBridge>>()
-const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
 
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
 
@@ -136,11 +130,9 @@ const onViewMoreClick = () => {
 
 const onSynchronizeMicrochainsClick = () => {
   if (!selectedOwner.value) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  rpcMicrochainBridge.value?.chains(selectedOwner.value?.address).then(async (chains: Chains) => {
+  rpcBridge.Microchain.chains(selectedOwner.value?.address).then(async (chains: Chains) => {
     for (const microchain of chains.list) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await dbMicrochainBridge.value?.createMicrochain(selectedOwner.value.owner, microchain, undefined, undefined, undefined, chains.default === microchain)
+      await dbBridge.Microchain.create(selectedOwner.value.owner, microchain as string, undefined, undefined, undefined, chains.default === microchain)
     }
     await loadMicrochains()
     localStore.notification.pushNotification({
@@ -162,16 +154,14 @@ const onSynchronizeMicrochainsClick = () => {
 
 const loadMicrochainsRecursive = async (total: number, offset: number, limit: number) => {
   if (offset >= total) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  microchains.value.push(...(await dbMicrochainBridge.value?.ownerMicrochains(offset, limit, selectedOwner.value?.owner, true)) || [])
+  microchains.value.push(...await dbBridge.Microchain.ownerMicrochains(offset, limit, selectedOwner.value?.owner, true))
   void loadMicrochainsRecursive(total, offset + limit, limit)
 }
 
 const loadMicrochains = async () => {
   if (!selectedOwner.value) return
   microchains.value = []
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const count = (await dbMicrochainBridge.value?.microchainsCount()) as number || 0
+  const count = await dbBridge.Microchain.count()
   await loadMicrochainsRecursive(count, 0, 10)
 }
 

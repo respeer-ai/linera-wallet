@@ -17,7 +17,6 @@
       {{ $t('MSG_CANCEL') }}
     </q-btn>
     <GenerateKey ref='generateKey' />
-    <OwnerBridge ref='ownerBridge' />
   </div>
 </template>
 
@@ -25,9 +24,9 @@
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { onMounted, ref } from 'vue'
 import { _hex } from 'src/utils'
+import { dbBridge } from 'src/bridge'
 
 import GenerateKey from './GenerateKey.vue'
-import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 const accountName = ref('')
 
@@ -36,15 +35,13 @@ const emit = defineEmits<{(ev: 'created'): void,
 }>()
 
 const generateKey = ref<InstanceType<typeof GenerateKey>>()
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
 
 const onCreateClick = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const privateKey = generateKey.value?.generateKey() as string
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
   const publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await ownerBridge.value?.createOwner(publicKey, privateKey, accountName.value)
+  await dbBridge.Owner.create(publicKey, privateKey, accountName.value)
   emit('created')
 }
 

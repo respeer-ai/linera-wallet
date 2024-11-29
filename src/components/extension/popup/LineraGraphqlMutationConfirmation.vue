@@ -65,9 +65,6 @@
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
-    <DbRpcAuthBridge ref='rpcAuthBridge' />
-    <DbOriginRpcMicrochainBridge ref='dbOriginRpcMicrochainBridge' />
-    <DbChainOperationBridge ref='dbChainOperationBridge' />
   </div>
 </template>
 
@@ -78,13 +75,11 @@ import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey, LineraOperation } from '../../../../src-bex/middleware/types'
 import { db } from 'src/model'
+import { dbBridge } from 'src/bridge'
 
-import DbRpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
 import MutationInfoView from '../MutationInfoView.vue'
-import DbOriginRpcMicrochainBridge from '../../bridge/db/OriginRpcMicrochainBridge.vue'
-import DbChainOperationBridge from '../../bridge/db/ChainOperationBridge.vue'
 
 const step = ref(1)
 const allowMutateWallet = ref(false)
@@ -103,17 +98,12 @@ const operationState = ref(db.OperationState.FAILED)
 const microchain = ref(undefined as unknown as string)
 const processing = ref(false)
 
-const rpcAuthBridge = ref<InstanceType<typeof DbRpcAuthBridge>>()
-const dbOriginRpcMicrochainBridge = ref<InstanceType<typeof DbOriginRpcMicrochainBridge>>()
-const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
-
 const title = defineModel<string>('title')
 
 const createRpcAuth = async () => {
   const _respond = respond.value
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await rpcAuthBridge.value?.createRpcAuth(
+    await dbBridge.RpcAuth.create(
       origin.value,
       publicKey.value as string,
       method.value,
@@ -135,8 +125,7 @@ const createRpcAuth = async () => {
 const checkOperationState = async (): Promise<{ operation: db.ChainOperation | undefined, executed: boolean }> => {
   return new Promise((resolve, reject) => {
     if (!popupOperation.value) return reject('Invalid operation')
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    dbChainOperationBridge.value?.getChainOperation(popupOperation.value.operationId).then((operation: db.ChainOperation | undefined) => {
+    dbBridge.ChainOperation.get(popupOperation.value.operationId).then((operation: db.ChainOperation | undefined) => {
       if (!operation) {
         return resolve({ operation, executed: false })
       }
@@ -238,8 +227,7 @@ const onActionResize = (size: Size) => {
 onMounted(async () => {
   title.value = 'Permissions'
   publicKey.value = lineraGraphqlQueryPublicKey(request.value.request)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const rpcMicrochain = await dbOriginRpcMicrochainBridge.value?.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
+  const rpcMicrochain = await dbBridge.OriginRpcMicrochain.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
   microchain.value = rpcMicrochain?.microchain
   // TODO: here the public key should be the same as rpcMicrochain
   if (!publicKey.value?.length) {

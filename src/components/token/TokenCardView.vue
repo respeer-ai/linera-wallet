@@ -27,7 +27,6 @@
     <div v-if='showIndicator' class='selector-indicator selector-margin-x-left' />
     <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='token.id' />
     <DbOwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
-    <DbTokenBridge ref='dbTokenBridge' />
   </q-item>
 </template>
 
@@ -37,9 +36,9 @@ import { onMounted, ref, toRef, watch } from 'vue'
 
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
-import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
@@ -62,16 +61,10 @@ const usdBalance = ref(0)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
-const dbTokenBridge = ref<InstanceType<typeof DbTokenBridge>>()
-const dbOwnerBridge = ref<InstanceType<typeof DbOwnerBridge>>()
-
 const getBalance = async () => {
   if (!selectedOwner.value) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const balance = await dbOwnerBridge.value?.ownerBalance(selectedOwner.value, token.value.id as number)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const balance = await dbBridge.Owner.ownerBalance(selectedOwner.value, token.value.id as number)
   tokenBalance.value = balance?.tokenBalance || 0
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   usdBalance.value = balance?.usdBalance || 0
 }
 

@@ -37,7 +37,6 @@
       </div>
     </div>
   </q-item>
-  <TokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -45,12 +44,11 @@ import { db, rpc } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
-
-import { lineraLogo } from 'src/assets'
-
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 import { shortid } from 'src/utils'
 import { lineraGraphqlMutationQueryWithQuery } from 'app/src-bex/middleware/types'
+
+import { lineraLogo } from 'src/assets'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   operation: db.ChainOperation
@@ -77,14 +75,11 @@ const operationType = computed(() => {
 const transferAmount = ref(0)
 const token = ref(undefined as unknown as db.Token)
 
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
-
 onMounted(async () => {
   if (operation.value.operationType === db.OperationType.TRANSFER) {
     const _operation = JSON.parse(operation.value.operation) as rpc.Operation
     transferAmount.value = Number(_operation.System.Transfer.amount)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    token.value = await dbTokenBridge.value?.nativeToken() as db.Token
+    token.value = await dbBridge.Token.native() as db.Token
   }
 })
 

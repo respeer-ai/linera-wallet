@@ -27,43 +27,4 @@ watch(_networks, async () => {
   }
 })
 
-const resetSelected = async () => {
-  const _networks = networks.value?.filter((network) => network.selected) || []
-  for (const network of _networks) {
-    await dbBase.networks.update(network.id, { selected: false })
-  }
-}
-
-const createNetwork = async (network: db.Network) => {
-  if (await existNetwork(network.name)) return Promise.reject('Already exists')
-  if (network.selected) await resetSelected()
-  await dbBase.networks.add(network)
-}
-
-const updateNetwork = async (network: db.Network) => {
-  if (await existNetwork(network.name) && !await existNetwork(network.name, network.id)) return Promise.reject('Already exists')
-  if (network.selected) await resetSelected()
-  await dbBase.networks.update(network.id, network)
-}
-
-const deleteNetwork = async (id: number) => {
-  await dbBase.networks.delete(id)
-}
-
-const _selectedNetwork = async () => {
-  return (await dbBase.networks.toArray()).find((el) => el.selected)
-}
-
-const existNetwork = async (name: string, id?: number) => {
-  return await dbBase.networks.where('name').equals(name).and((network) => id === undefined || network.id === id).count() > 0
-}
-
-defineExpose({
-  createNetwork,
-  deleteNetwork,
-  updateNetwork,
-  _selectedNetwork,
-  existNetwork
-})
-
 </script>

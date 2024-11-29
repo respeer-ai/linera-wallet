@@ -48,9 +48,10 @@
 <script setup lang='ts'>
 import { db } from 'src/model'
 import { computed, ref, watch } from 'vue'
+import { localStore } from 'src/localstores'
+import { dbBridge } from 'src/bridge'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
-import { localStore } from 'src/localstores'
 
 const network = defineModel<db.Network>({ default: {} as db.Network })
 
@@ -102,16 +103,13 @@ const networkBridge = ref<InstanceType<typeof NetworkBridge>>()
 
 const onSaveClick = async () => {
   network.value.id === undefined
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    ? await networkBridge.value?.createNetwork({ ...network.value })
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    : await networkBridge.value?.updateNetwork({ ...network.value })
+    ? await dbBridge.Network.create({ ...network.value })
+    : await dbBridge.Network.update({ ...network.value })
   emit('saved', network.value)
 }
 
 const onDeleteClick = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await (networkBridge.value)?.deleteNetwork(network.value.id as number)
+  await dbBridge.Network.delete(network.value.id as number)
   emit('deleted', network.value)
 }
 

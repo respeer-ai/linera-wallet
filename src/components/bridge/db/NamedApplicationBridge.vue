@@ -30,27 +30,4 @@ onMounted(async () => {
   }
 })
 
-const createNamedApplication = async (namedApplication: db.NamedApplication) => {
-  await dbWallet.namedApplications.add(namedApplication)
-}
-
-const updateNamedApplication = async (namedApplication: db.NamedApplication) => {
-  await dbWallet.namedApplications.update(namedApplication.id, namedApplication)
-}
-
-const deleteNamedApplication = async (id: number) => {
-  await dbWallet.namedApplications.delete(id)
-}
-
-const getNamedApplicationWithType = async (applicationType: db.ApplicationType): Promise<db.NamedApplication | undefined> => {
-  return (await dbWallet.namedApplications.toArray()).find((el) => el.applicationType === applicationType)
-}
-
-defineExpose({
-  createNamedApplication,
-  deleteNamedApplication,
-  updateNamedApplication,
-  getNamedApplicationWithType
-})
-
 </script>

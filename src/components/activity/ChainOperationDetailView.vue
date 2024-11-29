@@ -97,10 +97,8 @@
     <div class='extra-margin-bottom vertical-items-margin decorate-underline-dashed items-x-margin word-break-all'>
       <pre :style='{width: "calc(100% - 12px)"}' v-html='operationStr' />
     </div>
-    <TokenBridge ref='dbTokenBridge' />
     <OwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
     <MicrochainOwnerBridge v-if='selectedOwner' :owner='selectedOwner?.owner' v-model:microchain-owners='microchainOwners' />
-    <DbMicrochainBridge ref='dbMicrochainBridge' />
   </div>
 </template>
 
@@ -110,11 +108,10 @@ import { computed, onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
+import { dbBridge } from 'src/bridge'
 
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
-import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 import { microchainLogo } from 'src/assets'
 
@@ -146,10 +143,6 @@ const operationType = computed(() => {
   return 'Unknown'
 })
 
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
-const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
-const dbOwnerBridge = ref<InstanceType<typeof OwnerBridge>>()
-
 const operationChain = ref(undefined as unknown as db.Microchain)
 
 const operationState = computed(() => db.OperationState[operation.value.state === db.OperationState.POST_PROCESSED ? db.OperationState.CONFIRMED : operation.value.state])
@@ -170,11 +163,9 @@ const onCloseClick = () => {
 // TODO: parse application operation
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  operationChain.value = await dbMicrochainBridge.value?.getMicrochain(operation.value.microchain) as db.Microchain
+  operationChain.value = await dbBridge.Microchain.microchain(operation.value.microchain) as db.Microchain
   if (operation.value.operationType === db.OperationType.TRANSFER) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    token.value = await dbTokenBridge.value?.nativeToken() as db.Token
+    token.value = await dbBridge.Token.native() as db.Token
     const _operation = JSON.parse(operation.value.operation) as rpc.Operation
     transferAmount.value = Number(_operation.System.Transfer.amount)
   }

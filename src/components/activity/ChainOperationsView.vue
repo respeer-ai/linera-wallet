@@ -14,7 +14,6 @@
     </div>
     <q-space />
   </div>
-  <DbChainOperationBridge ref='dbChainOperationBridge' />
 </template>
 
 <script setup lang="ts">
@@ -22,8 +21,8 @@ import { computed, onMounted, ref, toRef } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
 
-import DbChainOperationBridge from '../bridge/db/ChainOperationBridge.vue'
 import ChainOperationCardView from './ChainOperationCardView.vue'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   microchain?: string
@@ -33,8 +32,6 @@ const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
 const xPadding = toRef(props, 'xPadding')
 
-const dbChainOperationBridge = ref<InstanceType<typeof DbChainOperationBridge>>()
-
 const chainOperations = ref([] as db.ChainOperation[])
 const displayChainOperations = computed(() => {
   return [...chainOperations.value].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
@@ -42,15 +39,13 @@ const displayChainOperations = computed(() => {
 
 const loadChainOperationsRecursive = async (total: number, offset: number, limit: number) => {
   if (offset >= total) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  chainOperations.value.push(...(await dbChainOperationBridge.value?.getChainOperations(offset, limit, microchain.value)) || [])
+  chainOperations.value.push(...(await dbBridge.ChainOperation.chainOperations(offset, limit, microchain.value)) || [])
   void loadChainOperationsRecursive(total, offset + limit, limit)
 }
 
 const loadChainOperations = async () => {
   chainOperations.value = []
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const count = (await dbChainOperationBridge.value?.chainOperationsCount()) as number || 0
+  const count = await dbBridge.ChainOperation.count()
   await loadChainOperationsRecursive(count, 0, 10)
 }
 

@@ -29,7 +29,6 @@
     </div>
   </q-card>
   <PasswordBridge ref='passwordBridge' />
-  <LoginTimestampBridge ref='loginTimestampBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -39,7 +38,7 @@ import { useI18n } from 'vue-i18n'
 
 import InputPassword from '../password/InputPassword.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
-import LoginTimestampBridge from '../bridge/db/LoginTimestampBridge.vue'
+import { dbBridge } from 'src/bridge'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -65,17 +64,14 @@ const emit = defineEmits(['verified', 'error', 'cancel'])
 const passwordError = ref(false)
 
 const passwordBridge = ref<InstanceType<typeof PasswordBridge>>()
-const loginTimestampBridge = ref<InstanceType<typeof LoginTimestampBridge>>()
 
 watch(shadowPassword, () => {
   password.value = shadowPassword.value
 })
 
 const onVerifyClick = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  if (await passwordBridge.value?.verifyPassword(password.value)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await loginTimestampBridge.value?.saveLoginTimestamp()
+  if (await dbBridge.Password.verify(password.value)) {
+    await dbBridge.LoginTimestamp.save()
     emit('verified')
   } else {
     emit('error')
@@ -105,10 +101,8 @@ const onActionResize = (size: Size) => {
 
 onMounted(async () => {
   if (checkLoginTimeout.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    if (!await loginTimestampBridge.value?.loginTimeout()) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      password.value = await passwordBridge.value?.getPassword() as string
+    if (!await dbBridge.LoginTimestamp.loginTimeout()) {
+      password.value = await dbBridge.Password.password() as string
       emit('verified')
     }
   }

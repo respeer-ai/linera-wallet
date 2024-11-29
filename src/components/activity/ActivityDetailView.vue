@@ -119,10 +119,8 @@
       <div>{{ date.formatDate(activity.timestamp / 1000, 'YYYY/MM/DD HH:mm:ss') }}</div>
     </div>
   </div>
-  <TokenBridge ref='dbTokenBridge' />
   <OwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
   <MicrochainOwnerBridge v-if='selectedOwner' :owner='selectedOwner?.owner' v-model:microchain-owners='microchainOwners' />
-  <DbMicrochainBridge ref='dbMicrochainBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -132,12 +130,11 @@ import { shortid } from 'src/utils'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
 
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
-import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 import { microchainLogo } from 'src/assets'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   activity: db.Activity
@@ -182,10 +179,6 @@ const action = computed(() => {
   return 'Unknown'
 })
 
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
-const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
-const dbOwnerBridge = ref<InstanceType<typeof OwnerBridge>>()
-
 const emit = defineEmits<{(ev: 'back'): void,
   (ev: 'close'): void
 }>()
@@ -201,20 +194,15 @@ const onCloseClick = () => {
 onMounted(async () => {
   if (activity.value.sourceAddress?.length) {
     const address = activity.value.sourceAddress.includes(':') ? activity.value.sourceAddress.split(':')[1] : activity.value.sourceAddress
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    sourceOwner.value = await dbOwnerBridge.value?.getOwner(address) as db.Owner
+    sourceOwner.value = await dbBridge.Owner.owner(address) as db.Owner
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  sourceMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(activity.value.sourceChain) as db.Microchain
+  sourceMicrochain.value = await dbBridge.Microchain.microchain(activity.value.sourceChain) as db.Microchain
   if (activity.value.targetAddress?.length) {
     const address = activity.value.targetAddress.includes(':') ? activity.value.targetAddress.split(':')[1] : activity.value.targetAddress
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    targetOwner.value = await dbOwnerBridge.value?.getOwner(address) as db.Owner
+    targetOwner.value = await dbBridge.Owner.owner(address) as db.Owner
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  targetMicrochain.value = await dbMicrochainBridge.value?.getMicrochain(activity.value.targetChain) as db.Microchain
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  token.value = await dbTokenBridge.value?.tokenWithId(activity.value.tokenId || 1) as db.Token
+  targetMicrochain.value = await dbBridge.Microchain.microchain(activity.value.targetChain) as db.Microchain
+  token.value = await dbBridge.Token.tokenWithId(activity.value.tokenId || 1) as db.Token
 })
 
 </script>

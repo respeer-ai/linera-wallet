@@ -34,7 +34,6 @@
   </q-item>
   <OwnerBridge v-model:selected-owner='owner' />
   <MicrochainOwnerBridge :owner='owner?.owner' v-model:microchain-owners='microchainOwners' />
-  <TokenBridge ref='dbTokenBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -43,10 +42,10 @@ import { shortid } from 'src/utils'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
+import { dbBridge } from 'src/bridge'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
-import TokenBridge from '../bridge/db/TokenBridge.vue'
 
 import { lineraLogo } from 'src/assets'
 
@@ -61,8 +60,6 @@ const xPadding = toRef(props, 'xPadding')
 const owner = ref(undefined as unknown as db.Owner)
 const microchainOwners = ref([] as db.MicrochainOwner[])
 const token = ref(undefined as unknown as db.Token)
-
-const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
 const action = computed(() => {
   if (activity.value.sourceAddress === activity.value.targetAddress) {
@@ -163,8 +160,7 @@ const icon = computed(() => {
 })
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  token.value = await dbTokenBridge.value?.tokenWithId(activity.value.tokenId) as db.Token
+  token.value = await dbBridge.Token.tokenWithId(activity.value.tokenId) as db.Token
 })
 
 </script>

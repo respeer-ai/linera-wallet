@@ -38,6 +38,7 @@ import { onMounted, ref, toRef } from 'vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   owner: db.Owner
@@ -61,14 +62,12 @@ const onEditClick = () => {
 }
 
 const onSaveClick = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  await ownerBridge.value?.updateOwner(owner.value)
+  await dbBridge.Owner.update(owner.value)
   editing.value = false
 }
 
 onMounted(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  nativeTokenId.value = (await dbTokenBridge.value?.nativeToken())?.id as number
+  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
 })
 
 </script>

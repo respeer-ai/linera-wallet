@@ -42,9 +42,6 @@
       <q-resize-observer @resize='onActionResize' />
     </div>
   </div>
-  <OriginRpcMicrochainBridge ref='originRpcMicrochainBridge' />
-  <RpcAuthBridge ref='rpcAuthBridge' />
-  <DbMicrochainBridge ref='dbMicrochainBridge' />
 </template>
 
 <script setup lang='ts'>
@@ -53,14 +50,12 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 import { db } from 'src/model'
+import { dbBridge } from 'src/bridge'
 
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import MicrochainSelector from '../selector/MicrochainSelector.vue'
 import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
-import OriginRpcMicrochainBridge from '../../bridge/db/OriginRpcMicrochainBridge.vue'
-import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
-import DbMicrochainBridge from '../../bridge/db/MicrochainBridge.vue'
 
 const step = ref(1)
 
@@ -75,15 +70,10 @@ const title = defineModel<string>('title')
 const owner = ref(undefined as unknown as db.Owner)
 const microchain = ref(undefined as unknown as db.Microchain)
 
-const originRpcMicrochainBridge = ref<InstanceType<typeof OriginRpcMicrochainBridge>>()
-const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
-const dbMicrochainBridge = ref<InstanceType<typeof DbMicrochainBridge>>()
-
 const onNextStepClick = async () => {
   step.value += 1
   if (step.value === 3) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await originRpcMicrochainBridge.value?.createOriginRpcMicrochain(
+    await dbBridge.OriginRpcMicrochain.create(
       localStore.popup.popupOrigin,
       owner.value?.address,
       microchain.value?.microchain
@@ -96,8 +86,7 @@ const onNextStepClick = async () => {
       void respond.value?.({
         code: 0
       } as commontypes.PopupResponse)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      void rpcAuthBridge.value?.createRpcAuth(origin.value, owner.value?.address, method.value, undefined, undefined, true)
+      void dbBridge.RpcAuth.create(origin.value, owner.value?.address, method.value, undefined, undefined, true)
       localStore.popup.removeRequest(localStore.popup.popupRequestId)
     }, 2000)
   }
@@ -137,11 +126,9 @@ const onActionResize = (size: Size) => {
 
 onMounted(async () => {
   title.value = 'Select Linera account'
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const rpcMicrochain = await originRpcMicrochainBridge.value?.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
+  const rpcMicrochain = await dbBridge.OriginRpcMicrochain.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
   if (!rpcMicrochain) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  microchain.value = await dbMicrochainBridge.value?.getMicrochain(rpcMicrochain.microchain) as db.Microchain
+  microchain.value = await dbBridge.Microchain.microchain(rpcMicrochain.microchain) as db.Microchain
 })
 
 watch(step, () => {

@@ -39,8 +39,6 @@
       />
       <q-resize-observer @resize='onActionResize' />
     </div>
-    <OwnerBridge ref='ownerBridge' />
-    <RpcAuthBridge ref='rpcAuthBridge' />
   </div>
 </template>
 
@@ -54,11 +52,10 @@ import { Web3 } from 'web3'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { db } from 'src/model'
 
-import OwnerBridge from '../..//bridge/db/OwnerBridge.vue'
 import VerifyPassword from '../..//password/VerifyPassword.vue'
-import RpcAuthBridge from '../../bridge/db/RpcAuthBridge.vue'
 import SignInfoView from '../SignInfoView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
+import { dbBridge } from 'src/bridge'
 
 const step = ref(1)
 const origin = computed(() => localStore.popup.popupOrigin)
@@ -73,9 +70,6 @@ const password = ref('')
 const passwordVerified = ref(false)
 const processing = ref(false)
 
-const ownerBridge = ref<InstanceType<typeof OwnerBridge>>()
-const rpcAuthBridge = ref<InstanceType<typeof RpcAuthBridge>>()
-
 const title = defineModel<string>('title')
 
 const onVerifyPasswordError = () => {
@@ -83,8 +77,7 @@ const onVerifyPasswordError = () => {
 }
 
 const signResponse = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const _account = await ownerBridge.value?.getOwnerWithPublicKeyPrefix(publicKey.value) as db.Owner
+  const _account = await dbBridge.Owner.getOwnerWithPublicKeyPrefix(publicKey.value) as db.Owner
   if (!_account) {
     return onCancelClick()
   }
@@ -99,8 +92,7 @@ const signResponse = async () => {
       code: 0,
       message: signature
     } as commontypes.PopupResponse)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    void rpcAuthBridge.value?.createRpcAuth(origin.value, publicKey.value, method.value)
+    void dbBridge.RpcAuth.create(origin.value, publicKey.value, method.value)
     localStore.popup.removeRequest(localStore.popup.popupRequestId)
   }, 2000)
 }

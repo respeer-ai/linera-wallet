@@ -29,25 +29,20 @@
       </div>
     </div>
   </div>
-  <RpcNetworkInfoBridge ref='rpcNetworkInfoBridge' />
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { localStore } from 'src/localstores'
 import { type NetworkInfoQuery } from 'src/__generated__/graphql/faucet/graphql'
-
-import RpcNetworkInfoBridge from '../bridge/rpc/NetworkInfoBridge.vue'
-
-const rpcNetworkInfoBridge = ref<InstanceType<typeof RpcNetworkInfoBridge>>()
+import { rpcBridge } from 'src/bridge'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 const networkInfo = computed(() => localStore.setting._networkInfo as NetworkInfoQuery)
 
 onMounted(async () => {
   if (!networkInfo.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    localStore.setting.NetworkInfo = await rpcNetworkInfoBridge.value?.getNetworkInfo() as NetworkInfoQuery
+    localStore.setting.NetworkInfo = await rpcBridge.GenesisInfo.getNetworkInfo()
   }
 })
 
