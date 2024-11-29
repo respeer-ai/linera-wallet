@@ -94,10 +94,15 @@ export class BlockSigner {
             _message.User.application_id
           )) as db.Token
           const tokenId = token?.id || 2
-          const erc20MessageStr =
-            await lineraWasm.bcs_deserialize_erc20_message(
+          let erc20MessageStr = undefined as unknown as string
+          try {
+            erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(
               `[${_message.User.bytes.toString()}]`
             )
+          } catch (e) {
+            console.log('Failed deserialize message', e)
+            continue
+          }
           // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
