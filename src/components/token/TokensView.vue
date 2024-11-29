@@ -21,6 +21,7 @@
     <q-space />
   </div>
   <OwnerBridge v-model:selected-owner='selectedOwner' />
+  <TokenBridge />
   <q-dialog v-model='importingToken'>
     <q-card class='dialog page-y-padding'>
       <h5 class='onboarding-page-title text-center page-title'>
@@ -38,12 +39,13 @@
 import { onMounted, ref } from 'vue'
 import { db } from 'src/model'
 import { localStore } from 'src/localstores'
+import { dbBridge } from 'src/bridge'
 
 import TokenCardView from './TokenCardView.vue'
 import ImportTokenView from './ImportTokenView.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import AccountDetailView from '../account/AccountDetailView.vue'
-import { dbBridge } from 'src/bridge'
+import TokenBridge from '../bridge/db/TokenBridge.vue'
 
 const tokens = ref([] as db.Token[])
 const selectedOwner = ref(undefined as unknown as db.Owner)

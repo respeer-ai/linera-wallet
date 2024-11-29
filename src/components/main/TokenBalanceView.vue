@@ -50,43 +50,33 @@
       </div>
       <q-space />
     </div>
-    <DbOwnerBridge v-model:selected-owner='selectedOwner' ref='dbOwnerBridge' />
+    <DbOwnerBridge
+      v-model:selected-owner='selectedOwner'
+      v-model:native-token-balance='tokenBalance'
+      v-model:native-usd-balance='usdBalance'
+    />
+    <DbMicrochainBridge v-model:count='microchainCount' />
   </div>
 </template>
 
 <script setup lang='ts'>
-import { onMounted, ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
 
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
-import { dbBridge } from 'src/bridge'
+import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
 const selectedOwner = ref(undefined as unknown as db.Owner)
+const microchainCount = ref(0)
 
 const router = useRouter()
 
 const onTransferClick = () => {
   void router.push({ path: localStore.setting.formalizePath('/transfer') })
 }
-
-const getBalance = async () => {
-  if (!selectedOwner.value) return
-  const nativeTokenId = (await dbBridge.Token.native())?.id || 0
-  const balance = await dbBridge.Owner.ownerBalance(selectedOwner.value, nativeTokenId)
-  tokenBalance.value = balance?.tokenBalance || 0
-  usdBalance.value = balance?.usdBalance || 0
-}
-
-watch(selectedOwner, async () => {
-  await getBalance()
-})
-
-onMounted(async () => {
-  await getBalance()
-})
 
 </script>

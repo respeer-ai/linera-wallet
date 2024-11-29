@@ -26,6 +26,7 @@ const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
+const microchainCompensates = new Map<string, number>()
 
 type stopFunc = () => void
 const subscribed = ref(new Map<string, stopFunc>())
@@ -147,11 +148,19 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
 const updateFungibleBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
   const tokens = await dbBridge.Token.fungibles() || []
   for (const token of tokens) {
-    const balance = await rpcBridge.ERC20ApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string) || 0
-    await updateChainBalance(microchain, token.id as number, balance)
-    for (const publicKey of publicKeys) {
-      const balance = await rpcBridge.ERC20ApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string, publicKey) || 0
-      await updateAccountBalance(microchain, token.id as number, publicKey, balance)
+    try {
+      const balance = await rpcBridge.ERC20ApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string) || 0
+      await updateChainBalance(microchain, token.id as number, balance)
+      for (const publicKey of publicKeys) {
+        try {
+          const balance = await rpcBridge.ERC20ApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string, publicKey) || 0
+          await updateAccountBalance(microchain, token.id as number, publicKey, balance)
+        } catch (e) {
+          console.log('Failed process account balance', e)
+        }
+      }
+    } catch (e) {
+      console.log('Failed process fungible balance', e)
     }
   }
 }
@@ -210,14 +219,23 @@ const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => 
 }
 
 const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<{ certificateHash: string, isRetryBlock: boolean }> => {
+  if (microchainCompensates.has(microchain)) {
+    window.clearTimeout(microchainCompensates.get(microchain))
+    microchainCompensates.delete(microchain)
+  }
+
   return new Promise((resolve, reject) => {
     rpcBridge.BlockMaterial.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
       if (!operation && blockMaterial.incomingBundles.length === 0) return resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
 
+      const maxProcessBundles = 2
+      const continueProcess = blockMaterial.incomingBundles.length > maxProcessBundles
+      const incomingBundles = blockMaterial.incomingBundles.slice(0, maxProcessBundles)
+
       const executedBlockMaterial = await rpcBridge.ExecutedBlock.executeBlockWithFullMaterials(
         microchain,
         operation ? [operation] : [],
-        blockMaterial.incomingBundles,
+        incomingBundles,
         blockMaterial.localTime as number
       )
 
@@ -310,13 +328,36 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             Type: localStore.notify.NotifyType.Info
           })
         }
+        if (continueProcess) {
+          if (microchainCompensates.has(microchain)) {
+            window.clearTimeout(microchainCompensates.get(microchain))
+            microchainCompensates.delete(microchain)
+          }
+          microchainCompensates.set(microchain, window.setTimeout(() => {
+            processNewIncomingBundle(microchain).then(() => {
+              // DO NOTHING
+            }).catch((e) => {
+              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+              console.log(`Fail process incoming bundle: ${e}`)
+            })
+          }, 200))
+        }
         resolve({ certificateHash, isRetryBlock })
       }).catch((error) => {
         console.log('Failed submit block', error)
         if (blockMaterial.incomingBundles.length > 0) {
-          setTimeout(() => {
-            void processNewIncomingBundle(microchain)
-          }, 1000)
+          if (microchainCompensates.has(microchain)) {
+            window.clearTimeout(microchainCompensates.get(microchain))
+            microchainCompensates.delete(microchain)
+          }
+          microchainCompensates.set(microchain, window.setTimeout(() => {
+            processNewIncomingBundle(microchain).then(() => {
+              // DO NOTHING
+            }).catch((e) => {
+              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+              console.log(`Fail process incoming bundle: ${e}`)
+            })
+          }, 1000))
         }
         reject(error)
       })

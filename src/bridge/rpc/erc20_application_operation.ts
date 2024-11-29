@@ -100,7 +100,7 @@ export class ERC20ApplicationOperation {
 
       onError((error) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        reject(`Query token metadata: ${error}`)
+        reject(`Query balanceOf: ${error}`)
       })
     })
   }

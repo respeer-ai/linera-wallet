@@ -11,6 +11,7 @@ import { db } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
+import { dbBridge } from 'src/bridge'
 
 import NetworkBridge from './NetworkBridge.vue'
 import PasswordBridge from './PasswordBridge.vue'
@@ -24,6 +25,8 @@ const microchainOwners = ref([] as db.MicrochainOwner[])
 
 const owners = defineModel<db.Owner[]>('owners')
 const selectedOwner = defineModel<db.Owner>('selectedOwner')
+const nativeTokenBalance = defineModel<number>('nativeTokenBalance')
+const nativeUsdBalance = defineModel<number>('nativeUsdBalance')
 
 const microchainBridge = ref<InstanceType<typeof MicrochainBridge>>()
 
@@ -33,9 +36,37 @@ const _owners = useObservable<db.Owner[]>(
   }) as never
 )
 
-watch(_owners, () => {
+const _nativeTokenBalance = useObservable<number>(
+  liveQuery(async () => {
+    const selectedOwner = await dbBridge.Owner.selected()
+    if (!selectedOwner) return 0
+    const nativeTokenId = (await dbBridge.Token.native())?.id || 0
+    const balance = await dbBridge.Owner.ownerBalance(selectedOwner, nativeTokenId)
+    return balance.tokenBalance
+  }) as never
+)
+
+const _nativeUsdBalance = useObservable<number>(
+  liveQuery(async () => {
+    const selectedOwner = await dbBridge.Owner.selected()
+    if (!selectedOwner) return 0
+    const nativeTokenId = (await dbBridge.Token.native())?.id || 0
+    const balance = await dbBridge.Owner.ownerBalance(selectedOwner, nativeTokenId)
+    return balance.usdBalance
+  }) as never
+)
+
+watch(_owners, async () => {
   owners.value = _owners.value
-  selectedOwner.value = _owners.value?.find((el) => el.selected)
+  selectedOwner.value = await dbBridge.Owner.selected()
+})
+
+watch(_nativeTokenBalance, () => {
+  nativeTokenBalance.value = _nativeTokenBalance.value
+})
+
+watch(_nativeUsdBalance, () => {
+  nativeUsdBalance.value = _nativeUsdBalance.value
 })
 
 </script>

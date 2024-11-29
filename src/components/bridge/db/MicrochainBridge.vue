@@ -22,13 +22,23 @@ const selectedNetwork = ref(undefined as unknown as db.Network)
 
 const microchains = defineModel<db.Microchain[]>('microchains')
 const defaultMicrochain = defineModel<db.Microchain>('defaultMicrochain')
+const count = defineModel<number>('count')
 
 const _microchains = useObservable<db.Microchain[]>(
   liveQuery(async () => {
     if (owner.value !== undefined) {
       return await dbBridge.Microchain.ownerMicrochains(0, 1000, owner.value)
     }
-    return (await dbWallet.microchains.toArray()).filter((el) => el.imported)
+    return await dbWallet.microchains.toArray()
+  }) as never
+)
+
+const _count = useObservable<number>(
+  liveQuery(async () => {
+    if (owner.value !== undefined) {
+      return (await dbBridge.Microchain.ownerMicrochains(0, 1000, owner.value)).length
+    }
+    return await dbBridge.Microchain.count()
   }) as never
 )
 
@@ -43,6 +53,10 @@ const updateMicrochains = (__microchains: db.Microchain[]) => {
 
 watch(_microchains, () => {
   updateMicrochains(_microchains.value ? _microchains.value : [])
+})
+
+watch(_count, () => {
+  count.value = _count.value
 })
 
 watch(owner, async () => {
