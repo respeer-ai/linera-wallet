@@ -47,6 +47,7 @@
   </div>
   <DbMicrochainOwnerBridge v-model:microchain-owners='microchainOwners' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
+  <DbMicrochainBridge v-model:count='count' />
   <q-dialog v-model='creatingMicrochain'>
     <q-card class='dialog'>
       <h5 class='onboarding-page-title text-center page-title'>
@@ -78,12 +79,14 @@ import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainCardView from './MicrochainCardView.vue'
 import CreateMicrochainView from './CreateMicrochainView.vue'
 import ImportMicrochainView from './ImportMicrochainView.vue'
+import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
 const microchainOwners = ref([] as db.MicrochainOwner[])
 const microchains = ref([] as db.Microchain[])
 const selectedOwner = ref(undefined as unknown as db.Owner)
+const count = ref(0)
 
 const displayCount = ref(4)
 const displayMicrochains = computed(() => microchains.value.slice(0, displayCount.value))
@@ -152,18 +155,24 @@ const onSynchronizeMicrochainsClick = () => {
   })
 }
 
-const loadMicrochainsRecursive = async (total: number, offset: number, limit: number) => {
-  if (offset >= total) return
-  microchains.value.push(...await dbBridge.Microchain.ownerMicrochains(offset, limit, selectedOwner.value?.owner, true))
-  void loadMicrochainsRecursive(total, offset + limit, limit)
+const loadMicrochainsRecursive = async (total: number, offset: number, limit: number, _microchains: db.Microchain[]) => {
+  if (offset >= total) {
+    microchains.value = _microchains
+    return
+  }
+  _microchains.push(...await dbBridge.Microchain.ownerMicrochains(offset, limit, selectedOwner.value?.owner, true))
+  void loadMicrochainsRecursive(total, offset + limit, limit, _microchains)
 }
 
 const loadMicrochains = async () => {
   if (!selectedOwner.value) return
-  microchains.value = []
   const count = await dbBridge.Microchain.count()
-  await loadMicrochainsRecursive(count, 0, 10)
+  await loadMicrochainsRecursive(count, 0, 10, [])
 }
+
+watch(count, async () => {
+  await loadMicrochains()
+})
 
 onMounted(async () => {
   await loadMicrochains()
