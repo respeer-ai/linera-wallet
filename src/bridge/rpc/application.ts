@@ -19,7 +19,7 @@ export class Application {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        resolve((graphqlResult.rootData(res) as ApplicationsQuery).applications)
+        resolve((graphqlResult.rootData(res) as ApplicationsQuery).applications as ApplicationOverview[])
       })
 
       onError((error) => {

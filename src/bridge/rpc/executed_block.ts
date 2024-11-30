@@ -1,11 +1,10 @@
-import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { ApolloClient } from '@apollo/client/core'
-import { provideApolloClient, useMutation } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
-import { rpc } from 'src/model'
+import { db, rpc } from 'src/model'
 import { EXECUTE_BLOCK_WITH_FULL_MATERIALS } from 'src/graphql'
 import { type IncomingBundle, type ExecuteBlockWithFullMaterialsMutation, type ExecutedBlockMaterial } from 'src/__generated__/graphql/service/graphql'
-import { stringify } from 'lossless-json'
+import * as dbBridge from '../db'
+import axios from 'axios'
+import { parse, stringify } from 'lossless-json'
 
 export class ExecutedBlock {
   static executeBlockWithFullMaterials = async (
@@ -14,17 +13,38 @@ export class ExecutedBlock {
     incomingBundles: IncomingBundle[],
     localTime: number
   ): Promise<ExecutedBlockMaterial> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
-    const apolloClient = new ApolloClient(options)
+    const network = await dbBridge.Network.selected() as db.Network
+    if (!network) return Promise.reject('Invalid network')
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { mutate } = provideApolloClient(apolloClient)(() => useMutation(EXECUTE_BLOCK_WITH_FULL_MATERIALS))
-    const res = await mutate({
-      chainId,
-      operations,
-      incomingBundles: stringify(incomingBundles),
-      localTime
+    const applicationUrl = `http://${network?.host}:${network?.port}`
+    return new Promise((resolve, reject) => {
+      axios.post(applicationUrl, stringify({
+        query: EXECUTE_BLOCK_WITH_FULL_MATERIALS.loc?.source.body,
+        variables: {
+          chainId,
+          operations,
+          incomingBundles,
+          localTime
+        },
+        operationName: 'executeBlockWithFullMaterials'
+      }),
+      {
+        responseType: 'text',
+        transformResponse: [data => data as string]
+      }).then((res) => {
+        const dataString = graphqlResult.rootData(res) as string
+        const data = parse(dataString)
+        const errors = (data as Record<string, unknown[]>).errors
+        if (errors && errors.length > 0) {
+          return reject(stringify(errors))
+        }
+        const executeBlockWithFullMaterials = (data as Record<string, ExecuteBlockWithFullMaterialsMutation>).data
+        resolve(executeBlockWithFullMaterials.executeBlockWithFullMaterials)
+      }).catch((e) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed execute block with full materials: ${e}`)
+        reject(e)
+      })
     })
-    return (graphqlResult.rootData(res) as ExecuteBlockWithFullMaterialsMutation).executeBlockWithFullMaterials
   }
 }

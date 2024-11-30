@@ -16,6 +16,7 @@ import { type HashedCertificateValue, type CandidateBlockMaterial, type Executed
 import { useI18n } from 'vue-i18n'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { Round } from 'src/model/rpc/model'
+import { parse, stringify } from 'lossless-json'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
@@ -95,7 +96,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
         const erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(`[${_message.User.bytes.toString()}]`)
         // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
+        const erc20Message = parse(erc20MessageStr) as rpc.ERC20Message
         if (erc20Message?.Transfer) {
           await dbBridge.Activity.create(
             microchain.microchain,
@@ -228,9 +229,11 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
     const maxProcessBundles = 2
 
     rpcBridge.BlockMaterial.getBlockMaterial(microchain, maxProcessBundles).then(async (blockMaterial: CandidateBlockMaterial) => {
-      if (!operation && blockMaterial.incomingBundles.length === 0) return resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
+      if (!operation && blockMaterial.incomingBundles.length === 0) {
+        return resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
+      }
 
-      const continueProcess = blockMaterial.incomingBundles.length >= maxProcessBundles
+      const continueProcess = blockMaterial?.incomingBundles?.length >= maxProcessBundles
 
       const executedBlockMaterial = await rpcBridge.ExecutedBlock.executeBlockWithFullMaterials(
         microchain,
@@ -248,14 +251,14 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
       if (operation && !isRetryBlock) {
         const executedOperation = executedBlock.block.operations[0] as rpc.Operation
-        const operationHash = await sha3(JSON.stringify(sortedObject(operation), (key, value) => {
+        const operationHash = await sha3(stringify(sortedObject(operation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
-        }))
-        const executedOperationHash = await sha3(JSON.stringify(sortedObject(executedOperation), (key, value) => {
+        }) as string)
+        const executedOperationHash = await sha3(stringify(sortedObject(executedOperation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
-        }))
+        }) as string)
         if (operationHash !== executedOperationHash) {
           return reject('Invalid operation payload')
         }
@@ -269,7 +272,7 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
       // const stateHash1 = await constructBlock.value?.constructBlock(microchain, operation, blockMaterial.incomingBundles, blockMaterial.localTime)
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const block = JSON.parse(JSON.stringify(executedBlock.block), function (this: Record<string, unknown>, key: string, value: unknown) {
+      const block = parse(stringify(executedBlock.block) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
         if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
           const _key = toSnake(key)
@@ -286,17 +289,17 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const payload = await lineraWasm.executed_block_payload(
-        JSON.stringify(block, null, 2),
-        JSON.stringify(blockMaterial.round),
+        stringify(block, null, 2) as string,
+        stringify(blockMaterial.round) as string,
         ''
       )
       const owner = await dbBridge.Microchain.microchainOwner(microchain) as db.Owner
       if (!owner) reject('Invalid owner')
-      const signature = await rpcBridge.Block.signPayload(owner, JSON.parse(payload) as Uint8Array)
+      const signature = await rpcBridge.Block.signPayload(owner, parse(payload) as Uint8Array)
       if (!signature) reject('Failed generate signature')
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const _executedBlock = JSON.parse(JSON.stringify(executedBlock), function (this: Record<string, unknown>, key: string, value: unknown) {
+      const _executedBlock = parse(stringify(executedBlock) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
         if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
           const _key = toSnake(key)
@@ -437,7 +440,7 @@ const _handleOperations = async () => {
     const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING])
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
-      const _operation = JSON.parse(operation.operation) as rpc.Operation
+      const _operation = parse(operation.operation) as rpc.Operation
       try {
         operation.state = db.OperationState.EXECUTING
         await dbBridge.ChainOperation.update(operation)
@@ -460,7 +463,7 @@ const _handleOperations = async () => {
   }
   const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CONFIRMED])
   for (const operation of operations) {
-    const _operation = JSON.parse(operation.operation) as rpc.Operation
+    const _operation = parse(operation.operation) as rpc.Operation
     try {
       switch (operation.operationType) {
         case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:

@@ -1,31 +1,54 @@
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
-import { provideApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable'
+import { provideApolloClient, useQuery, useSubscription } from '@vue/apollo-composable'
 import { graphqlResult, _hex } from 'src/utils'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { db, rpc } from 'src/model'
 import { dbBase } from 'src/controller'
 import { SUBMIT_BLOCK_AND_SIGNATURE, NOTIFICATIONS, BLOCK } from 'src/graphql'
-import { type BlockQuery, type NotificationsSubscription, type HashedCertificateValue, type ExecutedBlock } from 'src/__generated__/graphql/service/graphql'
-import { stringify } from 'lossless-json'
+import { type BlockQuery, type NotificationsSubscription, type HashedCertificateValue, type ExecutedBlock, type SubmitBlockAndSignatureMutation } from 'src/__generated__/graphql/service/graphql'
+import * as dbBridge from '../db'
+import axios from 'axios'
+import { parse, stringify } from 'lossless-json'
 
 export class Block {
   static submitBlockAndSignature = async (chainId: string, height: number, executedBlock: ExecutedBlock, round: rpc.Round, signature: string, retry: boolean, validatedBlockCertificateHash?: string): Promise<string> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
-    const apolloClient = new ApolloClient(options)
+    const network = await dbBridge.Network.selected() as db.Network
+    if (!network) return Promise.reject('Invalid network')
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { mutate } = provideApolloClient(apolloClient)(() => useMutation(SUBMIT_BLOCK_AND_SIGNATURE))
-    const res = await mutate({
-      chainId,
-      height,
-      executedBlock: stringify(executedBlock),
-      round,
-      signature,
-      retry,
-      validatedBlockCertificateHash
+    const applicationUrl = `http://${network?.host}:${network?.port}`
+    return new Promise((resolve, reject) => {
+      axios.post(applicationUrl, stringify({
+        query: SUBMIT_BLOCK_AND_SIGNATURE.loc?.source.body,
+        variables: {
+          chainId,
+          height,
+          executedBlock,
+          round,
+          signature,
+          retry,
+          validatedBlockCertificateHash
+        },
+        operationName: 'submitBlockAndSignature'
+      }),
+      {
+        responseType: 'text',
+        transformResponse: [data => data as string]
+      }).then((res) => {
+        const dataString = graphqlResult.rootData(res) as string
+        const data = parse(dataString)
+        const errors = (data as Record<string, unknown[]>).errors
+        if (errors && errors.length > 0) {
+          return reject(stringify(errors))
+        }
+        const submitBlockAndSignature = (data as Record<string, SubmitBlockAndSignatureMutation>).data
+        resolve(submitBlockAndSignature.submitBlockAndSignature as string)
+      }).catch((e) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed execute block with full materials: ${e}`)
+        reject(e)
+      })
     })
-    return graphqlResult.data(res, 'submitBlockAndSignature') as string
   }
 
   static signPayload = async (owner: db.Owner, payload: Uint8Array): Promise<string> => {
