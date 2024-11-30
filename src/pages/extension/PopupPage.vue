@@ -63,7 +63,6 @@ watch(popupCount, () => {
 })
 
 const handleUpdateRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
-  console.log('Update popup', payload)
   switch (payload.data.type) {
     case middlewaretypes.PopupRequestType.EXECUTION:
       // It can only update a confirmed popup
