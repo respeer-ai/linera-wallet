@@ -11,17 +11,17 @@
       </q-badge>
     </q-avatar>
     <div class='selector-margin-x-left'>
-      <div class='text-bold text-grey-9 row'>
+      <div class='text-bold text-grey-9 row text-left'>
         {{ token.name }}
       </div>
     </div>
     <q-space />
-    <div>
+    <div class='selector-margin-x-left'>
       <div class='text-bold text-grey-9 text-right'>
-        {{ tokenBalance }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
+        {{ parseFloat(tokenBalance.toFixed(4)) }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
       </div>
       <div class='text-right'>
-        $ {{ usdBalance }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
+        $ {{ parseFloat(usdBalance.toFixed(2)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
       </div>
     </div>
     <div v-if='showIndicator' class='selector-indicator selector-margin-x-left' />
