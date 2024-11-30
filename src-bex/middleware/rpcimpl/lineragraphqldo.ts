@@ -36,7 +36,6 @@ const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
 
 export const queryDo = async (microchain: string, query: RpcGraphqlQuery): Promise<unknown> => {
   const graphqlUrl = await queryUrl(microchain, query)
-  const operationName = lineraGraphqlMutationQueryWithQuery(query.query.query) as string
 
   return new Promise((resolve, reject) => {
     axios.post(graphqlUrl, stringify(query.query),
@@ -51,11 +50,7 @@ export const queryDo = async (microchain: string, query: RpcGraphqlQuery): Promi
         return reject(stringify(errors))
       }
       const _data = (data as Record<string, unknown>).data
-      const payload = graphqlResponseKeyValue(
-        _data,
-        operationName[0].toLowerCase() + operationName.slice(1)
-      )
-      resolve(payload)
+      resolve(_data)
     }).catch((e) => {
       reject(e)
     })
