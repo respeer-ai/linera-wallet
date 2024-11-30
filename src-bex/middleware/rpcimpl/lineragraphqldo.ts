@@ -14,6 +14,8 @@ import type { Json } from '@metamask/utils'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { db, rpc } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
+import { graphqlResult } from 'src/utils'
+import { parse, stringify } from 'lossless-json'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
@@ -32,35 +34,42 @@ const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   return graphqlUrl
 }
 
-export const queryDo = async (microchain: string, query: RpcGraphqlQuery) => {
+export const queryDo = async (microchain: string, query: RpcGraphqlQuery): Promise<unknown> => {
   const graphqlUrl = await queryUrl(microchain, query)
-  const res = await axios({
-    method: 'post',
-    url: graphqlUrl,
-    data: query.query
+  const operationName = lineraGraphqlMutationQueryWithQuery(query.query.query) as string
+
+  return new Promise((resolve, reject) => {
+    axios.post(graphqlUrl, stringify(query.query),
+      {
+        responseType: 'text',
+        transformResponse: [data => data as string]
+      }).then((res) => {
+      const dataString = graphqlResult.rootData(res) as string
+      const data = parse(dataString)
+      const errors = (data as Record<string, unknown[]>).errors
+      if (errors && errors.length > 0) {
+        return reject(stringify(errors))
+      }
+      const _data = (data as Record<string, unknown>).data
+      const payload = graphqlResponseKeyValue(
+        _data,
+        operationName[0].toLowerCase() + operationName.slice(1)
+      )
+      resolve(payload)
+    }).catch((e) => {
+      reject(e)
+    })
   })
-  const errors = graphqlResponseData(res, 'errors') as unknown[]
-  if (errors?.length) {
-    return Promise.reject(new Error(JSON.stringify(errors)))
-  }
-  const data = graphqlResponseData(res, 'data') as Record<string, unknown>
-  return data
 }
 
 const graphqlResponseKeyValue = (data: unknown, key: string) => {
   return (data as Record<string, unknown>)[key]
 }
 
-const graphqlResponseData = (result: unknown, key: string) => {
-  return ((result as Record<string, unknown>).data as Record<string, unknown>)[
-    key
-  ]
-}
-
 export const queryApplication = async (
   microchain: string,
   query: RpcGraphqlQuery
-) => {
+): Promise<unknown> => {
   const operationName = lineraGraphqlMutationQueryWithQuery(query.query.query)
   if (!operationName) return Promise.reject('Invalid operation')
 
@@ -72,21 +81,32 @@ export const queryApplication = async (
   if (query.applicationId) {
     variables.checko_query_only = true
   }
-  const res = await axios.post(graphqlUrl, {
-    query: query.query.query,
-    variables,
-    operationName: query.query.operationName
+  return new Promise((resolve, reject) => {
+    axios.post(graphqlUrl, stringify({
+      query: query.query.query,
+      variables,
+      operationName: query.query.operationName
+    }),
+    {
+      responseType: 'text',
+      transformResponse: [data => data as string]
+    }).then((res) => {
+      const dataString = graphqlResult.rootData(res) as string
+      const data = parse(dataString)
+      const errors = (data as Record<string, unknown[]>).errors
+      if (errors && errors.length > 0) {
+        return reject(stringify(errors))
+      }
+      const _data = (data as Record<string, unknown>).data
+      const payload = graphqlResponseKeyValue(
+        _data,
+        operationName[0].toLowerCase() + operationName.slice(1)
+      )
+      resolve(payload)
+    }).catch((e) => {
+      reject(e)
+    })
   })
-  const errors = graphqlResponseData(res, 'errors') as unknown[]
-  if (errors?.length) {
-    return Promise.reject(new Error(JSON.stringify(errors)))
-  }
-  const data = graphqlResponseData(res, 'data') as Record<string, unknown>
-  const bytes = graphqlResponseKeyValue(
-    data,
-    operationName[0].toLowerCase() + operationName.slice(1)
-  )
-  return bytes
 }
 
 const queryApplicationMutation = async (
@@ -140,7 +160,7 @@ const parseSystemMutation = async (
     applicationType: db.ApplicationType.ANONYMOUS,
     operation,
     graphqlQuery: query.query.query,
-    graphqlVariables: JSON.stringify(query.query.variables),
+    graphqlVariables: stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
 

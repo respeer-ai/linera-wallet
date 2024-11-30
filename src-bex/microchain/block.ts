@@ -194,13 +194,14 @@ export class BlockSigner {
     }
   }
 
-  static async getBlockMaterial(microchain: string) {
+  static async getBlockMaterial(microchain: string, maxPendingMessages: number) {
     const blockMaterialQuery = {
       query: {
         operationName: 'blockMaterial',
         query: BLOCK_MATERIAL.loc?.source?.body,
         variables: {
-          chainId: microchain
+          chainId: microchain,
+          maxPendingMessages
         }
       }
     } as RpcGraphqlQuery
@@ -386,14 +387,14 @@ export class BlockSigner {
       BlockSigner.messageCompensates.delete(microchain)
     }
 
-    const _blockMaterial = await BlockSigner.getBlockMaterial(microchain)
-
-    if (!operation && _blockMaterial.incomingBundles.length === 0) return Promise.resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
-
     const maxProcessBundles = 2
-    const blockMaterial = { ..._blockMaterial }
-    const continueProcess = blockMaterial.incomingBundles.length > maxProcessBundles
-    blockMaterial.incomingBundles = blockMaterial.incomingBundles.slice(0, maxProcessBundles)
+    const blockMaterial = await BlockSigner.getBlockMaterial(microchain, maxProcessBundles)
+
+    if (!operation && blockMaterial.incomingBundles.length === 0) {
+      return Promise.resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
+    }
+
+    const continueProcess = blockMaterial.incomingBundles.length >= maxProcessBundles
 
     const executedBlockMaterial =
       await BlockSigner.executeBlockWithFullMaterials(
