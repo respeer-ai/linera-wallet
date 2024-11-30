@@ -38,14 +38,18 @@ export default class NotificationManager {
           )
         })
         if (_window) {
-          await browser.windows.update(_window.id as number, { focused: true })
-          const listener = this.onWindowClosed(
-            requestId,
-            _window,
-            onWindowClosed
-          )
-          browser.windows.onRemoved.addListener(listener)
-          return resolve()
+          try {
+            await browser.windows.update(_window.id as number, { focused: true })
+            const listener = this.onWindowClosed(
+              requestId,
+              _window,
+              onWindowClosed
+            )
+            browser.windows.onRemoved.addListener(listener)
+            return resolve()
+          } catch (e) {
+            // DO NOTHING
+          }
         }
         browser.windows
           .getCurrent()
