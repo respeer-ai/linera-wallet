@@ -13,7 +13,7 @@
         </div>
         <div class='text-grey-9 row flex items-center justify-center'>
           <div>
-            0x{{ shortid.shortId(address, 8) }}
+            0x{{ shortid.shortId(address, 6) }}
           </div>
           <div class='page-item-x-margin-left cursor-pointer'>
             <q-icon name='bi-copy' size='12px' :style='{marginBottom: "3px"}' @click.stop='(evt) => _copyToClipboard(address, evt)' />
