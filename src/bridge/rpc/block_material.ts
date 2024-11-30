@@ -6,13 +6,14 @@ import { BLOCK_MATERIAL } from 'src/graphql'
 import { type BlockMaterialQuery, type CandidateBlockMaterial } from 'src/__generated__/graphql/service/graphql'
 
 export class BlockMaterial {
-  static getBlockMaterial = async (chainId: string): Promise<CandidateBlockMaterial> => {
+  static getBlockMaterial = async (chainId: string, maxPendingMessages: number): Promise<CandidateBlockMaterial> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(BLOCK_MATERIAL, {
-      chainId
+      chainId,
+      maxPendingMessages
     }, {
       fetchPolicy: 'network-only'
     }))

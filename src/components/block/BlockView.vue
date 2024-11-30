@@ -225,17 +225,17 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
   }
 
   return new Promise((resolve, reject) => {
-    rpcBridge.BlockMaterial.getBlockMaterial(microchain).then(async (blockMaterial: CandidateBlockMaterial) => {
+    const maxProcessBundles = 2
+
+    rpcBridge.BlockMaterial.getBlockMaterial(microchain, maxProcessBundles).then(async (blockMaterial: CandidateBlockMaterial) => {
       if (!operation && blockMaterial.incomingBundles.length === 0) return resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
 
-      const maxProcessBundles = 2
-      const continueProcess = blockMaterial.incomingBundles.length > maxProcessBundles
-      const incomingBundles = blockMaterial.incomingBundles.slice(0, maxProcessBundles)
+      const continueProcess = blockMaterial.incomingBundles.length >= maxProcessBundles
 
       const executedBlockMaterial = await rpcBridge.ExecutedBlock.executeBlockWithFullMaterials(
         microchain,
         operation ? [operation] : [],
-        incomingBundles,
+        blockMaterial.incomingBundles,
         blockMaterial.localTime as number
       )
 

@@ -5,6 +5,7 @@ import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { EXECUTE_BLOCK_WITH_FULL_MATERIALS } from 'src/graphql'
 import { type IncomingBundle, type ExecuteBlockWithFullMaterialsMutation, type ExecutedBlockMaterial } from 'src/__generated__/graphql/service/graphql'
+import { stringify } from 'lossless-json'
 
 export class ExecutedBlock {
   static executeBlockWithFullMaterials = async (
@@ -21,7 +22,7 @@ export class ExecutedBlock {
     const res = await mutate({
       chainId,
       operations,
-      incomingBundles,
+      incomingBundles: stringify(incomingBundles),
       localTime
     })
     return (graphqlResult.rootData(res) as ExecuteBlockWithFullMaterialsMutation).executeBlockWithFullMaterials

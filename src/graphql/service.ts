@@ -16,7 +16,7 @@ export const GET_CHAIN_ACCOUNT_BALANCES = gql`
 `
 
 export const APPLICATION_WITH_DESCRIPTIONS = gql`
-  query applications($chainId: ChainId!) {
+  query applicationsWithOperations($chainId: ChainId!) {
     applications(chainId: $chainId) {
       id
       link
@@ -59,29 +59,6 @@ export const WALLET_INIT_WITHOUT_KEYPAIR = gql`
       chainId: $chainId
       messageId: $messageId
       certificateHash: $certificateHash
-    )
-  }
-`
-
-export const GET_PENDING_RAW_BLOCK = gql`
-  query getPendingRawBlock($chainId: ChainId!) {
-    peekCandidateRawBlockPayload(chainId: $chainId) {
-      height
-      payloadBytes
-    }
-  }
-`
-
-export const SUBMIT_BLOCK_SIGNATURE = gql`
-  mutation submitBlockSignature(
-    $chainId: ChainId!
-    $height: BlockHeight!
-    $signature: Signature!
-  ) {
-    submitBlockSignature(
-      chainId: $chainId
-      height: $height
-      signature: $signature
     )
   }
 `
@@ -175,8 +152,8 @@ export const BLOCK = gql`
 `
 
 export const BLOCK_MATERIAL = gql`
-  query blockMaterial($chainId: ChainId!) {
-    blockMaterial(chainId: $chainId) {
+  query blockMaterial($chainId: ChainId!, $maxPendingMessages: Int!) {
+    blockMaterial(chainId: $chainId, maxPendingMessages: $maxPendingMessages) {
       incomingBundles {
         action
         bundle {
@@ -289,24 +266,6 @@ export const PENDING_MESSAGES = gql`
       }
       origin
     }
-  }
-`
-
-export const TRANSFER_WITHOUT_BLOCK_PROPOSAL = gql`
-  mutation transferWithoutBlockProposal(
-    $fromPublicKey: PublicKey
-    $fromChainId: ChainId!
-    $toPublicKey: PublicKey
-    $toChainId: ChainId!
-    $amount: Amount!
-  ) {
-    transferWithoutBlockProposal(
-      fromPublicKey: $fromPublicKey
-      fromChainId: $fromChainId
-      toPublicKey: $toPublicKey
-      toChainId: $toChainId
-      amount: $amount
-    )
   }
 `
 

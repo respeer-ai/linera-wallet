@@ -553,17 +553,10 @@ export type MutationRoot = {
    * on this one.
    */
   requestApplication: Scalars['CryptoHash']['output'];
-  /**
-   * Requests a `RegisterApplications` message from another chain so the application can be used
-   * on this one.
-   */
-  requestApplicationWithoutBlockProposal: Scalars['ApplicationId']['output'];
   /** Retries the pending block that was unsuccessfully proposed earlier. */
   retryPendingBlock?: Maybe<Scalars['CryptoHash']['output']>;
   /** Submit block proposal with signature */
   submitBlockAndSignature: Scalars['CryptoHash']['output'];
-  /** Submit pending block proposal signature */
-  submitBlockSignature: Scalars['CryptoHash']['output'];
   /** Subscribes to a system channel. */
   subscribe: Scalars['CryptoHash']['output'];
   /**
@@ -571,12 +564,6 @@ export type MutationRoot = {
    * If no owner is given, try to take the units out of the unattributed account.
    */
   transfer: Scalars['CryptoHash']['output'];
-  /**
-   * Transfers `amount` units of value from the given owner's account to the recipient.
-   * If no owner is given, try to take the units out of the unattributed account.
-   * Different from transfer, node service won't sign block in transfer_without_block_proposal
-   */
-  transferWithoutBlockProposal: Scalars['ChainId']['output'];
   /** Unsubscribes from a system channel. */
   unsubscribe: Scalars['CryptoHash']['output'];
   /** ResPeer::CheCko::Initialize offline wallet */
@@ -706,13 +693,6 @@ export type MutationRootRequestApplicationArgs = {
 };
 
 
-export type MutationRootRequestApplicationWithoutBlockProposalArgs = {
-  applicationId: Scalars['ApplicationId']['input'];
-  chainId: Scalars['ChainId']['input'];
-  targetChainId?: InputMaybe<Scalars['ChainId']['input']>;
-};
-
-
 export type MutationRootRetryPendingBlockArgs = {
   chainId: Scalars['ChainId']['input'];
 };
@@ -729,13 +709,6 @@ export type MutationRootSubmitBlockAndSignatureArgs = {
 };
 
 
-export type MutationRootSubmitBlockSignatureArgs = {
-  chainId: Scalars['ChainId']['input'];
-  height: Scalars['BlockHeight']['input'];
-  signature: Scalars['Signature']['input'];
-};
-
-
 export type MutationRootSubscribeArgs = {
   channel: SystemChannel;
   publisherChainId: Scalars['ChainId']['input'];
@@ -748,15 +721,6 @@ export type MutationRootTransferArgs = {
   chainId: Scalars['ChainId']['input'];
   owner?: InputMaybe<Scalars['Owner']['input']>;
   recipient: Scalars['Recipient']['input'];
-};
-
-
-export type MutationRootTransferWithoutBlockProposalArgs = {
-  amount: Scalars['Amount']['input'];
-  fromChainId: Scalars['ChainId']['input'];
-  fromPublicKey?: InputMaybe<Scalars['PublicKey']['input']>;
-  toChainId: Scalars['ChainId']['input'];
-  toPublicKey?: InputMaybe<Scalars['PublicKey']['input']>;
 };
 
 
@@ -845,8 +809,6 @@ export type QueryRoot = {
   chains: Chains;
   /** Returns the maintained chains of given owner */
   chainsWithPublicKey: Chains;
-  /** Returns the next raw block proposal */
-  peekCandidateRawBlockPayload?: Maybe<RawBlockProposalPayload>;
   /** Returns the pending message of the chain */
   pendingMessages: Array<IncomingBundle>;
   /** Returns the version information on this node service. */
@@ -879,6 +841,7 @@ export type QueryRootBlockArgs = {
 
 export type QueryRootBlockMaterialArgs = {
   chainId: Scalars['ChainId']['input'];
+  maxPendingMessages: Scalars['Int']['input'];
 };
 
 
@@ -896,11 +859,6 @@ export type QueryRootChainArgs = {
 
 export type QueryRootChainsWithPublicKeyArgs = {
   publicKey: Scalars['PublicKey']['input'];
-};
-
-
-export type QueryRootPeekCandidateRawBlockPayloadArgs = {
-  chainId: Scalars['ChainId']['input'];
 };
 
 
@@ -936,12 +894,6 @@ export type QueueView_TimestampedBundleInInbox_5a630c55 = {
 
 export type QueueView_TimestampedBundleInInbox_5a630c55EntriesArgs = {
   count?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type RawBlockProposalPayload = {
-  __typename?: 'RawBlockProposalPayload';
-  height: Scalars['BlockHeight']['output'];
-  payloadBytes: Array<Scalars['Int']['output']>;
 };
 
 export type ReentrantCollectionView_ChannelFullName_ChannelStateView_629706216 = {
