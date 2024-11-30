@@ -110,7 +110,7 @@ export const lineraGraphqlOperation = (request: RpcRequest) => {
   const query = (
     request?.request?.params as unknown as RpcGraphqlQuery
   )?.query?.query?.replace('\n', '')
-  const patterns = query?.match(/\s+([a-zA-Z]+)\s+/)
+  const patterns = query?.match(/\s*([a-zA-Z]+)\s+/)
   if (!patterns) return undefined
   if (patterns?.length < 2) return undefined
   if (patterns[1] === 'query') return GraphqlOperation.QUERY
