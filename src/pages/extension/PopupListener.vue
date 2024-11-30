@@ -22,7 +22,10 @@ const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>
       })
       return localStore.popup.insertRequest(payload)
     default:
-      return void payload.respond({})
+      return void payload.respond({
+        code: -1,
+        message: 'Invalid request'
+      })
   }
 }
 

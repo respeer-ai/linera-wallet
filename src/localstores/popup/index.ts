@@ -61,10 +61,11 @@ export const usePopupStore = defineStore('popups', {
     },
     updateRequest(payload: BexPayload<commontypes.PopupRequest, unknown>) {
       if (this.popupRequestId !== Number(payload.data.request.request.id)) {
-        return
+        return false
       }
       this.popups.set(Number(payload.data.request.request.id), payload)
       this.popupPrivData = payload.data.privData
+      return true
     },
     removeRequest(requestId: number) {
       this.popups.delete(requestId)
