@@ -7,6 +7,7 @@ import { rpc } from 'src/model'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { type IncomingBundle } from 'src/__generated__/graphql/service/graphql'
 import { dbBridge } from 'src/bridge'
+import { stringify } from 'lossless-json'
 
 const constructBlock = async (
   microchain: string,
@@ -25,8 +26,8 @@ const constructBlock = async (
         owner?.address as string,
         microchain,
         microchain,
-        JSON.stringify(operation ? [operation] : []),
-        JSON.stringify(incomingBundles),
+        stringify(operation ? [operation] : []) as string,
+        stringify(incomingBundles) as string,
         BigInt(localTime),
         BigInt(1)
       ).then((v) => {

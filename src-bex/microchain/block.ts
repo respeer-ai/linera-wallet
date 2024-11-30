@@ -23,6 +23,7 @@ import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbBase, dbWallet } from '../../src/controller'
 import { _hex, graphqlResult } from '../../src/utils'
 import { HashedCertificateValue } from 'src/__generated__/graphql/sdk/graphql'
+import { parse, stringify } from 'lossless-json'
 
 export class BlockSigner {
   static running = false
@@ -106,7 +107,7 @@ export class BlockSigner {
           }
           // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const erc20Message = JSON.parse(erc20MessageStr) as rpc.ERC20Message
+          const erc20Message = parse(erc20MessageStr) as rpc.ERC20Message
           if (erc20Message?.Transfer) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await sharedStore.createActivity(
@@ -263,19 +264,19 @@ export class BlockSigner {
   ) {
     const executedOperation = executedBlock.block.operations[0] as rpc.Operation
     const operationHash = await sha3(
-      JSON.stringify(BlockSigner.sortedObject(operation), (key, value) => {
+      stringify(BlockSigner.sortedObject(operation), (key, value) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         if (value !== null) return value
-      })
+      }) as string
     )
     const executedOperationHash = await sha3(
-      JSON.stringify(
+      stringify(
         BlockSigner.sortedObject(executedOperation),
         (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
         }
-      )
+      ) as string
     )
     if (operationHash !== executedOperationHash) {
       return Promise.reject('Invalid operation payload')
@@ -283,8 +284,8 @@ export class BlockSigner {
   }
 
   static formalizeExecutedBlockBlock(executedBlock: ExecutedBlock) {
-    return JSON.parse(
-      JSON.stringify(executedBlock.block),
+    return parse(
+      stringify(executedBlock.block) as string,
       function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
         if (
@@ -308,8 +309,8 @@ export class BlockSigner {
   }
 
   static formalizeExecutedBlock(executedBlock: ExecutedBlock) {
-    return JSON.parse(
-      JSON.stringify(executedBlock),
+    return parse(
+      stringify(executedBlock) as string,
       function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
         if (
@@ -419,15 +420,15 @@ export class BlockSigner {
     const block = BlockSigner.formalizeExecutedBlockBlock(executedBlock)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const payload = await lineraWasm.executed_block_payload(
-      JSON.stringify(block, null, 2),
-      JSON.stringify(blockMaterial.round),
+      stringify(block, null, 2) as string,
+      stringify(blockMaterial.round) as string,
       ''
     )
     const owner = (await sharedStore.microchainOwner(microchain)) as db.Owner
     if (!owner) return Promise.reject('Invalid owner')
     const signature = await BlockSigner.signPayload(
       owner,
-      JSON.parse(payload) as Uint8Array
+      parse(payload) as Uint8Array
     )
     if (!signature) return Promise.reject('Failed generate signature')
 
@@ -473,7 +474,7 @@ export class BlockSigner {
     )
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
-      const _operation = JSON.parse(operation.operation) as rpc.Operation
+      const _operation = parse(operation.operation) as rpc.Operation
 
       if (_operation.User && !_operation.User.bytes) {
         operation.state = db.OperationState.FAILED
@@ -500,7 +501,7 @@ export class BlockSigner {
         if ((operation.createdAt || 0) + 10 * 1000 < Date.now()) {
           operation.state = db.OperationState.FAILED
           operation.failedAt = Date.now()
-          operation.failReason = JSON.stringify(e)
+          operation.failReason = stringify(e)
           await sharedStore.updateChainOperation(operation)
         }
         console.log('Failed process operation', e)
