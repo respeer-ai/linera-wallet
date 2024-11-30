@@ -87,13 +87,14 @@ const persistAuthentication = ref(false)
 const respond = computed(() => localStore.popup._popupRespond)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
-const request = computed(() => localStore.popup._popupPayload.data)
-const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.value.request) as string)
-const operation = computed(() => lineraGraphqlMutationOperation(request.value.request) as string)
-const graphqlQuery = computed(() => lineraGraphqlQuery(request.value.request).query)
-const graphqlVariables = computed(() => lineraGraphqlQuery(request.value.request).variables)
-const publicKey = ref(lineraGraphqlQueryPublicKey(request.value.request))
+const request = computed(() => localStore.popup._popupPayload?.data)
+const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.value?.request) as string)
+const operation = computed(() => lineraGraphqlMutationOperation(request.value?.request) as string)
+const graphqlQuery = computed(() => lineraGraphqlQuery(request.value?.request)?.query)
+const graphqlVariables = computed(() => lineraGraphqlQuery(request.value?.request)?.variables)
+const publicKey = ref(lineraGraphqlQueryPublicKey(request.value?.request))
 const popupOperation = computed(() => localStore.popup._popupPrivData as LineraOperation)
+const popupUpdated = computed(() => localStore.popup._popupUpdated)
 const operationState = ref(db.OperationState.FAILED)
 const microchain = ref(undefined as unknown as string)
 const processing = ref(false)
@@ -141,6 +142,9 @@ const checkOperationState = async (): Promise<{ operation: db.ChainOperation | u
 }
 
 const checkOperation = () => {
+  if (!popupUpdated.value) {
+    return window.setTimeout(checkOperation, 1000)
+  }
   checkOperationState().then(({ operation, executed }) => {
     if (!operation || executed) {
       processing.value = false

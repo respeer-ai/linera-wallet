@@ -126,9 +126,9 @@ const queryApplicationMutation = async (
     operationType: db.OperationType.ANONYMOUS,
     applicationId: query.applicationId,
     applicationType: db.ApplicationType.ANONYMOUS,
-    operation: JSON.stringify(operation),
+    operation: stringify(operation),
     graphqlQuery: query.query.query,
-    graphqlVariables: JSON.stringify(query.query.variables),
+    graphqlVariables: stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
 
@@ -142,7 +142,7 @@ const parseSystemMutation = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-type-assertion
   const operation = (await lineraWasm.graphql_deserialize_operation(
     query.query.query,
-    JSON.stringify(query.query.variables)
+    stringify(query.query.variables) as string
   )) as string
 
   const operationId = uuidv4()
