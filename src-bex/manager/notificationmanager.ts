@@ -39,7 +39,9 @@ export default class NotificationManager {
         })
         if (_window) {
           try {
-            await browser.windows.update(_window.id as number, { focused: true })
+            await browser.windows.update(_window.id as number, {
+              focused: true
+            })
             const listener = this.onWindowClosed(
               requestId,
               _window,

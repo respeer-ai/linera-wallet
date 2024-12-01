@@ -11,9 +11,16 @@ export class GenesisInfo {
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(NETWORK_INFO, {}, {
-      fetchPolicy: 'network-only'
-    }))
+    const { /* result, refetch, fetchMore, */ onResult, onError } =
+      provideApolloClient(apolloClient)(() =>
+        useQuery(
+          NETWORK_INFO,
+          {},
+          {
+            fetchPolicy: 'network-only'
+          }
+        )
+      )
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
@@ -21,7 +28,7 @@ export class GenesisInfo {
       })
 
       onError((error) => {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         reject(new Error(`Get block: ${error}`))
       })
     })

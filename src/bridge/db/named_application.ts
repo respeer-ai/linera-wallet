@@ -3,7 +3,7 @@ import { db } from 'src/model'
 
 export class NamedApplication {
   static initialize = async () => {
-    if (await dbWallet.namedApplications.count() > 0) return
+    if ((await dbWallet.namedApplications.count()) > 0) return
     for (const namedApplication of db.defaultNamedApplications) {
       await dbWallet.namedApplications.add(namedApplication)
     }
@@ -14,14 +14,21 @@ export class NamedApplication {
   }
 
   static update = async (namedApplication: db.NamedApplication) => {
-    await dbWallet.namedApplications.update(namedApplication.id, namedApplication)
+    await dbWallet.namedApplications.update(
+      namedApplication.id,
+      namedApplication
+    )
   }
 
   static delete = async (id: number) => {
     await dbWallet.namedApplications.delete(id)
   }
 
-  static namedApplicationWithType = async (applicationType: db.ApplicationType): Promise<db.NamedApplication | undefined> => {
-    return (await dbWallet.namedApplications.toArray()).find((el) => el.applicationType === applicationType)
+  static namedApplicationWithType = async (
+    applicationType: db.ApplicationType
+  ): Promise<db.NamedApplication | undefined> => {
+    return (await dbWallet.namedApplications.toArray()).find(
+      (el) => el.applicationType === applicationType
+    )
   }
 }

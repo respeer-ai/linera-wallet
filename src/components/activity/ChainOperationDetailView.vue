@@ -145,7 +145,7 @@ const operationType = computed(() => {
 
 const operationChain = ref(undefined as unknown as db.Microchain)
 
-const operationState = computed(() => db.OperationState[operation.value.state === db.OperationState.POST_PROCESSED ? db.OperationState.CONFIRMED : operation.value.state])
+const operationState = computed(() => db.OperationState[operation.value.state])
 const operationStr = computed(() => JSON.stringify(JSON.parse(operation.value.operation), null, 2))
 
 const emit = defineEmits<{(ev: 'back'): void,

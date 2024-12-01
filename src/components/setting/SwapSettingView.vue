@@ -73,9 +73,11 @@ const onSaveSwapApplicationId = async () => {
 
     for (const microchain of microchains) {
       try {
-        if (!await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, false)) {
-          await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, db.ApplicationType.SWAP)
+        if (operationId) {
+          await rpcBridge.Operation.waitOperation(operationId)
         }
+        await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, false)
       } catch (e) {
         console.log('Faled refresh swap application', e)
       }
@@ -96,14 +98,15 @@ const onRefresh = async () => {
   if (!swapApplicationId.value?.length) return
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(swapApplicationId.value)
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
       try {
-        if (!await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, true)) {
-          await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, creationChain, db.ApplicationType.SWAP)
+        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, db.ApplicationType.SWAP)
+        if (operationId) {
+          await rpcBridge.Operation.waitOperation(operationId)
         }
+        await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, false)
       } catch (e) {
         console.log('Faled refresh swap application', e)
       }

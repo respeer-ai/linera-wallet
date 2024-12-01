@@ -75,9 +75,11 @@ const onSaveAMSApplicationId = async () => {
 
     for (const microchain of microchains) {
       try {
-        if (!await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain, false)) {
-          await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, db.ApplicationType.AMS)
+        if (operationId) {
+          await rpcBridge.Operation.waitOperation(operationId)
         }
+        await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain, false)
       } catch (e) {
         console.log('Faled save ams application', e)
       }
@@ -98,14 +100,15 @@ const onRefresh = async () => {
   if (!amsApplicationId.value?.length) return
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(amsApplicationId.value)
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
       try {
-        if (!await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain, true)) {
-          await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, creationChain, db.ApplicationType.AMS)
+        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, db.ApplicationType.AMS)
+        if (operationId) {
+          await rpcBridge.Operation.waitOperation(operationId)
         }
+        await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain, false)
       } catch (e) {
         console.log('Faled refresh ams application', e)
       }

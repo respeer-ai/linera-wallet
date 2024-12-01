@@ -83,8 +83,8 @@ const onSaveWlineraApplicationId = async () => {
 
     for (const microchain of microchains) {
       try {
-        if (!await rpcBridge.ERC20ApplicationOperation.subscribeWLineraCreationChain(microchain.microchain, false)) {
-          await rpcBridge.Operation.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        if (await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, wlineraApplicationId.value, db.ApplicationType.WLINERA)) {
+          await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(microchain.microchain, wlineraApplicationId.value, false)
         }
       } catch (e) {
         console.log('Faled refresh swap application', e)
@@ -100,13 +100,12 @@ const onRefresh = async () => {
   if (!wlineraApplicationId.value?.length) return
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(wlineraApplicationId.value)
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
       try {
-        if (!await rpcBridge.ERC20ApplicationOperation.subscribeWLineraCreationChain(microchain.microchain, true)) {
-          await rpcBridge.Operation.requestApplication(microchain.microchain, wlineraApplicationId.value, creationChain, db.ApplicationType.WLINERA)
+        if (await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, wlineraApplicationId.value, db.ApplicationType.WLINERA)) {
+          await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(microchain.microchain, wlineraApplicationId.value, false)
         }
       } catch (e) {
         console.log('Faled refresh wlinera application', e)

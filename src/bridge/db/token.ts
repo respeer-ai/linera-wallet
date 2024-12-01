@@ -9,7 +9,12 @@ export class Token {
   }
 
   static create = async (token: db.Token) => {
-    if ((await dbBase.tokens.toArray()).findIndex((el) => el.applicationId === token.applicationId) >= 0) return
+    if (
+      (await dbBase.tokens.toArray()).findIndex(
+        (el) => el.applicationId === token.applicationId
+      ) >= 0
+    )
+      return
     await dbBase.tokens.add(token)
   }
 
@@ -26,15 +31,22 @@ export class Token {
   }
 
   static fungibles = async () => {
-    return (await dbBase.tokens.toArray()).filter((el) => el.tokenType === db.TokenType.Fungible)
+    return (await dbBase.tokens.toArray()).filter(
+      (el) => el.tokenType === db.TokenType.Fungible
+    )
   }
 
   static token = async (applicationId: string) => {
-    return (await dbBase.tokens.toArray()).find((el) => el.applicationId === applicationId)
+    return (await dbBase.tokens.toArray()).find(
+      (el) => el.applicationId === applicationId
+    )
   }
 
-  static tokens = async (offset: number, limit: number): Promise<db.Token[]> => {
-    return (await dbBase.tokens.offset(offset).limit(limit).toArray())
+  static tokens = async (
+    offset: number,
+    limit: number
+  ): Promise<db.Token[]> => {
+    return await dbBase.tokens.offset(offset).limit(limit).toArray()
   }
 
   static count = async () => {
@@ -43,5 +55,14 @@ export class Token {
 
   static tokenWithId = async (id: number) => {
     return (await dbBase.tokens.toArray()).find((el) => el.id === id)
+  }
+
+  static exists = async (applicationId: string) => {
+    return (
+      (await dbBase.tokens
+        .where('applicationId')
+        .equals(applicationId)
+        .first()) !== undefined
+    )
   }
 }

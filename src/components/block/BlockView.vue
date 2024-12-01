@@ -8,7 +8,7 @@
 <script setup lang='ts'>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { db, rpc } from 'src/model'
-import { localStore, operationDef } from 'src/localstores'
+import { localStore } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { toSnake } from 'ts-case-convert'
@@ -459,51 +459,6 @@ const _handleOperations = async () => {
         // When fail, don't continue
         continue
       }
-    }
-  }
-  const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CONFIRMED])
-  for (const operation of operations) {
-    const _operation = parse(operation.operation) as rpc.Operation
-    try {
-      switch (operation.operationType) {
-        case operationDef.OperationType.SUBSCRIBE_CREATOR_CHAIN:
-          if (operation.applicationType === db.ApplicationType.ERC20 || operation.applicationType === db.ApplicationType.WLINERA) {
-            const { success, retry } = await rpcBridge.ERC20ApplicationOperation.persistApplication(operation.microchain, _operation.User.application_id)
-            if (!success && retry) continue
-          }
-          await dbBridge.ApplicationCreatorChainSubscription.create(operation.microchain, _operation.User.application_id)
-          operation.state = db.OperationState.POST_PROCESSED
-          await dbBridge.ChainOperation.update(operation)
-          break
-        case operationDef.OperationType.REQUEST_APPLICATION:
-          if (operation.applicationType === db.ApplicationType.WLINERA) {
-            if (await rpcBridge.ERC20ApplicationOperation.subscribeWLineraCreationChain(operation.microchain, true)) {
-              operation.state = db.OperationState.POST_PROCESSED
-              await dbBridge.ChainOperation.update(operation)
-            }
-          } else if (operation.applicationType === db.ApplicationType.ERC20) {
-            if (await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(operation.microchain, _operation.System.RequestApplication.application_id, true)) {
-              operation.state = db.OperationState.POST_PROCESSED
-              await dbBridge.ChainOperation.update(operation)
-            }
-          } else if (operation.applicationType === db.ApplicationType.SWAP) {
-            if (await rpcBridge.SwapApplicationOperation.subscribeCreationChain(operation.microchain, true)) {
-              operation.state = db.OperationState.POST_PROCESSED
-              await dbBridge.ChainOperation.update(operation)
-            }
-          } else if (operation.applicationType === db.ApplicationType.AMS) {
-            if (await rpcBridge.AMSApplicationOperation.subscribeCreationChain(operation.microchain, true)) {
-              operation.state = db.OperationState.POST_PROCESSED
-              await dbBridge.ChainOperation.update(operation)
-            }
-          }
-          break
-      }
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Failed post process operation: ${error}`)
-      // When fail, don't continue
-      continue
     }
   }
 }

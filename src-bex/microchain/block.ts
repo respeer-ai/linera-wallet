@@ -195,7 +195,10 @@ export class BlockSigner {
     }
   }
 
-  static async getBlockMaterial(microchain: string, maxPendingMessages: number) {
+  static async getBlockMaterial(
+    microchain: string,
+    maxPendingMessages: number
+  ) {
     const blockMaterialQuery = {
       query: {
         operationName: 'blockMaterial',
@@ -270,13 +273,10 @@ export class BlockSigner {
       }) as string
     )
     const executedOperationHash = await sha3(
-      stringify(
-        BlockSigner.sortedObject(executedOperation),
-        (key, value) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          if (value !== null) return value
-        }
-      ) as string
+      stringify(BlockSigner.sortedObject(executedOperation), (key, value) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        if (value !== null) return value
+      }) as string
     )
     if (operationHash !== executedOperationHash) {
       return Promise.reject('Invalid operation payload')
@@ -389,13 +389,20 @@ export class BlockSigner {
     }
 
     const maxProcessBundles = 2
-    const blockMaterial = await BlockSigner.getBlockMaterial(microchain, maxProcessBundles)
+    const blockMaterial = await BlockSigner.getBlockMaterial(
+      microchain,
+      maxProcessBundles
+    )
 
     if (!operation && blockMaterial.incomingBundles.length === 0) {
-      return Promise.resolve({ certificateHash: undefined as unknown as string, isRetryBlock: false })
+      return Promise.resolve({
+        certificateHash: undefined as unknown as string,
+        isRetryBlock: false
+      })
     }
 
-    const continueProcess = blockMaterial.incomingBundles.length >= maxProcessBundles
+    const continueProcess =
+      blockMaterial.incomingBundles.length >= maxProcessBundles
 
     const executedBlockMaterial =
       await BlockSigner.executeBlockWithFullMaterials(
@@ -446,9 +453,12 @@ export class BlockSigner {
       )
 
       if (continueProcess) {
-        BlockSigner.messageCompensates.set(microchain, setTimeout(() => {
-          void BlockSigner.processNewIncomingMessageWithOperation(microchain)
-        }, 1000) as unknown as number)
+        BlockSigner.messageCompensates.set(
+          microchain,
+          setTimeout(() => {
+            void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+          }, 1000) as unknown as number
+        )
       }
 
       return { certificateHash, isRetryBlock }
@@ -458,11 +468,17 @@ export class BlockSigner {
           clearTimeout(BlockSigner.messageCompensates.get(microchain))
           BlockSigner.messageCompensates.delete(microchain)
         }
-        BlockSigner.messageCompensates.set(microchain, setTimeout(() => {
-          void BlockSigner.processNewIncomingMessageWithOperation(microchain)
-        }, 1000) as unknown as number)
+        BlockSigner.messageCompensates.set(
+          microchain,
+          setTimeout(() => {
+            void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+          }, 1000) as unknown as number
+        )
       }
-      return { certificateHash: undefined as unknown as string, isRetryBlock: false }
+      return {
+        certificateHash: undefined as unknown as string,
+        isRetryBlock: false
+      }
     }
   }
 

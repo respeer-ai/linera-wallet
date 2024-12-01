@@ -3,7 +3,10 @@ import { db } from 'src/model'
 
 export class OriginRpcMicrochain {
   static formalize = async (origin: string) => {
-    const microchains = await dbBase.rpcMicrochains.where('origin').equals(origin).toArray()
+    const microchains = await dbBase.rpcMicrochains
+      .where('origin')
+      .equals(origin)
+      .toArray()
     if (microchains.length > 1) {
       for (const microchain of microchains) {
         await dbBase.rpcMicrochains.delete(microchain.id)
@@ -11,13 +14,19 @@ export class OriginRpcMicrochain {
     }
   }
 
-  static create = async (origin: string, publicKey: string, microchain: string) => {
+  static create = async (
+    origin: string,
+    publicKey: string,
+    microchain: string
+  ) => {
     await OriginRpcMicrochain.formalize(origin)
-    const _microchain = await dbBase.rpcMicrochains.where('origin').equals(origin).first() || {
-      origin,
-      publicKey,
-      microchain
-    } as db.OriginRpcMicrochain
+    const _microchain =
+      (await dbBase.rpcMicrochains.where('origin').equals(origin).first()) ||
+      ({
+        origin,
+        publicKey,
+        microchain
+      } as db.OriginRpcMicrochain)
     _microchain.microchain = microchain
     _microchain.id === undefined
       ? await dbBase.rpcMicrochains.add(_microchain)

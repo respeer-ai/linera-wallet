@@ -8,20 +8,27 @@ export class Network {
   }
 
   static resetSelected = async () => {
-    const networks = await dbBase.networks.filter((network) => network.selected).toArray()
+    const networks = await dbBase.networks
+      .filter((network) => network.selected)
+      .toArray()
     for (const network of networks) {
       await dbBase.networks.update(network.id, { selected: false })
     }
   }
 
   static create = async (network: db.Network) => {
-    if (await Network.exists(network.name)) return Promise.reject('Already exists')
+    if (await Network.exists(network.name))
+      return Promise.reject('Already exists')
     if (network.selected) await Network.resetSelected()
     await dbBase.networks.add(network)
   }
 
   static update = async (network: db.Network) => {
-    if (await Network.exists(network.name) && !await Network.exists(network.name, network.id)) return Promise.reject('Already exists')
+    if (
+      (await Network.exists(network.name)) &&
+      !(await Network.exists(network.name, network.id))
+    )
+      return Promise.reject('Already exists')
     if (network.selected) await Network.resetSelected()
     await dbBase.networks.update(network.id, network)
   }
@@ -35,6 +42,12 @@ export class Network {
   }
 
   static exists = async (name: string, id?: number) => {
-    return await dbBase.networks.where('name').equals(name).and((network) => id === undefined || network.id === id).count() > 0
+    return (
+      (await dbBase.networks
+        .where('name')
+        .equals(name)
+        .and((network) => id === undefined || network.id === id)
+        .count()) > 0
+    )
   }
 }

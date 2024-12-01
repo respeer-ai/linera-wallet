@@ -31,7 +31,7 @@
         <div class='row'>
           <q-space />
           <div :class='[ operation.state === db.OperationState.FAILED ? "text-red-6" : "text-green" ]'>
-            {{ db.OperationState[operation.state === db.OperationState.POST_PROCESSED ? db.OperationState.CONFIRMED : operation.state] }}
+            {{ db.OperationState[operation.state] }}
           </div>
         </div>
       </div>

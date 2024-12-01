@@ -3,7 +3,9 @@ import { db } from 'src/model'
 
 export class Password {
   static resetActive = async () => {
-    for (const passwd of (await dbBase.passwords.toArray()).filter((el) => el.active)) {
+    for (const passwd of (await dbBase.passwords.toArray()).filter(
+      (el) => el.active
+    )) {
       await dbBase.passwords.update(passwd.id, { active: false })
     }
   }
@@ -24,7 +26,10 @@ export class Password {
     await Password.resetActive()
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid finterprint')
-    const _passwd = db.buildPassword(passwd || password || '', fingerPrint.fingerPrint)
+    const _passwd = db.buildPassword(
+      passwd || password || '',
+      fingerPrint.fingerPrint
+    )
     if (_passwd) {
       await dbBase.passwords.add(_passwd)
     }

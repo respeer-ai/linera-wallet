@@ -11,36 +11,88 @@ import { MonoApplicationOperation } from './mono_application_opeartion'
 import { Operation } from './operation'
 
 export class ERC20ApplicationOperation {
-  static subscribeWLineraCreationChain = async (chainId: string, force?: boolean): Promise<boolean> => {
-    return await MonoApplicationOperation.subscribeCreationChainWithType(chainId, db.ApplicationType.WLINERA, force) || false
+  static subscribeWLineraCreationChain = async (
+    chainId: string,
+    force?: boolean
+  ) => {
+    await MonoApplicationOperation.subscribeCreationChainWithType(
+      chainId,
+      db.ApplicationType.WLINERA,
+      force
+    )
   }
 
-  static subscribeCreationChain = async (chainId: string, applicationId: string, force?: boolean): Promise<boolean> => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-    return await MonoApplicationOperation.subscribeCreationChainWithId(chainId, applicationId, db.ApplicationType.ERC20, force) || false
+  static subscribeCreationChain = async (
+    chainId: string,
+    applicationId: string,
+    force?: boolean
+  ) => {
+    await MonoApplicationOperation.subscribeCreationChainWithId(
+      chainId,
+      applicationId,
+      db.ApplicationType.ERC20,
+      force
+    )
   }
 
-  static requestApplication = async (chainId: string, applicationId: string, creationChainId: string) => {
-    await Operation.requestApplication(chainId, applicationId, creationChainId, db.ApplicationType.ERC20)
+  static requestApplication = async (
+    chainId: string,
+    applicationId: string,
+    applicationType?: db.ApplicationType
+  ): Promise<string | undefined> => {
+    return await Operation.requestApplication(
+      chainId,
+      applicationId,
+      applicationType || db.ApplicationType.ERC20
+    )
   }
 
-  static persistApplication = async (chainId: string, applicationId: string): Promise<{ success: boolean, retry?: boolean }> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Application, chainId, applicationId)
+  static persistApplication = async (
+    chainId: string,
+    applicationId: string,
+    applicationType?: db.ApplicationType
+  ): Promise<boolean> => {
+    const operationId = await ERC20ApplicationOperation.requestApplication(
+      chainId,
+      applicationId,
+      applicationType
+    )
+    if (operationId) {
+      if (!(await Operation.waitOperation(operationId))) {
+        return Promise.reject('Failed request application')
+      }
+    }
+
+    if (!(await dbBridge.Token.exists(applicationId)))
+      return operationId !== undefined
+
+    const options = await getClientOptionsWithEndpointType(
+      EndpointType.Application,
+      chainId,
+      applicationId
+    )
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(TOKEN_METADATA, {
-      // NO PARAMETER
-    }, {
-      fetchPolicy: 'network-only'
-    }))
+    const { /* result, refetch, fetchMore, */ onResult, onError } =
+      provideApolloClient(apolloClient)(() =>
+        useQuery(
+          TOKEN_METADATA,
+          {
+            // NO PARAMETER
+          },
+          {
+            fetchPolicy: 'network-only'
+          }
+        )
+      )
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       onResult((res) => {
         const token = graphqlResult.rootData(res) as rpc.ERC20Token
         if (!token.tokenMetadata) {
           // Add to ticker run let block subscription run it
-          return resolve({ success: false, retry: true })
+          return reject('Invalid token metadata')
         }
         void dbBridge.Token.create({
           name: token.name,
@@ -60,21 +112,22 @@ export class ERC20ApplicationOperation {
           github: token.tokenMetadata.github,
           mintable: token.tokenMetadata.mintable
         })
-        return resolve({ success: true })
+        return resolve(operationId !== undefined)
       })
 
-      onError((error) => {
-        if (error.graphQLErrors?.length === 0) {
-          return resolve({ success: false, retry: true })
-        }
+      onError((e) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Query token metadata: ${error}`)
-        return resolve({ success: false, retry: false })
+        console.log(`Query token metadata: ${e}`)
+        reject(e)
       })
     })
   }
 
-  static balanceOf = async (chainId: string, applicationId: string, publicKey?: string): Promise<number> => {
+  static balanceOf = async (
+    chainId: string,
+    applicationId: string,
+    publicKey?: string
+  ): Promise<number> => {
     const chainAccountOwner = {
       chain_id: chainId
     } as rpc.ChainAccountOwner
@@ -82,15 +135,26 @@ export class ERC20ApplicationOperation {
       const owner = await db.ownerFromPublicKey(publicKey)
       chainAccountOwner.owner = `User:${owner}`
     }
-    const options = await getClientOptionsWithEndpointType(EndpointType.Application, chainId, applicationId)
+    const options = await getClientOptionsWithEndpointType(
+      EndpointType.Application,
+      chainId,
+      applicationId
+    )
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { /* result, refetch, fetchMore, */ onResult, onError } = provideApolloClient(apolloClient)(() => useQuery(BALANCE_OF, {
-      owner: chainAccountOwner
-    }, {
-      fetchPolicy: 'network-only'
-    }))
+    const { /* result, refetch, fetchMore, */ onResult, onError } =
+      provideApolloClient(apolloClient)(() =>
+        useQuery(
+          BALANCE_OF,
+          {
+            owner: chainAccountOwner
+          },
+          {
+            fetchPolicy: 'network-only'
+          }
+        )
+      )
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
@@ -105,13 +169,24 @@ export class ERC20ApplicationOperation {
     })
   }
 
-  static mint = async (chainId: string, applicationId: string, to: rpc.ChainAccountOwner | undefined, amount: number) => {
+  static mint = async (
+    chainId: string,
+    applicationId: string,
+    to: rpc.ChainAccountOwner | undefined,
+    amount: number
+  ) => {
     try {
       const variables = {
         to,
         amount: amount.toString()
       }
-      const queryRespBytes = await ApplicationOperation.queryApplication(chainId, applicationId, MINT, 'mint', variables)
+      const queryRespBytes = await ApplicationOperation.queryApplication(
+        chainId,
+        applicationId,
+        MINT,
+        'mint',
+        variables
+      )
 
       const operation = {
         operationType: db.OperationType.MINT,
@@ -135,13 +210,24 @@ export class ERC20ApplicationOperation {
     }
   }
 
-  static transfer = async (chainId: string, applicationId: string, to: rpc.ChainAccountOwner | undefined, amount: number) => {
+  static transfer = async (
+    chainId: string,
+    applicationId: string,
+    to: rpc.ChainAccountOwner | undefined,
+    amount: number
+  ) => {
     try {
       const variables = {
         to,
         amount: amount.toString()
       }
-      const queryRespBytes = await ApplicationOperation.queryApplication(chainId, applicationId, TRANSFER_ERC20, 'transfer', variables)
+      const queryRespBytes = await ApplicationOperation.queryApplication(
+        chainId,
+        applicationId,
+        TRANSFER_ERC20,
+        'transfer',
+        variables
+      )
 
       const operation = {
         operationType: db.OperationType.MINT,

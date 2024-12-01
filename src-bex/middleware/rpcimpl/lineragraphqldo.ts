@@ -34,26 +34,31 @@ const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   return graphqlUrl
 }
 
-export const queryDo = async (microchain: string, query: RpcGraphqlQuery): Promise<unknown> => {
+export const queryDo = async (
+  microchain: string,
+  query: RpcGraphqlQuery
+): Promise<unknown> => {
   const graphqlUrl = await queryUrl(microchain, query)
 
   return new Promise((resolve, reject) => {
-    axios.post(graphqlUrl, stringify(query.query),
-      {
+    axios
+      .post(graphqlUrl, stringify(query.query), {
         responseType: 'text',
-        transformResponse: [data => data as string]
-      }).then((res) => {
-      const dataString = graphqlResult.rootData(res) as string
-      const data = parse(dataString)
-      const errors = (data as Record<string, unknown[]>).errors
-      if (errors && errors.length > 0) {
-        return reject(stringify(errors))
-      }
-      const _data = (data as Record<string, unknown>).data
-      resolve(_data)
-    }).catch((e) => {
-      reject(e)
-    })
+        transformResponse: [(data) => data as string]
+      })
+      .then((res) => {
+        const dataString = graphqlResult.rootData(res) as string
+        const data = parse(dataString)
+        const errors = (data as Record<string, unknown[]>).errors
+        if (errors && errors.length > 0) {
+          return reject(stringify(errors))
+        }
+        const _data = (data as Record<string, unknown>).data
+        resolve(_data)
+      })
+      .catch((e) => {
+        reject(e)
+      })
   })
 }
 
@@ -77,30 +82,36 @@ export const queryApplication = async (
     variables.checko_query_only = true
   }
   return new Promise((resolve, reject) => {
-    axios.post(graphqlUrl, stringify({
-      query: query.query.query,
-      variables,
-      operationName: query.query.operationName
-    }),
-    {
-      responseType: 'text',
-      transformResponse: [data => data as string]
-    }).then((res) => {
-      const dataString = graphqlResult.rootData(res) as string
-      const data = parse(dataString)
-      const errors = (data as Record<string, unknown[]>).errors
-      if (errors && errors.length > 0) {
-        return reject(stringify(errors))
-      }
-      const _data = (data as Record<string, unknown>).data
-      const payload = graphqlResponseKeyValue(
-        _data,
-        operationName[0].toLowerCase() + operationName.slice(1)
+    axios
+      .post(
+        graphqlUrl,
+        stringify({
+          query: query.query.query,
+          variables,
+          operationName: query.query.operationName
+        }),
+        {
+          responseType: 'text',
+          transformResponse: [(data) => data as string]
+        }
       )
-      resolve(payload)
-    }).catch((e) => {
-      reject(e)
-    })
+      .then((res) => {
+        const dataString = graphqlResult.rootData(res) as string
+        const data = parse(dataString)
+        const errors = (data as Record<string, unknown[]>).errors
+        if (errors && errors.length > 0) {
+          return reject(stringify(errors))
+        }
+        const _data = (data as Record<string, unknown>).data
+        const payload = graphqlResponseKeyValue(
+          _data,
+          operationName[0].toLowerCase() + operationName.slice(1)
+        )
+        resolve(payload)
+      })
+      .catch((e) => {
+        reject(e)
+      })
   })
 }
 

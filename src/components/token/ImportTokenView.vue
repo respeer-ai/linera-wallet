@@ -34,8 +34,6 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
-import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { rpcBridge } from 'src/bridge'
 
 const applicationId = ref('')
@@ -55,12 +53,11 @@ const onImportClick = async () => {
   if (applicationIdError.value) return
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(applicationId.value)
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      if (!await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(microchain.microchain, applicationId.value, false)) {
-        await rpcBridge.Operation.requestApplication(microchain.microchain, applicationId.value, creationChain, db.ApplicationType.ERC20)
+      if (await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, applicationId.value)) {
+        await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(microchain.microchain, applicationId.value, false)
       }
     }
 

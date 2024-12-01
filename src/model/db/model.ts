@@ -348,7 +348,6 @@ export enum OperationState {
   EXECUTING,
   EXECUTED,
   CONFIRMED,
-  POST_PROCESSED,
   FAILED
 }
 
