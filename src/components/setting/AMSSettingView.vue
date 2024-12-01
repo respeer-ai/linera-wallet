@@ -36,6 +36,7 @@
         flat class='btn btn-alt vertical-menus-margin full-width' label='Submit'
         no-caps @click='onSaveAMSApplicationId'
         :disable='!amsApplicationId?.length'
+        :loading='updatingAMSApplication'
       />
     </div>
   </div>
@@ -55,6 +56,7 @@ import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
 const nameApplications = ref([] as db.NamedApplication[])
 
 const editingAMSApplication = ref(false)
+const updatingAMSApplication = ref(false)
 
 const amsApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.AMS))
 const amsApplicationId = ref(amsApplication.value?.applicationId)
@@ -68,6 +70,7 @@ const namedApplicationBridge = ref<InstanceType<typeof NamedApplicationBridge>>(
 const onSaveAMSApplicationId = async () => {
   if (!amsApplicationId.value?.length) return
   editingAMSApplication.value = false
+  updatingAMSApplication.value = true
 
   try {
     const creationChain = await lineraWasm.application_creation_chain_id(amsApplicationId.value)
@@ -90,14 +93,18 @@ const onSaveAMSApplicationId = async () => {
       applicationId: amsApplicationId.value,
       creatorChain: creationChain
     } as db.NamedApplication)
+
+    updatingAMSApplication.value = false
   } catch (error) {
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Failed update ams application: ${error}`)
+    updatingAMSApplication.value = false
   }
 }
 
 const onRefresh = async () => {
   if (!amsApplicationId.value?.length) return
+  updatingAMSApplication.value = true
 
   try {
     const microchains = await dbWallet.microchains.toArray()
@@ -120,6 +127,8 @@ const onRefresh = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
+
+    updatingAMSApplication.value = false
   } catch (e) {
     localStore.notification.pushNotification({
       Title: 'Refresh AMS application',
@@ -128,6 +137,7 @@ const onRefresh = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })
+    updatingAMSApplication.value = false
   }
 }
 

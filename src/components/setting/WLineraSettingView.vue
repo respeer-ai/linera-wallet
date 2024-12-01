@@ -38,6 +38,7 @@
         flat class='btn btn-alt vertical-menus-margin full-width' label='Save'
         no-caps @click='onSaveWlineraApplicationId'
         :disable='!wlineraApplicationId?.length'
+        :loading='updatingWlineraApplication'
       />
     </div>
   </div>
@@ -57,6 +58,7 @@ import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
 const nameApplications = ref([] as db.NamedApplication[])
 
 const editingWlineraApplication = ref(false)
+const updatingWlineraApplication = ref(false)
 
 const wlineraApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.WLINERA))
 const wlineraApplicationId = ref(wlineraApplication.value?.applicationId)
@@ -70,6 +72,7 @@ const namedApplicationBridge = ref<InstanceType<typeof NamedApplicationBridge>>(
 const onSaveWlineraApplicationId = async () => {
   if (!wlineraApplicationId.value?.length) return
   editingWlineraApplication.value = false
+  updatingWlineraApplication.value = true
 
   try {
     const creationChain = await lineraWasm.application_creation_chain_id(wlineraApplicationId.value)
@@ -88,14 +91,18 @@ const onSaveWlineraApplicationId = async () => {
         console.log('Faled save swap application', e)
       }
     }
+
+    updatingWlineraApplication.value = false
   } catch (error) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Failed update wlinera application: ${error}`)
+    updatingWlineraApplication.value = false
   }
 }
 
 const onRefresh = async () => {
   if (!wlineraApplicationId.value?.length) return
+  updatingWlineraApplication.value = true
 
   try {
     const microchains = await dbWallet.microchains.toArray()
@@ -114,6 +121,8 @@ const onRefresh = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
+
+    updatingWlineraApplication.value = false
   } catch (e) {
     localStore.notification.pushNotification({
       Title: 'Refresh WLinera application',
@@ -122,6 +131,7 @@ const onRefresh = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })
+    updatingWlineraApplication.value = false
   }
 }
 

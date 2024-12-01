@@ -36,6 +36,7 @@
         flat class='btn btn-alt vertical-menus-margin full-width' label='Submit'
         no-caps @click='onSaveSwapApplicationId'
         :disable='!swapApplicationId?.length'
+        :loading='updatingSwapApplication'
       />
     </div>
   </div>
@@ -55,6 +56,7 @@ import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
 const nameApplications = ref([] as db.NamedApplication[])
 
 const editingSwapApplication = ref(false)
+const updatingSwapApplication = ref(false)
 
 const swapApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.SWAP))
 const swapApplicationId = ref(swapApplication.value?.applicationId)
@@ -66,6 +68,7 @@ watch(swapApplication, () => {
 const onSaveSwapApplicationId = async () => {
   if (!swapApplicationId.value?.length) return
   editingSwapApplication.value = false
+  updatingSwapApplication.value = true
 
   try {
     const creationChain = await lineraWasm.application_creation_chain_id(swapApplicationId.value)
@@ -88,14 +91,18 @@ const onSaveSwapApplicationId = async () => {
       applicationId: swapApplicationId.value,
       creatorChain: creationChain
     } as db.NamedApplication)
+
+    updatingSwapApplication.value = false
   } catch (error) {
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Failed update swap application: ${error}`)
+    updatingSwapApplication.value = false
   }
 }
 
 const onRefresh = async () => {
   if (!swapApplicationId.value?.length) return
+  updatingSwapApplication.value = true
 
   try {
     const microchains = await dbWallet.microchains.toArray()
@@ -118,6 +125,8 @@ const onRefresh = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
+
+    updatingSwapApplication.value = false
   } catch (e) {
     localStore.notification.pushNotification({
       Title: 'Refresh Swap application',
@@ -126,6 +135,7 @@ const onRefresh = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })
+    updatingSwapApplication.value = false
   }
 }
 
