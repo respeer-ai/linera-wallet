@@ -56,7 +56,7 @@
   />
   <DbOwnerBridge v-model:selected-owner='owner' />
   <DbMicrochainOwnerBalanceBridge
-    v-if='nativeTokenId !== undefined'
+    v-if='nativeTokenId !== undefined && owner'
     v-model:token-balance='ownerTokenBalance' v-model:usd-balance='ownerUsdBalance' :token-id='nativeTokenId' :microchain-id='microchain.microchain'
     :owner='owner?.owner'
   />
