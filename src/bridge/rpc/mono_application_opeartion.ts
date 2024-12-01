@@ -8,8 +8,7 @@ export class MonoApplicationOperation {
   static subscribeCreationChainWithId = async (
     chainId: string,
     applicationId: string,
-    applicationType: db.ApplicationType,
-    force?: boolean
+    applicationType: db.ApplicationType
   ) => {
     const applications = await Application.microchainApplications(chainId)
     if (!applications) return
@@ -18,19 +17,17 @@ export class MonoApplicationOperation {
         (el: ApplicationOverview) => el.id === applicationId
       ) < 0
     )
-      return false
+      return
     await ApplicationOperation.subscribeCreatorChain(
       chainId,
       applicationId,
-      applicationType,
-      force
+      applicationType
     )
   }
 
   static subscribeCreationChainWithType = async (
     chainId: string,
-    applicationType: db.ApplicationType,
-    force?: boolean
+    applicationType: db.ApplicationType
   ) => {
     const application =
       (await dbBridge.NamedApplication.namedApplicationWithType(
@@ -40,8 +37,7 @@ export class MonoApplicationOperation {
     await MonoApplicationOperation.subscribeCreationChainWithId(
       chainId,
       application.applicationId,
-      applicationType,
-      force
+      applicationType
     )
   }
 }

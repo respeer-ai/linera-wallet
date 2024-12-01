@@ -1,11 +1,12 @@
 import { DocumentNode } from 'graphql'
 import { rpc, db } from 'src/model'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { graphqlResult } from 'src/utils'
-import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE } from 'src/graphql'
+import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE, SCHEMA } from 'src/graphql'
 import { uid } from 'quasar'
 import * as dbBridge from '../db'
 import { Operation } from './operation'
+import { stringify } from 'lossless-json'
 
 export class ApplicationOperation {
   static existChainApplication = async (
@@ -15,16 +16,19 @@ export class ApplicationOperation {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return false
 
-    // TODO: application creation chain may not loaded in our rpc endpoint
-
     const applicationUrl = `http://${network?.host}:${network?.port}/chains/${chainId}/applications/${applicationId}`
     return new Promise((resolve, reject) => {
       axios
-        .get(applicationUrl)
+        .post(applicationUrl, {
+          query: SCHEMA.loc?.source?.body
+        })
         .then(() => {
           resolve(true)
         })
-        .catch((e) => {
+        .catch((e: AxiosError) => {
+          if (stringify(e.response?.data)?.includes('is not registered by the chain')) {
+            return resolve(false)
+          }
           reject(e)
         })
     })
@@ -72,11 +76,9 @@ export class ApplicationOperation {
   static subscribeCreatorChain = async (
     chainId: string,
     applicationId: string,
-    applicationType: db.ApplicationType,
-    force?: boolean
+    applicationType: db.ApplicationType
   ) => {
     if (
-      !force &&
       (await dbBridge.ApplicationCreatorChainSubscription.subscribed(
         chainId,
         applicationId

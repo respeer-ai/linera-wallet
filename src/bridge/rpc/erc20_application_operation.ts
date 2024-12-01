@@ -12,26 +12,23 @@ import { Operation } from './operation'
 
 export class ERC20ApplicationOperation {
   static subscribeWLineraCreationChain = async (
-    chainId: string,
-    force?: boolean
+    chainId: string
   ) => {
     await MonoApplicationOperation.subscribeCreationChainWithType(
       chainId,
-      db.ApplicationType.WLINERA,
-      force
+      db.ApplicationType.WLINERA
     )
   }
 
   static subscribeCreationChain = async (
     chainId: string,
     applicationId: string,
-    force?: boolean
+    applicationType?: db.ApplicationType
   ) => {
     await MonoApplicationOperation.subscribeCreationChainWithId(
       chainId,
       applicationId,
-      db.ApplicationType.ERC20,
-      force
+      applicationType || db.ApplicationType.ERC20
     )
   }
 
@@ -51,7 +48,7 @@ export class ERC20ApplicationOperation {
     chainId: string,
     applicationId: string,
     applicationType?: db.ApplicationType
-  ): Promise<boolean> => {
+  ) => {
     const operationId = await ERC20ApplicationOperation.requestApplication(
       chainId,
       applicationId,
@@ -63,8 +60,10 @@ export class ERC20ApplicationOperation {
       }
     }
 
-    if (!(await dbBridge.Token.exists(applicationId)))
-      return operationId !== undefined
+    if (await dbBridge.Token.exists(applicationId))
+      return
+
+    await ERC20ApplicationOperation.subscribeCreationChain(chainId, applicationId)
 
     const options = await getClientOptionsWithEndpointType(
       EndpointType.Application,
@@ -112,7 +111,7 @@ export class ERC20ApplicationOperation {
           github: token.tokenMetadata.github,
           mintable: token.tokenMetadata.mintable
         })
-        return resolve(operationId !== undefined)
+        resolve(undefined)
       })
 
       onError((e) => {

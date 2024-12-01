@@ -54,13 +54,15 @@ export class Operation {
       applicationId
     )
 
+    /*
     let exist = await ApplicationOperation.existChainApplication(
       creationChainId,
       applicationId
     )
     if (!exist) return Promise.reject('Application not exists')
+    */
 
-    exist = await ApplicationOperation.existChainApplication(
+    const exist = await ApplicationOperation.existChainApplication(
       requesterChainId,
       applicationId
     )

@@ -77,7 +77,7 @@ const onSaveSwapApplicationId = async () => {
         if (operationId) {
           await rpcBridge.Operation.waitOperation(operationId)
         }
-        await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, false)
+        await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
         console.log('Faled refresh swap application', e)
       }
@@ -106,7 +106,7 @@ const onRefresh = async () => {
         if (operationId) {
           await rpcBridge.Operation.waitOperation(operationId)
         }
-        await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain, false)
+        await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
         console.log('Faled refresh swap application', e)
       }

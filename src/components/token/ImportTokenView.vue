@@ -56,9 +56,7 @@ const onImportClick = async () => {
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
-      if (await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, applicationId.value)) {
-        await rpcBridge.ERC20ApplicationOperation.subscribeCreationChain(microchain.microchain, applicationId.value, false)
-      }
+      await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, applicationId.value)
     }
 
     emit('imported')

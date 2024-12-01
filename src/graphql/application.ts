@@ -11,3 +11,11 @@ export const LEGACY_REQUEST_SUBSCRIBE = gql`
     requestSubscribe
   }
 `
+
+export const SCHEMA = gql`
+  query {
+    __schema {
+      __typename
+    }
+  }
+`
