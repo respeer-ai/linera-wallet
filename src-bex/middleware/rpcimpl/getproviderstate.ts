@@ -1,4 +1,4 @@
-import { sharedStore } from 'app/src-bex/store'
+import { sharedStore } from '../../../src-bex/store'
 import { RpcRequest } from '../types'
 
 export const getProviderStateHandler = async (request?: RpcRequest) => {

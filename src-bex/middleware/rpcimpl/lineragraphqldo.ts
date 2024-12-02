@@ -14,7 +14,7 @@ import type { Json } from '@metamask/utils'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { db, rpc } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
-import { graphqlResult } from 'src/utils'
+import { graphqlResult } from '../../../src/utils'
 import { parse, stringify } from 'lossless-json'
 import { rpcBridge } from '../../../src/bridge'
 
