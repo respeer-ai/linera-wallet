@@ -67,17 +67,18 @@ export class Owner {
 
   static ownerBalance = async (
     owner: db.Owner,
-    tokenId: number
+    tokenId: number,
+    microchain?: string
   ): Promise<{ tokenBalance: number; usdBalance: number }> => {
     const token = await dbBase.tokens.get(tokenId)
     if (!token) return Promise.reject('Invalid token')
 
-    const microchains = await Microchain.ownerMicrochains(
+    const microchains = (await Microchain.ownerMicrochains(
       0,
       1000,
       owner.owner,
       true
-    )
+    )).filter((_microchain) => !microchain || _microchain.microchain === microchain)
 
     let balance = 0
     for (const microchain of microchains) {

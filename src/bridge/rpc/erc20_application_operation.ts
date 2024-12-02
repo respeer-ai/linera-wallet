@@ -25,7 +25,6 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     applicationType?: db.ApplicationType
   ) => {
-    console.log('Subscribe', chainId, applicationId)
     await MonoApplicationOperation.subscribeCreationChainWithId(
       chainId,
       applicationId,

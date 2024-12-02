@@ -5,6 +5,13 @@
       <div v-for='chainOperation in displayChainOperations' :key='chainOperation.id' @click='onChainOperationClick(chainOperation)'>
         <ChainOperationCardView :operation='chainOperation' :x-padding='xPadding' />
       </div>
+      <q-btn
+        rounded flat no-caps class='full-width bg-grey-1'
+        @click='onViewMoreClick'
+        v-if='displayCount < chainOperations.length'
+        color='grey-6'
+        :label='$t("MSG_VIEW_MORE_THREE_DOTS")'
+      />
     </div>
     <div v-else class='page-item-placeholder'>
       <div>
@@ -33,8 +40,10 @@ const microchain = toRef(props, 'microchain')
 const xPadding = toRef(props, 'xPadding')
 
 const chainOperations = ref([] as db.ChainOperation[])
+const displayCount = ref(4)
+
 const displayChainOperations = computed(() => {
-  return [...chainOperations.value].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  return [...chainOperations.value].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, displayCount.value)
 })
 
 const loadChainOperationsRecursive = async (total: number, offset: number, limit: number) => {
@@ -56,6 +65,11 @@ onMounted(() => {
 const onChainOperationClick = (operation: db.ChainOperation) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_OPERATION
   localStore.setting.HomeActionParams = operation
+}
+
+const onViewMoreClick = () => {
+  displayCount.value += 4
+  displayCount.value = Math.min(displayCount.value, chainOperations.value.length)
 }
 
 </script>

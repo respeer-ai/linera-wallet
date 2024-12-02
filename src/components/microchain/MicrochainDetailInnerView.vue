@@ -18,6 +18,24 @@
         :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
+    <div v-if='requestedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+      {{ $t('MSG_REQUESTED_TOKENS') }}
+    </div>
+    <div v-if='requestedTokens.length > 0'>
+      <MicrochainTokenBalanceCardView
+        v-for='token in requestedTokens' :key='token.id' :token='token' :microchain='microchain'
+        :show-indicator='false'
+      />
+    </div>
+    <div v-if='importedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+      {{ $t('MSG_IMPORTED_TOKENS') }}
+    </div>
+    <div v-if='importedTokens.length > 0'>
+      <RequestTokenCardView
+        v-for='token in importedTokens' :key='token.id' :token='token' :microchain='microchain'
+        :show-indicator='false'
+      />
+    </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       {{ $t('MSG_CHAIN_DETAILS') }}
     </div>
@@ -98,6 +116,8 @@ import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
+import { type ApplicationOverview } from 'src/__generated__/graphql/sdk/graphql'
+import { dbBridge, rpcBridge } from 'src/bridge'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -106,7 +126,8 @@ import MicrochainCardView from './MicrochainCardView.vue'
 import ActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 import ChainOperationsView from '../activity/ChainOperationsView.vue'
-import { dbBridge } from 'src/bridge'
+import MicrochainTokenBalanceCardView from './MicrochainTokenBalanceCardView.vue'
+import RequestTokenCardView from './RequestTokenCardView.vue'
 
 interface Props {
   microchain: db.Microchain
@@ -123,9 +144,14 @@ const activities = ref([] as db.Activity[])
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const nativeTokenId = ref(undefined as unknown as number)
+const requestedTokens = ref([] as db.Token[])
+const importedTokens = ref([] as db.Token[])
 
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
+  const applicationIds = (await rpcBridge.Application.applications([microchain.value.microchain])).map((app: ApplicationOverview) => app.id as string)
+  requestedTokens.value = await dbBridge.Token.tokens(0, 1000, applicationIds)
+  importedTokens.value = (await dbBridge.Token.tokens(0, 1000)).filter((token: db.Token) => !token.native && !applicationIds.includes(token.applicationId as string))
 })
 
 </script>

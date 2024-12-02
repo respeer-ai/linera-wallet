@@ -327,5 +327,9 @@ export default {
   MSG_ADMIN_CHAIN: 'Admin chain',
   MSG_VALIDATORS: 'Validators',
   MSG_APPLICATION_MANAGEMENT_SERVICE: 'Application management service',
-  MSG_AMS_APPLICATION: 'AMS Application'
+  MSG_AMS_APPLICATION: 'AMS Application',
+  MSG_REQUESTED_TOKENS: 'Requested tokens',
+  MSG_IMPORTED_TOKENS: 'Imported tokens',
+  MSG_BALANCES: 'Balances',
+  MSG_REQUEST_NOW: 'Request now'
 }

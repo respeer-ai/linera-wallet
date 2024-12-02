@@ -44,8 +44,12 @@ export class Token {
 
   static tokens = async (
     offset: number,
-    limit: number
+    limit: number,
+    applicationIds?: string[]
   ): Promise<db.Token[]> => {
+    if (applicationIds && applicationIds.length) {
+      return await dbBase.tokens.where('applicationId').anyOf(applicationIds).offset(offset).limit(limit).toArray()
+    }
     return await dbBase.tokens.offset(offset).limit(limit).toArray()
   }
 

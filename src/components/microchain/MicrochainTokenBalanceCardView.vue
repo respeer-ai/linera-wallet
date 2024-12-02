@@ -1,5 +1,5 @@
 <template>
-  <q-item class='row full-width tab-panel-item' clickable>
+  <q-item class='row full-width tab-panel-item'>
     <div v-if='showIndicator' :class='[ "selector-indicator", (active || (activeNative && token.native)) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='token.logo.replace(/\s/g, "+")' />
@@ -11,21 +11,23 @@
       </q-badge>
     </q-avatar>
     <div class='selector-margin-x-left'>
-      <div class='text-bold text-grey-9 row text-left'>
+      <div class='text-bold text-grey-9 text-left'>
+        {{ token.ticker }}
+      </div>
+      <div class='text-grey-6 text-left'>
         {{ token.name }}
       </div>
     </div>
     <q-space />
     <div class='selector-margin-x-left'>
       <div class='text-bold text-grey-9 text-right'>
-        {{ parseFloat(tokenBalance.toFixed(4)) }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
+        {{ parseFloat(ownerTokenBalance.toFixed(4)) }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
       </div>
       <div class='text-right'>
-        $ {{ parseFloat(usdBalance.toFixed(2)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
+        $ {{ parseFloat(ownerUsdBalance.toFixed(2)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
       </div>
     </div>
     <div v-if='showIndicator' class='selector-indicator selector-margin-x-left' />
-    <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' v-model:usd-balance='usdBalance' :token-id='token.id' />
     <DbOwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
   </q-item>
 </template>
@@ -33,18 +35,18 @@
 <script setup lang='ts'>
 import { db } from 'src/model'
 import { onMounted, ref, toRef, watch } from 'vue'
+import { dbBridge } from 'src/bridge'
 
-import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 import { lineraLogo } from 'src/assets'
-import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
   showIndicator?: boolean
   active?: boolean
-  activeNative?: boolean
+  activeNative?: boolean,
+  microchain: db.Microchain
 }
 const props = withDefaults(defineProps<Props>(), {
   showIndicator: true,
@@ -55,17 +57,17 @@ const token = toRef(props, 'token')
 const showIndicator = toRef(props, 'showIndicator')
 const active = toRef(props, 'active')
 const activeNative = toRef(props, 'activeNative')
+const microchain = toRef(props, 'microchain')
 
-const tokenBalance = ref(0)
-const usdBalance = ref(0)
+const ownerTokenBalance = ref(0)
+const ownerUsdBalance = ref(0)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const getBalance = async () => {
   if (!selectedOwner.value) return
-  const balance = await dbBridge.Owner.ownerBalance(selectedOwner.value, token.value.id as number)
-  tokenBalance.value = balance?.tokenBalance
-  usdBalance.value = balance?.usdBalance
+  ownerTokenBalance.value = (await dbBridge.MicrochainOwnerFungibleTokenBalance.balance(microchain.value.microchain, selectedOwner.value?.owner, token.value.id as number))?.balance || 0
+  ownerUsdBalance.value = ownerTokenBalance.value * token.value.usdCurrency
 }
 
 watch(selectedOwner, async () => {
