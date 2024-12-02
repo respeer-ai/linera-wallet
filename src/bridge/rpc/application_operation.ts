@@ -9,6 +9,7 @@ import { stringify } from 'lossless-json'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
+import axios from 'axios'
 
 export class ApplicationOperation {
   static existChainApplication = async (
@@ -89,38 +90,35 @@ export class ApplicationOperation {
     operationName: string,
     variables?: Record<string, unknown>
   ): Promise<Uint8Array | undefined> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc, chainId, applicationId)
-    const apolloClient = new ApolloClient(options)
+    const network = (await dbBridge.Network.selected()) as db.Network
+    if (!network) return
+
+    // TODO: we can serialize locally
 
     variables = variables || {}
     variables.checko_query_only = true
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { /* result, refetch, fetchMore, */ onResult, onError } =
-      provideApolloClient(apolloClient)(() =>
-        useQuery(
-          query,
-          variables || {},
-          {
-            fetchPolicy: 'network-only'
-          }
-        )
-      )
-
+    const applicationUrl = `http://${network?.host}:${network?.port}/chains/${chainId}/applications/${applicationId}`
     return new Promise((resolve, reject) => {
-      onResult((res) => {
-        const bytes = graphqlResult.keyValue(
-          res,
+      axios
+        .post(applicationUrl, {
+          query: query.loc?.source.body,
+          variables,
           operationName
-        ) as Uint8Array
-        resolve(bytes)
-      })
-
-      onError((e) => {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Failed query application: ${e}`)
-        reject(e)
-      })
+        })
+        .then((res) => {
+          const data = graphqlResult.data(res, 'data')
+          const bytes = graphqlResult.keyValue(
+            data,
+            operationName
+          ) as Uint8Array
+          resolve(bytes)
+        })
+        .catch((e) => {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.log(`Failed query application: ${e}`)
+          reject(e)
+        })
     })
   }
 
