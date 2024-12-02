@@ -453,11 +453,13 @@ const _handleOperations = async () => {
         operation.state = db.OperationState.EXECUTED
         operation.certificateHash = certificateHash
         await dbBridge.ChainOperation.update(operation)
-      } catch (error) {
+      } catch (e) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Failed process incoming bundle: ${error}`)
+        console.log(`Failed process incoming bundle: ${e}`)
         if (operation.createdAt || 0 + 10 * 1000 < Date.now()) {
           operation.state = db.OperationState.FAILED
+          operation.failedAt = Date.now()
+          operation.failReason = stringify(e)
           await dbBridge.ChainOperation.update(operation)
         }
       }
