@@ -1,40 +1,44 @@
 <template>
   <div :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
-    <q-item class='row full-width tab-panel-item'>
+    <div class='full-width tab-panel-item'>
       <div>
-        <div v-if='_microchain'>
+        <div v-if='_microchain' class='row decorate-underline-dashed'>
           <div class='word-break-all'>
             {{ _microchain.microchain }}
           </div>
+          <q-space />
           <div class='row'>
-            <q-img :src='microchainLogo' width='16px' height='16px' />
-            <q-avatar size='16px' class='page-item-x-margin-left'>
-              <q-img :src='db.microchainAvatar(_microchain)' width='16px' height='16px' />
+            <q-img :src='microchainLogo' width='20px' height='20px' />
+            <q-avatar size='20px' class='page-item-x-margin-left'>
+              <q-img :src='db.microchainAvatar(_microchain)' width='20px' height='20px' />
             </q-avatar>
           </div>
         </div>
-        <div v-if='selectedOwner' class='vertical-items-margin'>
+        <div v-if='selectedOwner' class='vertical-items-margin row decorate-underline-dashed'>
           <div class='word-break-all'>
             {{ selectedOwner.owner }}
           </div>
+          <q-space />
           <div class='row'>
-            <q-avatar size='16px'>
-              <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='16px' height='16px' />
+            <q-avatar size='20px'>
+              <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='20px' height='20px' />
             </q-avatar>
           </div>
         </div>
       </div>
-      <q-space />
-      <div class='selector-margin-x-left'>
-        <div class='text-bold text-grey-9 text-right'>
+      <div class='row vertical-items-margin'>
+        <div class='text-bold text-grey-9'>
           {{ parseFloat(tokenBalance.toFixed(4)) }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
         </div>
-        <div class='text-right'>
+        <div class='page-item-x-margin-left'>
+          ≈
+        </div>
+        <div class='page-item-x-margin-left'>
           $ {{ parseFloat(usdBalance.toFixed(2)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
         </div>
       </div>
       <DbOwnerBridge v-model:selected-owner='selectedOwner' />
-    </q-item>
+    </div>
     <q-separator />
   </div>
 </template>
