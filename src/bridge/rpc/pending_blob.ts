@@ -6,7 +6,10 @@ import { graphqlResult } from 'src/utils'
 import { type AddPendingBlobMutation } from 'src/__generated__/graphql/service/graphql'
 
 export class PendingBlob {
-  static addPendingBlob = async (chainId: string, bytes: Uint8Array): Promise<string> => {
+  static addPendingBlob = async (
+    chainId: string,
+    bytes: Uint8Array
+  ): Promise<string> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
@@ -19,6 +22,7 @@ export class PendingBlob {
       bytes
     })
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return (graphqlResult.rootData(res) as AddPendingBlobMutation).addPendingBlob as string
+    return (graphqlResult.rootData(res) as AddPendingBlobMutation)
+      .addPendingBlob as string
   }
 }

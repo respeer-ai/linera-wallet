@@ -233,7 +233,10 @@ export const lineraGraphqlPublishDataBlob = async (request?: RpcRequest) => {
     return Promise.reject(new Error('Invalid microchain'))
   }
 
-  const blobHash = await rpcBridge.PendingBlob.addPendingBlob(microchain, (query.query.variables as Record<string, Uint8Array>).bytes)
+  const blobHash = await rpcBridge.PendingBlob.addPendingBlob(
+    microchain,
+    (query.query.variables as Record<string, Uint8Array>).bytes
+  )
 
   const operationId = uuidv4()
   const operation = JSON.stringify({

@@ -23,10 +23,7 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
     RpcMethod.LINERA_GRAPHQL_MUTATION,
     lineraGraphqlDo.lineraGraphqlMutationHandler
   ],
-  [
-    RpcMethod.LINERA_GRAPHQL_QUERY,
-    lineraGraphqlDo.lineraGraphqlQueryHandler
-  ],
+  [RpcMethod.LINERA_GRAPHQL_QUERY, lineraGraphqlDo.lineraGraphqlQueryHandler],
   [
     RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB,
     lineraGraphqlDo.lineraGraphqlPublishDataBlob
