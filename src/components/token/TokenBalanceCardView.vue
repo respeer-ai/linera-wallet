@@ -13,10 +13,10 @@
             {{ _microchain.microchain }}
           </div>
         </div>
-        <div v-if='selectedOwner' class='vertical-items-margin row decorate-underline-dashed'>
+        <div v-if='owner && selectedOwner' class='vertical-items-margin row decorate-underline-dashed'>
           <div class='row'>
             <q-avatar size='20px'>
-              <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='20px' height='20px' />
+              <q-img v-if='owner && selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='20px' height='20px' />
             </q-avatar>
             <div :style='{marginLeft: "20px"}' />
           </div>
@@ -71,6 +71,7 @@ const xPadding = toRef(props, 'xPadding')
 const tokenBalance = computed(() => chainBalance.value?.balance || ownerBalance.value?.balance || 0)
 const usdBalance = computed(() => tokenBalance.value * token.value.usdCurrency || 0)
 const microchain = computed(() => chainBalance.value?.microchain || ownerBalance.value?.microchain)
+const owner = computed(() => ownerBalance.value?.owner)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 const _microchain = ref(undefined as unknown as db.Microchain)
