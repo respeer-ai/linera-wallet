@@ -8,6 +8,7 @@ import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
 import { computed, ref, toRef, watch } from 'vue'
+import { dbBridge } from 'src/bridge'
 
 import TokenBridge from './TokenBridge.vue'
 
@@ -48,6 +49,12 @@ const _usdBalance = computed(() => {
 
 watch(_usdBalance, () => {
   usdBalance.value = _usdBalance.value
+})
+
+watch(microchainId, async () => {
+  if (!microchainId.value || !tokenId.value) return
+  tokenBalance.value = (await dbBridge.MicrochainFungibleTokenBalance.balance(microchainId.value, tokenId.value))?.balance || 0
+  usdBalance.value = tokenBalance.value * ((await dbBridge.Token.tokenWithId(tokenId.value))?.usdCurrency || 0)
 })
 
 </script>

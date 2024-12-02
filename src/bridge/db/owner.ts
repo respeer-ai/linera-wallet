@@ -82,8 +82,12 @@ export class Owner {
     let balance = 0
     for (const microchain of microchains) {
       balance +=
-        (await MicrochainFungibleTokenBalance.balance(microchain, tokenId))
-          ?.balance || 0
+        (
+          await MicrochainFungibleTokenBalance.balance(
+            microchain.microchain,
+            tokenId
+          )
+        )?.balance || 0
       balance +=
         (
           await MicrochainOwnerFungibleTokenBalance.balance(

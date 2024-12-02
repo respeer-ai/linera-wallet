@@ -6,8 +6,6 @@ export class OwnerBalance {
     owner = owner || (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return
 
-    let tokenBalance = 0
-
     const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter(
       (el) => el.owner === owner?.owner
     )
@@ -53,19 +51,18 @@ export class OwnerBalance {
       )
     )
 
-    tokenBalance =
-      tokenId === undefined
-        ? 0
-        : microchainOwnerFungibleTokenBalances.reduce(
-          (sum, a) => sum + Number(a.balance || 0),
-          0
-        ) +
-          microchainFungibleTokenBalances.reduce(
-            (sum, a) => sum + Number(a.balance || 0),
-            0
-          )
+    if (tokenId === undefined) return 0
 
-    return tokenBalance
+    return (
+      microchainOwnerFungibleTokenBalances.reduce(
+        (sum, a) => sum + Number(a.balance || 0),
+        0
+      ) +
+      microchainFungibleTokenBalances.reduce(
+        (sum, a) => sum + Number(a.balance || 0),
+        0
+      )
+    )
   }
 
   static getUsdBalance = async (owner?: db.Owner, tokenId?: number) => {

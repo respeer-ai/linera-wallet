@@ -97,7 +97,7 @@
     />
   </div>
   <DbOwnerBridge v-model:selected-owner='selectedOwner' />
-  <DbMicrochainBridge v-if='selectedOwner' :owner='selectedOwner?.owner' v-model:default-microchain='selectedMicrochain' v-model:microchains='microchains' />
+  <DbMicrochainBridge v-if='selectedOwner' :owner='selectedOwner?.owner' v-model:microchains='microchains' />
   <q-dialog v-model='selectingOwner'>
     <OwnerSelector v-model='selectedOwner' @selected='onOwnerSelected' :creatable='false' :persistent='true' />
   </q-dialog>
@@ -220,8 +220,13 @@ const onMintNowClick = async () => {
 
 const nativeTokenId = ref(undefined as unknown as number)
 
+watch(selectedOwner, async () => {
+  selectedMicrochain.value = (await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedOwner.value?.owner as string))[0]
+})
+
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
+  selectedMicrochain.value = (await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedOwner.value?.owner as string))[0]
 })
 
 const onChangeFromBalanceClick = () => {

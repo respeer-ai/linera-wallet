@@ -33,14 +33,14 @@ type stopFunc = () => void
 const subscribed = ref(new Map<string, stopFunc>())
 
 const updateChainBalance = async (microchain: db.Microchain, tokenId: number, balance: number) => {
-  const microchainBalance = (await dbBridge.MicrochainFungibleTokenBalance.balance(microchain, tokenId)) as db.MicrochainFungibleTokenBalance || {
+  const microchainBalance = (await dbBridge.MicrochainFungibleTokenBalance.balance(microchain.microchain, tokenId)) as db.MicrochainFungibleTokenBalance || {
     microchain: microchain.microchain,
     tokenId,
     balance: 0
   } as db.MicrochainFungibleTokenBalance
   microchainBalance.balance = Number(balance)
   microchainBalance.id === undefined
-    ? await dbBridge.MicrochainFungibleTokenBalance.create(microchain, microchainBalance.tokenId, microchainBalance.balance)
+    ? await dbBridge.MicrochainFungibleTokenBalance.create(microchain.microchain, microchainBalance.tokenId, microchainBalance.balance)
     : await dbBridge.MicrochainFungibleTokenBalance.update(microchainBalance)
 }
 
