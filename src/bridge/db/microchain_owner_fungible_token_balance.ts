@@ -15,6 +15,17 @@ export class MicrochainOwnerFungibleTokenBalance {
     )
   }
 
+  static balances = async (
+    owner: string,
+    token: number
+  ): Promise<db.MicrochainOwnerFungibleTokenBalance[]> => {
+    return (
+      await dbWallet.microchainOwnerFungibleTokenBalances.toArray()
+    ).filter(
+      (el) => el.owner === owner && el.tokenId === token && el.balance > 0
+    )
+  }
+
   static create = async (
     microchain: string,
     owner: string,

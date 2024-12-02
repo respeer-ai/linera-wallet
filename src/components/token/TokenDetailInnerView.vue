@@ -34,6 +34,19 @@
     <div v-if='!token.native' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       {{ $t('MSG_TOKEN_PRICE') }}
     </div>
+    <div v-if='ownerBalances.length || chainBalances.length' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+      {{ $t('MSG_BALANCES') }}
+    </div>
+    <div v-if='ownerBalances.length || chainBalances.length'>
+      <TokenBalanceCardView
+        v-for='balance in ownerBalances' :key='balance.id' :token='token' :show-indicator='false'
+        :owner-balance='balance'
+      />
+      <TokenBalanceCardView
+        v-for='balance in chainBalances' :key='balance.id' :token='token' :show-indicator='false'
+        :chain-balance='balance'
+      />
+    </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       {{ $t('MSG_TOKEN_DETAILS') }}
     </div>
@@ -179,13 +192,15 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { onMounted, ref, toRef } from 'vue'
+import { onMounted, ref, toRef, watch } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
+import { dbBridge } from 'src/bridge'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
+import TokenBalanceCardView from './TokenBalanceCardView.vue'
+
 import { discordLogo, githubLogo, telegramLogo, twitterLogo } from 'src/assets'
-import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
@@ -194,10 +209,17 @@ const props = defineProps<Props>()
 const token = toRef(props, 'token')
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
-const nativeTokenId = ref(undefined as unknown as number)
+const ownerBalances = ref([] as db.MicrochainOwnerFungibleTokenBalance[])
+const chainBalances = ref([] as db.MicrochainFungibleTokenBalance[])
+
+watch(selectedOwner, async () => {
+  ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+  chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value, token.value.id as number)
+})
 
 onMounted(async () => {
-  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
+  ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+  chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value, token.value.id as number)
 })
 
 </script>

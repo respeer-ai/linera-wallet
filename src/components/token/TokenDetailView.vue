@@ -85,7 +85,7 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { onMounted, ref, toRef } from 'vue'
+import { ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
@@ -95,7 +95,6 @@ import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import TokenDetailInnerView from './TokenDetailInnerView.vue'
 import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import MintTokenView from './MintTokenView.vue'
-import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
@@ -120,12 +119,6 @@ const onBackClick = () => {
 const onCloseClick = () => {
   emit('close')
 }
-
-const nativeTokenId = ref(undefined as unknown as number)
-
-onMounted(async () => {
-  nativeTokenId.value = (await dbBridge.Token.native())?.id as number
-})
 
 const router = useRouter()
 

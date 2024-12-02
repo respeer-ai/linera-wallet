@@ -1,7 +1,12 @@
 import { DocumentNode } from 'graphql'
 import { rpc, db } from 'src/model'
 import { graphqlResult } from 'src/utils'
-import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE, SCHEMA, SUBSCRIBED_CREATOR_CHAIN } from 'src/graphql'
+import {
+  SUBSCRIBE_CREATOR_CHAIN,
+  LEGACY_REQUEST_SUBSCRIBE,
+  SCHEMA,
+  SUBSCRIBED_CREATOR_CHAIN
+} from 'src/graphql'
 import { uid } from 'quasar'
 import * as dbBridge from '../db'
 import { Operation } from './operation'
@@ -16,7 +21,11 @@ export class ApplicationOperation {
     chainId: string,
     applicationId: string
   ): Promise<boolean> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc, chainId, applicationId)
+    const options = await getClientOptionsWithEndpointType(
+      EndpointType.Rpc,
+      chainId,
+      applicationId
+    )
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -24,8 +33,7 @@ export class ApplicationOperation {
       provideApolloClient(apolloClient)(() =>
         useQuery(
           SCHEMA,
-          {
-          },
+          {},
           {
             fetchPolicy: 'network-only'
           }
@@ -38,7 +46,9 @@ export class ApplicationOperation {
       })
 
       onError((e) => {
-        if (stringify(e)?.includes('is not registered by the chain during Query')) {
+        if (
+          stringify(e)?.includes('is not registered by the chain during Query')
+        ) {
           return resolve(false)
         }
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -51,7 +61,11 @@ export class ApplicationOperation {
     chainId: string,
     applicationId: string
   ): Promise<boolean> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc, chainId, applicationId)
+    const options = await getClientOptionsWithEndpointType(
+      EndpointType.Rpc,
+      chainId,
+      applicationId
+    )
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -59,8 +73,7 @@ export class ApplicationOperation {
       provideApolloClient(apolloClient)(() =>
         useQuery(
           SUBSCRIBED_CREATOR_CHAIN,
-          {
-          },
+          {},
           {
             fetchPolicy: 'network-only'
           }
@@ -127,7 +140,10 @@ export class ApplicationOperation {
     applicationId: string,
     applicationType: db.ApplicationType
   ) => {
-    if (await ApplicationOperation.subscribedCreatorChain(chainId, applicationId)) return
+    if (
+      await ApplicationOperation.subscribedCreatorChain(chainId, applicationId)
+    )
+      return
 
     if (
       await dbBridge.ChainOperation.exists(

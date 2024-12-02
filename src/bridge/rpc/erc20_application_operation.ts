@@ -11,9 +11,7 @@ import { MonoApplicationOperation } from './mono_application_opeartion'
 import { Operation } from './operation'
 
 export class ERC20ApplicationOperation {
-  static subscribeWLineraCreationChain = async (
-    chainId: string
-  ) => {
+  static subscribeWLineraCreationChain = async (chainId: string) => {
     await MonoApplicationOperation.subscribeCreationChainWithType(
       chainId,
       db.ApplicationType.WLINERA
@@ -49,7 +47,10 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     applicationType?: db.ApplicationType
   ) => {
-    await ERC20ApplicationOperation.subscribeCreationChain(chainId, applicationId)
+    await ERC20ApplicationOperation.subscribeCreationChain(
+      chainId,
+      applicationId
+    )
 
     const operationId = await ERC20ApplicationOperation.requestApplication(
       chainId,
@@ -62,10 +63,12 @@ export class ERC20ApplicationOperation {
       }
     }
 
-    await ERC20ApplicationOperation.subscribeCreationChain(chainId, applicationId)
+    await ERC20ApplicationOperation.subscribeCreationChain(
+      chainId,
+      applicationId
+    )
 
-    if (await dbBridge.Token.exists(applicationId))
-      return
+    if (await dbBridge.Token.exists(applicationId)) return
 
     const options = await getClientOptionsWithEndpointType(
       EndpointType.Application,

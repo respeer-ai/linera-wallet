@@ -60,10 +60,10 @@ export class OwnerBalance {
           (sum, a) => sum + Number(a.balance || 0),
           0
         ) +
-        microchainFungibleTokenBalances.reduce(
-          (sum, a) => sum + Number(a.balance || 0),
-          0
-        )
+          microchainFungibleTokenBalances.reduce(
+            (sum, a) => sum + Number(a.balance || 0),
+            0
+          )
 
     return tokenBalance
   }

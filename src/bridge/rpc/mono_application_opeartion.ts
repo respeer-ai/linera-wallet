@@ -8,7 +8,10 @@ export class MonoApplicationOperation {
     applicationId: string,
     applicationType: db.ApplicationType
   ) => {
-    const exist = await ApplicationOperation.existChainApplication(chainId, applicationId)
+    const exist = await ApplicationOperation.existChainApplication(
+      chainId,
+      applicationId
+    )
     if (!exist) return
     await ApplicationOperation.subscribeCreatorChain(
       chainId,
