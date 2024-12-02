@@ -25,8 +25,10 @@ export enum RpcMethod {
   CHECKO_PING = 'checko_ping',
   LINERA_SUBSCRIBE = 'linera_subscribe',
   LINERA_UNSUBSCRIBE = 'linera_unsubscribe',
+
   LINERA_GRAPHQL_MUTATION = 'linera_graphqlMutation',
   LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery',
+  LINERA_GRAPHQL_PUBLISH_DATA_BLOB = 'linera_graphqlPublishDataBlob',
 
   ETH_GET_BALANCE = 'eth_getBalance'
 }
