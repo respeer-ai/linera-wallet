@@ -1,4 +1,4 @@
-import { uid } from 'quasar'
+import { v4 as uuidv4 } from 'uuid'
 import { db, rpc } from 'src/model'
 import { dbBridge } from '..'
 import { ApplicationOperation } from './application_operation'
@@ -24,7 +24,7 @@ export class Operation {
 
     const operation = {
       operationType: db.OperationType.TRANSFER,
-      operationId: uid(),
+      operationId: uuidv4(),
       microchain: fromChainId,
       operation: stringify({
         System: {
@@ -69,7 +69,7 @@ export class Operation {
     )
     if (exist) return undefined
 
-    const operationId = uid()
+    const operationId = uuidv4()
     const operation = {
       operationType: db.OperationType.REQUEST_APPLICATION,
       applicationType,

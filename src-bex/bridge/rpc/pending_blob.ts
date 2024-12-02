@@ -1,34 +1,27 @@
+import { ADD_PENDING_BLOB } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
-import { BLOCK_MATERIAL } from 'src/graphql'
-import {
-  type BlockMaterialQuery,
-  type CandidateBlockMaterial
-} from 'src/__generated__/graphql/service/graphql'
-import { parse, stringify } from 'lossless-json'
+import { type AddPendingBlobMutation } from 'src/__generated__/graphql/service/graphql'
+import { sharedStore } from 'app/src-bex/store'
 import axios from 'axios'
-import * as dbBridge from '../db'
-import { db } from 'src/model'
+import { parse, stringify } from 'lossless-json'
 
-export class BlockMaterial {
-  static getBlockMaterial = async (
+export class PendingBlob {
+  static addPendingBlob = async (
     chainId: string,
-    maxPendingMessages: number
-  ): Promise<CandidateBlockMaterial> => {
-    const network = (await dbBridge.Network.selected()) as db.Network
-    if (!network) return Promise.reject('Invalid network')
-
-    const rpcUrl = `http://${network?.host}:${network?.port}`
+    bytes: Uint8Array
+  ): Promise<string> => {
+    const rpcUrl = await sharedStore.getRpcEndpoint()
     return new Promise((resolve, reject) => {
       axios
         .post(
           rpcUrl,
           {
-            query: BLOCK_MATERIAL.loc?.source.body,
+            query: ADD_PENDING_BLOB.loc?.source.body,
             variables: {
               chainId,
-              maxPendingMessages
+              bytes
             },
-            operationName: 'blockMaterial'
+            operationName: 'addPendingBlob'
           },
           {
             responseType: 'text',
@@ -42,9 +35,10 @@ export class BlockMaterial {
           if (errors && errors.length > 0) {
             return reject(stringify(errors))
           }
-          const blockMaterial = (data as Record<string, BlockMaterialQuery>)
-            .data
-          resolve(blockMaterial.blockMaterial)
+          const addPendingBlob = (
+            data as Record<string, AddPendingBlobMutation>
+          ).data
+          resolve(addPendingBlob.addPendingBlob as string)
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

@@ -1,6 +1,6 @@
 import { db } from 'src/model'
 import { ApplicationOperation } from './application_operation'
-import { dbBridge } from '..'
+import * as dbBridge from '../db'
 
 export class MonoApplicationOperation {
   static subscribeCreationChainWithId = async (

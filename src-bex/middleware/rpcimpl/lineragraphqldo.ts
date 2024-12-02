@@ -16,7 +16,7 @@ import { db, rpc } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
 import { graphqlResult } from '../../../src/utils'
 import { parse, stringify } from 'lossless-json'
-import { rpcBridge } from '../../../src/bridge'
+import { rpcBridge } from '../../../src-bex/bridge'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string

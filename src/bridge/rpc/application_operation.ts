@@ -7,7 +7,7 @@ import {
   SCHEMA,
   SUBSCRIBED_CREATOR_CHAIN
 } from 'src/graphql'
-import { uid } from 'quasar'
+import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
 import { Operation } from './operation'
 import { stringify } from 'lossless-json'
@@ -167,7 +167,7 @@ export class ApplicationOperation {
         SUBSCRIBE_CREATOR_CHAIN,
         'subscribeCreatorChain'
       )
-      const operationId = uid()
+      const operationId = uuidv4()
 
       const operation = {
         operationType: db.OperationType.SUBSCRIBE_CREATOR_CHAIN,
@@ -201,7 +201,7 @@ export class ApplicationOperation {
 
     const operation = {
       operationType: db.OperationType.LEGACY_REQUEST_SUBSCRIBE,
-      operationId: uid(),
+      operationId: uuidv4(),
       microchain: chainId,
       applicationId,
       applicationType: db.ApplicationType.ANONYMOUS,
