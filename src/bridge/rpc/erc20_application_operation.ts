@@ -25,6 +25,7 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     applicationType?: db.ApplicationType
   ) => {
+    console.log('Subscribe', chainId, applicationId)
     await MonoApplicationOperation.subscribeCreationChainWithId(
       chainId,
       applicationId,
@@ -49,6 +50,8 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     applicationType?: db.ApplicationType
   ) => {
+    await ERC20ApplicationOperation.subscribeCreationChain(chainId, applicationId)
+
     const operationId = await ERC20ApplicationOperation.requestApplication(
       chainId,
       applicationId,
@@ -60,10 +63,10 @@ export class ERC20ApplicationOperation {
       }
     }
 
+    await ERC20ApplicationOperation.subscribeCreationChain(chainId, applicationId)
+
     if (await dbBridge.Token.exists(applicationId))
       return
-
-    await ERC20ApplicationOperation.subscribeCreationChain(chainId, applicationId)
 
     const options = await getClientOptionsWithEndpointType(
       EndpointType.Application,

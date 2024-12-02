@@ -1,36 +1,84 @@
 import { DocumentNode } from 'graphql'
 import { rpc, db } from 'src/model'
-import axios, { AxiosError } from 'axios'
 import { graphqlResult } from 'src/utils'
-import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE, SCHEMA } from 'src/graphql'
+import { SUBSCRIBE_CREATOR_CHAIN, LEGACY_REQUEST_SUBSCRIBE, SCHEMA, SUBSCRIBED_CREATOR_CHAIN } from 'src/graphql'
 import { uid } from 'quasar'
 import * as dbBridge from '../db'
 import { Operation } from './operation'
 import { stringify } from 'lossless-json'
+import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
+import { ApolloClient } from '@apollo/client/core'
+import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 
 export class ApplicationOperation {
   static existChainApplication = async (
     chainId: string,
     applicationId: string
   ): Promise<boolean> => {
-    const network = (await dbBridge.Network.selected()) as db.Network
-    if (!network) return false
+    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc, chainId, applicationId)
+    const apolloClient = new ApolloClient(options)
 
-    const applicationUrl = `http://${network?.host}:${network?.port}/chains/${chainId}/applications/${applicationId}`
-    return new Promise((resolve, reject) => {
-      axios
-        .post(applicationUrl, {
-          query: SCHEMA.loc?.source?.body
-        })
-        .then(() => {
-          resolve(true)
-        })
-        .catch((e: AxiosError) => {
-          if (stringify(e.response?.data)?.includes('is not registered by the chain')) {
-            return resolve(false)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const { /* result, refetch, fetchMore, */ onResult, onError } =
+      provideApolloClient(apolloClient)(() =>
+        useQuery(
+          SCHEMA,
+          {
+          },
+          {
+            fetchPolicy: 'network-only'
           }
-          reject(e)
-        })
+        )
+      )
+
+    return new Promise((resolve, reject) => {
+      onResult(() => {
+        resolve(true)
+      })
+
+      onError((e) => {
+        if (stringify(e)?.includes('is not registered by the chain during Query')) {
+          return resolve(false)
+        }
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        reject(new Error(`Query chain application: ${e}`))
+      })
+    })
+  }
+
+  static subscribedCreatorChain = async (
+    chainId: string,
+    applicationId: string
+  ): Promise<boolean> => {
+    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc, chainId, applicationId)
+    const apolloClient = new ApolloClient(options)
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const { /* result, refetch, fetchMore, */ onResult, onError } =
+      provideApolloClient(apolloClient)(() =>
+        useQuery(
+          SUBSCRIBED_CREATOR_CHAIN,
+          {
+          },
+          {
+            fetchPolicy: 'network-only'
+          }
+        )
+      )
+
+    return new Promise((resolve, reject) => {
+      onResult((res) => {
+        const subscribed = graphqlResult.keyValue(
+          res,
+          'subscribedCreatorChain'
+        ) as boolean
+        resolve(subscribed)
+      })
+
+      onError((e) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        reject(new Error(`Query chain application: ${e}`))
+      })
     })
   }
 
@@ -41,35 +89,38 @@ export class ApplicationOperation {
     operationName: string,
     variables?: Record<string, unknown>
   ): Promise<Uint8Array | undefined> => {
-    const network = (await dbBridge.Network.selected()) as db.Network
-    if (!network) return
-
-    // TODO: we can serialize locally
+    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc, chainId, applicationId)
+    const apolloClient = new ApolloClient(options)
 
     variables = variables || {}
     variables.checko_query_only = true
 
-    const applicationUrl = `http://${network?.host}:${network?.port}/chains/${chainId}/applications/${applicationId}`
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const { /* result, refetch, fetchMore, */ onResult, onError } =
+      provideApolloClient(apolloClient)(() =>
+        useQuery(
+          query,
+          variables || {},
+          {
+            fetchPolicy: 'network-only'
+          }
+        )
+      )
+
     return new Promise((resolve, reject) => {
-      axios
-        .post(applicationUrl, {
-          query: query.loc?.source.body,
-          variables,
+      onResult((res) => {
+        const bytes = graphqlResult.keyValue(
+          res,
           operationName
-        })
-        .then((res) => {
-          const data = graphqlResult.data(res, 'data')
-          const bytes = graphqlResult.keyValue(
-            data,
-            operationName
-          ) as Uint8Array
-          resolve(bytes)
-        })
-        .catch((e) => {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`Failed query application: ${e}`)
-          reject(e)
-        })
+        ) as Uint8Array
+        resolve(bytes)
+      })
+
+      onError((e) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed query application: ${e}`)
+        reject(e)
+      })
     })
   }
 
@@ -78,13 +129,7 @@ export class ApplicationOperation {
     applicationId: string,
     applicationType: db.ApplicationType
   ) => {
-    if (
-      (await dbBridge.ApplicationCreatorChainSubscription.subscribed(
-        chainId,
-        applicationId
-      ))
-    )
-      return
+    if (await ApplicationOperation.subscribedCreatorChain(chainId, applicationId)) return
 
     if (
       await dbBridge.ChainOperation.exists(
@@ -127,11 +172,6 @@ export class ApplicationOperation {
       await dbBridge.ChainOperation.create({ ...operation })
 
       await Operation.waitOperation(operationId)
-
-      await dbBridge.ApplicationCreatorChainSubscription.create(
-        operation.microchain,
-        applicationId
-      )
     } catch (e) {
       return Promise.reject(e)
     }

@@ -19,3 +19,9 @@ export const SCHEMA = gql`
     }
   }
 `
+
+export const SUBSCRIBED_CREATOR_CHAIN = gql`
+  query subscribedCreatorChain {
+    subscribedCreatorChain
+  }
+`

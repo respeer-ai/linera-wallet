@@ -328,12 +328,6 @@ export const defaultNamedApplications = [
   }
 ] as NamedApplication[]
 
-export interface ApplicationCreatorChainSubscription {
-  id?: number
-  applicationId: string
-  microchain: string
-}
-
 export enum OperationType {
   LEGACY_REQUEST_SUBSCRIBE = 'requestSubscribe',
   SUBSCRIBE_CREATOR_CHAIN = 'subscribeCreatorChain',
