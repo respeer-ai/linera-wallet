@@ -1,10 +1,12 @@
 <template>
-  <div :class='[ "row", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-    <div class='flex items-center justify-center'>
-      <q-icon name='bi-box-seam' size='16px' />
-    </div>
-    <div class='label-text-small page-item-x-margin-left'>
-      {{ $t('MSG_SWAP_APPLICATION') }}
+  <div :class='[ localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+    <div class='row'>
+      <div class='flex items-center justify-center'>
+        <q-icon name='bi-box-seam' size='16px' />
+      </div>
+      <div class='label-text-small page-item-x-margin-left'>
+        {{ $t('MSG_SWAP_APPLICATION') }}
+      </div>
     </div>
     <div class='word-break-all vertical-menus-margin extra-margin-bottom'>
       <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
