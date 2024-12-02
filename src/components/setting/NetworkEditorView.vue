@@ -4,31 +4,31 @@
       {{ $t('MSG_NETWORK_NAME') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='network.name' :disable='network.preset' />
+      <q-input dense outlined v-model='network.name' :disable='network.preset || network.selected' />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_FAUCET_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='network.faucetUrl' :disable='network.preset' />
+      <q-input dense outlined v-model='network.faucetUrl' :disable='network.preset || network.selected' />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_RPC_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='rpcUrl' :disable='network.preset' />
+      <q-input dense outlined v-model='rpcUrl' :disable='network.preset || network.selected' />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_SUBSCRIPTION_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='wsUrl' :disable='network.preset' />
+      <q-input dense outlined v-model='wsUrl' :disable='network.preset || network.selected' />
     </div>
     <div class='vertical-sections-margin'>
       <q-btn
         flat class='btn full-width vertical-menus-margin' no-caps
         @click='onSaveClick'
-        v-if='!network.preset'
+        v-if='!network.preset && !network.selected'
         :disable='!network.faucetUrl || !network.host || !network.name || !network.port || !network.rpcSchema || !network.wsSchema'
       >
         {{ $t('MSG_SAVE') }}
