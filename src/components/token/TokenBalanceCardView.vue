@@ -1,25 +1,23 @@
 <template>
   <div>
-    <q-item class='row full-width tab-panel-item' clickable>
+    <q-item class='row full-width tab-panel-item'>
       <div>
-        <div v-if='_microchain' class='cursor-pointer row'>
+        <div v-if='_microchain'>
           <div class='word-break-all'>
             {{ _microchain.microchain }}
           </div>
           <div class='row'>
-            <q-space />
             <q-img :src='microchainLogo' width='16px' height='16px' />
             <q-avatar size='16px' class='page-item-x-margin-left'>
               <q-img :src='db.microchainAvatar(_microchain)' width='16px' height='16px' />
             </q-avatar>
           </div>
         </div>
-        <div v-if='selectedOwner' class='vertical-items-margin cursor-pointer row'>
+        <div v-if='selectedOwner' class='vertical-items-margin'>
           <div class='word-break-all'>
             {{ selectedOwner.owner }}
           </div>
           <div class='row'>
-            <q-space />
             <q-avatar size='16px'>
               <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='16px' height='16px' />
             </q-avatar>
