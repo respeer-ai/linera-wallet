@@ -98,7 +98,7 @@
     <div class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_BLOCK_HEIGHT') }}</div>
       <q-space />
-      <div>{{ activity.blockHeight }}</div>
+      <div>{{ stringify(activity.blockHeight) }}</div>
     </div>
     <div class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_GRANT') }}</div>
@@ -109,7 +109,7 @@
       <div :style='{width: "128px"}'>
         {{ $t('MSG_CERTIFICATE_HASH') }}
       </div>
-      <div class='text-right' :style='{width: "calc(100% - 148px)"}'>
+      <div class='text-right' :style='{width: "calc(100% - 128px)"}'>
         {{ activity.certificateHash }}
       </div>
     </div>
@@ -129,12 +129,13 @@ import { computed, onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
+import { dbBridge } from 'src/bridge'
+import { stringify } from 'lossless-json'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
 
 import { microchainLogo } from 'src/assets'
-import { dbBridge } from 'src/bridge'
 
 interface Props {
   activity: db.Activity
