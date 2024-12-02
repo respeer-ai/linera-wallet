@@ -139,7 +139,7 @@ export class BlockSigner {
             const message = el.message as rpc.Message
             return (
               destination?.Recipient ===
-                _operation.System?.Transfer.recipient.Account?.chain_id &&
+                _operation.System?.Transfer?.recipient.Account?.chain_id &&
               message?.System?.Credit?.source ===
                 _operation.System?.Transfer.owner &&
               message?.System?.Credit?.target ===

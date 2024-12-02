@@ -167,7 +167,7 @@ onMounted(async () => {
   if (operation.value.operationType === db.OperationType.TRANSFER) {
     token.value = await dbBridge.Token.native() as db.Token
     const _operation = JSON.parse(operation.value.operation) as rpc.Operation
-    transferAmount.value = Number(_operation.System.Transfer.amount)
+    transferAmount.value = Number(_operation.System?.Transfer?.amount)
   }
 })
 

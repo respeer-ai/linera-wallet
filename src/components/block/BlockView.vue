@@ -123,7 +123,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
         grant = messages.find((el) => {
           const destination = el.destination as rpc.Destination
           const message = el.message as rpc.Message
-          return destination?.Recipient === _operation.System?.Transfer.recipient.Account?.chain_id &&
+          return destination?.Recipient === _operation.System?.Transfer?.recipient.Account?.chain_id &&
                      message?.System?.Credit?.source === _operation.System?.Transfer.owner &&
                      message?.System?.Credit?.target === _operation?.System.Transfer.recipient?.Account?.owner
         })?.grant as string
