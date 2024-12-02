@@ -12,7 +12,7 @@
     </q-avatar>
     <div class='selector-margin-x-left'>
       <div class='text-bold text-grey-9 row text-left'>
-        {{ token.name }}
+        {{ token.ticker }}
       </div>
     </div>
     <q-space />
