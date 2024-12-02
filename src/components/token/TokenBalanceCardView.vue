@@ -3,30 +3,30 @@
     <div class='full-width tab-panel-item'>
       <div>
         <div v-if='_microchain' class='row decorate-underline-dashed'>
-          <div class='word-break-all'>
-            {{ _microchain.microchain }}
-          </div>
-          <q-space />
           <div class='row'>
             <q-img :src='microchainLogo' width='20px' height='20px' />
             <q-avatar size='20px' class='page-item-x-margin-left'>
               <q-img :src='db.microchainAvatar(_microchain)' width='20px' height='20px' />
             </q-avatar>
           </div>
+          <div class='word-break-all page-item-x-margin-left' :style='{width: "calc(100% - 52px)"}'>
+            {{ _microchain.microchain }}
+          </div>
         </div>
         <div v-if='selectedOwner' class='vertical-items-margin row decorate-underline-dashed'>
-          <div class='word-break-all'>
-            {{ selectedOwner.owner }}
-          </div>
-          <q-space />
           <div class='row'>
             <q-avatar size='20px'>
               <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='20px' height='20px' />
             </q-avatar>
+            <div :style='{marginLeft: "20px"}' />
+          </div>
+          <div class='word-break-all page-item-x-margin-left' :style='{width: "calc(100% - 52px)"}'>
+            {{ selectedOwner.owner }}
           </div>
         </div>
       </div>
       <div class='row vertical-items-margin'>
+        <q-space />
         <div class='text-bold text-grey-9'>
           {{ parseFloat(tokenBalance.toFixed(4)) }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
         </div>
