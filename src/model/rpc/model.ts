@@ -17,11 +17,11 @@ export type Origin = {
 }
 
 export type Recipient = {
-  Account: {
+  Account?: {
     chain_id: string
     owner?: string
   }
-  Burn: unknown
+  Burn?: unknown
 }
 
 export type Message = {

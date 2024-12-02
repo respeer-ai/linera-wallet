@@ -3,6 +3,7 @@ import { db, rpc } from 'src/model'
 import { dbBridge } from '..'
 import { ApplicationOperation } from './application_operation'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { stringify } from 'lossless-json'
 
 export class Operation {
   static transfer = async (
@@ -25,7 +26,7 @@ export class Operation {
       operationType: db.OperationType.TRANSFER,
       operationId: uid(),
       microchain: fromChainId,
-      operation: JSON.stringify({
+      operation: stringify({
         System: {
           Transfer: {
             owner: fromOwner,
@@ -35,7 +36,7 @@ export class Operation {
                 owner: toOwner
               }
             },
-            amount: amount.toString()
+            amount: stringify(amount)
           }
         }
       } as rpc.Operation)

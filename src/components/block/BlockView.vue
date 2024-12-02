@@ -134,8 +134,8 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
         nativeTokenId,
         block.value.executedBlock?.block.chainId as string,
         _operation.System.Transfer.owner,
-        _operation.System.Transfer.recipient.Account.chain_id,
-        _operation.System.Transfer.recipient.Account.owner,
+        _operation.System.Transfer.recipient.Account?.chain_id as string,
+        _operation.System.Transfer.recipient.Account?.owner,
         _operation.System.Transfer.amount,
         block.value.executedBlock?.block.height as number,
         block.value.executedBlock?.block.timestamp as number,
@@ -456,8 +456,10 @@ const _handleOperations = async () => {
       } catch (error) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Failed process incoming bundle: ${error}`)
-        // When fail, don't continue
-        continue
+        if (operation.createdAt || 0 + 10 * 1000 < Date.now()) {
+          operation.state = db.OperationState.FAILED
+          await dbBridge.ChainOperation.update(operation)
+        }
       }
     }
   }
