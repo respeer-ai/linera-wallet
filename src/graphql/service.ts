@@ -298,3 +298,9 @@ export const REQUEST_APPLICATION = gql`
     )
   }
 `
+
+export const ADD_PENDING_BLOB = gql`
+  mutation addPendingBlob($chainId: ChainId!, $bytes: [Int!]!) {
+    addPendingBlob(chainId: $chainId, bytes: $bytes)
+  }
+`

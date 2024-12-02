@@ -39,13 +39,13 @@ export type Message = {
 }
 
 export type Operation = {
-  System: {
-    Transfer: {
+  System?: {
+    Transfer?: {
       owner?: string
       recipient: Recipient
       amount: string
     }
-    Claim: {
+    Claim?: {
       owner: string
       target_id: string
       recipient: Recipient
@@ -58,28 +58,28 @@ export type Operation = {
     // TODO: Subscribe
     // TODO: Unsubscribe
     // TODO: Admin
-    PublishByteCode: {
+    PublishByteCode?: {
       bytecode_id: string
     }
-    PublishDataBlob: {
+    PublishDataBlob?: {
       blob_hash: string
     }
-    ReadBlob: {
+    ReadBlob?: {
       blob_id: string
     }
-    CreateApplication: {
+    CreateApplication?: {
       bytecode_id: string
       parameters: Uint8Array
       instantiation_argument: Uint8Array
       required_application_ids: string[]
     }
-    RequestApplication: {
+    RequestApplication?: {
       chain_id: string
       application_id: string
     }
-    CloseChain: unknown
+    CloseChain?: unknown
   }
-  User: {
+  User?: {
     application_id: string
     bytes: Uint8Array
   }

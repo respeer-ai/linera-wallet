@@ -16,6 +16,7 @@ import { db, rpc } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
 import { graphqlResult } from 'src/utils'
 import { parse, stringify } from 'lossless-json'
+import { rpcBridge } from '../../../src/bridge'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
@@ -216,11 +217,46 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
 }
 
 export const lineraGraphqlPublishDataBlob = async (request?: RpcRequest) => {
-  // TODO: add pending blob
-  // TODO: create publish blob operation
-  // TODO: return blob id
-  console.log(request)
-  return Promise.resolve()
+  if (!request) {
+    return await Promise.reject('Invalid request')
+  }
+  const query = request.request.params as unknown as RpcGraphqlQuery
+  if (!query || !query.query) {
+    return await Promise.reject('Invalid query')
+  }
+  const publicKey = query.publicKey
+  const microchain = await sharedStore.getRpcMicrochain(
+    request.origin,
+    publicKey as string
+  )
+  if (!microchain) {
+    return Promise.reject(new Error('Invalid microchain'))
+  }
+
+  const blobHash = await rpcBridge.PendingBlob.addPendingBlob(microchain, (query.query.variables as Record<string, Uint8Array>).bytes)
+
+  const operationId = uuidv4()
+  const operation = JSON.stringify({
+    System: {
+      PublishDataBlob: {
+        blob_hash: blobHash
+      }
+    }
+  } as rpc.Operation)
+
+  await sharedStore.createChainOperation({
+    operationId,
+    microchain,
+    operationType: db.OperationType.ANONYMOUS,
+    applicationId: query.applicationId,
+    applicationType: db.ApplicationType.ANONYMOUS,
+    operation,
+    graphqlQuery: query.query.query,
+    graphqlVariables: stringify(query.query.variables),
+    state: db.OperationState.CREATED
+  } as db.ChainOperation)
+
+  return { operationId, operation, blobHash }
 }
 
 export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
