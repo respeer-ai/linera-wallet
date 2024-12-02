@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <q-item class='row full-width tab-panel-item'>
       <div>
         <div v-if='_microchain'>
@@ -52,14 +52,17 @@ interface Props {
   token: db.Token
   chainBalance?: db.MicrochainFungibleTokenBalance
   ownerBalance?: db.MicrochainOwnerFungibleTokenBalance
+  xPadding?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   chainBalance: undefined,
-  ownerBalance: undefined
+  ownerBalance: undefined,
+  xPadding: '0'
 })
 const token = toRef(props, 'token')
 const chainBalance = toRef(props, 'chainBalance')
 const ownerBalance = toRef(props, 'ownerBalance')
+const xPadding = toRef(props, 'xPadding')
 
 const tokenBalance = computed(() => chainBalance.value?.balance || ownerBalance.value?.balance || 0)
 const usdBalance = computed(() => tokenBalance.value * token.value.usdCurrency || 0)

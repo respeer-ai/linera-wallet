@@ -40,11 +40,11 @@
     <div v-if='ownerBalances.length || chainBalances.length'>
       <TokenBalanceCardView
         v-for='balance in ownerBalances' :key='balance.id' :token='token' :show-indicator='false'
-        :owner-balance='balance'
+        :owner-balance='balance' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
       <TokenBalanceCardView
         v-for='balance in chainBalances' :key='balance.id' :token='token' :show-indicator='false'
-        :chain-balance='balance'
+        :chain-balance='balance' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>

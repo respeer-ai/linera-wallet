@@ -1,5 +1,5 @@
 <template>
-  <q-item class='row full-width tab-panel-item'>
+  <q-item class='row full-width tab-panel-item' :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <div v-if='showIndicator' :class='[ "selector-indicator", (active || (activeNative && token.native)) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
       <q-img :src='token.logo.replace(/\s/g, "+")' />
@@ -42,13 +42,15 @@ interface Props {
   token: db.Token
   showIndicator?: boolean
   active?: boolean
-  activeNative?: boolean,
+  activeNative?: boolean
   microchain: db.Microchain
+  xPadding?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   showIndicator: true,
   active: false,
-  activeNative: true
+  activeNative: true,
+  xPadding: '0'
 })
 const token = toRef(props, 'token')
 const showIndicator = toRef(props, 'showIndicator')
@@ -56,6 +58,7 @@ const active = toRef(props, 'active')
 const activeNative = toRef(props, 'activeNative')
 const microchain = toRef(props, 'microchain')
 const requesting = ref(false)
+const xPadding = toRef(props, 'xPadding')
 
 const onRequestNowClick = async () => {
   requesting.value = true

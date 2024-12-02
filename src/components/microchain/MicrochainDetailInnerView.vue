@@ -24,7 +24,7 @@
     <div v-if='requestedTokens.length > 0'>
       <MicrochainTokenBalanceCardView
         v-for='token in requestedTokens' :key='token.id' :token='token' :microchain='microchain'
-        :show-indicator='false'
+        :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
     <div v-if='importedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -33,7 +33,7 @@
     <div v-if='importedTokens.length > 0'>
       <RequestTokenCardView
         v-for='token in importedTokens' :key='token.id' :token='token' :microchain='microchain'
-        :show-indicator='false'
+        :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -150,7 +150,7 @@ const importedTokens = ref([] as db.Token[])
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
   const applicationIds = (await rpcBridge.Application.applications([microchain.value.microchain])).map((app: ApplicationOverview) => app.id as string)
-  requestedTokens.value = await dbBridge.Token.tokens(0, 1000, applicationIds)
+  requestedTokens.value = (await dbBridge.Token.tokens(0, 1000, applicationIds)).filter((el) => !el.native)
   importedTokens.value = (await dbBridge.Token.tokens(0, 1000)).filter((token: db.Token) => !token.native && !applicationIds.includes(token.applicationId as string))
 })
 
