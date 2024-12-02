@@ -215,6 +215,14 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   }
 }
 
+export const lineraGraphqlPublishDataBlob = async (request?: RpcRequest) => {
+  // TODO: add pending blob
+  // TODO: create publish blob operation
+  // TODO: return blob id
+  console.log(request)
+  return Promise.resolve()
+}
+
 export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
   return lineraGraphqlDoHandler(request)
 }
