@@ -47,11 +47,6 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     applicationType?: db.ApplicationType
   ) => {
-    await ERC20ApplicationOperation.subscribeCreationChain(
-      chainId,
-      applicationId
-    )
-
     const operationId = await ERC20ApplicationOperation.requestApplication(
       chainId,
       applicationId,
