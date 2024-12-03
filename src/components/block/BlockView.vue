@@ -167,12 +167,21 @@ const updateFungibleBalances = async (microchain: db.Microchain, publicKeys: str
 }
 
 const updateChainOperations = async (microchain: db.Microchain, block: HashedCertificateValue) => {
-  const operations = (await dbBridge.ChainOperation.chainOperations(0, 0, microchain.microchain, [db.OperationState.EXECUTED]) || [])
+  const operations = await dbBridge.ChainOperation.chainOperations(
+    0,
+    0,
+    microchain.microchain,
+    [db.OperationState.EXECUTING, db.OperationState.EXECUTED],
+    (block.value.executedBlock?.outcome.stateHash || (block.value.executedBlock?.outcome as unknown as Record<string, string>).state_hash) as string
+  )
   for (const operation of operations) {
-    if (operation.certificateHash === block.hash) {
-      operation.state = db.OperationState.CONFIRMED
-      await dbBridge.ChainOperation.update(operation)
+    if (operation.state !== db.OperationState.EXECUTED) {
+      return setTimeout(() => {
+        void updateChainOperations(microchain, block)
+      }, 1000)
     }
+    operation.state = db.OperationState.CONFIRMED
+    await dbBridge.ChainOperation.update(operation)
   }
 }
 

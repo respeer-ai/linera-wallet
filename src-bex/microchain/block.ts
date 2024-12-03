@@ -55,10 +55,16 @@ export class BlockSigner {
   ) => {
     const operations = await sharedStore.getChainOperations(
       microchain,
-      block.hash as string,
-      [db.OperationState.CREATED, db.OperationState.EXECUTING]
+      undefined,
+      [db.OperationState.EXECUTING, db.OperationState.EXECUTED],
+      block.value.executedBlock?.outcome.stateHash as string
     )
     for (const operation of operations) {
+      if (operation.state !== db.OperationState.EXECUTED) {
+        return setTimeout(() => {
+          void BlockSigner.updateChainOperations(microchain, block)
+        }, 1000)
+      }
       operation.state = db.OperationState.CONFIRMED
       await dbWallet.chainOperations.update(operation.id, operation)
     }
@@ -381,8 +387,10 @@ export class BlockSigner {
 
   static async processNewIncomingMessageWithOperation(
     microchain: string,
-    operation?: rpc.Operation
+    _operation?: db.ChainOperation
   ): Promise<{ certificateHash: string; isRetryBlock: boolean }> {
+    const operation = _operation ? parse(_operation?.operation) as rpc.Operation : undefined
+
     if (BlockSigner.messageCompensates.has(microchain)) {
       clearTimeout(BlockSigner.messageCompensates.get(microchain))
       BlockSigner.messageCompensates.delete(microchain)
@@ -441,6 +449,12 @@ export class BlockSigner {
 
     const _executedBlock = BlockSigner.formalizeExecutedBlock(executedBlock)
 
+    if (_operation) {
+      _operation.state = db.OperationState.EXECUTING
+      _operation.stateHash = (_executedBlock.outcome.stateHash || (_executedBlock.outcome as unknown as Record<string, string>).state_hash) as string
+      await sharedStore.updateChainOperation(_operation)
+    }
+
     try {
       const certificateHash = await BlockSigner.submitBlockAndSignature(
         microchain,
@@ -497,14 +511,11 @@ export class BlockSigner {
         continue
       }
 
-      operation.state = db.OperationState.EXECUTING
-      await sharedStore.updateChainOperation(operation)
-
       try {
         const { certificateHash, isRetryBlock } =
           await BlockSigner.processNewIncomingMessageWithOperation(
             operation.microchain,
-            _operation
+            operation
           )
         if (isRetryBlock) continue
         operation.state = db.OperationState.EXECUTED
