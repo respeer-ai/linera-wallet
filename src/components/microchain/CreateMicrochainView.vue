@@ -58,20 +58,23 @@ const createMicrochain = async (): Promise<db.Microchain> => {
 
       let namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
       if (!namedApplication) return
-      await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.SWAP)
-      // Subscribe creation chain will be done when next block is signed
+      let operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.SWAP)
+      if (operationId) {
+        await rpcBridge.Operation.waitOperation(operationId)
+      }
+      await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain)
 
       namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
       if (!namedApplication) return
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.WLINERA)
-      // Subscribe creation chain will be done when next block is signed
+      await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.WLINERA)
 
       namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.AMS)) as db.NamedApplication
       if (!namedApplication) return
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.AMS)
-      // Subscribe creation chain will be done when next block is signed
+      operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.AMS)
+      if (operationId) {
+        await rpcBridge.Operation.waitOperation(operationId)
+      }
+      await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
 
       resolve(microchain)
     }).catch((error) => {

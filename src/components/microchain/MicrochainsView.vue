@@ -113,8 +113,29 @@ const onImportMicrochainClick = () => {
   importingMicrochain.value = true
 }
 
-const onMicrochainImported = async () => {
+const onMicrochainImported = async (microchain: string) => {
   importingMicrochain.value = false
+
+  let namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
+  if (!namedApplication) return
+  let operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.SWAP)
+  if (operationId) {
+    await rpcBridge.Operation.waitOperation(operationId)
+  }
+  await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain)
+
+  namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
+  if (!namedApplication) return
+  await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain, namedApplication.applicationId, db.ApplicationType.WLINERA)
+
+  namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.AMS)) as db.NamedApplication
+  if (!namedApplication) return
+  operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.AMS)
+  if (operationId) {
+    await rpcBridge.Operation.waitOperation(operationId)
+  }
+  await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain)
+
   await loadMicrochains()
 }
 

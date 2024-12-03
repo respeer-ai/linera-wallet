@@ -57,7 +57,7 @@ const microchainIdError = ref(false)
 const messageIdError = ref(false)
 const certificateHashError = ref(false)
 
-const emit = defineEmits<{(ev: 'imported'): void,
+const emit = defineEmits<{(ev: 'imported', value: string): void,
   (ev: 'error'): void,
   (ev: 'canceled'): void
 }>()
@@ -85,7 +85,7 @@ const onImportClick = () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
-    emit('imported')
+    emit('imported', microchainId.value)
   }).catch((error) => {
     importing.value = false
     localStore.notification.pushNotification({
