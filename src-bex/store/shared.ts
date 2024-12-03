@@ -116,7 +116,8 @@ export const createChainOperation = async (operation: db.ChainOperation) => {
 export const getChainOperations = async (
   microchain: string | undefined,
   certificateHash: string | undefined,
-  states: db.OperationState[]
+  states: db.OperationState[],
+  stateHash?: string
 ) => {
   let query = dbWallet.chainOperations.where('state').anyOf(states)
   if (microchain) {
@@ -124,6 +125,9 @@ export const getChainOperations = async (
   }
   if (certificateHash) {
     query = query.and((op) => op.certificateHash === certificateHash)
+  }
+  if (stateHash) {
+    query = query.and((op) => op.stateHash === stateHash)
   }
   return await query.toArray()
 }
