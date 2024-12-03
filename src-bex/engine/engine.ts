@@ -10,6 +10,7 @@ import {
 import { sharedStore } from '../store'
 import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { basebridge } from '../event'
+import { commontypes } from '../../src/types'
 
 export class Engine {
   middlewareHandlers = [] as Array<types.MiddlewareImplHandler>
@@ -103,7 +104,10 @@ export class Engine {
                         request: req,
                         privData: res
                       })
-                      .then(() => {
+                      .then((_res: BexPayload<commontypes.PopupResponse, unknown>) => {
+                        if (_res.data.code !== 0) {
+                          return reject(new Error(_res.data.message))
+                        }
                         resolve(res)
                       })
                       .catch((e: Error) => {

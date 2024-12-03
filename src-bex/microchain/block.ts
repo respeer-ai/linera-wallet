@@ -475,10 +475,7 @@ export class BlockSigner {
           }, 1000) as unknown as number
         )
       }
-      return {
-        certificateHash: undefined as unknown as string,
-        isRetryBlock: false
-      }
+      return Promise.reject(e)
     }
   }
 
