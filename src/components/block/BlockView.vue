@@ -185,6 +185,13 @@ const updateChainOperations = async (microchain: db.Microchain, block: HashedCer
   }
 }
 
+const updateMicrochainOpenState = async (microchain: db.Microchain, block: HashedCertificateValue) => {
+  if (microchain.openChainCertificateHash === block.hash) {
+    microchain.opened = true
+    await dbBridge.Microchain.update(microchain)
+  }
+}
+
 const processNewBlock = async (microchain: db.Microchain, hash: string) => {
   const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
   if (!owners?.length) return
@@ -210,6 +217,11 @@ const processNewBlock = async (microchain: db.Microchain, hash: string) => {
     await updateChainOperations(microchain, block)
   } catch (e) {
     console.log('Failed update chain operations', e)
+  }
+  try {
+    await updateMicrochainOpenState(microchain, block)
+  } catch (e) {
+    console.log('Failed update chain open state', e)
   }
 }
 
@@ -323,6 +335,8 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         return value
       })
 
+      const isOpenChain = stringify(_executedBlock)?.includes('OpenChain')
+
       rpcBridge.Block.submitBlockAndSignature(
         microchain,
         executedBlock.block.height as number,
@@ -354,6 +368,18 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
             })
           }, 200))
         }
+
+        if (isOpenChain) {
+          dbBridge.Microchain.microchain(microchain).then((_microchain?: db.Microchain) => {
+            if (!_microchain) return
+            _microchain.opening = true
+            _microchain.openChainCertificateHash = certificateHash
+            void dbBridge.Microchain.update(_microchain)
+          }).catch((e) => {
+            console.log('Failed update mirochain', e)
+          })
+        }
+
         resolve({ certificateHash, isRetryBlock })
       }).catch((error) => {
         console.log('Failed submit block', error)

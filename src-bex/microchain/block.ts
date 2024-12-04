@@ -182,6 +182,14 @@ export class BlockSigner {
     }
   }
 
+  static updateMicrochainOpenState = async (microchain: string, block: HashedCertificateValue) => {
+    const _microchain = await sharedStore.getMicrochain(microchain) as db.Microchain
+    if (_microchain.openChainCertificateHash === block.hash) {
+      _microchain.opened = true
+      await sharedStore.updateMicrochain(_microchain)
+    }
+  }
+
   static async onNewBlock(subscriptionId: string, data: unknown) {
     if (!data || !graphqlResult.rootData(data)) return
     const notifications = (
@@ -208,6 +216,7 @@ export class BlockSigner {
       )) as HashedCertificateValue
       await BlockSigner.updateChainOperations(microchain, block)
       await BlockSigner.updateActivities(microchain, block)
+      await BlockSigner.updateMicrochainOpenState(microchain, block)
     }
   }
 
@@ -465,6 +474,8 @@ export class BlockSigner {
       await sharedStore.updateChainOperation(_operation)
     }
 
+    const isOpenChain = stringify(_executedBlock)?.includes('OpenChain')
+
     try {
       const certificateHash = await BlockSigner.submitBlockAndSignature(
         microchain,
@@ -483,6 +494,17 @@ export class BlockSigner {
             void BlockSigner.processNewIncomingMessageWithOperation(microchain)
           }, 1000) as unknown as number
         )
+      }
+
+      if (isOpenChain) {
+        sharedStore.getMicrochain(microchain).then((_microchain?: db.Microchain) => {
+          if (!_microchain) return
+          _microchain.opening = true
+          _microchain.openChainCertificateHash = certificateHash
+          void sharedStore.updateMicrochain(_microchain)
+        }).catch((e) => {
+          console.log('Failed update mirochain', e)
+        })
       }
 
       return { certificateHash, isRetryBlock }

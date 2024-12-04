@@ -12,6 +12,14 @@ export const getAccountWithPrefix = async (prefix: string) => {
   )?.address
 }
 
+export const getMicrochain = async (microchain: string) => {
+  return await dbWallet.microchains.where('microchain').equals(microchain).first()
+}
+
+export const updateMicrochain = async (microchain: db.Microchain) => {
+  return await dbWallet.microchains.update(microchain.id, microchain)
+}
+
 export const getMicrochains = async (owner?: string) => {
   const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter(
     (el) => !owner || el.owner === owner

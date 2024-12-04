@@ -84,7 +84,9 @@ export class Microchain {
       networkId: selectedNetwork.id,
       name,
       default: _default,
-      imported: true
+      imported: true,
+      opening: false,
+      opened: false
     } as db.Microchain
     await MicrochainOwner.create(owner, microchainId)
     await dbWallet.microchains.add(microchain)

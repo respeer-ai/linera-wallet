@@ -19,6 +19,9 @@ export interface Microchain {
   name: string
   default: boolean
   imported: boolean // If it's imported in selected network
+  opening: boolean
+  opened: boolean
+  openChainCertificateHash?: string
 }
 
 export const microchainAvatar = (microchain: Microchain) => {

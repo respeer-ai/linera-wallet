@@ -46,7 +46,7 @@ export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
 dbWallet.version(1).stores({
   microchainOwners: '++id, microchain, owner, balance',
   microchains:
-    '++id, microchain, messageId, certificateHash, name, default, imported',
+    '++id, microchain, messageId, certificateHash, name, default, imported, opening, opened, openChainCertificateHash',
   owners: '++id, address, owner, privateKey, salt, name, selected',
   microchainFungibleTokenBalances: '++id, microchain, tokenId, balance',
   microchainOwnerFungibleTokenBalances:
