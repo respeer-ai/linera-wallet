@@ -301,30 +301,31 @@ export interface NamedApplication {
   creatorChain: string
 }
 
+const defaultSwapAppId = '1d31f665a7286953a77a7314eedb7fc35da20e974687238a1eee7869bee3696b85edb0c350775b8817236d600203a6df84903de8cf50457a5e79a77cd2ecbfb44d308b7ba121c99d78871450da8506f0f6ae1f5cab99e904b45fd1bc7da29b95030000000000000000000000'
+const defaultSwapCreatorChain = '4d308b7ba121c99d78871450da8506f0f6ae1f5cab99e904b45fd1bc7da29b95'
+const defaultWLineraAppId = 'fd840f3a9c5962758daea130071880a20c1807a8e13dea2d2447024f3018dffbb1ccf87542e3e3b13146ef138a4f3d068346e3dbbbf9807d57fcfc176a8e8f13ec3c536f03e277d39021dcdf580615580963fb1e00c1a5bba3d0061dcca88f81030000000000000000000000'
+const defaultWLineraCreatorChain = 'ec3c536f03e277d39021dcdf580615580963fb1e00c1a5bba3d0061dcca88f81'
+const defaultAMSAppId = 'bcda6ad39f0f135af6a0999311fe53aebe31807591cb1ebef2269dd3dcbd94117ca41c35bda8680ea2ba8d7638169668a0165b475fe692f19f218f34bbae0cc8532d9cb3258636e1f7dcc6d03c6a3fff2c64e7ac388fff567815cb1af152544a010000000000000000000000'
+const defaultAMSCreatorChain = '532d9cb3258636e1f7dcc6d03c6a3fff2c64e7ac388fff567815cb1af152544a'
+
 export const defaultNamedApplications = [
   {
     applicationType: ApplicationType.SWAP,
     name: 'swap',
-    applicationId:
-      'd72927687ef4e4501336d030291190c3efcd714a8ecfcb551d03da68938b58f2096ae7794f1fc97b4b8f6b29a7f4bef6f3d98402be87da8c5eefa2745ab4538e1cab8114d56a7388ce39e42a08ccfb8a6198d109b63cdc23cf20815a6df89ef2010000000000000000000000',
-    creatorChain:
-      '1cab8114d56a7388ce39e42a08ccfb8a6198d109b63cdc23cf20815a6df89ef2'
+    applicationId: defaultSwapAppId,
+    creatorChain: defaultSwapCreatorChain
   },
   {
     applicationType: ApplicationType.WLINERA,
     name: 'wlinera',
-    applicationId:
-      '7f5f35725a130873e8d8a3aa1e1c596e9bd2482961ac6046564b7670449630fa98886d18b99722f4e4c74ee7e9ee53defea69f1f7b62f63933c38b745c30b0d1717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3010000000000000000000000',
-    creatorChain:
-      '717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3'
+    applicationId: defaultWLineraAppId,
+    creatorChain: defaultWLineraCreatorChain
   },
   {
     applicationType: ApplicationType.AMS,
     name: 'ams',
-    applicationId:
-      '8f5f35725a130873e8d8a3aa1e1c596e9bd2482961ac6046564b7670449630fa98886d18b99722f4e4c74ee7e9ee53defea69f1f7b62f63933c38b745c30b0d1717b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3010000000000000000000000',
-    creatorChain:
-      '817b3ce25477861f9960357f4a070749553f2382a9353e8c2d813d54e9ed80d3'
+    applicationId: defaultAMSAppId,
+    creatorChain: defaultAMSCreatorChain
   }
 ] as NamedApplication[]
 
