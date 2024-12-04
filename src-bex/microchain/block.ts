@@ -29,6 +29,16 @@ export class BlockSigner {
   static running = false
   static messageCompensates = new Map<string, number>()
 
+  static async onInitialized(subscriptionId: string, data: unknown) {
+    const _data = data as Record<string, string>
+    if (!_data || !_data.topic || _data.topic !== 'Initialized' || !_data.microchain) return
+    try {
+      await BlockSigner.processNewIncomingMessageWithOperation(_data.microchain)
+    } catch (e) {
+      console.log('Failed process incoming message', e)
+    }
+  }
+
   static async onNewIncomingMessage(subscriptionId: string, data: unknown) {
     if (!data || !graphqlResult.rootData(data)) return
     const notifications = (
@@ -563,6 +573,13 @@ export class BlockSigner {
       ['NewBlock'],
       (subscriptionId: string, data: unknown) =>
         BlockSigner.onNewBlock(subscriptionId, data)
+    )
+
+    // Subscribe initialized
+    subscription.Subscription.subscribe(
+      ['Initialized'],
+      (subscriptionId: string, data: unknown) =>
+        BlockSigner.onInitialized(subscriptionId, data)
     )
   }
 }

@@ -364,6 +364,7 @@ export const setupLineraSubscription = () => {
                     }
                   }
                 })
+              subscription.Subscription.handle({ topic: 'Initialized', microchain })
               subscribed.set(microchain, _subscribed.unsubscribe)
             })
           })
