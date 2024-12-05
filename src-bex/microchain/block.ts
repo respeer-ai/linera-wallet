@@ -43,6 +43,13 @@ export class BlockSigner {
     } catch (e) {
       console.log('Failed process incoming message', e)
     }
+
+    try {
+      await BlockSigner.processNewIncomingMessageWithOperation(_data.microchain)
+      await BlockSigner.processNewBlock(_data.microchain)
+    } catch {
+      // DO NOTHING
+    }
   }
 
   static async onNewIncomingMessage(subscriptionId: string, data: unknown) {
@@ -188,6 +195,29 @@ export class BlockSigner {
     }
   }
 
+  static processNewBlock = async (
+    microchain: string,
+    hash?: string
+  ) => {
+    const blockQuery = {
+      query: {
+        operationName: 'block',
+        query: BLOCK.loc?.source?.body,
+        variables: {
+          chainId: microchain,
+          hash
+        }
+      }
+    } as RpcGraphqlQuery
+    const block = (await queryApplication(
+      microchain,
+      blockQuery
+    )) as HashedCertificateValue
+    await BlockSigner.updateChainOperations(microchain, block)
+    await BlockSigner.updateActivities(microchain, block)
+    await BlockSigner.updateMicrochainOpenState(microchain, block)
+  }
+
   static updateMicrochainOpenState = async (
     microchain: string,
     block: HashedCertificateValue
@@ -211,23 +241,7 @@ export class BlockSigner {
     const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
     if (newBlock) {
       const hash = graphqlResult.keyValue(newBlock, 'hash') as string
-      const blockQuery = {
-        query: {
-          operationName: 'block',
-          query: BLOCK.loc?.source?.body,
-          variables: {
-            chainId: microchain,
-            hash
-          }
-        }
-      } as RpcGraphqlQuery
-      const block = (await queryApplication(
-        microchain,
-        blockQuery
-      )) as HashedCertificateValue
-      await BlockSigner.updateChainOperations(microchain, block)
-      await BlockSigner.updateActivities(microchain, block)
-      await BlockSigner.updateMicrochainOpenState(microchain, block)
+      await BlockSigner.processNewBlock(microchain, hash)
     }
   }
 
