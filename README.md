@@ -28,6 +28,6 @@ Basically, CheCko is the wallet login system of ResPeer. But for a stable web3 a
 
 #### Todo
 
-- [ ] Construct block with rust
-- [ ] Move block signer to background
-- [ ] Implement web3.js apis
+- [X] Construct block with rust
+- [X] Move block signer to background
+- [X] Implement web3.js apis
