@@ -62,7 +62,7 @@ const onImportClick = async () => {
     emit('imported')
   } catch (error) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Failed refresh erc20 application: ${error}`)
+    console.log(`Failed import erc20 application: ${error}`)
     emit('error')
   }
 }
