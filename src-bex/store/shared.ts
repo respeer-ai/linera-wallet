@@ -13,7 +13,10 @@ export const getAccountWithPrefix = async (prefix: string) => {
 }
 
 export const getMicrochain = async (microchain: string) => {
-  return await dbWallet.microchains.where('microchain').equals(microchain).first()
+  return await dbWallet.microchains
+    .where('microchain')
+    .equals(microchain)
+    .first()
 }
 
 export const updateMicrochain = async (microchain: db.Microchain) => {

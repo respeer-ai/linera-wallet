@@ -31,7 +31,13 @@ export class BlockSigner {
 
   static async onInitialized(subscriptionId: string, data: unknown) {
     const _data = data as Record<string, string>
-    if (!_data || !_data.topic || _data.topic !== 'Initialized' || !_data.microchain) return
+    if (
+      !_data ||
+      !_data.topic ||
+      _data.topic !== 'Initialized' ||
+      !_data.microchain
+    )
+      return
     try {
       await BlockSigner.processNewIncomingMessageWithOperation(_data.microchain)
     } catch (e) {
@@ -182,8 +188,13 @@ export class BlockSigner {
     }
   }
 
-  static updateMicrochainOpenState = async (microchain: string, block: HashedCertificateValue) => {
-    const _microchain = await sharedStore.getMicrochain(microchain) as db.Microchain
+  static updateMicrochainOpenState = async (
+    microchain: string,
+    block: HashedCertificateValue
+  ) => {
+    const _microchain = (await sharedStore.getMicrochain(
+      microchain
+    )) as db.Microchain
     if (_microchain.openChainCertificateHash === block.hash) {
       _microchain.opened = true
       await sharedStore.updateMicrochain(_microchain)
@@ -408,7 +419,9 @@ export class BlockSigner {
     microchain: string,
     _operation?: db.ChainOperation
   ): Promise<{ certificateHash: string; isRetryBlock: boolean }> {
-    const operation = _operation ? parse(_operation?.operation) as rpc.Operation : undefined
+    const operation = _operation
+      ? (parse(_operation?.operation) as rpc.Operation)
+      : undefined
 
     if (BlockSigner.messageCompensates.has(microchain)) {
       clearTimeout(BlockSigner.messageCompensates.get(microchain))
@@ -470,7 +483,9 @@ export class BlockSigner {
 
     if (_operation) {
       _operation.state = db.OperationState.EXECUTING
-      _operation.stateHash = (_executedBlock.outcome.stateHash || (_executedBlock.outcome as unknown as Record<string, string>).state_hash) as string
+      _operation.stateHash = (_executedBlock.outcome.stateHash ||
+        (_executedBlock.outcome as unknown as Record<string, string>)
+          .state_hash) as string
       await sharedStore.updateChainOperation(_operation)
     }
 
@@ -497,14 +512,17 @@ export class BlockSigner {
       }
 
       if (isOpenChain) {
-        sharedStore.getMicrochain(microchain).then((_microchain?: db.Microchain) => {
-          if (!_microchain) return
-          _microchain.opening = true
-          _microchain.openChainCertificateHash = certificateHash
-          void sharedStore.updateMicrochain(_microchain)
-        }).catch((e) => {
-          console.log('Failed update mirochain', e)
-        })
+        sharedStore
+          .getMicrochain(microchain)
+          .then((_microchain?: db.Microchain) => {
+            if (!_microchain) return
+            _microchain.opening = true
+            _microchain.openChainCertificateHash = certificateHash
+            void sharedStore.updateMicrochain(_microchain)
+          })
+          .catch((e) => {
+            console.log('Failed update mirochain', e)
+          })
       }
 
       return { certificateHash, isRetryBlock }

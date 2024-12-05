@@ -104,12 +104,16 @@ export class Engine {
                         request: req,
                         privData: res
                       })
-                      .then((_res: BexPayload<commontypes.PopupResponse, unknown>) => {
-                        if (_res.data.code !== 0) {
-                          return reject(new Error(_res.data.message))
+                      .then(
+                        (
+                          _res: BexPayload<commontypes.PopupResponse, unknown>
+                        ) => {
+                          if (_res.data.code !== 0) {
+                            return reject(new Error(_res.data.message))
+                          }
+                          resolve(res)
                         }
-                        resolve(res)
-                      })
+                      )
                       .catch((e: Error) => {
                         reject(e)
                       })
