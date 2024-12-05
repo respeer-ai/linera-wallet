@@ -23,6 +23,28 @@ export class ApplicationOperation {
     return ((await Application.microchainApplications(chainId)).findIndex((el) => el.id === applicationId) >= 0)
   }
 
+  static waitExistChainApplication = async (
+    chainId: string,
+    applicationId: string,
+    timeoutSeconds: number
+  ): Promise<boolean> => {
+    if (((await Application.microchainApplications(chainId)).findIndex((el) => el.id === applicationId) >= 0)) {
+      return true
+    }
+    if (timeoutSeconds <= 0) {
+      return Promise.reject('Wait timeout')
+    }
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        ApplicationOperation.waitExistChainApplication(chainId, applicationId, timeoutSeconds - 1).then((exists) => {
+          resolve(exists)
+        }).catch((e) => {
+          reject(e)
+        })
+      }, 1000)
+    })
+  }
+
   static subscribedCreatorChain = async (
     chainId: string,
     applicationId: string
@@ -108,8 +130,10 @@ export class ApplicationOperation {
   ) => {
     if (
       await ApplicationOperation.subscribedCreatorChain(chainId, applicationId)
-    )
+    ) {
+      console.log(`${applicationId} already subscribed on ${chainId}`)
       return
+    }
 
     if (
       await dbBridge.ChainOperation.exists(
@@ -123,8 +147,10 @@ export class ApplicationOperation {
           db.OperationState.CONFIRMED
         ]
       )
-    )
+    ) {
+      console.log(`${applicationId} subscribe operation exists on ${chainId}`)
       return
+    }
 
     try {
       const queryRespBytes = await ApplicationOperation.queryApplication(

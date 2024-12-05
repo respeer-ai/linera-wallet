@@ -12,7 +12,10 @@ export class MonoApplicationOperation {
       chainId,
       applicationId
     )
-    if (!exist) return
+    if (!exist) {
+      console.log(`${applicationId} not exists on ${chainId}`)
+      return
+    }
     await ApplicationOperation.subscribeCreatorChain(
       chainId,
       applicationId,

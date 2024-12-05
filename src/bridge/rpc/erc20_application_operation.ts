@@ -58,6 +58,8 @@ export class ERC20ApplicationOperation {
       }
     }
 
+    await ApplicationOperation.waitExistChainApplication(chainId, applicationId, 10)
+
     await ERC20ApplicationOperation.subscribeCreationChain(
       chainId,
       applicationId
