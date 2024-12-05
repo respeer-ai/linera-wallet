@@ -147,7 +147,8 @@ const parseActivities = async (microchain: db.Microchain, block: HashedCertifica
 }
 
 const updateFungibleBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
-  const tokens = await dbBridge.Token.fungibles() || []
+  const applications = await rpcBridge.Application.microchainApplications(microchain.microchain)
+  const tokens = (await dbBridge.Token.fungibles()).filter((token) => applications.findIndex((el) => el.id === token.applicationId) >= 0)
   for (const token of tokens) {
     try {
       const balance = await rpcBridge.ERC20ApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string) || 0

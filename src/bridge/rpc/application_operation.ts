@@ -4,57 +4,23 @@ import { graphqlResult } from 'src/utils'
 import {
   SUBSCRIBE_CREATOR_CHAIN,
   LEGACY_REQUEST_SUBSCRIBE,
-  SCHEMA,
   SUBSCRIBED_CREATOR_CHAIN
 } from 'src/graphql'
 import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
 import { Operation } from './operation'
-import { stringify } from 'lossless-json'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import axios from 'axios'
+import { Application } from './application'
 
 export class ApplicationOperation {
   static existChainApplication = async (
     chainId: string,
     applicationId: string
   ): Promise<boolean> => {
-    const options = await getClientOptionsWithEndpointType(
-      EndpointType.Rpc,
-      chainId,
-      applicationId
-    )
-    const apolloClient = new ApolloClient(options)
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const { /* result, refetch, fetchMore, */ onResult, onError } =
-      provideApolloClient(apolloClient)(() =>
-        useQuery(
-          SCHEMA,
-          {},
-          {
-            fetchPolicy: 'network-only'
-          }
-        )
-      )
-
-    return new Promise((resolve, reject) => {
-      onResult(() => {
-        resolve(true)
-      })
-
-      onError((e) => {
-        if (
-          stringify(e)?.includes('is not registered by the chain during Query')
-        ) {
-          return resolve(false)
-        }
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        reject(new Error(`Query chain application: ${e}`))
-      })
-    })
+    return ((await Application.microchainApplications(chainId)).findIndex((el) => el.id === applicationId) >= 0)
   }
 
   static subscribedCreatorChain = async (
