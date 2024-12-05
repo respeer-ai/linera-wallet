@@ -92,7 +92,7 @@ export const NOTIFICATIONS = gql`
 `
 
 export const BLOCK = gql`
-  query block($chainId: ChainId!, $hash: CryptoHash!) {
+  query block($chainId: ChainId!, $hash: CryptoHash) {
     block(chainId: $chainId, hash: $hash) {
       hash
       value {

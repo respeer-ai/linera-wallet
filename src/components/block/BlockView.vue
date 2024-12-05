@@ -192,7 +192,7 @@ const updateMicrochainOpenState = async (microchain: db.Microchain, block: Hashe
   }
 }
 
-const processNewBlock = async (microchain: db.Microchain, hash: string) => {
+const processNewBlock = async (microchain: db.Microchain, hash?: string) => {
   const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
   if (!owners?.length) return
 
@@ -240,7 +240,9 @@ const sortedObject = (obj: Record<string, unknown>): Record<string, unknown> => 
   return _sortedObject
 }
 
-const processNewIncomingBundle = async (microchain: string, operation?: rpc.Operation): Promise<{ certificateHash: string, isRetryBlock: boolean }> => {
+const processNewIncomingBundle = async (microchain: string, _operation?: db.ChainOperation): Promise<{ certificateHash: string, isRetryBlock: boolean }> => {
+  const operation = _operation ? parse(_operation.operation) as rpc.Operation : undefined
+
   if (microchainCompensates.has(microchain)) {
     window.clearTimeout(microchainCompensates.get(microchain))
     microchainCompensates.delete(microchain)
@@ -333,14 +335,22 @@ const processNewIncomingBundle = async (microchain: string, operation?: rpc.Oper
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value
-      })
+      }) as ExecutedBlock
+
+      if (_operation) {
+        _operation.state = db.OperationState.EXECUTING
+        _operation.stateHash = (_executedBlock.outcome.stateHash ||
+          (_executedBlock.outcome as unknown as Record<string, string>)
+            .state_hash) as string
+        await dbBridge.ChainOperation.update(_operation)
+      }
 
       const isOpenChain = stringify(_executedBlock)?.includes('OpenChain')
 
       rpcBridge.Block.submitBlockAndSignature(
         microchain,
         executedBlock.block.height as number,
-        _executedBlock as ExecutedBlock,
+        _executedBlock,
         blockMaterial.round as Round,
         signature,
         isRetryBlock,
@@ -419,7 +429,7 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
     // DO NOTHING
   }
 
-  return await rpcBridge.Block.subscribe(
+  const unsubscribe = await rpcBridge.Block.subscribe(
     microchain.microchain,
     () => {
       // DO NOTHING
@@ -440,6 +450,15 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
         })
       }
     }) as () => void
+
+  try {
+    await processNewIncomingBundle(microchain.microchain)
+    await processNewBlock(microchain)
+  } catch {
+    // DO NOTHING
+  }
+
+  return unsubscribe
 }
 
 const subscribeMicrochains = async () => {
@@ -475,11 +494,8 @@ const _handleOperations = async () => {
     const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING])
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
-      const _operation = parse(operation.operation) as rpc.Operation
       try {
-        operation.state = db.OperationState.EXECUTING
-        await dbBridge.ChainOperation.update(operation)
-        const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, _operation)
+        const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, operation)
         // TODO: get operation certificate hash
         // We don't know the reason of the failure, so we let user to choose if retry
         // TODO: processNewIncomingBundle return if retry
@@ -491,7 +507,7 @@ const _handleOperations = async () => {
       } catch (e) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Failed process incoming bundle: ${e}`)
-        if (operation.createdAt || 0 + 10 * 1000 < Date.now()) {
+        if ((operation.createdAt || 0) + 10 * 1000 < Date.now()) {
           operation.state = db.OperationState.FAILED
           operation.failedAt = Date.now()
           operation.failReason = stringify(e)

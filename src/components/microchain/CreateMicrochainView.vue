@@ -48,9 +48,16 @@ const emit = defineEmits<{(ev: 'created', value: db.Microchain): void,
 const importPresetApplications = async (microchain: db.Microchain) => {
   const _microchain = await dbBridge.Microchain.microchain(microchain.microchain)
   if (!_microchain?.opened) {
-    return setTimeout(() => {
-      void importPresetApplications(microchain)
-    }, 1000)
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        importPresetApplications(microchain).then(() => {
+          resolve(undefined)
+        }).catch((e) => {
+          console.log('Failed import preset applications', e)
+          reject(e)
+        })
+      }, 1000)
+    })
   }
 
   let namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication

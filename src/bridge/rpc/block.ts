@@ -142,7 +142,7 @@ export class Block {
 
   static getBlockWithHash = async (
     chainId: string,
-    hash: string
+    hash?: string
   ): Promise<HashedCertificateValue> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
