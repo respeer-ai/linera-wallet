@@ -28,16 +28,16 @@
         </div>
       </div>
       <q-input
-        v-model='swapApplicationId' v-if='editingBlobGatewayApplication' autogrow hide-bottom-space
+        v-model='blobGatewayApplicationId' v-if='editingBlobGatewayApplication' autogrow hide-bottom-space
         type='textarea' :style='{marginTop: "-10px"}'
       />
       <p v-else class='vertical-items-margin text-grey-6'>
-        {{ swapApplicationId }}
+        {{ blobGatewayApplicationId }}
       </p>
       <q-btn
         flat class='btn btn-alt vertical-menus-margin full-width' label='Submit'
         no-caps @click='onSaveBlobGatewayApplicationId'
-        :disable='!swapApplicationId?.length'
+        :disable='!blobGatewayApplicationId?.length'
         :loading='updatingBlobGatewayApplication'
       />
     </div>
@@ -60,50 +60,50 @@ const nameApplications = ref([] as db.NamedApplication[])
 const editingBlobGatewayApplication = ref(false)
 const updatingBlobGatewayApplication = ref(false)
 
-const swapApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.SWAP))
-const swapApplicationId = ref(swapApplication.value?.applicationId)
+const blobGatewayApplication = computed(() => nameApplications.value.find((el) => el.applicationType === db.ApplicationType.BLOB_GATEWAY))
+const blobGatewayApplicationId = ref(blobGatewayApplication.value?.applicationId)
 
-watch(swapApplication, () => {
-  swapApplicationId.value = swapApplication.value?.applicationId
+watch(blobGatewayApplication, () => {
+  blobGatewayApplicationId.value = blobGatewayApplication.value?.applicationId
 })
 
 const onSaveBlobGatewayApplicationId = async () => {
-  if (!swapApplicationId.value?.length) return
+  if (!blobGatewayApplicationId.value?.length) return
   editingBlobGatewayApplication.value = false
   updatingBlobGatewayApplication.value = true
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(swapApplicationId.value)
+    const creationChain = await lineraWasm.application_creation_chain_id(blobGatewayApplicationId.value)
     const microchains = await dbWallet.microchains.toArray()
 
     for (const microchain of microchains) {
       try {
-        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, db.ApplicationType.SWAP)
+        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, blobGatewayApplicationId.value, db.ApplicationType.BLOB_GATEWAY)
         if (operationId) {
           await rpcBridge.Operation.waitOperation(operationId)
         }
         await rpcBridge.BlobGatewayApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
-        console.log('Faled refresh swap application', e)
+        console.log('Faled refresh blobGateway application', e)
       }
     }
 
     await dbBridge.NamedApplication.update({
-      ...swapApplication.value,
-      applicationId: swapApplicationId.value,
+      ...blobGatewayApplication.value,
+      applicationId: blobGatewayApplicationId.value,
       creatorChain: creationChain
     } as db.NamedApplication)
 
     updatingBlobGatewayApplication.value = false
   } catch (error) {
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Failed update swap application: ${error}`)
+    console.log(`Failed update blobGateway application: ${error}`)
     updatingBlobGatewayApplication.value = false
   }
 }
 
 const onRefresh = async () => {
-  if (!swapApplicationId.value?.length) return
+  if (!blobGatewayApplicationId.value?.length) return
   updatingBlobGatewayApplication.value = true
 
   try {
@@ -111,19 +111,19 @@ const onRefresh = async () => {
 
     for (const microchain of microchains) {
       try {
-        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, swapApplicationId.value, db.ApplicationType.SWAP)
+        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, blobGatewayApplicationId.value, db.ApplicationType.BLOB_GATEWAY)
         if (operationId) {
           await rpcBridge.Operation.waitOperation(operationId)
         }
         await rpcBridge.BlobGatewayApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
-        console.log('Faled refresh swap application', e)
+        console.log('Faled refresh blobGateway application', e)
       }
     }
 
     localStore.notification.pushNotification({
       Title: 'Refresh BlobGateway application',
-      Message: 'Success refresh swap application.',
+      Message: 'Success refresh blobGateway application.',
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
@@ -133,7 +133,7 @@ const onRefresh = async () => {
     localStore.notification.pushNotification({
       Title: 'Refresh BlobGateway application',
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed refresh swap application: ${e}.`,
+      Message: `Failed refresh blobGateway application: ${e}.`,
       Popup: true,
       Type: localStore.notify.NotifyType.Error
     })
