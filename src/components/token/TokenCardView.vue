@@ -33,12 +33,12 @@
 <script setup lang='ts'>
 import { db } from 'src/model'
 import { onMounted, ref, toRef, watch } from 'vue'
+import { dbBridge } from 'src/bridge'
 
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 
 import { lineraLogo } from 'src/assets'
-import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token

@@ -2,6 +2,7 @@ import { dbBase } from 'src/controller'
 import { db } from 'src/model'
 import { Network } from './network'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { NamedApplication } from './named_application'
 
 export class Token {
   static initialize = async (nativeLogo: string) => {
@@ -80,11 +81,13 @@ export class Token {
   static logo = async (tokenId: number) => {
     const token = await dbBase.tokens.get(tokenId)
     if (!token) return undefined
-    if (token.name) return token.logo
+    if (token.native) return token.logo
     const network = await Network.selected()
     if (!network) return token.logo
+    const namedApplication = await NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)
+    if (!namedApplication) return token.logo
     const creationChain = await lineraWasm.application_creation_chain_id(
-      token.applicationId as string
+      namedApplication.applicationId
     )
     const blobGatewayUrl = network.blobGatewayUrl.endsWith('/')
       ? network.blobGatewayUrl.slice(0, network.blobGatewayUrl.length - 1)
@@ -94,7 +97,9 @@ export class Token {
       '/chains/' +
       creationChain +
       '/applications/' +
-      (token.applicationId as string)
+      namedApplication.applicationId +
+      '/image/' +
+      token.logo
     )
   }
 }
