@@ -31,4 +31,8 @@ export class NamedApplication {
       (el) => el.applicationType === applicationType
     )
   }
+
+  static namedApplications = async () => {
+    return await dbWallet.namedApplications.toArray()
+  }
 }

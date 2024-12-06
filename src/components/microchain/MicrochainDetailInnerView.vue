@@ -18,6 +18,15 @@
         :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
+    <div v-if='namedApplications.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
+      {{ $t('MSG_NAMED_APPLICATIONS') }}
+    </div>
+    <div v-if='namedApplications.length > 0'>
+      <RequestNamedApplicationCardView
+        v-for='namedApplication in namedApplications' :key='namedApplication.id' :named-application='namedApplication' :microchain='microchain'
+        :x-padding='localStore.setting.extensionMode ? "8px" : "0"' :requested='chainApplications.findIndex((el) => el.id === namedApplication.applicationId) >= 0'
+      />
+    </div>
     <div v-if='requestedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       {{ $t('MSG_REQUESTED_TOKENS') }}
     </div>
@@ -128,6 +137,7 @@ import ActivitiesView from '../activity/ActivitiesView.vue'
 import ChainOperationsView from '../activity/ChainOperationsView.vue'
 import MicrochainTokenBalanceCardView from './MicrochainTokenBalanceCardView.vue'
 import RequestTokenCardView from './RequestTokenCardView.vue'
+import RequestNamedApplicationCardView from './RequestNamedApplicationCardView.vue'
 
 interface Props {
   microchain: db.Microchain
@@ -146,12 +156,16 @@ const selectedOwner = ref(undefined as unknown as db.Owner)
 const nativeTokenId = ref(undefined as unknown as number)
 const requestedTokens = ref([] as db.Token[])
 const importedTokens = ref([] as db.Token[])
+const namedApplications = ref([] as db.NamedApplication[])
+const chainApplications = ref([] as ApplicationOverview[])
 
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
   const applicationIds = (await rpcBridge.Application.applications([microchain.value.microchain])).map((app: ApplicationOverview) => app.id as string)
   requestedTokens.value = (await dbBridge.Token.tokens(0, 1000, applicationIds)).filter((el) => !el.native)
   importedTokens.value = (await dbBridge.Token.tokens(0, 1000)).filter((token: db.Token) => !token.native && !applicationIds.includes(token.applicationId as string))
+  namedApplications.value = (await dbBridge.NamedApplication.namedApplications()).filter((el) => el.applicationType !== db.ApplicationType.WLINERA)
+  chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
 })
 
 </script>
