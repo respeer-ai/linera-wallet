@@ -84,7 +84,9 @@ export class Token {
     if (token.native) return token.logo
     const network = await Network.selected()
     if (!network) return token.logo
-    const namedApplication = await NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)
+    const namedApplication = await NamedApplication.namedApplicationWithType(
+      db.ApplicationType.BLOB_GATEWAY
+    )
     if (!namedApplication) return token.logo
     const creationChain = await lineraWasm.application_creation_chain_id(
       namedApplication.applicationId
