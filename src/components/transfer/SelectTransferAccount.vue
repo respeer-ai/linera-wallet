@@ -13,7 +13,10 @@
     <template #label>
       <div class='row full-width'>
         <q-avatar>
-          <q-img v-if='selectedToken' :src='selectedTokenLogo' width='36px' height='36px' />
+          <q-img
+            v-if='selectedToken' :src='selectedTokenLogo' width='36px' height='36px'
+            fit='contain'
+          />
         </q-avatar>
         <div v-if='selectedToken' class='header-items-margin-x-left text-left' :style='{width: "calc(100% - 36px - 12px - 20px)"}'>
           <div>
@@ -97,7 +100,7 @@
     {{ $t('MSG_TO') }}
   </div>
   <div class='vertical-menus-margin'>
-    <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input owner (not public key)'>
+    <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input address'>
       <template #append>
         <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToAccountClick'>
           {{ $t('MSG_SELECT') }}
@@ -351,6 +354,9 @@ onMounted(async () => {
   if (selectedToOwner.value) {
     const microchains = await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedToOwner.value?.owner)
     selectedFromMicrochain.value = microchains.find((el) => el.default) || microchains[0]
+  }
+  if (selectedToken.value) {
+    selectedTokenLogo.value = await dbBridge.Token.logo(selectedToken.value?.id as number) as string
   }
 })
 
