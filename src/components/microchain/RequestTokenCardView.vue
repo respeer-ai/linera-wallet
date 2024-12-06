@@ -2,7 +2,7 @@
   <q-item class='row full-width tab-panel-item' :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <div v-if='showIndicator' :class='[ "selector-indicator", (active || (activeNative && token.native)) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
-      <q-img :src='tokenLogo' />
+      <q-img :src='tokenLogo' width='36px' height='36px' fit='contain' />
       <q-badge
         v-if='!token.native' color='transparent' rounded transparent
         floating
@@ -33,7 +33,7 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { ref, toRef } from 'vue'
+import { onMounted, ref, toRef } from 'vue'
 import { dbBridge, rpcBridge } from 'src/bridge'
 
 import { lineraLogo } from 'src/assets'
@@ -65,7 +65,10 @@ const onRequestNowClick = async () => {
   requesting.value = true
   await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.value.microchain, token.value.applicationId as string, db.ApplicationType.ERC20)
   requesting.value = false
-  tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
 }
+
+onMounted(async () => {
+  tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
+})
 
 </script>
