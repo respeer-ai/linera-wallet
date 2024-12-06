@@ -93,7 +93,7 @@
           </div>
         </template>
       </q-btn-dropdown>
-      <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
+      <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer word-break-all'>
         {{ toAddress }}
       </div>
       <q-btn-dropdown
@@ -120,7 +120,7 @@
           </div>
         </template>
       </q-btn-dropdown>
-      <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
+      <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer word-break-all'>
         {{ toMicrochainId }}
       </div>
     </div>
