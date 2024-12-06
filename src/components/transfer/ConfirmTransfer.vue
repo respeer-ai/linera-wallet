@@ -5,7 +5,7 @@
     </div>
     <div class='row flex items-center vertical-items-margin extra-margin-bottom'>
       <q-avatar>
-        <q-img :src='token.logo.replace(/\s/g, "+")' width='48px' height='48px' />
+        <q-img :src='tokenLogo' width='48px' height='48px' />
       </q-avatar>
       <div class='selector-margin-x-left'>
         <div class='label-text-extra-large'>
@@ -145,9 +145,9 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { toRef } from 'vue'
-
+import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   token: db.Token
@@ -173,10 +173,16 @@ const fromChainBalance = toRef(props, 'fromChainBalance')
 const toChainBalance = toRef(props, 'toChainBalance')
 const amount = toRef(props, 'amount')
 
+const tokenLogo = ref('')
+
 const emit = defineEmits<{(ev: 'confirmed'): void}>()
 
 const onTransferClick = () => {
   emit('confirmed')
 }
+
+onMounted(async () => {
+  tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
+})
 
 </script>

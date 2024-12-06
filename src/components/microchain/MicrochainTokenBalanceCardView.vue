@@ -2,7 +2,7 @@
   <q-item class='row full-width tab-panel-item' :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <div v-if='showIndicator' :class='[ "selector-indicator", (active || (activeNative && token.native)) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
-      <q-img :src='token.logo.replace(/\s/g, "+")' />
+      <q-img :src='selectedNetwork?.blobGatewayUrl' />
       <q-badge
         v-if='!token.native' color='transparent' rounded transparent
         floating
@@ -66,6 +66,7 @@ const ownerTokenBalance = ref(0)
 const ownerUsdBalance = ref(0)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedNetwork = ref(undefined as unknown as db.Network)
 
 const getBalance = async () => {
   if (!selectedOwner.value) return

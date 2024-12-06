@@ -2,7 +2,7 @@
   <q-item class='row full-width tab-panel-item' clickable>
     <div v-if='showIndicator' :class='[ "selector-indicator", (active || (activeNative && token.native)) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
-      <q-img :src='token.logo.replace(/\s/g, "+")' />
+      <q-img :src='tokenLogo' />
       <q-badge
         v-if='!token.native' color='transparent' rounded transparent
         floating
@@ -58,6 +58,7 @@ const activeNative = toRef(props, 'activeNative')
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
+const tokenLogo = ref('')
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
@@ -74,6 +75,7 @@ watch(selectedOwner, async () => {
 
 onMounted(async () => {
   await getBalance()
+  tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
 })
 
 </script>

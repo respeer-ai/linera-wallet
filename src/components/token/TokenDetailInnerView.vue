@@ -4,7 +4,7 @@
       {{ $t('MSG_TOKEN_INFORMATION') }}
     </div>
     <div class='row vertical-items-margin'>
-      <q-img :src='token.logo.replace(/\s/g, "+")' width='128px' class='page-item-x-margin-left' />
+      <q-img :src='tokenLogo' width='128px' class='page-item-x-margin-left' />
       <div class='page-x-padding selector-y-padding selector-margin-x-left' :style='{width: "calc(100% - 128px - 12px - 12px)"}'>
         <div v-html='token.description?.length > 0 ? token.description : "The creator <strong>DID NOT</strong> leave any description to the token! Please make sure you know the <strong>RISK</strong> to interact with the token!"' />
         <div class='row vertical-sections-margin'>
@@ -106,7 +106,7 @@
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
         <q-space />
-        <q-img :src='token.logo.replace(/\s/g, "+")' width='32px' height='32px' />
+        <q-img :src='tokenLogo' width='32px' height='32px' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -212,6 +212,8 @@ const selectedOwner = ref(undefined as unknown as db.Owner)
 const ownerBalances = ref([] as db.MicrochainOwnerFungibleTokenBalance[])
 const chainBalances = ref([] as db.MicrochainFungibleTokenBalance[])
 
+const tokenLogo = ref('')
+
 watch(selectedOwner, async () => {
   ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
   chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
@@ -220,6 +222,7 @@ watch(selectedOwner, async () => {
 onMounted(async () => {
   ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
   chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+  tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
 })
 
 </script>

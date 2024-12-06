@@ -15,7 +15,7 @@
     <div class='transfer-amount-space' />
     <div class='row tip info-bg vertical-sections-margin flax items-center justify-center'>
       <q-avatar>
-        <q-img :src='token.logo.replace(/\s/g, "+")' width='36px' height='36px' />
+        <q-img :src='tokenLogo' width='36px' height='36px' />
       </q-avatar>
       <div class='page-item-x-margin-left'>
         <div v-if='token.native' class='row'>
@@ -57,12 +57,13 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, onMounted, ref, toRef, watch } from 'vue'
 import { db } from 'src/model'
 
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import TokenBridge from '../bridge/db/TokenBridge.vue'
+import { dbBridge } from 'src/bridge'
 
 interface Props {
   fromOwner: db.Owner
@@ -90,6 +91,7 @@ const inputWidth = computed(() => ((Math.max(Math.min(amount.value.toString().le
 
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)
+const tokenLogo = ref('')
 
 const dbTokenBridge = ref<InstanceType<typeof TokenBridge>>()
 
@@ -106,6 +108,10 @@ const onMaxAmountClick = () => {
 const onContinueClick = () => {
   emit('next')
 }
+
+onMounted(async () => {
+  tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
+})
 
 </script>
 

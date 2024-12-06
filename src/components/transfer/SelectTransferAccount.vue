@@ -13,7 +13,7 @@
     <template #label>
       <div class='row full-width'>
         <q-avatar>
-          <q-img v-if='selectedToken' :src='selectedToken.logo.replace(/\s/g, "+")' width='36px' height='36px' />
+          <q-img v-if='selectedToken' :src='selectedTokenLogo' width='36px' height='36px' />
         </q-avatar>
         <div v-if='selectedToken' class='header-items-margin-x-left text-left' :style='{width: "calc(100% - 36px - 12px - 20px)"}'>
           <div>
@@ -241,6 +241,7 @@ const selectingFromMicrochain = ref(false)
 const selectingToOwner = ref(false)
 const selectingToMicrochain = ref(false)
 const selectingToken = ref(false)
+const selectedTokenLogo = ref('')
 
 const onFromAccountClick = () => {
   selectingFromOwner.value = true
@@ -305,6 +306,10 @@ const onTokenSelected = () => {
 
 watch(selectedToMicrochain, () => {
   toMicrochain.value = selectedToMicrochain.value?.microchain
+})
+
+watch(selectedToken, async () => {
+  selectedTokenLogo.value = await dbBridge.Token.logo(selectedToken.value?.id as number) as string
 })
 
 const canGotoNext = computed(() => {

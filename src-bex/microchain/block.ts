@@ -195,10 +195,7 @@ export class BlockSigner {
     }
   }
 
-  static processNewBlock = async (
-    microchain: string,
-    hash?: string
-  ) => {
+  static processNewBlock = async (microchain: string, hash?: string) => {
     const blockQuery = {
       query: {
         operationName: 'block',

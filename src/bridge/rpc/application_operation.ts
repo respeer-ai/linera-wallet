@@ -20,7 +20,11 @@ export class ApplicationOperation {
     chainId: string,
     applicationId: string
   ): Promise<boolean> => {
-    return ((await Application.microchainApplications(chainId)).findIndex((el) => el.id === applicationId) >= 0)
+    return (
+      (await Application.microchainApplications(chainId)).findIndex(
+        (el) => el.id === applicationId
+      ) >= 0
+    )
   }
 
   static waitExistChainApplication = async (
@@ -28,7 +32,11 @@ export class ApplicationOperation {
     applicationId: string,
     timeoutSeconds: number
   ): Promise<boolean> => {
-    if (((await Application.microchainApplications(chainId)).findIndex((el) => el.id === applicationId) >= 0)) {
+    if (
+      (await Application.microchainApplications(chainId)).findIndex(
+        (el) => el.id === applicationId
+      ) >= 0
+    ) {
       return true
     }
     if (timeoutSeconds <= 0) {
@@ -36,11 +44,17 @@ export class ApplicationOperation {
     }
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        ApplicationOperation.waitExistChainApplication(chainId, applicationId, timeoutSeconds - 1).then((exists) => {
-          resolve(exists)
-        }).catch((e) => {
-          reject(e)
-        })
+        ApplicationOperation.waitExistChainApplication(
+          chainId,
+          applicationId,
+          timeoutSeconds - 1
+        )
+          .then((exists) => {
+            resolve(exists)
+          })
+          .catch((e) => {
+            reject(e)
+          })
       }, 1000)
     })
   }

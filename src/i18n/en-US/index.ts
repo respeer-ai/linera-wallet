@@ -333,5 +333,6 @@ export default {
   MSG_BALANCES: 'Balances',
   MSG_REQUEST_NOW: 'Request now',
   MSG_BLOB_GATEWAY_APPLICATION: 'Blob gateway application',
-  MSG_NAMED_APPLICATIONS: 'Named applications'
+  MSG_NAMED_APPLICATIONS: 'Named applications',
+  MSG_BLOB_GATEWAY_URL: 'Blob Gateway URL'
 }
