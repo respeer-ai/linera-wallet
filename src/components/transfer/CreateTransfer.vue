@@ -121,8 +121,8 @@ const onTransferConfirmed = async () => {
     await rpcBridge.Operation.transfer(
       fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
       selectedFromMicrochain.value?.microchain,
-      toChainBalance.value ? undefined : selectedToOwner.value?.address,
-      selectedToMicrochain.value?.microchain,
+      toChainBalance.value ? undefined : selectedToOwner.value?.address || toAddress.value,
+      selectedToMicrochain.value?.microchain || toMicrochain.value,
       amount.value
     )
   }
