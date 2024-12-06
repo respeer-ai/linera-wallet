@@ -21,6 +21,10 @@ export class Operation {
       toPublicKey !== undefined
         ? await db.ownerFromPublicKey(toPublicKey)
         : undefined
+    let amountStr = stringify(amount)
+    if (!amountStr?.endsWith('.')) {
+      amountStr += '.'
+    }
 
     const operation = {
       operationType: db.OperationType.TRANSFER,
@@ -36,7 +40,7 @@ export class Operation {
                 owner: toOwner
               }
             },
-            amount: stringify(amount)
+            amount: amountStr
           }
         }
       } as rpc.Operation)
