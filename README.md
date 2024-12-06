@@ -14,11 +14,7 @@ Linera Node Service is actually the wallet system of Linera. It will hold the ke
 
 #### How it Works
 
-We probably need to let Node Service not generate new blocks automatically, and let the wallet client be able to get data to be signed to sign and then submit to Node Service for execution. The workflow is mainly as follows:
-
-![image](src/assets/CheCkoArchitecture.png)
-
-As the figure described, Linera Node Service won't store acount keys and sign blocks anymore. Instead of that, it maintains a pending blocks list in which all of the blocks are constructed but not signed. When the browser wallet client is launched, it'll subscribe to Node Service for new block notifications. Of course, if the Node Service do not have a microchain for the local account, it could create one with its public key, and keep the private key in wallet client keystore locally.
+We probably need to let Node Service not generate new blocks automatically, and let the wallet client be able to get data to be signed to sign and then submit to Node Service for execution. In that way, Linera Node Service won't store account private keys and sign blocks anymore. Browser wallet client will subscribe to Node Service for new messages notifications. Of course, if the Node Service do not have a microchain for the local account, it could create one with its public key, and keep the private key in wallet client keystore locally.
 
 #### About CheCko
 
