@@ -12,6 +12,9 @@
     <q-tab-panel :name='localStore.settingDef.Menu.WLINERA'>
       <WLineraSettingView />
     </q-tab-panel>
+    <q-tab-panel :name='localStore.settingDef.Menu.BLOB_GATEWAY'>
+      <BlobGatewaySetting />
+    </q-tab-panel>
     <q-tab-panel :name='localStore.settingDef.Menu.AMS'>
       <AMSSettingView />
     </q-tab-panel>
@@ -43,6 +46,7 @@ import SwapSettingView from './SwapSettingView.vue'
 import WLineraSettingView from './WLineraSettingView.vue'
 import GenesisInfoView from './GenesisInfoView.vue'
 import AMSSettingView from './AMSSettingView.vue'
+import BlobGatewaySetting from './BlobGatewaySetting.vue'
 
 const accountsView = ref<InstanceType<typeof AccountsView>>()
 const networkSettingView = ref<InstanceType<typeof NetworkSettingNarrowView>>()

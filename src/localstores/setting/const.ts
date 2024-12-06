@@ -31,6 +31,13 @@ export const SettingMenus = [
   },
   {
     icon: 'bi-box-seam',
+    label: 'Blob',
+    menu: Menu.BLOB_GATEWAY,
+    disable: false,
+    separator: false
+  },
+  {
+    icon: 'bi-box-seam',
     label: 'AMS',
     menu: Menu.AMS,
     disable: false,

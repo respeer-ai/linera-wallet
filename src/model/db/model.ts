@@ -293,7 +293,8 @@ export enum ApplicationType {
   WLINERA,
   ERC20,
   ANONYMOUS,
-  AMS
+  AMS,
+  BLOB_GATEWAY
 }
 
 export interface NamedApplication {
@@ -316,6 +317,10 @@ const defaultAMSAppId =
   'bcda6ad39f0f135af6a0999311fe53aebe31807591cb1ebef2269dd3dcbd94117ca41c35bda8680ea2ba8d7638169668a0165b475fe692f19f218f34bbae0cc8532d9cb3258636e1f7dcc6d03c6a3fff2c64e7ac388fff567815cb1af152544a010000000000000000000000'
 const defaultAMSCreatorChain =
   '532d9cb3258636e1f7dcc6d03c6a3fff2c64e7ac388fff567815cb1af152544a'
+const defaultBlobGatewayAppId =
+  'bcda6ad39f0f135af6a0999311fe53aebe31807591cb1ebef2269dd3dcbd94117ca41c35bda8680ea2ba8d7638169668a0165b475fe692f19f218f34bbae0cc8532d9cb3258636e1f7dcc6d03c6a3fff2c64e7ac388fff567815cb1af152544a010000000000000000000001'
+const defaultBlobGatewayCreatorChain =
+  '532d9cb3258636e1f7dcc6d03c6a3fff2c64e7ac388fff567815cb1af152544b'
 
 export const defaultNamedApplications = [
   {
@@ -335,6 +340,12 @@ export const defaultNamedApplications = [
     name: 'ams',
     applicationId: defaultAMSAppId,
     creatorChain: defaultAMSCreatorChain
+  },
+  {
+    applicationType: ApplicationType.BLOB_GATEWAY,
+    name: 'blob',
+    applicationId: defaultBlobGatewayAppId,
+    creatorChain: defaultBlobGatewayCreatorChain
   }
 ] as NamedApplication[]
 

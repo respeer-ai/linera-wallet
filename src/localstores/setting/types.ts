@@ -6,6 +6,7 @@ export enum Menu {
   SWAP = 'Swap',
   WLINERA = 'WLinera',
   AMS = 'AMS',
+  BLOB_GATEWAY = 'Blob',
   ABOUT_US = 'AboutUs',
   STORAGE = 'Storage',
   ACCOUNTS = 'Accounts',

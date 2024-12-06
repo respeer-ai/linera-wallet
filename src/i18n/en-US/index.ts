@@ -331,5 +331,6 @@ export default {
   MSG_REQUESTED_TOKENS: 'Requested tokens',
   MSG_IMPORTED_TOKENS: 'Imported tokens',
   MSG_BALANCES: 'Balances',
-  MSG_REQUEST_NOW: 'Request now'
+  MSG_REQUEST_NOW: 'Request now',
+  MSG_BLOB_GATEWAY_APPLICATION: 'Blob gateway application'
 }
