@@ -226,7 +226,9 @@ watch(selectedOwner, async () => {
 
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
-  selectedMicrochain.value = (await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedOwner.value?.owner as string))[0]
+  if (selectedOwner.value) {
+    selectedMicrochain.value = (await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedOwner.value.owner))[0]
+  }
 })
 
 const onChangeFromBalanceClick = () => {

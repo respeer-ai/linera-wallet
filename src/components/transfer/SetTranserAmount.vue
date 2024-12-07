@@ -15,7 +15,7 @@
     <div class='transfer-amount-space' />
     <div class='row tip info-bg vertical-sections-margin flax items-center justify-center'>
       <q-avatar>
-        <q-img :src='tokenLogo' width='36px' height='36px' />
+        <q-img :src='tokenLogo' width='36px' height='36px' fit='contain' />
       </q-avatar>
       <div class='page-item-x-margin-left'>
         <div v-if='token.native' class='row'>

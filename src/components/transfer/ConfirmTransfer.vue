@@ -5,7 +5,7 @@
     </div>
     <div class='row flex items-center vertical-items-margin extra-margin-bottom'>
       <q-avatar>
-        <q-img :src='tokenLogo' width='48px' height='48px' />
+        <q-img :src='tokenLogo' width='48px' height='48px' fit='contain' />
       </q-avatar>
       <div class='selector-margin-x-left'>
         <div class='label-text-extra-large'>
