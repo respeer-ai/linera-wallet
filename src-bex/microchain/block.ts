@@ -468,7 +468,7 @@ export class BlockSigner {
     const isRetryBlock = executedBlockMaterial?.retry
 
     if (!executedBlock) return Promise.reject('Failed execute block')
-    if (executedBlock.block.operations.length !== (operation ? 1 : 0))
+    if (!isRetryBlock && executedBlock.block.operations.length !== (operation ? 1 : 0))
       return Promise.reject('Invalid operation count')
 
     if (operation && !isRetryBlock) {

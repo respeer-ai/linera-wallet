@@ -272,7 +272,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
 
       if (!executedBlock) return reject('Failed execute block')
 
-      if (executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
+      if (!isRetryBlock && executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
       if (operation && !isRetryBlock) {
         const executedOperation = executedBlock.block.operations[0] as rpc.Operation
         const operationHash = await sha3(stringify(sortedObject(operation), (key, value) => {
