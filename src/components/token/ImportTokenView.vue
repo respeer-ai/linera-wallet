@@ -18,7 +18,7 @@
     </div>
     <q-btn
       class='btn vertical-sections-margin full-width' flat no-caps
-      @click='onImportClick' :disabled='!canImport'
+      @click='onImportClick' :disabled='!canImport' :loading='importing'
     >
       {{ $t('MSG_IMPORT') }}
     </q-btn>
@@ -38,6 +38,7 @@ import { rpcBridge } from 'src/bridge'
 
 const applicationId = ref('')
 const applicationIdError = ref(false)
+const importing = ref(false)
 
 const canImport = computed(() => {
   return applicationId.value.length > 0
@@ -52,6 +53,8 @@ const onImportClick = async () => {
   applicationIdError.value = applicationId.value.length === 0
   if (applicationIdError.value) return
 
+  importing.value = true
+
   try {
     const microchains = await dbWallet.microchains.toArray()
 
@@ -59,8 +62,10 @@ const onImportClick = async () => {
       await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, applicationId.value)
     }
 
+    importing.value = false
     emit('imported')
   } catch (error) {
+    importing.value = false
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Failed import erc20 application: ${error}`)
     emit('error')

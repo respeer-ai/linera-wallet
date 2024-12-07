@@ -468,7 +468,10 @@ export class BlockSigner {
     const isRetryBlock = executedBlockMaterial?.retry
 
     if (!executedBlock) return Promise.reject('Failed execute block')
-    if (!isRetryBlock && executedBlock.block.operations.length !== (operation ? 1 : 0))
+    if (
+      !isRetryBlock &&
+      executedBlock.block.operations.length !== (operation ? 1 : 0)
+    )
       return Promise.reject('Invalid operation count')
 
     if (operation && !isRetryBlock) {
@@ -564,7 +567,11 @@ export class BlockSigner {
     for (const operation of operations) {
       if (!operation.firstProcessedAt) {
         operation.firstProcessedAt = Date.now()
-        console.log(`Operation ${operation.operationId} created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
+        console.log(
+          `Operation ${operation.operationId} created at ${
+            operation.createdAt || 0
+          }, processing at ${operation.firstProcessedAt}`
+        )
       }
 
       const _operation = parse(operation.operation) as rpc.Operation
@@ -592,7 +599,13 @@ export class BlockSigner {
           continue
         }
         if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
-          console.log(`Operation ${operation.operationId} created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}, timeout at ${Date.now()}`)
+          console.log(
+            `Operation ${operation.operationId} created at ${
+              operation.createdAt || 0
+            }, processing at ${
+              operation.firstProcessedAt
+            }, timeout at ${Date.now()}`
+          )
           operation.state = db.OperationState.FAILED
           operation.failedAt = Date.now()
           operation.failReason = stringify(e)
