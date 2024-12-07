@@ -84,7 +84,7 @@ const importPresetApplications = async (microchain: db.Microchain) => {
 
   namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)) as db.NamedApplication
   if (!namedApplication) return
-  operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.AMS)
+  operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.BLOB_GATEWAY)
   if (operationId) {
     await rpcBridge.Operation.waitOperation(operationId)
   }

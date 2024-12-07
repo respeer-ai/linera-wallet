@@ -495,6 +495,11 @@ const _handleOperations = async () => {
     const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING])
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
+      if (!operation.firstProcessedAt) {
+        operation.firstProcessedAt = Date.now()
+        console.log(`Operation created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
+      }
+
       try {
         const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, operation)
         // TODO: get operation certificate hash
@@ -506,9 +511,12 @@ const _handleOperations = async () => {
         operation.certificateHash = certificateHash
         await dbBridge.ChainOperation.update(operation)
       } catch (e) {
+        if (stringify(e)?.includes('Was expecting block height')) {
+          continue
+        }
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Failed process incoming bundle: ${e}`)
-        if ((operation.createdAt || 0) + 10 * 1000 < Date.now()) {
+        if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
           operation.state = db.OperationState.FAILED
           operation.failedAt = Date.now()
           operation.failReason = stringify(e)

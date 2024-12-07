@@ -562,6 +562,11 @@ export class BlockSigner {
     )
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
+      if (!operation.firstProcessedAt) {
+        operation.firstProcessedAt = Date.now()
+        console.log(`Operation ${operation.operationId} created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
+      }
+
       const _operation = parse(operation.operation) as rpc.Operation
 
       if (_operation.User && !_operation.User.bytes) {
@@ -583,7 +588,11 @@ export class BlockSigner {
         operation.certificateHash = certificateHash
         await sharedStore.updateChainOperation(operation)
       } catch (e) {
-        if ((operation.createdAt || 0) + 10 * 1000 < Date.now()) {
+        if (stringify(e)?.includes('Was expecting block height')) {
+          continue
+        }
+        if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
+          console.log(`Operation ${operation.operationId} created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}, timeout at ${Date.now()}`)
           operation.state = db.OperationState.FAILED
           operation.failedAt = Date.now()
           operation.failReason = stringify(e)
