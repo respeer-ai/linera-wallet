@@ -497,6 +497,7 @@ const _handleOperations = async () => {
     for (const operation of operations) {
       if (!operation.firstProcessedAt) {
         operation.firstProcessedAt = Date.now()
+        await dbBridge.ChainOperation.update(operation)
         console.log(`Operation created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
       }
 

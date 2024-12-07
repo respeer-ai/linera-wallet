@@ -567,6 +567,7 @@ export class BlockSigner {
     for (const operation of operations) {
       if (!operation.firstProcessedAt) {
         operation.firstProcessedAt = Date.now()
+        await sharedStore.updateChainOperation(operation)
         console.log(
           `Operation ${operation.operationId} created at ${
             operation.createdAt || 0
