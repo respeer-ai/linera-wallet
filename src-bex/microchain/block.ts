@@ -520,7 +520,11 @@ export class BlockSigner {
         BlockSigner.messageCompensates.set(
           microchain,
           setTimeout(() => {
-            void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+            try {
+              void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+            } catch (e) {
+              console.log('Failed process incoming bundles', e)
+            }
           }, 1000) as unknown as number
         )
       }
@@ -549,7 +553,11 @@ export class BlockSigner {
         BlockSigner.messageCompensates.set(
           microchain,
           setTimeout(() => {
-            void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+            try {
+              void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+            } catch (e) {
+              console.log('Failed process incoming bundles', e)
+            }
           }, 1000) as unknown as number
         )
       }
