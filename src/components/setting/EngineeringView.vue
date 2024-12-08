@@ -7,6 +7,7 @@
     <RequestApplication class='vertical-items-margin' />
     <SubscribeCreatorChain class='vertical-items-margin' />
     <PublishDataBlob class='vertical-items-margin' />
+    <LineraSubscription class='vertical-items-margin' />
   </div>
 </template>
 
@@ -19,5 +20,6 @@ import LineraMutationTransfer from './engineering/LineraMutationTransfer.vue'
 import RequestApplication from './engineering/RequestApplication.vue'
 import SubscribeCreatorChain from './engineering/SubscribeCreatorChain.vue'
 import PublishDataBlob from './engineering/PublishDataBlob.vue'
+import LineraSubscription from './engineering/LineraSubscription.vue'
 
 </script>

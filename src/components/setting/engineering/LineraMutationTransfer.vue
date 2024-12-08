@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-btn
-      label='Linera transfer' no-caps class='btn full-width' flat
+      :label='"Linera transfer" + (purpose ? (" " + purpose) : "")' no-caps class='btn full-width' flat
       @click='onRun'
     />
   </div>
@@ -11,6 +11,13 @@
 import { TRANSFER } from 'src/graphql'
 import Web3 from 'web3'
 import { db, rpc } from 'src/model'
+import { toRef } from 'vue'
+
+interface Props {
+  purpose?: string
+}
+const props = defineProps<Props>()
+const purpose = toRef(props, 'purpose')
 
 const onRun = async () => {
   try {

@@ -105,15 +105,24 @@ const subscriptionHandler = (
         .send('data', rpcRequest)
         .then(
           (payload: BexPayload<PendingJsonRpcResponse<string>, undefined>) => {
-            const subscriptionId = payload.data.result as string
-            const handler = (
-              payload: BexPayload<bgSubscription.SubscriptionPayload, unknown>
-            ) => {
-              notifier(subscriptionId, payload.data.payload)
+            if (!payload.data.result && !payload.data.error) {
+              console.log('Invalid rpc response', payload.data)
             }
-            subscription.Subscription.subscribe(subscriptionId, handler)
-            bridge.on('linera_subscription', handler)
-            res.result = subscriptionId
+            if (payload.data.error) {
+              console.log('CheCko inpage error', req, payload.data.error)
+              res.error = payload.data.error
+            } else {
+              const subscriptionId = payload.data.result as string
+              const handler = (
+                payload: BexPayload<bgSubscription.SubscriptionPayload, unknown>
+              ) => {
+                notifier(subscriptionId, payload.data.payload)
+              }
+              subscription.Subscription.subscribe(subscriptionId, handler)
+              bridge.on('linera_subscription', handler)
+
+              res.result = subscriptionId
+            }
             end()
           }
         )

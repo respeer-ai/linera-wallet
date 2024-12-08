@@ -74,6 +74,7 @@ export interface RpcGraphqlQuery {
   publicKey?: string
   applicationId?: string
   query: GraphqlQuery
+  topics?: string[]
 }
 
 export interface LineraOperation {

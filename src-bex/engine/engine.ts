@@ -62,6 +62,8 @@ export class Engine {
     if (!RpcMethods.includes(req.request.method as RpcMethod)) {
       return Promise.reject(new Error('Invalid rpc method'))
     }
+    if (!req.request.params) req.request.params = {}
+
     switch (req.request.method) {
       case RpcMethod.LINERA_SUBSCRIBE:
       case RpcMethod.LINERA_GRAPHQL_MUTATION:
