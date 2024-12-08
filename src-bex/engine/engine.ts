@@ -63,6 +63,7 @@ export class Engine {
       return Promise.reject(new Error('Invalid rpc method'))
     }
     switch (req.request.method) {
+      case RpcMethod.LINERA_SUBSCRIBE:
       case RpcMethod.LINERA_GRAPHQL_MUTATION:
       case RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB: {
         const query = req.request.params as unknown as RpcGraphqlQuery

@@ -274,10 +274,18 @@ export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
   if (!request) {
     return await Promise.reject('Invalid request')
   }
+  const query = request.request.params as unknown as RpcGraphqlQuery
+  if (!query || !query.query) {
+    return await Promise.reject('Invalid query')
+  }
+  const publicKey = query.publicKey
   const subscriptionId = subscription.Subscription.subscribe(
     request.request.params as string[],
     async (subscriptionId: string, data: unknown) => {
-      const microchain = await sharedStore.getRpcMicrochain(request.origin, '')
+      const microchain = await sharedStore.getRpcMicrochain(
+        request.origin,
+        publicKey as string
+      )
       if (!microchain) {
         return Promise.reject(new Error('Invalid microchain'))
       }
