@@ -521,7 +521,9 @@ export class BlockSigner {
           microchain,
           setTimeout(() => {
             try {
-              void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+              void BlockSigner.processNewIncomingMessageWithOperation(
+                microchain
+              )
             } catch (e) {
               console.log('Failed process incoming bundles', e)
             }
@@ -554,7 +556,9 @@ export class BlockSigner {
           microchain,
           setTimeout(() => {
             try {
-              void BlockSigner.processNewIncomingMessageWithOperation(microchain)
+              void BlockSigner.processNewIncomingMessageWithOperation(
+                microchain
+              )
             } catch (e) {
               console.log('Failed process incoming bundles', e)
             }
