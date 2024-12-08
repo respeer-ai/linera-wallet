@@ -9,6 +9,7 @@
             v-model='allowMutateWallet'
           />
           <CheckboxView
+            v-if='shouldPersist'
             text='Use the same selection for future requests'
             v-model='persistAuthentication'
           />
@@ -104,6 +105,7 @@ const popupUpdated = computed(() => localStore.popup._popupUpdated)
 const operationState = ref(db.OperationState.FAILED)
 const microchain = ref(undefined as unknown as string)
 const processing = ref(false)
+const shouldPersist = computed(() => !['Approve', 'Transfer', 'Swap'].includes(operation.value))
 
 const title = defineModel<string>('title')
 
