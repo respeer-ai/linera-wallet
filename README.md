@@ -34,3 +34,4 @@ Basically, CheCko is the wallet login system of ResPeer. But for a stable web3 a
 - [ ] Multiple popup implementation and accurate popup closing
 - [ ] Dynamic loading of application bytecode to serialize and deserialize application operations
 - [ ] Serialize application operation locally
+- [ ] Refactor architecture of block process
