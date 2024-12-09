@@ -30,3 +30,7 @@ Basically, CheCko is the wallet login system of ResPeer. But for a stable web3 a
 - [ ] Remove request application (depends on linera-protocol implementation)
 - [ ] Implement load chain, then we can query chain state from RPC directly
 - [ ] Remove subscribe creator chain, just keep application state on creator chain
+- [ ] Event driven implementation of message process
+- [ ] Multiple popup implementation and accurate popup closing
+- [ ] Dynamic loading of application bytecode to serialize and deserialize application operations
+- [ ] Serialize application operation locally
