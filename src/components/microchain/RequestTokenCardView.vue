@@ -19,7 +19,7 @@
       </div>
     </div>
     <q-space />
-    <div class='selector-margin-x-left'>
+    <div v-if='!requested' class='selector-margin-x-left'>
       <q-btn
         flat rounded dense :label='$t("MSG_REQUEST_NOW")'
         @click='onRequestNowClick'
@@ -45,12 +45,14 @@ interface Props {
   activeNative?: boolean
   microchain: db.Microchain
   xPadding?: string
+  requested?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   showIndicator: true,
   active: false,
   activeNative: true,
-  xPadding: '0'
+  xPadding: '0',
+  requested: false
 })
 const token = toRef(props, 'token')
 const showIndicator = toRef(props, 'showIndicator')
@@ -59,6 +61,7 @@ const activeNative = toRef(props, 'activeNative')
 const microchain = toRef(props, 'microchain')
 const requesting = ref(false)
 const xPadding = toRef(props, 'xPadding')
+const requested = toRef(props, 'requested')
 const tokenLogo = ref('')
 
 const emit = defineEmits<{(ev: 'requested', applicationId: string): void}>()

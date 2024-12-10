@@ -44,7 +44,7 @@
       <RequestTokenCardView
         v-for='token in importedTokens' :key='token.id' :token='token' :microchain='microchain'
         :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
-        @requested='onTokenRequested'
+        @requested='onTokenRequested' :requested='chainApplications.findIndex((el) => el.id === token.applicationId) >= 0'
       />
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
