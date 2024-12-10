@@ -84,6 +84,7 @@ const onSaveAMSApplicationId = async () => {
         if (operationId) {
           await rpcBridge.Operation.waitOperation(operationId)
         }
+        await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, amsApplicationId.value, 60)
         await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
         console.log('Faled save ams application', e)
@@ -117,9 +118,10 @@ const onRefresh = async () => {
         if (operationId) {
           await rpcBridge.Operation.waitOperation(operationId)
         }
+        await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, amsApplicationId.value, 60)
         await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
-        console.log('Faled refresh ams application', e)
+        console.log('Failed refresh ams application', e)
       }
     }
 

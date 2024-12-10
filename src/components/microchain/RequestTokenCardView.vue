@@ -61,9 +61,17 @@ const requesting = ref(false)
 const xPadding = toRef(props, 'xPadding')
 const tokenLogo = ref('')
 
+const emit = defineEmits<{(ev: 'requested'): void}>()
+
 const onRequestNowClick = async () => {
   requesting.value = true
-  await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.value.microchain, token.value.applicationId as string, db.ApplicationType.ERC20)
+  try {
+    await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.value.microchain, token.value.applicationId as string, db.ApplicationType.ERC20)
+    emit('requested')
+  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Failed request application: ${e}`)
+  }
   requesting.value = false
 }
 

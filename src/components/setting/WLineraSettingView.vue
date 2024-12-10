@@ -88,7 +88,7 @@ const onSaveWlineraApplicationId = async () => {
       try {
         await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, wlineraApplicationId.value, db.ApplicationType.WLINERA)
       } catch (e) {
-        console.log('Faled save swap application', e)
+        console.log('Failed save swap application', e)
       }
     }
 
@@ -111,7 +111,7 @@ const onRefresh = async () => {
       try {
         await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, wlineraApplicationId.value, db.ApplicationType.WLINERA)
       } catch (e) {
-        console.log('Faled refresh wlinera application', e, microchain.microchain)
+        console.log('Failed refresh wlinera application', e, microchain.microchain)
       }
     }
 

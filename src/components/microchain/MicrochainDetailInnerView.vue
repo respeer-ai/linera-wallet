@@ -25,6 +25,7 @@
       <RequestNamedApplicationCardView
         v-for='namedApplication in namedApplications' :key='namedApplication.id' :named-application='namedApplication' :microchain='microchain'
         :x-padding='localStore.setting.extensionMode ? "8px" : "0"' :requested='chainApplications.findIndex((el) => el.id === namedApplication.applicationId) >= 0'
+        @requested='onNamedApplicationRequested'
       />
     </div>
     <div v-if='requestedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -43,6 +44,7 @@
       <RequestTokenCardView
         v-for='token in importedTokens' :key='token.id' :token='token' :microchain='microchain'
         :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
+        @requested='onTokenRequested'
       />
     </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
@@ -167,5 +169,13 @@ onMounted(async () => {
   namedApplications.value = (await dbBridge.NamedApplication.namedApplications()).filter((el) => el.applicationType !== db.ApplicationType.WLINERA)
   chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
 })
+
+const onNamedApplicationRequested = async () => {
+  chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
+}
+
+const onTokenRequested = async () => {
+  chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
+}
 
 </script>

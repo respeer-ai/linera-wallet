@@ -14,11 +14,18 @@
     <q-space />
     <div v-if='!requested' class='selector-margin-x-left'>
       <q-btn
-        flat rounded dense :label='$t("MSG_REQUEST_NOW")'
+        flat rounded dense :label='btnLabel'
         @click='onRequestNowClick'
         :style='{fontSize: "12px"}'
         class='text-blue-6' :loading='requesting'
-      />
+      >
+        <template #loading>
+          <div>
+            <q-spinner-facebook class='on-left' />
+            <div>{{ btnLabel }}</div>
+          </div>
+        </template>
+      </q-btn>
     </div>
   </q-item>
 </template>
@@ -28,6 +35,10 @@ import { db } from 'src/model'
 import { computed, ref, toRef } from 'vue'
 import { rpcBridge } from 'src/bridge'
 import { shortid } from 'src/utils'
+import { useI18n } from 'vue-i18n'
+import { localStore } from 'src/localstores'
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface Props {
   namedApplication: db.NamedApplication
@@ -44,6 +55,8 @@ const requesting = ref(false)
 const xPadding = toRef(props, 'xPadding')
 const requested = toRef(props, 'requested')
 
+const btnLabel = ref(t('MSG_REQUEST_NOW'))
+
 const applicationName = computed(() => {
   switch (namedApplication.value.applicationType) {
     case db.ApplicationType.AMS: return 'Application management service'
@@ -53,14 +66,39 @@ const applicationName = computed(() => {
   }
 })
 
+const emit = defineEmits<{(ev: 'requested'): void}>()
+
 const onRequestNowClick = async () => {
   requesting.value = true
-  const operationId = await rpcBridge.Operation.requestApplication(microchain.value.microchain, namedApplication.value.applicationId, namedApplication.value.applicationType)
-  if (operationId) {
-    await rpcBridge.Operation.waitOperation(operationId)
+
+  try {
+    btnLabel.value = t('MSG_REQUESTING_THREE_DOTS')
+    const operationId = await rpcBridge.Operation.requestApplication(microchain.value.microchain, namedApplication.value.applicationId, namedApplication.value.applicationType)
+    if (operationId) {
+      await rpcBridge.Operation.waitOperation(operationId)
+    }
+    btnLabel.value = t('MSG_WAITING_THREE_DOTS')
+    await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.value.microchain, namedApplication.value.applicationId, 60)
+    btnLabel.value = t('MSG_SUBSCRIBING_THREE_DOTS')
+    await rpcBridge.MonoApplicationOperation.subscribeCreationChainWithType(microchain.value.microchain, namedApplication.value.applicationType)
+
+    emit('requested')
+
+    localStore.notification.pushNotification({
+      Title: t('MSG_REQUEST_APPLICATION'),
+      Message: t('MSG_SUCCESS_REQUEST_APPLICATION'),
+      Popup: true,
+      Type: localStore.notify.NotifyType.Info
+    })
+  } catch (e) {
+    localStore.notification.pushNotification({
+      Title: t('MSG_REQUEST_APPLICATION'),
+      Message: t('MSG_FAILED_REQUEST_APPLICATION'),
+      Popup: true,
+      Type: localStore.notify.NotifyType.Error
+    })
   }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.value.microchain, namedApplication.value.applicationId, 60)
-  await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.value.microchain)
+  btnLabel.value = t('MSG_REQUEST_NOW')
   requesting.value = false
 }
 

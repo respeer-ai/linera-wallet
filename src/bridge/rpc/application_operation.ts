@@ -159,7 +159,9 @@ export class ApplicationOperation {
           db.OperationState.EXECUTING,
           db.OperationState.EXECUTED,
           db.OperationState.CONFIRMED
-        ]
+        ],
+        undefined,
+        Date.now() - 120000
       )
     ) {
       console.log(`${applicationId} subscribe operation exists on ${chainId}`)

@@ -62,7 +62,9 @@ export class ChainOperation {
     microchain: string,
     operationType: db.OperationType,
     applicationId?: string,
-    states?: db.OperationState[]
+    states?: db.OperationState[],
+    createdBefore?: number,
+    createdAfter?: number
   ) => {
     return (
       (await dbWallet.chainOperations
@@ -71,6 +73,8 @@ export class ChainOperation {
         .and((op) => op.operationType === operationType)
         .and((op) => !applicationId || op.applicationId === applicationId)
         .and((op) => !states?.length || states.includes(op.state))
+        .and((op) => createdBefore === undefined || (op.createdAt || 0) <= createdBefore)
+        .and((op) => createdAfter === undefined || (op.createdAt || 0) > createdAfter)
         .first()) !== undefined
     )
   }
