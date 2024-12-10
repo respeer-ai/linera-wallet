@@ -108,7 +108,7 @@ export class Operation {
       setTimeout(() => {
         Operation.waitOperation(operationId)
           .then((success) => {
-            setTimeout(() => resolve(success), 1000)
+            resolve(success)
           })
           .catch((e) => {
             reject(e)
