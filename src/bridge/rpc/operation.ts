@@ -22,7 +22,7 @@ export class Operation {
         ? await db.ownerFromPublicKey(toPublicKey)
         : undefined
     let amountStr = stringify(amount)
-    if (!amountStr?.endsWith('.')) {
+    if (!amountStr?.endsWith('.') && !amountStr.includes('.')) {
       amountStr += '.'
     }
 

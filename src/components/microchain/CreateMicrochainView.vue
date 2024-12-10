@@ -66,7 +66,7 @@ const importPresetApplications = async (microchain: db.Microchain) => {
   if (operationId) {
     await rpcBridge.Operation.waitOperation(operationId)
   }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 10)
+  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
   await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain.microchain)
 
   namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
@@ -79,7 +79,7 @@ const importPresetApplications = async (microchain: db.Microchain) => {
   if (operationId) {
     await rpcBridge.Operation.waitOperation(operationId)
   }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 10)
+  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
   await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
 
   namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)) as db.NamedApplication
@@ -88,7 +88,7 @@ const importPresetApplications = async (microchain: db.Microchain) => {
   if (operationId) {
     await rpcBridge.Operation.waitOperation(operationId)
   }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 10)
+  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
   await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
 }
 

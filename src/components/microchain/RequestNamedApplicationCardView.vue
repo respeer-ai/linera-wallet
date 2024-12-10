@@ -59,7 +59,7 @@ const onRequestNowClick = async () => {
   if (operationId) {
     await rpcBridge.Operation.waitOperation(operationId)
   }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.value.microchain, namedApplication.value.applicationId, 10)
+  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.value.microchain, namedApplication.value.applicationId, 60)
   await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.value.microchain)
   requesting.value = false
 }

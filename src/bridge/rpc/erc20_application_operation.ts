@@ -61,7 +61,7 @@ export class ERC20ApplicationOperation {
     await ApplicationOperation.waitExistChainApplication(
       chainId,
       applicationId,
-      10
+      60
     )
 
     await ERC20ApplicationOperation.subscribeCreationChain(
