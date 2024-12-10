@@ -21,8 +21,9 @@ export class Operation {
       toPublicKey !== undefined
         ? await db.ownerFromPublicKey(toPublicKey)
         : undefined
-    let amountStr = stringify(amount)
-    if (!amountStr?.endsWith('.') && !amountStr.includes('.')) {
+    let amountStr = stringify(amount) || '0'
+    if (Number(amountStr) === 0) return
+    if (!amountStr?.endsWith('.') && !amountStr?.includes('.')) {
       amountStr += '.'
     }
 
