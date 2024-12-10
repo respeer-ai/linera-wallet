@@ -32,7 +32,7 @@ export async function getClientOptionsWithEndpointType(
     wsSchema =
       protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS
     host = url.hostname
-    port = parseInt(url.port ? url.port : protocol === db.HTTPSchema.HTTP ? 80 : 443)
+    port = parseInt(url.port ? url.port : protocol === db.HTTPSchema.HTTP ? '80' : '443')
   }
 
   return getClientOptions(schema, wsSchema, host, port, chainId, applicationId)
