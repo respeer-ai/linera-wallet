@@ -394,20 +394,6 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         resolve({ certificateHash, isRetryBlock })
       }).catch((error) => {
         console.log('Failed submit block', error)
-        if (blockMaterial.incomingBundles.length > 0) {
-          if (microchainCompensates.has(microchain)) {
-            window.clearTimeout(microchainCompensates.get(microchain))
-            microchainCompensates.delete(microchain)
-          }
-          microchainCompensates.set(microchain, window.setTimeout(() => {
-            processNewIncomingBundle(microchain).then(() => {
-              // DO NOTHING
-            }).catch((e) => {
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              console.log(`Fail process incoming bundle: ${e}`)
-            })
-          }, 1000))
-        }
         reject(error)
       })
     }).catch((error) => {
@@ -492,6 +478,8 @@ const _unmounted = ref(false)
 
 const _handleOperations = async () => {
   if (window.location.origin.startsWith('http')) {
+    const processedMicrochains = new Map<string, boolean>()
+
     const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING])
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
@@ -500,6 +488,8 @@ const _handleOperations = async () => {
         await dbBridge.ChainOperation.update(operation)
         console.log(`Operation created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
       }
+
+      processedMicrochains.set(operation.microchain, true)
 
       try {
         const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, operation)
@@ -522,6 +512,16 @@ const _handleOperations = async () => {
           operation.failedAt = Date.now()
           operation.failReason = stringify(e)
           await dbBridge.ChainOperation.update(operation)
+        }
+      }
+    }
+    for (const microchain of microchains.value) {
+      if (!processedMicrochains.get(microchain.microchain)) {
+        try {
+          await processNewIncomingBundle(microchain.microchain)
+        } catch (e) {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.log(`Failed process incoming bundle: ${e}`)
         }
       }
     }

@@ -547,24 +547,6 @@ export class BlockSigner {
 
       return { certificateHash, isRetryBlock }
     } catch (e) {
-      if (blockMaterial.incomingBundles.length > 0) {
-        if (BlockSigner.messageCompensates.has(microchain)) {
-          clearTimeout(BlockSigner.messageCompensates.get(microchain))
-          BlockSigner.messageCompensates.delete(microchain)
-        }
-        BlockSigner.messageCompensates.set(
-          microchain,
-          setTimeout(() => {
-            try {
-              void BlockSigner.processNewIncomingMessageWithOperation(
-                microchain
-              )
-            } catch (e) {
-              console.log('Failed process incoming bundles', e)
-            }
-          }, 1000) as unknown as number
-        )
-      }
       return Promise.reject(e)
     }
   }
@@ -575,6 +557,9 @@ export class BlockSigner {
       undefined,
       [db.OperationState.CREATED, db.OperationState.EXECUTING]
     )
+
+    const processedMicrochains = new Map<string, boolean>()
+
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
       if (!operation.firstProcessedAt) {
@@ -596,6 +581,8 @@ export class BlockSigner {
         await sharedStore.updateChainOperation(operation)
         continue
       }
+
+      processedMicrochains.set(operation.microchain, true)
 
       try {
         const { certificateHash, isRetryBlock } =
@@ -625,6 +612,19 @@ export class BlockSigner {
           await sharedStore.updateChainOperation(operation)
         }
         console.log('Failed process operation', e)
+      }
+    }
+
+    const microchains = await sharedStore.getMicrochains()
+
+    for (const microchain of microchains) {
+      if (!processedMicrochains.get(microchain)) {
+        try {
+          await BlockSigner.processNewIncomingMessageWithOperation(microchain)
+        } catch (e) {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          console.log(`Failed process incoming bundle: ${e}`)
+        }
       }
     }
   }
