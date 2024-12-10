@@ -17,15 +17,17 @@
     <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
       {{ $t('MSG_VERSION') }}
     </div>
-    <p class='vertical-items-margin text-grey-6 word-break-all'>
-      {{ networkInfo?.version?.crateVersion }}
-    </p>
+    <div class='vertical-items-margin text-grey-6 word-break-all'>
+      {{ networkInfo?.version?.crateVersion }} - {{ networkInfo?.version?.gitCommit }}
+    </div>
     <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
       {{ $t('MSG_VALIDATORS') }}
     </div>
     <div class='vertical-items-margin text-grey-6 word-break-all'>
-      <div v-for='validator in networkInfo?.currentValidators' :key='validator.name'>
-        {{ validator.name }}
+      <div v-for='validator in networkInfo?.currentValidators' :key='validator.name' class='decorate-underline-dashed vertical-items-margin'>
+        <div>{{ validator.name }}</div>
+        <div>{{ validator.networkAddress }}</div>
+        <div class='vertical-items-margin' />
       </div>
     </div>
   </div>
