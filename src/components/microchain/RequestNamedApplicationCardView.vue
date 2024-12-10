@@ -66,7 +66,7 @@ const applicationName = computed(() => {
   }
 })
 
-const emit = defineEmits<{(ev: 'requested'): void}>()
+const emit = defineEmits<{(ev: 'requested', applicationId: string): void}>()
 
 const onRequestNowClick = async () => {
   requesting.value = true
@@ -82,7 +82,7 @@ const onRequestNowClick = async () => {
     btnLabel.value = t('MSG_SUBSCRIBING_THREE_DOTS')
     await rpcBridge.MonoApplicationOperation.subscribeCreationChainWithType(microchain.value.microchain, namedApplication.value.applicationType)
 
-    emit('requested')
+    emit('requested', namedApplication.value.applicationId)
 
     localStore.notification.pushNotification({
       Title: t('MSG_REQUEST_APPLICATION'),
