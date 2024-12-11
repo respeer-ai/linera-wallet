@@ -19,7 +19,7 @@
       </div>
     </div>
     <q-space />
-    <div v-if='!requested' class='selector-margin-x-left'>
+    <div v-if='!requested || !subscribed' class='selector-margin-x-left'>
       <q-btn
         flat rounded dense :label='$t("MSG_REQUEST_NOW")'
         @click='onRequestNowClick'
@@ -62,7 +62,9 @@ const microchain = toRef(props, 'microchain')
 const requesting = ref(false)
 const xPadding = toRef(props, 'xPadding')
 const requested = toRef(props, 'requested')
+
 const tokenLogo = ref('')
+const subscribed = ref(false)
 
 const emit = defineEmits<{(ev: 'requested', applicationId: string): void}>()
 
@@ -80,6 +82,8 @@ const onRequestNowClick = async () => {
 
 onMounted(async () => {
   tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
+  if (!requested.value) return
+  subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, token.value.applicationId as string)
 })
 
 </script>

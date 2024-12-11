@@ -12,7 +12,7 @@
       </div>
     </div>
     <q-space />
-    <div v-if='!requested' class='selector-margin-x-left'>
+    <div v-if='!requested || !subscribed' class='selector-margin-x-left'>
       <q-btn
         flat rounded dense :label='btnLabel'
         @click='onRequestNowClick'
@@ -32,7 +32,7 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { computed, ref, toRef } from 'vue'
+import { computed, onMounted, ref, toRef } from 'vue'
 import { rpcBridge } from 'src/bridge'
 import { shortid } from 'src/utils'
 import { useI18n } from 'vue-i18n'
@@ -56,6 +56,7 @@ const xPadding = toRef(props, 'xPadding')
 const requested = toRef(props, 'requested')
 
 const btnLabel = ref(t('MSG_REQUEST_NOW'))
+const subscribed = ref(false)
 
 const applicationName = computed(() => {
   switch (namedApplication.value.applicationType) {
@@ -101,5 +102,10 @@ const onRequestNowClick = async () => {
   btnLabel.value = t('MSG_REQUEST_NOW')
   requesting.value = false
 }
+
+onMounted(async () => {
+  if (!requested.value) return
+  subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId)
+})
 
 </script>

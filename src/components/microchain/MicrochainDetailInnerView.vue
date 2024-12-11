@@ -161,6 +161,13 @@ const importedTokens = ref([] as db.Token[])
 const namedApplications = ref([] as db.NamedApplication[])
 const chainApplications = ref([] as ApplicationOverview[])
 
+const formalizeRequestedTokens = async () => {
+  for (const token of requestedTokens.value) {
+    const subscribed = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, token.applicationId as string)
+    if (!subscribed) importedTokens.value.push(token)
+  }
+}
+
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
   const applicationIds = (await rpcBridge.Application.applications([microchain.value.microchain])).map((app: ApplicationOverview) => app.id as string)
@@ -168,6 +175,8 @@ onMounted(async () => {
   importedTokens.value = (await dbBridge.Token.tokens(0, 1000)).filter((token: db.Token) => !token.native && !applicationIds.includes(token.applicationId as string))
   namedApplications.value = (await dbBridge.NamedApplication.namedApplications()).filter((el) => el.applicationType !== db.ApplicationType.WLINERA)
   chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
+
+  await formalizeRequestedTokens()
 })
 
 const onNamedApplicationRequested = async () => {
