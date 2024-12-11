@@ -187,9 +187,15 @@ const updateChainOperations = async (microchain: db.Microchain, block: HashedCer
 }
 
 const updateMicrochainOpenState = async (microchain: db.Microchain, block: HashedCertificateValue) => {
-  if (microchain.openChainCertificateHash === block.hash) {
-    microchain.opened = true
-    await dbBridge.Microchain.update(microchain)
+  const _microchain = await dbBridge.Microchain.microchain(microchain.microchain) as db.Microchain
+  if (!_microchain.opening || !_microchain.openChainCertificateHash) {
+    return setTimeout(() => {
+      void updateMicrochainOpenState(_microchain, block)
+    }, 1000)
+  }
+  if (_microchain.openChainCertificateHash === block.hash) {
+    _microchain.opened = true
+    await dbBridge.Microchain.update(_microchain)
   }
 }
 
@@ -507,6 +513,9 @@ const _handleOperations = async () => {
         await dbBridge.ChainOperation.update(operation)
       } catch (e) {
         if (stringify(e)?.includes('Was expecting block height')) {
+          continue
+        }
+        if (stringify(e)?.includes('is out of order compared to previous messages from')) {
           continue
         }
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

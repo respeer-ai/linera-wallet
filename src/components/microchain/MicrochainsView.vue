@@ -140,12 +140,11 @@ const onMicrochainImported = async (microchain: string) => {
 
   namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)) as db.NamedApplication
   if (!namedApplication) return
-  operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.AMS)
+  operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.BLOB_GATEWAY)
   if (operationId) {
     await rpcBridge.Operation.waitOperation(operationId)
   }
   await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain, namedApplication.applicationId, 60)
-  await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain)
 
   await loadMicrochains()
 }

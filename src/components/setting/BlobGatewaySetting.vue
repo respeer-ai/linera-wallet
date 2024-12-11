@@ -83,7 +83,6 @@ const onSaveBlobGatewayApplicationId = async () => {
           await rpcBridge.Operation.waitOperation(operationId)
         }
         await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, blobGatewayApplicationId.value, 60)
-        await rpcBridge.BlobGatewayApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
         console.log('Failed refresh blobGateway application', e)
       }
@@ -117,7 +116,6 @@ const onRefresh = async () => {
           await rpcBridge.Operation.waitOperation(operationId)
         }
         await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, blobGatewayApplicationId.value, 60)
-        await rpcBridge.BlobGatewayApplicationOperation.subscribeCreationChain(microchain.microchain)
       } catch (e) {
         console.log('Faled refresh blobGateway application', e)
       }

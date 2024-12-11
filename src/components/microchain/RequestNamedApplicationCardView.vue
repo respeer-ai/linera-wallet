@@ -32,7 +32,7 @@
 
 <script setup lang='ts'>
 import { db } from 'src/model'
-import { computed, onMounted, ref, toRef } from 'vue'
+import { computed, onMounted, ref, toRef, watch } from 'vue'
 import { rpcBridge } from 'src/bridge'
 import { shortid } from 'src/utils'
 import { useI18n } from 'vue-i18n'
@@ -80,8 +80,14 @@ const onRequestNowClick = async () => {
     }
     btnLabel.value = t('MSG_WAITING_THREE_DOTS')
     await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.value.microchain, namedApplication.value.applicationId, 60)
-    btnLabel.value = t('MSG_SUBSCRIBING_THREE_DOTS')
-    await rpcBridge.MonoApplicationOperation.subscribeCreationChainWithType(microchain.value.microchain, namedApplication.value.applicationType)
+
+    if (namedApplication.value.applicationType !== db.ApplicationType.BLOB_GATEWAY) {
+      btnLabel.value = t('MSG_SUBSCRIBING_THREE_DOTS')
+      await rpcBridge.MonoApplicationOperation.subscribeCreationChainWithType(microchain.value.microchain, namedApplication.value.applicationType)
+      subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId)
+    } else {
+      subscribed.value = true
+    }
 
     emit('requested', namedApplication.value.applicationId)
 
@@ -103,9 +109,22 @@ const onRequestNowClick = async () => {
   requesting.value = false
 }
 
+watch(requested, async () => {
+  if (!requested.value) return
+  if (namedApplication.value.applicationType !== db.ApplicationType.BLOB_GATEWAY) {
+    subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId)
+  } else {
+    subscribed.value = true
+  }
+})
+
 onMounted(async () => {
   if (!requested.value) return
-  subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId)
+  if (namedApplication.value.applicationType !== db.ApplicationType.BLOB_GATEWAY) {
+    subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId)
+  } else {
+    subscribed.value = true
+  }
 })
 
 </script>

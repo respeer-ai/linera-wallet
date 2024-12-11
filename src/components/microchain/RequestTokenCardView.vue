@@ -72,6 +72,7 @@ const onRequestNowClick = async () => {
   requesting.value = true
   try {
     await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.value.microchain, token.value.applicationId as string, db.ApplicationType.ERC20)
+    subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, token.value.applicationId as string)
     emit('requested', token.value.applicationId as string)
   } catch (e) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

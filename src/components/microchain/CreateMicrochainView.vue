@@ -89,7 +89,6 @@ const importPresetApplications = async (microchain: db.Microchain) => {
     await rpcBridge.Operation.waitOperation(operationId)
   }
   await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
-  await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
 }
 
 const createMicrochain = async (): Promise<db.Microchain> => {

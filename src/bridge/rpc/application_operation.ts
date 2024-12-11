@@ -84,7 +84,7 @@ export class ApplicationOperation {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        const subscribed = graphqlResult.keyValue(
+        const subscribed = graphqlResult.data(
           res,
           'subscribedCreatorChain'
         ) as boolean

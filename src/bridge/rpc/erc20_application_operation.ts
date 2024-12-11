@@ -105,7 +105,7 @@ export class ERC20ApplicationOperation {
           totalSupply: Number(token.totalSupply),
           ticker: token.symbol,
           tokenType: db.TokenType.Fungible,
-          logo: token.tokenMetadata.logo.replace(/\s/g, '+'),
+          logo: token.tokenMetadata.logo,
           applicationId,
           native: false,
           usdCurrency: 0,

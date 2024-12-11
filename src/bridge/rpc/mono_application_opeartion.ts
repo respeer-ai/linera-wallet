@@ -16,6 +16,7 @@ export class MonoApplicationOperation {
       console.log(`${applicationId} not exists on ${chainId}`)
       return
     }
+    console.log('Subscribe creation chain', chainId, applicationId, applicationType)
     await ApplicationOperation.subscribeCreatorChain(
       chainId,
       applicationId,
