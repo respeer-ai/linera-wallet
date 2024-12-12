@@ -567,6 +567,15 @@ export class BlockSigner {
 
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
+      if (operation.certificateHash && operation.state === db.OperationState.EXECUTED) {
+        try {
+          await BlockSigner.processNewBlock(operation.microchain, operation.certificateHash)
+        } catch (e) {
+          // DO NOTHING
+        }
+        continue
+      }
+
       if (!operation.firstProcessedAt) {
         operation.firstProcessedAt = Date.now()
         await sharedStore.updateChainOperation(operation)

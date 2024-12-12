@@ -84,7 +84,13 @@ const onRequestNowClick = async () => {
     if (namedApplication.value.applicationType !== db.ApplicationType.BLOB_GATEWAY) {
       btnLabel.value = t('MSG_SUBSCRIBING_THREE_DOTS')
       await rpcBridge.MonoApplicationOperation.subscribeCreationChainWithType(microchain.value.microchain, namedApplication.value.applicationType)
-      subscribed.value = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId)
+      setTimeout(() => {
+        rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, namedApplication.value.applicationId).then((_subscribed) => {
+          subscribed.value = _subscribed
+        }).catch(() => {
+          // DO NOTHING
+        })
+      }, 1000)
     } else {
       subscribed.value = true
     }

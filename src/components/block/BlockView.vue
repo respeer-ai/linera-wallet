@@ -490,9 +490,19 @@ const _handleOperations = async () => {
   if (window.location.origin.startsWith('http')) {
     const processedMicrochains = new Map<string, boolean>()
 
-    const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING])
+    const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING, db.OperationState.EXECUTED])
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
+      if (operation.certificateHash && operation.state === db.OperationState.EXECUTED) {
+        try {
+          const microchain = await dbBridge.Microchain.microchain(operation.microchain) as db.Microchain
+          await processNewBlock(microchain, operation.certificateHash)
+        } catch (e) {
+          // DO NOTHING
+        }
+        continue
+      }
+
       if (!operation.firstProcessedAt) {
         operation.firstProcessedAt = Date.now()
         await dbBridge.ChainOperation.update(operation)
