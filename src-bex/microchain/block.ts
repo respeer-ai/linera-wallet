@@ -222,6 +222,11 @@ export class BlockSigner {
     const _microchain = (await sharedStore.getMicrochain(
       microchain
     )) as db.Microchain
+    if (!_microchain.opening || !_microchain.openChainCertificateHash) {
+      return setTimeout(() => {
+        void BlockSigner.updateMicrochainOpenState(microchain, block)
+      }, 1000)
+    }
     if (_microchain.openChainCertificateHash === block.hash) {
       _microchain.opened = true
       await sharedStore.updateMicrochain(_microchain)
