@@ -215,8 +215,10 @@ const chainBalances = ref([] as db.MicrochainFungibleTokenBalance[])
 const tokenLogo = ref('')
 
 watch(selectedOwner, async () => {
-  ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
-  chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+  if (selectedOwner.value) {
+    ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+    chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+  }
 })
 
 onMounted(async () => {
