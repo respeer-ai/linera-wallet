@@ -97,7 +97,9 @@ export class ERC20ApplicationOperation {
         const token = graphqlResult.rootData(res) as rpc.ERC20Token
         if (!token.tokenMetadata) {
           // Add to ticker run let block subscription run it
-          return reject('Invalid token metadata')
+          return setTimeout(() => {
+            void ERC20ApplicationOperation.persistApplication(chainId, applicationId, applicationType)
+          }, 1000)
         }
         void dbBridge.Token.create({
           name: token.name,

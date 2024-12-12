@@ -163,6 +163,12 @@ const chainApplications = ref([] as ApplicationOverview[])
 
 const formalizeRequestedTokens = async () => {
   for (const token of requestedTokens.value) {
+    if (importedTokens.value.findIndex((el) => el.applicationId === token.applicationId) >= 0) continue
+    const exist = await rpcBridge.ApplicationOperation.existChainApplication(microchain.value.microchain, token.applicationId as string)
+    if (!exist) {
+      importedTokens.value.push(token)
+      continue
+    }
     const subscribed = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, token.applicationId as string)
     if (!subscribed) importedTokens.value.push(token)
   }
