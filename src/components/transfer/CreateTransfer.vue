@@ -52,6 +52,7 @@
           :from-chain-balance='fromChainBalance'
           :to-chain-balance='toChainBalance'
           :amount='amount'
+          :transferring='transferring'
           @confirmed='onTransferConfirmed'
         />
       </div>
@@ -91,6 +92,7 @@ const toMicrochain = ref('')
 const fromChainBalance = ref(false)
 const toChainBalance = ref(false)
 const amount = ref(0)
+const transferring = ref(false)
 
 const router = useRouter()
 
@@ -108,24 +110,32 @@ const onBackClick = () => {
 }
 
 const onTransferConfirmed = async () => {
-  if (!selectedToken.value.native) {
-    const chainAccountOwner = {
-      chain_id: selectedToMicrochain.value?.microchain,
-      owner: `User:${selectedToOwner.value?.owner}`
-    } as rpc.ChainAccountOwner
-    await rpcBridge.ERC20ApplicationOperation.transfer(
-      selectedFromMicrochain.value?.microchain,
+  transferring.value = true
+  try {
+    if (!selectedToken.value.native) {
+      const chainAccountOwner = {
+        chain_id: selectedToMicrochain.value?.microchain,
+        owner: `User:${selectedToOwner.value?.owner}`
+      } as rpc.ChainAccountOwner
+      const operationId = await rpcBridge.ERC20ApplicationOperation.transfer(
+        selectedFromMicrochain.value?.microchain,
       selectedToken.value.applicationId as string,
       chainAccountOwner, amount.value)
-  } else {
-    await rpcBridge.Operation.transfer(
-      fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
-      selectedFromMicrochain.value?.microchain,
-      toChainBalance.value ? undefined : selectedToOwner.value?.address || toAddress.value,
-      selectedToMicrochain.value?.microchain || toMicrochain.value,
-      amount.value
-    )
+      await rpcBridge.Operation.waitOperation(operationId)
+    } else {
+      const operationId = await rpcBridge.Operation.transfer(
+        fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
+        selectedFromMicrochain.value?.microchain,
+        toChainBalance.value ? undefined : selectedToOwner.value?.address || toAddress.value,
+        selectedToMicrochain.value?.microchain || toMicrochain.value,
+        amount.value
+      )
+      await rpcBridge.Operation.waitOperation(operationId)
+    }
+  } catch (e) {
+    console.log('Failed transfer', e)
   }
+  transferring.value = false
   void router.back()
 }
 

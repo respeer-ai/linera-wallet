@@ -187,6 +187,7 @@
       </div>
     </div>
   </div>
+  <DbOwnerBalanceBridge v-model:token-balance='tokenBalance' :token-id='token.id' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
 </template>
 
@@ -197,6 +198,7 @@ import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
 import { dbBridge } from 'src/bridge'
 
+import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import TokenBalanceCardView from './TokenBalanceCardView.vue'
 
@@ -211,10 +213,18 @@ const token = toRef(props, 'token')
 const selectedOwner = ref(undefined as unknown as db.Owner)
 const ownerBalances = ref([] as db.MicrochainOwnerFungibleTokenBalance[])
 const chainBalances = ref([] as db.MicrochainFungibleTokenBalance[])
+const tokenBalance = ref(0)
 
 const tokenLogo = ref('')
 
 watch(selectedOwner, async () => {
+  if (selectedOwner.value) {
+    ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+    chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
+  }
+})
+
+watch(tokenBalance, async () => {
   if (selectedOwner.value) {
     ownerBalances.value = await dbBridge.MicrochainOwnerFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)
     chainBalances.value = await dbBridge.MicrochainFungibleTokenBalance.balances(selectedOwner.value?.owner, token.value.id as number)

@@ -4,7 +4,7 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { BALANCE_OF, MINT, TOKEN_METADATA, TRANSFER_ERC20 } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
-import { uid } from 'quasar'
+import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
 import { ApplicationOperation } from './application_operation'
 import { MonoApplicationOperation } from './mono_application_opeartion'
@@ -181,7 +181,7 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     to: rpc.ChainAccountOwner | undefined,
     amount: number
-  ) => {
+  ): Promise<string> => {
     try {
       const variables = {
         to,
@@ -195,10 +195,12 @@ export class ERC20ApplicationOperation {
         variables
       )
 
+      const operationId = uuidv4()
+
       const operation = {
         operationType: db.OperationType.MINT,
         applicationType: db.ApplicationType.ERC20,
-        operationId: uid(),
+        operationId,
         microchain: chainId,
         operation: JSON.stringify({
           User: {
@@ -211,9 +213,9 @@ export class ERC20ApplicationOperation {
         graphqlVariables: JSON.stringify(variables)
       } as db.ChainOperation
       await dbBridge.ChainOperation.create({ ...operation })
-      return true
-    } catch {
-      return false
+      return operationId
+    } catch (e) {
+      return Promise.reject(e)
     }
   }
 
@@ -222,7 +224,7 @@ export class ERC20ApplicationOperation {
     applicationId: string,
     to: rpc.ChainAccountOwner | undefined,
     amount: number
-  ) => {
+  ): Promise<string> => {
     try {
       const variables = {
         to,
@@ -236,10 +238,12 @@ export class ERC20ApplicationOperation {
         variables
       )
 
+      const operationId = uuidv4()
+
       const operation = {
         operationType: db.OperationType.MINT,
         applicationType: db.ApplicationType.ERC20,
-        operationId: uid(),
+        operationId,
         microchain: chainId,
         operation: JSON.stringify({
           User: {
@@ -252,10 +256,9 @@ export class ERC20ApplicationOperation {
         graphqlVariables: JSON.stringify(variables)
       } as db.ChainOperation
       await dbBridge.ChainOperation.create({ ...operation })
-      return true
+      return operationId
     } catch (e) {
-      console.log('Error', e)
-      return false
+      return Promise.reject(e)
     }
   }
 }

@@ -94,6 +94,7 @@
       @click='onMintNowClick'
       no-caps
       :disable='!canMint'
+      :loading='minting'
     />
   </div>
   <DbOwnerBridge v-model:selected-owner='selectedOwner' />
@@ -148,6 +149,7 @@ const selectingMicrochain = ref(false)
 const amount = defineModel<number>({ default: 0 })
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)
+const minting = ref(false)
 
 watch(amount, () => {
   if (amount.value.toString().startsWith('0.0')) {
@@ -194,8 +196,11 @@ const onMintNowClick = async () => {
   if (selectedOwner.value) {
     chainAccountOwner.owner = `User:${selectedOwner.value.owner}`
   }
+
+  minting.value = true
+
   try {
-    await rpcBridge.ERC20ApplicationOperation.mint(
+    const operationId = await rpcBridge.ERC20ApplicationOperation.mint(
       selectedMicrochain.value?.microchain,
       token.value.applicationId as string,
       chainAccountOwner, amount.value)
@@ -205,6 +210,7 @@ const onMintNowClick = async () => {
       Popup: true,
       Type: localStore.notify.NotifyType.Info
     })
+    await rpcBridge.Operation.waitOperation(operationId)
     emit('minted')
   } catch (error) {
     localStore.notification.pushNotification({
@@ -216,6 +222,7 @@ const onMintNowClick = async () => {
     })
     emit('error')
   }
+  minting.value = false
 }
 
 const nativeTokenId = ref(undefined as unknown as number)

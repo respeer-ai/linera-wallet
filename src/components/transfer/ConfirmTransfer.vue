@@ -138,6 +138,7 @@
         class='btn full-width extra-margin-bottom'
         @click='onTransferClick'
         no-caps
+        :loading='transferring'
       />
     </div>
   </div>
@@ -160,6 +161,7 @@ interface Props {
   fromChainBalance: boolean
   toChainBalance: boolean
   amount: number
+  transferring: boolean
 }
 const props = defineProps<Props>()
 const token = toRef(props, 'token')
@@ -172,6 +174,7 @@ const toMicrochainId = toRef(props, 'toMicrochainId')
 const fromChainBalance = toRef(props, 'fromChainBalance')
 const toChainBalance = toRef(props, 'toChainBalance')
 const amount = toRef(props, 'amount')
+const transferring = toRef(props, 'transferring')
 
 const tokenLogo = ref('')
 

@@ -12,7 +12,7 @@ export class Operation {
     toPublicKey: string | undefined,
     toChainId: string,
     amount: number
-  ) => {
+  ): Promise<string> => {
     const fromOwner =
       fromPublicKey !== undefined
         ? await db.ownerFromPublicKey(fromPublicKey)
@@ -22,14 +22,16 @@ export class Operation {
         ? await db.ownerFromPublicKey(toPublicKey)
         : undefined
     let amountStr = stringify(amount) || '0'
-    if (Number(amountStr) === 0) return
+    if (Number(amountStr) === 0) return Promise.reject('Invalid amount')
     if (!amountStr?.endsWith('.') && !amountStr?.includes('.')) {
       amountStr += '.'
     }
 
+    const operationId = uuidv4()
+
     const operation = {
       operationType: db.OperationType.TRANSFER,
-      operationId: uuidv4(),
+      operationId,
       microchain: fromChainId,
       operation: stringify({
         System: {
@@ -47,6 +49,7 @@ export class Operation {
       } as rpc.Operation)
     } as db.ChainOperation
     await dbBridge.ChainOperation.create({ ...operation })
+    return operationId
   }
 
   static requestApplication = async (
