@@ -200,15 +200,17 @@ const updateMicrochainOpenState = async (microchain: db.Microchain, block: Hashe
 }
 
 const processNewBlock = async (microchain: db.Microchain, hash?: string) => {
-  const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
-  if (!owners?.length) return
+  if (microchain.opened) {
+    const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
+    if (!owners?.length) return
 
-  const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
-  try {
-    await updateChainAccountBalances(microchain, publicKeys)
-    await updateFungibleBalances(microchain, publicKeys)
-  } catch (error) {
-    console.log('Failed update chain account balances', error)
+    const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
+    try {
+      await updateChainAccountBalances(microchain, publicKeys)
+      await updateFungibleBalances(microchain, publicKeys)
+    } catch (error) {
+      console.log('Failed update chain account balances', error)
+    }
   }
 
   const block = await rpcBridge.Block.getBlockWithHash(microchain.microchain, hash)
