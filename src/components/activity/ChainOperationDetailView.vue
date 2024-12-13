@@ -13,7 +13,7 @@
         <strong>{{ $t('MSG_STATUS') }}</strong>
       </div>
       <q-space />
-      <div class='text-green-8'>
+      <div :class='operation.state === db.OperationState.FAILED ? "text-red-6" : "text-green-8"'>
         <strong>{{ operationState }}</strong>
       </div>
     </div>
@@ -71,22 +71,29 @@
       <q-space />
       <div>{{ date.formatDate(operation.createdAt, 'YYYY/MM/DD HH:mm:ss') }}</div>
     </div>
-    <div v-if='operation.failedAt' class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed items-x-margin'>
+    <div v-if='operation.failedAt' class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_FAILED_AT') }}</div>
       <q-space />
       <div>{{ date.formatDate(operation.failedAt, 'YYYY/MM/DD HH:mm:ss') }}</div>
     </div>
-    <div v-if='operation.failReason?.length' class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed items-x-margin'>
-      <div>{{ $t('MSG_REASON') }}</div>
+    <div v-if='operation.failReason?.length' class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
+      <div :style='{width: "64px"}' class='word-break-all'>
+        {{ $t('MSG_REASON') }}
+      </div>
       <q-space />
-      <div>{{ operation.failReason }}</div>
+      <div class='word-break-all row flex items-center page-item-x-margin-left' :style='{width: "calc(100% - 70px)"}'>
+        <div :style='{width: "calc(100% - 18px)"}'>
+          {{ operation.failReason.substring(0, 240) }}...
+        </div>
+        <q-icon name='bi-copy' size='12px' class='page-item-x-margin-left cursor-pointer' @click.stop='(evt) => _copyToClipboard(operation.failReason as string, evt)' />
+      </div>
     </div>
-    <div v-if='operation.applicationId' class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed items-x-margin'>
+    <div v-if='operation.applicationId' class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_APPLICATION_ID') }}</div>
       <q-space />
       <div>{{ operation.applicationId }}</div>
     </div>
-    <div v-if='operation.applicationType' class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed items-x-margin'>
+    <div v-if='operation.applicationType' class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_APPLICATION_TYPE') }}</div>
       <q-space />
       <div>{{ db.ApplicationType[operation.applicationType] }}</div>
