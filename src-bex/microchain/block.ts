@@ -45,10 +45,9 @@ export class BlockSigner {
     }
 
     try {
-      await BlockSigner.processNewIncomingMessageWithOperation(_data.microchain)
       await BlockSigner.processNewBlock(_data.microchain)
-    } catch {
-      // DO NOTHING
+    } catch (e) {
+      console.log('Failed process new block', e)
     }
   }
 
@@ -525,13 +524,14 @@ export class BlockSigner {
         BlockSigner.messageCompensates.set(
           microchain,
           setTimeout(() => {
-            try {
-              void BlockSigner.processNewIncomingMessageWithOperation(
-                microchain
-              )
-            } catch (e) {
+            BlockSigner.messageCompensates.delete(microchain)
+            BlockSigner.processNewIncomingMessageWithOperation(
+              microchain
+            ).then(() => {
+              // DO NOTHING
+            }).catch((e) => {
               console.log('Failed process incoming bundles', e)
-            }
+            })
           }, 1000) as unknown as number
         )
       }
@@ -610,6 +610,9 @@ export class BlockSigner {
         await sharedStore.updateChainOperation(operation)
       } catch (e) {
         if (stringify(e)?.includes('Was expecting block height')) {
+          continue
+        }
+        if (stringify(e)?.includes('is out of order compared to previous messages from')) {
           continue
         }
         if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
