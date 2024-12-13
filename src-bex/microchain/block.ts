@@ -242,7 +242,11 @@ export class BlockSigner {
     const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
     if (newBlock) {
       const hash = graphqlResult.keyValue(newBlock, 'hash') as string
-      await BlockSigner.processNewBlock(microchain, hash)
+      try {
+        await BlockSigner.processNewBlock(microchain, hash)
+      } catch {
+        // DO NOTHING
+      }
     }
   }
 

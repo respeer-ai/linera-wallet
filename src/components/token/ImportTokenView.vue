@@ -60,6 +60,7 @@ const onImportClick = async () => {
     try {
       await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, applicationId.value)
     } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Failed import erc20 application: ${e}`)
     }
   }
