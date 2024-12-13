@@ -539,6 +539,13 @@ const _handleOperations = async () => {
       }
     }
     for (const microchain of microchains.value) {
+      if (microchain.openChainCertificateHash && !microchain.opened) {
+        try {
+          await processNewBlock(microchain, microchain.openChainCertificateHash)
+        } catch (e) {
+          // DO NOTHING
+        }
+      }
       if (!processedMicrochains.get(microchain.microchain)) {
         try {
           await processNewIncomingBundle(microchain.microchain)

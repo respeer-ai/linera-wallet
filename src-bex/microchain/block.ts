@@ -632,6 +632,15 @@ export class BlockSigner {
     const microchains = await sharedStore.getMicrochains()
 
     for (const microchain of microchains) {
+      const _microchain = await sharedStore.getMicrochain(microchain) as db.Microchain
+      if (!_microchain) continue
+      if (_microchain.openChainCertificateHash && !_microchain.opened) {
+        try {
+          await BlockSigner.processNewBlock(microchain, _microchain.openChainCertificateHash)
+        } catch (e) {
+          // DO NOTHING
+        }
+      }
       if (!processedMicrochains.get(microchain)) {
         try {
           await BlockSigner.processNewIncomingMessageWithOperation(microchain)
