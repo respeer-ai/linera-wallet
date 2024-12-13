@@ -54,22 +54,18 @@ const onImportClick = async () => {
   if (applicationIdError.value) return
 
   importing.value = true
+  const microchains = await dbWallet.microchains.toArray()
 
-  try {
-    const microchains = await dbWallet.microchains.toArray()
-
-    for (const microchain of microchains) {
+  for (const microchain of microchains) {
+    try {
       await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain.microchain, applicationId.value)
+    } catch (e) {
+      console.log(`Failed import erc20 application: ${e}`)
     }
-
-    importing.value = false
-    emit('imported')
-  } catch (error) {
-    importing.value = false
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.log(`Failed import erc20 application: ${error}`)
-    emit('error')
   }
+
+  importing.value = false
+  emit('imported')
 }
 
 const onCancelClick = () => {
