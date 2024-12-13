@@ -129,6 +129,7 @@ import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
 import { type ApplicationOverview } from 'src/__generated__/graphql/sdk/graphql'
 import { dbBridge, rpcBridge } from 'src/bridge'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -167,6 +168,10 @@ const formalizeRequestedTokens = async () => {
     const exist = await rpcBridge.ApplicationOperation.existChainApplication(microchain.value.microchain, token.applicationId as string)
     if (!exist) {
       importedTokens.value.push(token)
+      continue
+    }
+    const creationChain = await lineraWasm.application_creation_chain_id(token.applicationId as string)
+    if (creationChain === microchain.value.microchain) {
       continue
     }
     const subscribed = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, token.applicationId as string)
