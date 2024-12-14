@@ -529,13 +529,13 @@ export class BlockSigner {
           microchain,
           setTimeout(() => {
             BlockSigner.messageCompensates.delete(microchain)
-            BlockSigner.processNewIncomingMessageWithOperation(
-              microchain
-            ).then(() => {
-              // DO NOTHING
-            }).catch((e) => {
-              console.log('Failed process incoming bundles', e)
-            })
+            BlockSigner.processNewIncomingMessageWithOperation(microchain)
+              .then(() => {
+                // DO NOTHING
+              })
+              .catch((e) => {
+                console.log('Failed process incoming bundles', e)
+              })
           }, 1000) as unknown as number
         )
       }
@@ -564,18 +564,28 @@ export class BlockSigner {
     const operations = await sharedStore.getChainOperations(
       undefined,
       undefined,
-      [db.OperationState.CREATED, db.OperationState.EXECUTING]
+      [
+        db.OperationState.CREATED,
+        db.OperationState.EXECUTING,
+        db.OperationState.EXECUTED
+      ]
     )
 
     const processedMicrochains = new Map<string, boolean>()
 
     // TODO: merge operations of the same microchain
     for (const operation of operations) {
-      if (operation.certificateHash && operation.state === db.OperationState.EXECUTED) {
+      if (
+        operation.certificateHash &&
+        operation.state === db.OperationState.EXECUTED
+      ) {
         try {
-          await BlockSigner.processNewBlock(operation.microchain, operation.certificateHash)
+          await BlockSigner.processNewBlock(
+            operation.microchain,
+            operation.certificateHash
+          )
         } catch (e) {
-          // DO NOTHING
+          console.log('Failed process operation block', e)
         }
         continue
       }
@@ -616,7 +626,11 @@ export class BlockSigner {
         if (stringify(e)?.includes('Was expecting block height')) {
           continue
         }
-        if (stringify(e)?.includes('is out of order compared to previous messages from')) {
+        if (
+          stringify(e)?.includes(
+            'is out of order compared to previous messages from'
+          )
+        ) {
           continue
         }
         if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
@@ -639,13 +653,18 @@ export class BlockSigner {
     const microchains = await sharedStore.getMicrochains()
 
     for (const microchain of microchains) {
-      const _microchain = await sharedStore.getMicrochain(microchain) as db.Microchain
+      const _microchain = (await sharedStore.getMicrochain(
+        microchain
+      )) as db.Microchain
       if (!_microchain) continue
       if (_microchain.openChainCertificateHash && !_microchain.opened) {
         try {
-          await BlockSigner.processNewBlock(microchain, _microchain.openChainCertificateHash)
+          await BlockSigner.processNewBlock(
+            microchain,
+            _microchain.openChainCertificateHash
+          )
         } catch (e) {
-          // DO NOTHING
+          console.log('Failed process open chain block', e)
         }
       }
       if (!processedMicrochains.get(microchain)) {

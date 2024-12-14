@@ -73,8 +73,14 @@ export class ChainOperation {
         .and((op) => op.operationType === operationType)
         .and((op) => !applicationId || op.applicationId === applicationId)
         .and((op) => !states?.length || states.includes(op.state))
-        .and((op) => createdBefore === undefined || (op.createdAt || 0) <= createdBefore)
-        .and((op) => createdAfter === undefined || (op.createdAt || 0) > createdAfter)
+        .and(
+          (op) =>
+            createdBefore === undefined || (op.createdAt || 0) <= createdBefore
+        )
+        .and(
+          (op) =>
+            createdAfter === undefined || (op.createdAt || 0) > createdAfter
+        )
         .first()) !== undefined
     )
   }
