@@ -116,35 +116,9 @@ const onImportMicrochainClick = () => {
 const onMicrochainImported = async (microchain: string) => {
   importingMicrochain.value = false
 
-  let namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
-  if (!namedApplication) return
-  let operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.SWAP)
-  if (operationId) {
-    await rpcBridge.Operation.waitOperation(operationId)
-  }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain, namedApplication.applicationId, 60)
-  await rpcBridge.SwapApplicationOperation.subscribeCreationChain(microchain)
-
-  namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
-  if (!namedApplication) return
-  await rpcBridge.ERC20ApplicationOperation.persistApplication(microchain, namedApplication.applicationId, db.ApplicationType.WLINERA)
-
-  namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.AMS)) as db.NamedApplication
-  if (!namedApplication) return
-  operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.AMS)
-  if (operationId) {
-    await rpcBridge.Operation.waitOperation(operationId)
-  }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain, namedApplication.applicationId, 60)
-  await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain)
-
-  namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)) as db.NamedApplication
-  if (!namedApplication) return
-  operationId = await rpcBridge.Operation.requestApplication(microchain, namedApplication.applicationId, db.ApplicationType.BLOB_GATEWAY)
-  if (operationId) {
-    await rpcBridge.Operation.waitOperation(operationId)
-  }
-  await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain, namedApplication.applicationId, 60)
+  const _microchain = microchains.value.find((el) => el.microchain === microchain)
+  if (!_microchain) return
+  await rpcBridge.Microchain.importPresetApplications(_microchain)
 
   await loadMicrochains()
 }
