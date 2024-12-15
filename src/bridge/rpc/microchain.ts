@@ -186,48 +186,93 @@ export class Microchain {
   }
 
   static importPresetApplications = async (microchain: db.Microchain) => {
-    const _microchain = await dbBridge.Microchain.microchain(microchain.microchain)
+    const _microchain = await dbBridge.Microchain.microchain(
+      microchain.microchain
+    )
     if (!_microchain?.opened) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          Microchain.importPresetApplications(microchain).then(() => {
-            resolve(undefined)
-          }).catch((e) => {
-            console.log('Failed import preset applications', e)
-            reject(e)
-          })
+          Microchain.importPresetApplications(microchain)
+            .then(() => {
+              resolve(undefined)
+            })
+            .catch((e) => {
+              console.log('Failed import preset applications', e)
+              reject(e)
+            })
         }, 1000)
       })
     }
 
-    let namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.SWAP)) as db.NamedApplication
+    let namedApplication =
+      (await dbBridge.NamedApplication.namedApplicationWithType(
+        db.ApplicationType.SWAP
+      )) as db.NamedApplication
     if (!namedApplication) return Promise.reject('Invalid swap application')
-    let operationId = await Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.SWAP)
+    let operationId = await Operation.requestApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      db.ApplicationType.SWAP
+    )
     if (operationId) {
       await Operation.waitOperation(operationId)
     }
-    await ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
+    await ApplicationOperation.waitExistChainApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      60
+    )
     await SwapApplicationOperation.subscribeCreationChain(microchain.microchain)
 
-    namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.WLINERA)) as db.NamedApplication
+    namedApplication =
+      (await dbBridge.NamedApplication.namedApplicationWithType(
+        db.ApplicationType.WLINERA
+      )) as db.NamedApplication
     if (!namedApplication) return Promise.reject('Invalid wlinera application')
-    await ERC20ApplicationOperation.persistApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.WLINERA)
+    await ERC20ApplicationOperation.persistApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      db.ApplicationType.WLINERA
+    )
 
-    namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.AMS)) as db.NamedApplication
+    namedApplication =
+      (await dbBridge.NamedApplication.namedApplicationWithType(
+        db.ApplicationType.AMS
+      )) as db.NamedApplication
     if (!namedApplication) return Promise.reject('Invalid ams application')
-    operationId = await Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.AMS)
+    operationId = await Operation.requestApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      db.ApplicationType.AMS
+    )
     if (operationId) {
       await Operation.waitOperation(operationId)
     }
-    await ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
+    await ApplicationOperation.waitExistChainApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      60
+    )
     await AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
 
-    namedApplication = (await dbBridge.NamedApplication.namedApplicationWithType(db.ApplicationType.BLOB_GATEWAY)) as db.NamedApplication
-    if (!namedApplication) return Promise.reject('Invalid blob gateway application')
-    operationId = await Operation.requestApplication(microchain.microchain, namedApplication.applicationId, db.ApplicationType.BLOB_GATEWAY)
+    namedApplication =
+      (await dbBridge.NamedApplication.namedApplicationWithType(
+        db.ApplicationType.BLOB_GATEWAY
+      )) as db.NamedApplication
+    if (!namedApplication)
+      return Promise.reject('Invalid blob gateway application')
+    operationId = await Operation.requestApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      db.ApplicationType.BLOB_GATEWAY
+    )
     if (operationId) {
       await Operation.waitOperation(operationId)
     }
-    await ApplicationOperation.waitExistChainApplication(microchain.microchain, namedApplication.applicationId, 60)
+    await ApplicationOperation.waitExistChainApplication(
+      microchain.microchain,
+      namedApplication.applicationId,
+      60
+    )
   }
 }

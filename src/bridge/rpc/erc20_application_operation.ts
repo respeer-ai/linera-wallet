@@ -102,11 +102,13 @@ export class ERC20ApplicationOperation {
               chainId,
               applicationId,
               applicationType
-            ).then(() => {
-              resolve(undefined)
-            }).catch((e) => {
-              console.log('Failed get token metadata', e)
-            })
+            )
+              .then(() => {
+                resolve(undefined)
+              })
+              .catch((e) => {
+                console.log('Failed get token metadata', e)
+              })
           }, 1000)
         }
         void dbBridge.Token.create({
