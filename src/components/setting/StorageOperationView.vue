@@ -28,7 +28,7 @@
         fit='contain'
       />
     </div>
-    <div v-else>
+    <div v-else :class='[ localStore.setting.extensionMode ? "vertical-sections-margin" : "" ]'>
       <ClearStorageView />
     </div>
   </div>
