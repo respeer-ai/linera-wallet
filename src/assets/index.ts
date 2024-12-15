@@ -9,6 +9,10 @@ import discordLogo from './Discord.svg'
 import twitterLogo from './Twitter.svg'
 import telegramLogo from './Telegram.svg'
 import microchainLogo from './Microchain.svg'
+import lineraMemeLogo from './LineraMeme.png'
+import blobGatewayLogo from './BlobGateway.png'
+import lineraSwapLogo from './LineraSwap.png'
+import applicationManagementLogo from './ApplicationManagement.png'
 
 export {
   lineraLogo,
@@ -21,5 +25,9 @@ export {
   discordLogo,
   twitterLogo,
   telegramLogo,
-  microchainLogo
+  microchainLogo,
+  lineraMemeLogo,
+  blobGatewayLogo,
+  lineraSwapLogo,
+  applicationManagementLogo
 }
