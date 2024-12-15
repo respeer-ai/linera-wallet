@@ -25,7 +25,7 @@
       <div class='text-grey-6'>
         {{ shortid.shortId(activity.certificateHash, 8) }}
       </div>
-      <div class='page-item-x-margin-left'>
+      <div class='page-item-x-margin-left cursor-pointer'>
         <q-icon name='bi-copy' size='16px' :style='{marginTop: "-3px"}' @click.stop='(evt) => _copyToClipboard(activity.certificateHash, evt)' />
       </div>
     </div>
