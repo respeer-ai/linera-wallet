@@ -98,7 +98,7 @@
     <div class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_BLOCK_HEIGHT') }}</div>
       <q-space />
-      <div>{{ stringify(activity.blockHeight) }}</div>
+      <div>{{ blockHeight }}</div>
     </div>
     <div class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_GRANT') }}</div>
@@ -116,7 +116,7 @@
     <div class='row extra-margin-bottom vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_DATE') }}</div>
       <q-space />
-      <div>{{ date.formatDate(activity.timestamp / 1000, 'YYYY/MM/DD HH:mm:ss') }}</div>
+      <div>{{ timestamp }}</div>
     </div>
   </div>
   <OwnerBridge ref='dbOwnerBridge' v-model:selected-owner='selectedOwner' />
@@ -130,7 +130,7 @@ import { shortid } from 'src/utils'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
 import { dbBridge } from 'src/bridge'
-import { stringify } from 'lossless-json'
+import { LosslessNumber, parse } from 'lossless-json'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
@@ -191,6 +191,22 @@ const onBackClick = () => {
 const onCloseClick = () => {
   emit('close')
 }
+
+const blockHeight = computed(() => {
+  try {
+    return (parse(JSON.stringify(activity.value.blockHeight)) as LosslessNumber).value
+  } catch {
+    return activity.value.blockHeight
+  }
+})
+
+const timestamp = computed(() => {
+  try {
+    return date.formatDate(Number((parse(JSON.stringify(activity.value.timestamp)) as LosslessNumber).value) / 1000, 'YYYY/MM/DD HH:mm:ss')
+  } catch {
+    return date.formatDate(activity.value.timestamp / 1000, 'YYYY/MM/DD HH:mm:ss')
+  }
+})
 
 onMounted(async () => {
   if (activity.value.sourceAddress?.length) {
