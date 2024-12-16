@@ -24,7 +24,7 @@
           {{ $t('MSG_TRANSFER') }}
         </div>
       </div>
-      <div class='home-token-action-btn cursor-pointer' disabled>
+      <div class='home-token-action-btn cursor-pointer' @click='onSwapClick'>
         <q-avatar color='red-2' size='36px'>
           <q-icon name='bi-arrow-repeat' size='24px' />
         </q-avatar>
@@ -77,6 +77,10 @@ const router = useRouter()
 
 const onTransferClick = () => {
   void router.push({ path: localStore.setting.formalizePath('/transfer') })
+}
+
+const onSwapClick = () => {
+  window.open('https://testnet-archimedes.lineraswap.fun')
 }
 
 </script>
