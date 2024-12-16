@@ -38,7 +38,8 @@ export const needConfirm = async (req: RpcRequest) => {
       req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION
         ? lineraGraphqlQueryApplicationId(req)
         : undefined,
-      (req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION || req.request.method === RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB)
+      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION ||
+        req.request.method === RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB
         ? lineraGraphqlMutationOperation(req)
         : undefined
     ))
