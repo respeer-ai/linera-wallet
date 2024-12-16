@@ -98,6 +98,9 @@ export const lineraGraphqlMutationQueryWithQuery = (query: string) => {
 }
 
 export const lineraGraphqlMutationOperation = (request: RpcRequest) => {
+  if (request.request.method === RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB) {
+    return 'PublishDataBlob'
+  }
   const query = (
     request?.request?.params as unknown as RpcGraphqlQuery
   )?.query?.query?.replace('\n', '')
