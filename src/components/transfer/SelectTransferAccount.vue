@@ -102,9 +102,9 @@
   <div class='vertical-menus-margin'>
     <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input address'>
       <template #append>
-        <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToAccountClick'>
+        <q-btn flat dense class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToAccountClick'>
           {{ $t('MSG_SELECT') }}
-        </div>
+        </q-btn>
       </template>
     </q-input>
     <q-btn-dropdown
@@ -143,9 +143,12 @@
       :disable='!selectedToOwner && !toAddress'
     >
       <template #append>
-        <div class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToMicrochainClick'>
+        <q-btn
+          flat dense :disable='toMicrochainOwners.length === 0' class='text-blue-8 cursor-pointer label-text-small'
+          @click='onSelectToMicrochainClick'
+        >
           {{ $t('MSG_SELECT') }}
-        </div>
+        </q-btn>
       </template>
     </q-input>
     <q-btn-dropdown
@@ -245,6 +248,7 @@ const selectingToOwner = ref(false)
 const selectingToMicrochain = ref(false)
 const selectingToken = ref(false)
 const selectedTokenLogo = ref('')
+const toMicrochainOwners = ref([] as db.MicrochainOwner[])
 
 const onFromAccountClick = () => {
   selectingFromOwner.value = true
@@ -296,8 +300,13 @@ const onClearToAccountClick = () => {
 
 const onToOwnerSelected = (owner?: db.Owner) => {
   selectingToOwner.value = false
-  toAddress.value = owner?.owner || ''
+  toAddress.value = owner?.address || ''
 }
+
+watch(toAddress, async () => {
+  if (!toAddress.value) return
+  toMicrochainOwners.value = await dbBridge.MicrochainOwner.ownerMicrochainOwners(toAddress.value)
+})
 
 const onTokenClick = () => {
   selectingToken.value = true
