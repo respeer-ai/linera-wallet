@@ -4,31 +4,46 @@
       {{ $t('MSG_NETWORK_NAME') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='network.name' :disable='network.preset || network.selected' />
+      <q-input
+        autogrow dense outlined v-model='network.name'
+        :disable='network.preset || network.selected'
+      />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_FAUCET_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='network.faucetUrl' :disable='network.preset || network.selected' />
+      <q-input
+        autogrow dense outlined v-model='network.faucetUrl'
+        :disable='network.preset || network.selected'
+      />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_RPC_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='rpcUrl' :disable='network.preset || network.selected' />
+      <q-input
+        autogrow dense outlined v-model='rpcUrl'
+        :disable='network.preset || network.selected'
+      />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_SUBSCRIPTION_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='wsUrl' :disable='network.preset || network.selected' />
+      <q-input
+        autogrow dense outlined v-model='wsUrl'
+        :disable='network.preset || network.selected'
+      />
     </div>
     <div class='text-bold vertical-menus-margin'>
       {{ $t('MSG_BLOB_GATEWAY_URL') }}
     </div>
     <div class='page-item-y-margin-top'>
-      <q-input dense outlined v-model='network.blobGatewayUrl' :disable='network.preset || network.selected' />
+      <q-input
+        autogrow dense outlined v-model='network.blobGatewayUrl'
+        :disable='network.preset || network.selected'
+      />
     </div>
     <div class='vertical-sections-margin'>
       <q-btn
@@ -62,7 +77,7 @@ import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 const network = defineModel<db.Network>({ default: {} as db.Network })
 
 const rpcUrl = computed({
-  get: () => network.value ? db.rpcUrl(network.value) : '',
+  get: () => network.value ? db.rpcUrl(network.value, true) : '',
   set: (val: string) => {
     const v = new URL(val)
     const protocol = v.protocol.replace(':', '')

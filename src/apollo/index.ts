@@ -24,6 +24,8 @@ export async function getClientOptionsWithEndpointType(
   let wsSchema = network?.wsSchema
   let host = network?.host
   let port = network?.port
+  let path = network?.path?.length ? network?.path : undefined
+  let useAppHost = true
 
   if (endpointType === EndpointType.Faucet && network) {
     const url = new URL(network.faucetUrl)
@@ -35,9 +37,11 @@ export async function getClientOptionsWithEndpointType(
     port = parseInt(
       url.port ? url.port : protocol === db.HTTPSchema.HTTP ? '80' : '443'
     )
+    path = undefined
+    useAppHost = false
   }
 
-  return getClientOptions(schema, wsSchema, host, port, chainId, applicationId)
+  return getClientOptions(schema, wsSchema, host, port, path, chainId, applicationId, useAppHost)
 }
 
 export /* async */ function getClientOptions(
@@ -45,20 +49,25 @@ export /* async */ function getClientOptions(
   wsSchema?: string,
   host?: string,
   port?: number,
+  path?: string,
   chainId?: string,
-  applicationId?: string
+  applicationId?: string,
+  useAppHost?: boolean
 ) {
   const schema1 = schema || 'https'
   const port1 = port?.toString() || '8080'
   const host1 = host || 'localhost'
+  const path1 = path || ''
   const wsSchema1 = wsSchema || 'ws'
 
-  const httpBaseUrl =
-    schema1 +
+  const httpBaseUrl = schema1 +
     '://' +
     host1 +
     ':' +
-    port1 +
+    port1
+  const httpApiBaseUrl =
+    (!useAppHost ? httpBaseUrl : process.env.DEV ? '' : httpBaseUrl) +
+    path1 +
     (chainId ? `/chains/${chainId}` : '') +
     (applicationId ? `/applications/${applicationId}` : '')
   const wsBaseUrl = wsSchema1 + '://' + host1 + ':' + port1 + '/ws'
@@ -71,7 +80,7 @@ export /* async */ function getClientOptions(
 
   const httpLink = createHttpLink({
     uri: () => {
-      return httpBaseUrl
+      return httpApiBaseUrl
     }
   })
 

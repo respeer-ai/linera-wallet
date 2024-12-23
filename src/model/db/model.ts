@@ -116,29 +116,32 @@ export interface Network {
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
   name: 'Linera Testnet Archimedes ResPeer RPC',
-  // faucetUrl: 'https://faucet.testnet-archimedes.linera.net',
-  faucetUrl: 'http://faucet.testnet-archimedes.linera.net:40080',
-  // blobGatewayUrl: 'http://210.209.69.38:9081',
-  blobGatewayUrl: 'http://testnet-archimedes.blobgateway.com:9081',
-  rpcSchema: HTTPSchema.HTTP,
-  wsSchema: WSSchema.WS,
-  // host: '210.209.69.38',
-  host: 'rpc.testnet-archimedes.respeer.ai',
-  port: 30080,
-  path: '',
+  faucetUrl: 'https://faucet.testnet-archimedes.linera.net',
+  // faucetUrl: 'http://faucet.testnet-archimedes.linera.net:40080',
+  blobGatewayUrl: 'https://blobgateway.hk-testnet.blobgateway.com',
+  // blobGatewayUrl: 'http://testnet-archimedes.blobgateway.com:9081',
+  rpcSchema: HTTPSchema.HTTPS,
+  wsSchema: WSSchema.WSS,
+  host: 'node-service.hk-testnet.linerameme.fun',
+  // host: 'rpc.testnet-archimedes.respeer.ai',
+  port: 443,
+  path: '/rpc',
   selected: true,
   preset: true
 } as Network
 
-export const rpcUrl = (network: Network) => {
+export const rpcUrl = (network: Network, ignoreEnv?: boolean) => {
   if (
     !network.rpcSchema?.length ||
     !network.host?.length ||
     network.port === undefined
   )
     return ''
-  return `${network.rpcSchema}://${network.host}:${network.port}${
-    network.path?.length > 1 ? '/' + network.path : ''
+  const httpBaseUrl = (process.env.DEV && !ignoreEnv)
+    ? ''
+    : `${network.rpcSchema}://${network.host}:${network.port}`
+  return `${httpBaseUrl}${
+    network.path?.length > 1 ? network.path : ''
   }`
 }
 
@@ -149,9 +152,7 @@ export const wsUrl = (network: Network) => {
     network.port === undefined
   )
     return ''
-  return `${network.wsSchema}://${network.host}:${network.port}${
-    network.path?.length > 1 ? '/ws/' + network.path : '/ws'
-  }`
+  return `${network.wsSchema}://${network.host}:${network.port}/ws`
 }
 
 export interface DeviceFingerPrint {
@@ -311,21 +312,21 @@ export interface NamedApplication {
 }
 
 const defaultSwapAppId =
-  '0c9e557b2c282e737ab631de4a88764b38c2f604f6b80df1fa0cbaecec239e06876cc69c3196313037c9cd54c232ab80ca62c5e89018650840323a7f00fa4fc50aac8235c4f40075afb4b76df9883ce1a743b600ae765fedc0264bdd149cdc1d050000000000000000000000'
+  'ca30b7409bfa4a373c2597ca63568ce698679c53ddeef9cc033aba955d2823b5f332095b5e2bb1757c03fd11fa58e930c7f6e28cc5cea0309f21db1dca210a22962a32f98ab686e2e6caa5b1cb343761e8d0928410a2bd427afcbb4e9a06d5a9060000000000000000000000'
 const defaultSwapCreatorChain =
-  '0aac8235c4f40075afb4b76df9883ce1a743b600ae765fedc0264bdd149cdc1d'
+  '962a32f98ab686e2e6caa5b1cb343761e8d0928410a2bd427afcbb4e9a06d5a9'
 const defaultWLineraAppId =
-  'd9c33b013ffcdc4c259d7bf10a28ceccfc842f80267f77d1c248f2ebd34f03f2f59f2a99e8938b304bb64fecc1f26389163606d21f50b28ec94b127dfee748779d75ad0766c7d5fee02c8a84700411828eb56cc27e0018fbab8916e9d836a827050000000000000000000000'
+  '716c598da8db64bd276d6efbae5c67842c9caf16eade6587d51b0ff001e4a7b407b5e65376146b60763dfc1776a4353e15e3333f7ba53ccc88756f2b0d6308d29ab0c2036a048e4f1132a776a2fdfb1fa37345e15601f95229e559463d91aa31060000000000000000000000'
 const defaultWLineraCreatorChain =
-  '9d75ad0766c7d5fee02c8a84700411828eb56cc27e0018fbab8916e9d836a827'
+  '9ab0c2036a048e4f1132a776a2fdfb1fa37345e15601f95229e559463d91aa31'
 const defaultAMSAppId =
-  '19da788bdf56d68baf06719ade3262271ba4ce692609a81d75d44d87a1cb8d34d1359d2d50b146407a36eb8c3f7226a065b26aa905ba12bd72855e2f6d9761d81cab8114d56a7388ce39e42a08ccfb8a6198d109b63cdc23cf20815a6df89ef2010000000000000000000000'
+  '61afe169cf65c3798ebe9f968f0317bfb37a1087a131efa180308ba3d82e8ba53f73938f84203fb4f8cbc8f0a0eab6101872be430b536c756d5bfa7855d2a868a680686fd185b5bf96f9b8515523b05d1ed92010dc617a21fa9ecdaa7b63b53f030000000000000000000000'
 const defaultAMSCreatorChain =
-  '1cab8114d56a7388ce39e42a08ccfb8a6198d109b63cdc23cf20815a6df89ef2'
+  'a680686fd185b5bf96f9b8515523b05d1ed92010dc617a21fa9ecdaa7b63b53f'
 const defaultBlobGatewayAppId =
-  '18121c59938cd567f9dff016e39331ede2cc8fc1516160b0f16267ba7801b4a75a2c73580d6839233c4ab9fb875ceeb0ecfe205d5c866b86bf5378901806d82801745e6b1b2335e6fea9034392768a0647642c9959ee95ad70fbb17f49ba10320d0000000000000000000000'
+  '1bb9526a4624c2c29623e5cb699cf52315f77337055de65349b8116e212828db7103993ccfcf753b78737131616f7aac2d001b26de2da03374ddbba0aeca0548a2acd39056bf5a5591e5f7ecc1869f8b998eeb32ca89f98d871f135375a50d110f0000000000000000000000'
 const defaultBlobGatewayCreatorChain =
-  '01745e6b1b2335e6fea9034392768a0647642c9959ee95ad70fbb17f49ba1032'
+  'a2acd39056bf5a5591e5f7ecc1869f8b998eeb32ca89f98d871f135375a50d11'
 
 export const defaultNamedApplications = [
   {

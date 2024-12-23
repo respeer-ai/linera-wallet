@@ -20,7 +20,7 @@ export class ExecutedBlock {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return Promise.reject('Invalid network')
 
-    const applicationUrl = `http://${network?.host}:${network?.port}`
+    const applicationUrl = process.env.DEV ? network?.path : `http://${network?.host}:${network?.port}`
     return new Promise((resolve, reject) => {
       axios
         .post(

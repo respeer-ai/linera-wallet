@@ -17,7 +17,7 @@ export class BlockMaterial {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return Promise.reject('Invalid network')
 
-    const rpcUrl = `http://${network?.host}:${network?.port}`
+    const rpcUrl = process.env.DEV ? network?.path : `http://${network?.host}:${network?.port}`
     return new Promise((resolve, reject) => {
       axios
         .post(

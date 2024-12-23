@@ -128,6 +128,24 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
+      proxy: {
+        '/rpc': {
+          target: 'https://node-service.hk-testnet.linerameme.fun',
+          pathRewrite: {
+            '^/rpc': '/rpc'
+          },
+          secure: false,
+          changeOrigin: true
+        },
+        '/api/blobs': {
+          target: 'https://blobgateway.hk-testnet.blobgateway.com',
+          pathRewrite: {
+            '^/api/blobs': '/api/blobs'
+          },
+          secure: false,
+          changeOrigin: true
+        }
+      },
       server: {
         type: 'http'
       },

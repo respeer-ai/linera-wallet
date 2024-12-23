@@ -95,12 +95,12 @@ export class Token {
       ? network.blobGatewayUrl.slice(0, network.blobGatewayUrl.length - 1)
       : network.blobGatewayUrl
     return (
-      blobGatewayUrl +
-      '/chains/' +
+      (process.env.DEV ? '' : blobGatewayUrl) +
+      '/api/blobs/chains/' +
       creationChain +
       '/applications/' +
       namedApplication.applicationId +
-      '/image/' +
+      '/images/' +
       token.logo
     )
   }
