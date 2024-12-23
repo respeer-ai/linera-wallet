@@ -99,7 +99,7 @@ export const getRpcEndpoint = async () => {
   ) as db.Network
   if (!network) return ''
   return (
-    network.rpcSchema + '://' + network.host + ':' + network.port.toString()
+    network.rpcSchema + '://' + network.host + ':' + network.port.toString() + (network.path.length ? network.path : '')
   )
 }
 

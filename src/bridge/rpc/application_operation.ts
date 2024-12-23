@@ -114,8 +114,8 @@ export class ApplicationOperation {
     variables.checko_query_only = true
 
     const applicationUrl = process.env.DEV
-      ? `/rpc/chains/${chainId}/applications/${applicationId}`
-      : `http://${network?.host}:${network?.port}/rpc/chains/${chainId}/applications/${applicationId}`
+      ? `${network.path?.length ? network.path : ''}/chains/${chainId}/applications/${applicationId}`
+      : `${network?.rpcSchema}://${network?.host}:${network?.port}${network.path?.length ? network.path : ''}/chains/${chainId}/applications/${applicationId}`
     return new Promise((resolve, reject) => {
       axios
         .post(applicationUrl, {
