@@ -41,7 +41,16 @@ export async function getClientOptionsWithEndpointType(
     useAppHost = false
   }
 
-  return getClientOptions(schema, wsSchema, host, port, path, chainId, applicationId, useAppHost)
+  return getClientOptions(
+    schema,
+    wsSchema,
+    host,
+    port,
+    path,
+    chainId,
+    applicationId,
+    useAppHost
+  )
 }
 
 export /* async */ function getClientOptions(
@@ -60,11 +69,7 @@ export /* async */ function getClientOptions(
   const path1 = path || ''
   const wsSchema1 = wsSchema || 'ws'
 
-  const httpBaseUrl = schema1 +
-    '://' +
-    host1 +
-    ':' +
-    port1
+  const httpBaseUrl = schema1 + '://' + host1 + ':' + port1
   const httpApiBaseUrl =
     (!useAppHost ? httpBaseUrl : process.env.DEV ? '' : httpBaseUrl) +
     path1 +

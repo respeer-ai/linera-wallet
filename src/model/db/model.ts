@@ -137,12 +137,11 @@ export const rpcUrl = (network: Network, ignoreEnv?: boolean) => {
     network.port === undefined
   )
     return ''
-  const httpBaseUrl = (process.env.DEV && !ignoreEnv)
-    ? ''
-    : `${network.rpcSchema}://${network.host}:${network.port}`
-  return `${httpBaseUrl}${
-    network.path?.length > 1 ? network.path : ''
-  }`
+  const httpBaseUrl =
+    process.env.DEV && !ignoreEnv
+      ? ''
+      : `${network.rpcSchema}://${network.host}:${network.port}`
+  return `${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`
 }
 
 export const wsUrl = (network: Network) => {
