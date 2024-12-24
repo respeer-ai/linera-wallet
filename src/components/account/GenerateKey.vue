@@ -18,7 +18,7 @@ const password = toRef(props, 'password')
 
 const createAccount = () => {
   if (!password.value?.length) return
-  lineraWasm.generate_key_pair(password.value).then((val) => {
+  lineraWasm.generate_key_pair('').then((val) => {
     const keyObj = JSON.parse(val) as Record<string, string>
     const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(keyObj.secret_key)))
 

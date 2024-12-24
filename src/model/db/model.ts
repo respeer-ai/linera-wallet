@@ -118,11 +118,11 @@ export const defaultNetwork = {
   name: 'Linera Testnet Archimedes ResPeer RPC',
   faucetUrl: 'https://faucet.testnet-archimedes.linera.net',
   // faucetUrl: 'http://faucet.testnet-archimedes.linera.net:40080',
-  blobGatewayUrl: 'https://hk.testnet-archimedes.blobgateway.com',
+  blobGatewayUrl: 'https://testnet-archimedes.blobgateway.com',
   // blobGatewayUrl: 'http://testnet-archimedes.blobgateway.com:9081',
   rpcSchema: HTTPSchema.HTTPS,
   wsSchema: WSSchema.WSS,
-  host: 'hk.testnet-archimedes.respeer.ai',
+  host: 'testnet-archimedes.respeer.ai',
   // host: 'rpc.testnet-archimedes.respeer.ai',
   port: 443,
   path: '/rpc',
@@ -312,21 +312,21 @@ export interface NamedApplication {
 }
 
 const defaultSwapAppId =
-  'ca30b7409bfa4a373c2597ca63568ce698679c53ddeef9cc033aba955d2823b5f332095b5e2bb1757c03fd11fa58e930c7f6e28cc5cea0309f21db1dca210a22962a32f98ab686e2e6caa5b1cb343761e8d0928410a2bd427afcbb4e9a06d5a9060000000000000000000000'
+  'ca30b7409bfa4a373c2597ca63568ce698679c53ddeef9cc033aba955d2823b5f332095b5e2bb1757c03fd11fa58e930c7f6e28cc5cea0309f21db1dca210a222acc5e06468eb9d1de8f9234815e42e548e94f80c094b737427160ccd8c5facd060000000000000000000000'
 const defaultSwapCreatorChain =
-  '962a32f98ab686e2e6caa5b1cb343761e8d0928410a2bd427afcbb4e9a06d5a9'
+  '2acc5e06468eb9d1de8f9234815e42e548e94f80c094b737427160ccd8c5facd'
 const defaultWLineraAppId =
-  '716c598da8db64bd276d6efbae5c67842c9caf16eade6587d51b0ff001e4a7b407b5e65376146b60763dfc1776a4353e15e3333f7ba53ccc88756f2b0d6308d29ab0c2036a048e4f1132a776a2fdfb1fa37345e15601f95229e559463d91aa31060000000000000000000000'
+  '716c598da8db64bd276d6efbae5c67842c9caf16eade6587d51b0ff001e4a7b407b5e65376146b60763dfc1776a4353e15e3333f7ba53ccc88756f2b0d6308d28058da81e9c23e69faec667c6711db3871ca445ca9e3ffd4cdc5a160a67b5d92060000000000000000000000'
 const defaultWLineraCreatorChain =
-  '9ab0c2036a048e4f1132a776a2fdfb1fa37345e15601f95229e559463d91aa31'
+  '8058da81e9c23e69faec667c6711db3871ca445ca9e3ffd4cdc5a160a67b5d92'
 const defaultAMSAppId =
-  '61afe169cf65c3798ebe9f968f0317bfb37a1087a131efa180308ba3d82e8ba53f73938f84203fb4f8cbc8f0a0eab6101872be430b536c756d5bfa7855d2a868a680686fd185b5bf96f9b8515523b05d1ed92010dc617a21fa9ecdaa7b63b53f030000000000000000000000'
+  '61afe169cf65c3798ebe9f968f0317bfb37a1087a131efa180308ba3d82e8ba53f73938f84203fb4f8cbc8f0a0eab6101872be430b536c756d5bfa7855d2a868dd595b39eab6263d40abd9ec883ec547b8a2962eb8fb6848f2a6be479fa7e918030000000000000000000000'
 const defaultAMSCreatorChain =
-  'a680686fd185b5bf96f9b8515523b05d1ed92010dc617a21fa9ecdaa7b63b53f'
+  'dd595b39eab6263d40abd9ec883ec547b8a2962eb8fb6848f2a6be479fa7e918'
 const defaultBlobGatewayAppId =
-  '1bb9526a4624c2c29623e5cb699cf52315f77337055de65349b8116e212828db7103993ccfcf753b78737131616f7aac2d001b26de2da03374ddbba0aeca0548a2acd39056bf5a5591e5f7ecc1869f8b998eeb32ca89f98d871f135375a50d110f0000000000000000000000'
+  '1bb9526a4624c2c29623e5cb699cf52315f77337055de65349b8116e212828db7103993ccfcf753b78737131616f7aac2d001b26de2da03374ddbba0aeca0548088f922c7178abb39627756ac4001e5c7a99b45eed1db3a1741a73798f04d7970f0000000000000000000000'
 const defaultBlobGatewayCreatorChain =
-  'a2acd39056bf5a5591e5f7ecc1869f8b998eeb32ca89f98d871f135375a50d11'
+  '088f922c7178abb39627756ac4001e5c7a99b45eed1db3a1741a73798f04d797'
 
 export const defaultNamedApplications = [
   {

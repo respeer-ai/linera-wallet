@@ -130,7 +130,7 @@ module.exports = configure(function (ctx) {
     devServer: {
       proxy: {
         '/rpc': {
-          target: 'https://hk.testnet-archimedes.respeer.ai',
+          target: 'https://testnet-archimedes.respeer.ai',
           pathRewrite: {
             '^/rpc': '/rpc'
           },
@@ -138,7 +138,7 @@ module.exports = configure(function (ctx) {
           changeOrigin: true
         },
         '/api/blobs': {
-          target: 'https://hk.testnet-archimedes.blobgateway.com',
+          target: 'https://testnet-archimedes.blobgateway.com',
           pathRewrite: {
             '^/api/blobs': '/api/blobs'
           },
