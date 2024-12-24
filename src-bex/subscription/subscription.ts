@@ -54,12 +54,14 @@ export class Subscription {
 
   public static handle(data: unknown) {
     Subscription.instance.#subscribers.forEach((subscriber, subscriptionId) => {
-      try {
-        // TODO: here we should filter topics
-        void subscriber.handler(subscriptionId, data)
-      } catch (e) {
-        console.log('Failed process data', e)
-      }
+      subscriber
+        .handler(subscriptionId, data)
+        .then(() => {
+          // DO NOTHING
+        })
+        .catch((e) => {
+          console.log('Failed handle subscription', e, data)
+        })
     })
   }
 }

@@ -19,7 +19,9 @@ export class BlockMaterial {
 
     const rpcUrl = process.env.DEV
       ? network?.path
-      : `${network?.rpcSchema}://${network?.host}:${network?.port}${network?.path.length ? network?.path : ''}`
+      : `${network?.rpcSchema}://${network?.host}:${network?.port}${
+          network?.path.length ? network?.path : ''
+        }`
     return new Promise((resolve, reject) => {
       axios
         .post(
