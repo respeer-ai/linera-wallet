@@ -1,6 +1,6 @@
 {
   "name": "linera-checko-wallet",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "Another wallet client for Linera blockchain",
   "productName": "CheCko Wallet",
   "author": "respeer.ai <kikakkz@hotmail.com>",

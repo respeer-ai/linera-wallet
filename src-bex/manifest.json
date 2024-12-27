@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CheCko Wallet",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "icons": {
     "16": "icons/favicon.png",
     "48": "icons/favicon.png",

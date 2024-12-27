@@ -189,7 +189,7 @@ export default {
   MSG_SELECT_A_TOKEN: 'Select a token',
   MSG_DEDICATED_LINERA_MICROCHAIN_WALLET: 'Dedicated Linera microchain wallet.',
   MSG_VERSION: 'Version',
-  MSG_VERSION_NUMBER: 'v0.0.1',
+  MSG_VERSION_NUMBER: 'v0.0.4',
   MSG_BUILT_BY: 'Build by',
   MSG_SUPPORT: 'Support',
   MSG_EXPORT_ACCOUNT: 'Export account',
