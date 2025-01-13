@@ -11,6 +11,7 @@ arguments to these functions cannot be trusted and _must_ be verified!
 */
 use std::str::FromStr;
 
+use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
     crypto::{CryptoHash, KeyPair, PublicKey},
     data_types::{BlockHeight, OracleResponse, Round, Timestamp},
@@ -19,8 +20,7 @@ use linera_base::{
 use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
-use spec::{erc20::{ERC20Operation, ERC20Message}};
-use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
+use spec::erc20::{ERC20Message, ERC20Operation};
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -189,19 +189,24 @@ pub async fn application_creation_chain_id(application_id: &str) -> Result<Strin
 }
 
 #[wasm_bindgen]
-pub async fn executed_block_payload(block: &str, round: &str, oracle_responses: &str) -> Result<String, JsError> {
+pub async fn executed_block_payload(
+    block: &str,
+    round: &str,
+    oracle_responses: &str,
+) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(block);
     let block: Block = serde_path_to_error::deserialize(deserializer)?;
 
     let round: Round = serde_json::from_str(round)?;
-    let oracle_responses: Option<Vec<Vec<OracleResponse>>> = match serde_json::from_str(oracle_responses) {
-        Ok(responses) => Some(responses),
-        Err(_) => None,
-    };
+    let oracle_responses: Option<Vec<Vec<OracleResponse>>> =
+        match serde_json::from_str(oracle_responses) {
+            Ok(responses) => Some(responses),
+            Err(_) => None,
+        };
     let content = ProposalContent {
         block,
         round,
-        forced_oracle_responses: oracle_responses
+        forced_oracle_responses: oracle_responses,
     };
     let mut message = Vec::new();
     content.write(&mut message);
@@ -303,7 +308,10 @@ pub async fn bcs_deserialize_erc20_message(bytes_str: &str) -> Result<String, Js
 }
 
 #[wasm_bindgen]
-pub async fn graphql_deserialize_operation(query: &str, variables: &str) -> Result<String, JsError> {
+pub async fn graphql_deserialize_operation(
+    query: &str,
+    variables: &str,
+) -> Result<String, JsError> {
     let request = parse_query_string(&format!("query={}&variables={}", query, variables))?;
     let schema = Schema::new(QueryRoot, MutationRoot, EmptySubscription);
     let value = schema.execute(request).await.into_result().unwrap().data;

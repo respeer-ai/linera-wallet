@@ -1,7 +1,10 @@
 use std::str::FromStr;
 
-use async_graphql::{Object, Error};
-use linera_base::{data_types::Amount, identifiers::{ApplicationId, BytecodeId, ChainId, Owner, UserApplicationId}};
+use async_graphql::{Error, Object};
+use linera_base::{
+    data_types::Amount,
+    identifiers::{ApplicationId, BytecodeId, ChainId, Owner, UserApplicationId},
+};
 use linera_execution::{system::Recipient, Operation, SystemOperation};
 
 pub struct QueryRoot;
@@ -28,7 +31,11 @@ impl MutationRoot {
         recipient: Recipient,
         amount: Amount,
     ) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::Transfer { owner, recipient, amount }))
+        Ok(Operation::System(SystemOperation::Transfer {
+            owner,
+            recipient,
+            amount,
+        }))
     }
 
     async fn request_application(
@@ -37,7 +44,10 @@ impl MutationRoot {
         application_id: ApplicationId,
         target_chain_id: ChainId,
     ) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::RequestApplication { chain_id: target_chain_id, application_id }))
+        Ok(Operation::System(SystemOperation::RequestApplication {
+            chain_id: target_chain_id,
+            application_id,
+        }))
     }
 
     async fn create_application(
@@ -55,6 +65,11 @@ impl MutationRoot {
             .map(|s| UserApplicationId::from_str(s.as_str()))
             .filter_map(Result::ok)
             .collect();
-        Ok(Operation::System(SystemOperation::CreateApplication { bytecode_id, parameters: create_parameters, instantiation_argument: create_instantiation_argument, required_application_ids: create_required_application_ids }))
+        Ok(Operation::System(SystemOperation::CreateApplication {
+            bytecode_id,
+            parameters: create_parameters,
+            instantiation_argument: create_instantiation_argument,
+            required_application_ids: create_required_application_ids,
+        }))
     }
 }
