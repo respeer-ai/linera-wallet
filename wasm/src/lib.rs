@@ -104,6 +104,8 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     long_lived_services: false,
 
     tokio_threads: Some(1),
+
+    blob_download_timeout: std::time::Duration::from_millis(1000),
 };
 
 #[cfg(not(feature = "no-storage"))]
