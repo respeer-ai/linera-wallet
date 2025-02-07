@@ -96,7 +96,7 @@ export type ERC20Token = {
   totalSupply: string
   tokenMetadata: {
     discord: string
-    logoStoreType: string
+    logo_store_type: string
     logo: string
     telegram: string
     twitter: string

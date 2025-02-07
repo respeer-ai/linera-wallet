@@ -117,7 +117,7 @@ export class ERC20ApplicationOperation {
           totalSupply: Number(token.totalSupply),
           ticker: token.symbol,
           tokenType: db.TokenType.Fungible,
-          logoStoreType: token.tokenMetadata.logoStoreType as db.StoreType,
+          logoStoreType: token.tokenMetadata.logo_store_type as db.StoreType,
           logo: token.tokenMetadata.logo,
           applicationId,
           native: false,
