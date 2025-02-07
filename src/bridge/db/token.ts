@@ -96,10 +96,13 @@ export class Token {
       : network.blobGatewayUrl
     return (
       (process.env.DEV ? '' : blobGatewayUrl) +
-      `/api/${token.logoStoreType === db.StoreType.S3 ? 'file' : 'blobs'}/chains/` +
-      creationChain +
-      '/applications/' +
-      namedApplication.applicationId +
+      '/api' +
+      (token.logoStoreType === db.StoreType.S3
+        ? '/file/v1'
+        : '/blobs/chains/' +
+          creationChain +
+          '/applications/' +
+          namedApplication.applicationId) +
       '/images/' +
       token.logo
     )

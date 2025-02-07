@@ -213,7 +213,7 @@ export interface Token {
   totalSupply: number
   ticker: string
   tokenType: TokenType
-  logoStoreType?: StoreType,
+  logoStoreType?: StoreType
   logo: string
   applicationId?: string
   native: boolean
