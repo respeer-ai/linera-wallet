@@ -200,6 +200,12 @@ export enum TokenType {
   Native = 'Native'
 }
 
+export enum StoreType {
+  S3 = 'S3',
+  Blob = 'Blob',
+  Ipfs = 'Ipfs'
+}
+
 export interface Token {
   id?: number
   name: string
@@ -207,6 +213,7 @@ export interface Token {
   totalSupply: number
   ticker: string
   tokenType: TokenType
+  logoStoreType?: StoreType,
   logo: string
   applicationId?: string
   native: boolean
