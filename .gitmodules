@@ -1,7 +1,8 @@
 [submodule "wasm/linera-protocol"]
 	path = wasm/linera-protocol
 	url = https://github.com/respeer-ai/linera-protocol.git
-	branch = respeer-maas-testnet_archimedes-5fcbc190-2024_12_06
+	branch = respeer-maas-7b3ae0b6-2025_03_15
+# TODO: replace with linera-meme
 [submodule "wasm/linera-dapps"]
 	path = wasm/linera-dapps
 	url = https://github.com/linera-hacker/linera-dapps.git

@@ -13,11 +13,11 @@ use std::str::FromStr;
 
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
-    crypto::{CryptoHash, KeyPair, PublicKey},
+    crypto::{CryptoHash, AccountSecretKey, AccountPublicKey},
     data_types::{BlockHeight, OracleResponse, Round, Timestamp},
-    identifiers::{ApplicationId, ChainId},
+    identifiers::ChainId,
 };
-use linera_chain::data_types::{Block, IncomingBundle, ProposalContent};
+use linera_chain::data_types::{BlockExecutionOutcome, IncomingBundle, ProposalContent, ProposedBlock};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
 use spec::erc20::{ERC20Message, ERC20Operation};
@@ -40,11 +40,9 @@ type WebStorage =
     linera_storage::DbStorage<linera_views::memory::MemoryStore, linera_storage::WallClock>;
 
 pub async fn get_storage() -> Result<WebStorage, JsError> {
-    let root_key = &[];
-    Ok(linera_storage::DbStorage::new(
+    Ok(linera_storage::DbStorage::initialize(
         linera_views::memory::MemoryStoreConfig::new(1),
         "linera",
-        root_key,
         None,
     )
     .await?)
@@ -62,50 +60,31 @@ type SignClientContext = linera_client::client_context::ClientContext<WebStorage
 
 // TODO get from config
 pub const OPTIONS: ClientOptions = ClientOptions {
-    wallet_state_path: None,
-    storage_config: None,
-    with_wallet: None,
-
-    // Timeout for sending queries (milliseconds)
     send_timeout: std::time::Duration::from_millis(4000),
     recv_timeout: std::time::Duration::from_millis(4000),
     max_pending_message_bundles: 10,
-
-    // The WebAssembly runtime to use.
-    wasm_runtime: None,
-
-    // The maximal number of simultaneous queries to the database
+    wasm_runtime: Some(linera_execution::WasmRuntime::Wasmer),
     max_concurrent_queries: None,
-
-    // The maximal number of simultaneous stream queries to the database
+    max_loaded_chains: nonzero_lit::usize!(40),
     max_stream_queries: 10,
-
-    // The maximal number of entries in the storage cache.
     cache_size: 1000,
-
-    // Delay increment for retrying to connect to a validator for notifications.
     retry_delay: std::time::Duration::from_millis(1000),
-
-    // Number of times to retry connecting to a validator for notifications.
     max_retries: 10,
-
-    // Whether to wait until a quorum of validators has confirmed that all sent cross-chain
-    // messages have been delivered.
     wait_for_outgoing_messages: false,
-
-    // The policy for handling incoming messages.
     blanket_message_policy: linera_core::client::BlanketMessagePolicy::Accept,
-
-    // A dummy command, for now
-    command: linera_client::client_options::ClientCommand::Keygen,
-
     restrict_chain_ids_to: None,
-
     long_lived_services: false,
-
-    tokio_threads: Some(1),
-
     blob_download_timeout: std::time::Duration::from_millis(1000),
+    grace_period: linera_core::DEFAULT_GRACE_PERIOD,
+
+    // TODO(linera-protocol#2944): separate these out from the
+    // `ClientOptions` struct, since they apply only to the CLI/native
+    // client
+    tokio_threads: Some(1),
+    command: linera_client::client_options::ClientCommand::Keygen,
+    wallet_state_path: None,
+    storage_config: None,
+    with_wallet: None
 };
 
 #[cfg(not(feature = "no-storage"))]
@@ -185,30 +164,24 @@ pub async fn dapp_query(n: u32) -> u32 {
 }
 
 #[wasm_bindgen]
-pub async fn application_creation_chain_id(application_id: &str) -> Result<String, JsError> {
-    let application_id: ApplicationId = ApplicationId::from_str(application_id)?;
-    Ok(application_id.creation.chain_id.to_string())
-}
-
-#[wasm_bindgen]
 pub async fn executed_block_payload(
     block: &str,
     round: &str,
-    oracle_responses: &str,
+    outcome: &str,
 ) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(block);
-    let block: Block = serde_path_to_error::deserialize(deserializer)?;
+    let block: ProposedBlock = serde_path_to_error::deserialize(deserializer)?;
 
     let round: Round = serde_json::from_str(round)?;
-    let oracle_responses: Option<Vec<Vec<OracleResponse>>> =
-        match serde_json::from_str(oracle_responses) {
-            Ok(responses) => Some(responses),
+    let outcome: Option<BlockExecutionOutcome> =
+        match serde_json::from_str(outcome) {
+            Ok(outcome) => Some(outcome),
             Err(_) => None,
         };
     let content = ProposalContent {
         block,
         round,
-        forced_oracle_responses: oracle_responses,
+        outcome,
     };
     let mut message = Vec::new();
     content.write(&mut message);
@@ -232,7 +205,7 @@ pub async fn construct_block(
     let operations: Vec<Operation> = serde_json::from_str(operations)?;
     let incoming_bundles: Vec<IncomingBundle> = serde_json::from_str(incoming_bundles)?;
     let client_context: SignClientContext = get_fake_client_context().await?;
-    let key_pair = KeyPair::from_public_key(PublicKey::from_str(public_key)?);
+    let key_pair = AccountSecretKey::from_public_key(AccountPublicKey::from_str(public_key)?);
     let admin_id: ChainId = ChainId::from_str(admin_id)?;
     let block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(block_hash)?);
 
@@ -246,7 +219,7 @@ pub async fn construct_block(
     )?;
 
     let executed_block = chain_client
-        .execute_block_with_full_materials(
+        .simulate_execute_block(
             operations.clone(),
             incoming_bundles,
             Timestamp::from(local_time),
@@ -287,7 +260,7 @@ pub async fn generate_key_pair_from_mnemonic(
     let mut _seed = [0u8; 32];
     _seed.copy_from_slice(&seed[0..32]);
     let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
-    let key_pair = KeyPair::generate_from(&mut rng);
+    let key_pair = AccountSecretKey::generate_from(&mut rng);
     let key_str = format!("{}", serde_json::to_string(&key_pair)?);
     let key_str = key_str.replace("\"", "");
     Ok(key_str[..64].to_string())

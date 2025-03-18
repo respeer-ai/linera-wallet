@@ -3,7 +3,7 @@ use std::str::FromStr;
 use async_graphql::{Error, Object};
 use linera_base::{
     data_types::Amount,
-    identifiers::{ApplicationId, BytecodeId, ChainId, Owner, UserApplicationId},
+    identifiers::{ModuleId, ChainId, Owner, UserApplicationId},
 };
 use linera_execution::{system::Recipient, Operation, SystemOperation};
 
@@ -38,22 +38,10 @@ impl MutationRoot {
         }))
     }
 
-    async fn request_application(
-        &self,
-        _chain_id: ChainId,
-        application_id: ApplicationId,
-        target_chain_id: ChainId,
-    ) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::RequestApplication {
-            chain_id: target_chain_id,
-            application_id,
-        }))
-    }
-
     async fn create_application(
         &self,
         _chain_id: ChainId,
-        bytecode_id: BytecodeId,
+        module_id: ModuleId,
         parameters: String,
         instantiation_argument: String,
         required_application_ids: Vec<String>,
@@ -66,7 +54,7 @@ impl MutationRoot {
             .filter_map(Result::ok)
             .collect();
         Ok(Operation::System(SystemOperation::CreateApplication {
-            bytecode_id,
+            module_id,
             parameters: create_parameters,
             instantiation_argument: create_instantiation_argument,
             required_application_ids: create_required_application_ids,
