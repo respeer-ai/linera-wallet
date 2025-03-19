@@ -14,13 +14,13 @@ use std::str::FromStr;
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
     crypto::{CryptoHash, AccountSecretKey, AccountPublicKey},
-    data_types::{BlockHeight, OracleResponse, Round, Timestamp},
+    data_types::{BlockHeight, Round, Timestamp},
     identifiers::ChainId,
 };
 use linera_chain::data_types::{BlockExecutionOutcome, IncomingBundle, ProposalContent, ProposedBlock};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
-use spec::erc20::{ERC20Message, ERC20Operation};
+use abi::meme::{MemeMessage, MemeOperation};
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -149,21 +149,6 @@ pub async fn dapp_query_validators() -> Result<(), JsError> {
 }
 
 #[wasm_bindgen]
-pub async fn set_wallet(wallet: &str) -> Result<(), wasm_bindgen::JsError> {
-    #[cfg(not(feature = "no-storage"))]
-    linera_client::config::WalletState::create_from_local_storage(
-        "linera-wallet",
-        serde_json::from_str(wallet)?,
-    )?;
-    Ok(())
-}
-
-#[wasm_bindgen]
-pub async fn dapp_query(n: u32) -> u32 {
-    n + 1
-}
-
-#[wasm_bindgen]
 pub async fn executed_block_payload(
     block: &str,
     round: &str,
@@ -267,17 +252,17 @@ pub async fn generate_key_pair_from_mnemonic(
 }
 
 #[wasm_bindgen]
-pub async fn bcs_deserialize_erc20_operation(bytes_str: &str) -> Result<String, JsError> {
+pub async fn bcs_deserialize_meme_operation(bytes_str: &str) -> Result<String, JsError> {
     let bytes: Vec<u8> = serde_json::from_str(bytes_str)?;
-    let operation: ERC20Operation = bcs::from_bytes(&bytes)?;
+    let operation: MemeOperation = bcs::from_bytes(&bytes)?;
     let operation_str = serde_json::to_string(&operation)?;
     Ok(operation_str)
 }
 
 #[wasm_bindgen]
-pub async fn bcs_deserialize_erc20_message(bytes_str: &str) -> Result<String, JsError> {
+pub async fn bcs_deserialize_meme_message(bytes_str: &str) -> Result<String, JsError> {
     let bytes: Vec<u8> = serde_json::from_str(bytes_str)?;
-    let message: ERC20Message = bcs::from_bytes(&bytes)?;
+    let message: MemeMessage = bcs::from_bytes(&bytes)?;
     let message_str = serde_json::to_string(&message)?;
     Ok(message_str)
 }
