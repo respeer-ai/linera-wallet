@@ -13,8 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  mutation openChain($publicKey: PublicKey!) {\n    claim(publicKey: $publicKey) {\n      messageId\n      chainId\n      certificateHash\n    }\n  }\n": types.OpenChainDocument,
-    "\n  query networkInfo {\n    genesisConfig\n    version {\n      crateVersion\n      gitCommit\n      gitDirty\n      rpcHash\n      graphqlHash\n      witHash\n    }\n    currentValidators {\n      name\n      networkAddress\n    }\n  }\n": types.NetworkInfoDocument,
+    "\n  mutation openChain($owner: Owner!) {\n    claim(owner: $owner) {\n      messageId\n      chainId\n      certificateHash\n    }\n  }\n": types.OpenChainDocument,
+    "\n  query networkInfo {\n    genesisConfig\n    version\n    currentValidators {\n      publicKey\n      networkAddress\n    }\n  }\n": types.NetworkInfoDocument,
 };
 
 /**
@@ -34,11 +34,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation openChain($publicKey: PublicKey!) {\n    claim(publicKey: $publicKey) {\n      messageId\n      chainId\n      certificateHash\n    }\n  }\n"): (typeof documents)["\n  mutation openChain($publicKey: PublicKey!) {\n    claim(publicKey: $publicKey) {\n      messageId\n      chainId\n      certificateHash\n    }\n  }\n"];
+export function graphql(source: "\n  mutation openChain($owner: Owner!) {\n    claim(owner: $owner) {\n      messageId\n      chainId\n      certificateHash\n    }\n  }\n"): (typeof documents)["\n  mutation openChain($owner: Owner!) {\n    claim(owner: $owner) {\n      messageId\n      chainId\n      certificateHash\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query networkInfo {\n    genesisConfig\n    version {\n      crateVersion\n      gitCommit\n      gitDirty\n      rpcHash\n      graphqlHash\n      witHash\n    }\n    currentValidators {\n      name\n      networkAddress\n    }\n  }\n"): (typeof documents)["\n  query networkInfo {\n    genesisConfig\n    version {\n      crateVersion\n      gitCommit\n      gitDirty\n      rpcHash\n      graphqlHash\n      witHash\n    }\n    currentValidators {\n      name\n      networkAddress\n    }\n  }\n"];
+export function graphql(source: "\n  query networkInfo {\n    genesisConfig\n    version\n    currentValidators {\n      publicKey\n      networkAddress\n    }\n  }\n"): (typeof documents)["\n  query networkInfo {\n    genesisConfig\n    version\n    currentValidators {\n      publicKey\n      networkAddress\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

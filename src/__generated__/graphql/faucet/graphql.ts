@@ -16,18 +16,17 @@ export type Scalars = {
   Float: { input: number; output: number; }
   /** The unique identifier (UID) of a chain. This is currently computed as the hash value of a ChainDescription. */
   ChainId: { input: any; output: any; }
-  /** The version of the Linera crates used in this build */
-  CrateVersion: { input: any; output: any; }
-  /** A Sha3-256 value */
+  /** A Keccak256 value */
   CryptoHash: { input: any; output: any; }
   /** A scalar that can represent any JSON value. */
   JSON: { input: any; output: any; }
   /** The index of a message in a chain */
   MessageId: { input: any; output: any; }
-  /** A signature public key */
-  PublicKey: { input: any; output: any; }
-  /** The identity of a validator */
-  ValidatorName: { input: any; output: any; }
+  /** The owner of a chain. This is currently the hash of the owner's public key used to verify signatures. */
+  Owner: { input: any; output: any; }
+  /** A secp256k1 public key value */
+  Secp256k1PublicKey: { input: any; output: any; }
+  VersionInfo: { input: any; output: any; }
 };
 
 /** The result of a successful `claim` mutation. */
@@ -49,7 +48,7 @@ export type MutationRoot = {
 
 
 export type MutationRootClaimArgs = {
-  publicKey: Scalars['PublicKey']['input'];
+  owner: Scalars['Owner']['input'];
 };
 
 export type QueryRoot = {
@@ -59,34 +58,17 @@ export type QueryRoot = {
   /** Returns the genesis config. */
   genesisConfig: Scalars['JSON']['output'];
   /** Returns the version information on this faucet service. */
-  version: VersionInfo;
+  version: Scalars['VersionInfo']['output'];
 };
 
 export type Validator = {
   __typename?: 'Validator';
-  name: Scalars['ValidatorName']['output'];
   networkAddress: Scalars['String']['output'];
-};
-
-/** The version info of a build of Linera. */
-export type VersionInfo = {
-  __typename?: 'VersionInfo';
-  /** The crate version */
-  crateVersion: Scalars['CrateVersion']['output'];
-  /** The git commit hash */
-  gitCommit: Scalars['String']['output'];
-  /** Whether the git checkout was dirty */
-  gitDirty: Scalars['Boolean']['output'];
-  /** A hash of the GraphQL API */
-  graphqlHash: Scalars['String']['output'];
-  /** A hash of the RPC API */
-  rpcHash: Scalars['String']['output'];
-  /** A hash of the WIT API */
-  witHash: Scalars['String']['output'];
+  publicKey: Scalars['Secp256k1PublicKey']['output'];
 };
 
 export type OpenChainMutationVariables = Exact<{
-  publicKey: Scalars['PublicKey']['input'];
+  owner: Scalars['Owner']['input'];
 }>;
 
 
@@ -95,8 +77,8 @@ export type OpenChainMutation = { __typename?: 'MutationRoot', claim: { __typena
 export type NetworkInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NetworkInfoQuery = { __typename?: 'QueryRoot', genesisConfig: any, version: { __typename?: 'VersionInfo', crateVersion: any, gitCommit: string, gitDirty: boolean, rpcHash: string, graphqlHash: string, witHash: string }, currentValidators: Array<{ __typename?: 'Validator', name: any, networkAddress: string }> };
+export type NetworkInfoQuery = { __typename?: 'QueryRoot', genesisConfig: any, version: any, currentValidators: Array<{ __typename?: 'Validator', publicKey: any, networkAddress: string }> };
 
 
-export const OpenChainDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"openChain"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"publicKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PublicKey"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"claim"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"publicKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"publicKey"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messageId"}},{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}}]}}]}}]} as unknown as DocumentNode<OpenChainMutation, OpenChainMutationVariables>;
-export const NetworkInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"networkInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genesisConfig"}},{"kind":"Field","name":{"kind":"Name","value":"version"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"crateVersion"}},{"kind":"Field","name":{"kind":"Name","value":"gitCommit"}},{"kind":"Field","name":{"kind":"Name","value":"gitDirty"}},{"kind":"Field","name":{"kind":"Name","value":"rpcHash"}},{"kind":"Field","name":{"kind":"Name","value":"graphqlHash"}},{"kind":"Field","name":{"kind":"Name","value":"witHash"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currentValidators"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"networkAddress"}}]}}]}}]} as unknown as DocumentNode<NetworkInfoQuery, NetworkInfoQueryVariables>;
+export const OpenChainDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"openChain"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Owner"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"claim"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messageId"}},{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}}]}}]}}]} as unknown as DocumentNode<OpenChainMutation, OpenChainMutationVariables>;
+export const NetworkInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"networkInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genesisConfig"}},{"kind":"Field","name":{"kind":"Name","value":"version"}},{"kind":"Field","name":{"kind":"Name","value":"currentValidators"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"publicKey"}},{"kind":"Field","name":{"kind":"Name","value":"networkAddress"}}]}}]}}]} as unknown as DocumentNode<NetworkInfoQuery, NetworkInfoQueryVariables>;

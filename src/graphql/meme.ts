@@ -10,19 +10,13 @@ export const TOKEN_METADATA = gql`
 `
 
 export const BALANCE_OF = gql`
-  query balanceOf($owner: ChainAccountOwner!) {
+  query balanceOf($owner: Account!) {
     balanceOf(owner: $owner)
   }
 `
 
-export const MINT = gql`
-  mutation mint($to: ChainAccountOwner, $amount: Amount!) {
-    mint(to: $to, amount: $amount)
-  }
-`
-
-export const TRANSFER_ERC20 = gql`
-  mutation transfer($to: ChainAccountOwner, $amount: Amount!) {
+export const TRANSFER = gql`
+  mutation transfer($to: Account, $amount: Amount!) {
     transfer(to: $to, amount: $amount)
   }
 `

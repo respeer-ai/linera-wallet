@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client/core'
 
 export const OPEN_CHAIN = gql`
-  mutation openChain($publicKey: PublicKey!) {
-    claim(publicKey: $publicKey) {
+  mutation openChain($owner: Owner!) {
+    claim(owner: $owner) {
       messageId
       chainId
       certificateHash
@@ -13,16 +13,9 @@ export const OPEN_CHAIN = gql`
 export const NETWORK_INFO = gql`
   query networkInfo {
     genesisConfig
-    version {
-      crateVersion
-      gitCommit
-      gitDirty
-      rpcHash
-      graphqlHash
-      witHash
-    }
+    version
     currentValidators {
-      name
+      publicKey
       networkAddress
     }
   }
