@@ -2,3 +2,6 @@
 	path = wasm/linera-protocol
 	url = https://github.com/respeer-ai/linera-protocol.git
 	branch = respeer-maas-7b3ae0b6-2025_03_15
+[submodule "wasm/linera-meme"]
+	path = wasm/linera-meme
+	url = https://github.com/respeer-ai/linera-meme.git
