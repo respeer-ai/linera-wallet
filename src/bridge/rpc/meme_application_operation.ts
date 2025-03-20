@@ -2,73 +2,18 @@ import { db, rpc } from 'src/model'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { BALANCE_OF, MINT, TOKEN_METADATA, TRANSFER_ERC20 } from 'src/graphql'
+import { BALANCE_OF, TOKEN_METADATA, TRANSFER_MEME } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
 import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
 import { ApplicationOperation } from './application_operation'
-import { MonoApplicationOperation } from './mono_application_opeartion'
-import { Operation } from './operation'
 
-export class ERC20ApplicationOperation {
-  static subscribeWLineraCreationChain = async (chainId: string) => {
-    await MonoApplicationOperation.subscribeCreationChainWithType(
-      chainId,
-      db.ApplicationType.WLINERA
-    )
-  }
-
-  static subscribeCreationChain = async (
-    chainId: string,
-    applicationId: string,
-    applicationType?: db.ApplicationType
-  ) => {
-    await MonoApplicationOperation.subscribeCreationChainWithId(
-      chainId,
-      applicationId,
-      applicationType || db.ApplicationType.ERC20
-    )
-  }
-
-  static requestApplication = async (
-    chainId: string,
-    applicationId: string,
-    applicationType?: db.ApplicationType
-  ): Promise<string | undefined> => {
-    return await Operation.requestApplication(
-      chainId,
-      applicationId,
-      applicationType || db.ApplicationType.ERC20
-    )
-  }
-
+export class MemeApplicationOperation {
   static persistApplication = async (
     chainId: string,
     applicationId: string,
     applicationType?: db.ApplicationType
   ) => {
-    const operationId = await ERC20ApplicationOperation.requestApplication(
-      chainId,
-      applicationId,
-      applicationType
-    )
-    if (operationId) {
-      if (!(await Operation.waitOperation(operationId))) {
-        return Promise.reject('Failed request application')
-      }
-    }
-
-    await ApplicationOperation.waitExistChainApplication(
-      chainId,
-      applicationId,
-      60
-    )
-
-    await ERC20ApplicationOperation.subscribeCreationChain(
-      chainId,
-      applicationId
-    )
-
     if (await dbBridge.Token.exists(applicationId)) return
 
     const options = await getClientOptionsWithEndpointType(
@@ -94,11 +39,11 @@ export class ERC20ApplicationOperation {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        const token = graphqlResult.rootData(res) as rpc.ERC20Token
+        const token = graphqlResult.rootData(res) as rpc.MemeToken
         if (!token.tokenMetadata) {
           // Add to ticker run let block subscription run it
           return setTimeout(() => {
-            ERC20ApplicationOperation.persistApplication(
+            MemeApplicationOperation.persistApplication(
               chainId,
               applicationId,
               applicationType
@@ -148,7 +93,7 @@ export class ERC20ApplicationOperation {
   ): Promise<number> => {
     const chainAccountOwner = {
       chain_id: chainId
-    } as rpc.ChainAccountOwner
+    } as rpc.Account
     if (publicKey) {
       const owner = await db.ownerFromPublicKey(publicKey)
       chainAccountOwner.owner = `User:${owner}`
@@ -187,53 +132,10 @@ export class ERC20ApplicationOperation {
     })
   }
 
-  static mint = async (
-    chainId: string,
-    applicationId: string,
-    to: rpc.ChainAccountOwner | undefined,
-    amount: number
-  ): Promise<string> => {
-    try {
-      const variables = {
-        to,
-        amount: amount.toString()
-      }
-      const queryRespBytes = await ApplicationOperation.queryApplication(
-        chainId,
-        applicationId,
-        MINT,
-        'mint',
-        variables
-      )
-
-      const operationId = uuidv4()
-
-      const operation = {
-        operationType: db.OperationType.MINT,
-        applicationType: db.ApplicationType.ERC20,
-        operationId,
-        microchain: chainId,
-        operation: JSON.stringify({
-          User: {
-            application_id: applicationId,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            bytes: queryRespBytes
-          }
-        } as rpc.Operation),
-        graphqlQuery: MINT.loc?.source?.body,
-        graphqlVariables: JSON.stringify(variables)
-      } as db.ChainOperation
-      await dbBridge.ChainOperation.create({ ...operation })
-      return operationId
-    } catch (e) {
-      return Promise.reject(e)
-    }
-  }
-
   static transfer = async (
     chainId: string,
     applicationId: string,
-    to: rpc.ChainAccountOwner | undefined,
+    to: rpc.Account | undefined,
     amount: number
   ): Promise<string> => {
     try {
@@ -244,7 +146,7 @@ export class ERC20ApplicationOperation {
       const queryRespBytes = await ApplicationOperation.queryApplication(
         chainId,
         applicationId,
-        TRANSFER_ERC20,
+        TRANSFER_MEME,
         'transfer',
         variables
       )
@@ -253,7 +155,7 @@ export class ERC20ApplicationOperation {
 
       const operation = {
         operationType: db.OperationType.MINT,
-        applicationType: db.ApplicationType.ERC20,
+        applicationType: db.ApplicationType.MEME,
         operationId,
         microchain: chainId,
         operation: JSON.stringify({
@@ -263,7 +165,7 @@ export class ERC20ApplicationOperation {
             bytes: queryRespBytes
           }
         } as rpc.Operation),
-        graphqlQuery: TRANSFER_ERC20.loc?.source?.body,
+        graphqlQuery: TRANSFER_MEME.loc?.source?.body,
         graphqlVariables: JSON.stringify(variables)
       } as db.ChainOperation
       await dbBridge.ChainOperation.create({ ...operation })

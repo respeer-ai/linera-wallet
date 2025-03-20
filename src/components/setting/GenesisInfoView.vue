@@ -24,8 +24,8 @@
       {{ $t('MSG_VALIDATORS') }}
     </div>
     <div class='vertical-items-margin text-grey-6 word-break-all'>
-      <div v-for='validator in networkInfo?.currentValidators' :key='validator.name' class='decorate-underline-dashed vertical-items-margin'>
-        <div>{{ validator.name }}</div>
+      <div v-for='validator in networkInfo?.currentValidators' :key='validator.publicKey' class='decorate-underline-dashed vertical-items-margin'>
+        <div>{{ validator.publicKey }}</div>
         <div>{{ validator.networkAddress }}</div>
         <div class='vertical-items-margin' />
       </div>

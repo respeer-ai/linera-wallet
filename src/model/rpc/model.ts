@@ -1,9 +1,12 @@
-export interface _ChainAccountBalances {
-  chain_balance: number
-  account_balances: Record<string, number>
-}
+export type Balances = Record<string, {
+  chainBalance: number
+  ownerBalances: Record<string, number>
+}>
 
-export type ChainAccountBalances = Record<string, _ChainAccountBalances>
+export type Account = {
+  chain_id: string
+  owner?: string
+}
 
 export type Round =
   | 'Fast'
@@ -17,10 +20,7 @@ export type Origin = {
 }
 
 export type Recipient = {
-  Account?: {
-    chain_id: string
-    owner?: string
-  }
+  Account?: Account
   Burn?: unknown
 }
 
@@ -90,7 +90,7 @@ export type Destination = {
   Subscribers: Uint8Array
 }
 
-export type ERC20Token = {
+export type MemeToken = {
   name: string
   symbol: string
   totalSupply: string
@@ -107,22 +107,17 @@ export type ERC20Token = {
   }
 }
 
-export type ChainAccountOwner = {
-  chain_id: string
-  owner?: string /* User:$owner or Application:$applicationId */
-}
-
-export type ERC20Operation = {
-  BaseOperation: {
-    SubscribeCreatorChain
-  }
-  Transfer: { to: ChainAccountOwner; amount: string }
-}
-
-export type ERC20Message = {
+export type MemeOperation = {
   Transfer: {
-    origin: ChainAccountOwner
-    to: ChainAccountOwner
+    to: Account,
+    amount: string
+  }
+}
+
+export type MemeMessage = {
+  Transfer: {
+    from: Account
+    to: Account
     amount: string
   }
 }

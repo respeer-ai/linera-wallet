@@ -9,8 +9,8 @@ import { _hex, graphqlResult } from 'src/utils'
 import { dbBase, dbWallet } from 'src/controller'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import {
-  CHAINS_WITH_PUBLIC_KEY,
-  WALLET_INIT_WITHOUT_KEYPAIR,
+  OWNER_CHAINS,
+  WALLET_INIT_WITHOUT_SECRET_KEY,
   OPEN_CHAIN
 } from 'src/graphql'
 import {
@@ -19,15 +19,10 @@ import {
 } from 'src/__generated__/graphql/faucet/graphql'
 import {
   type Chains,
-  type ChainsWithPublicKeyQuery
+  type OwnerChainsQuery
 } from 'src/__generated__/graphql/service/graphql'
 import { db } from 'src/model'
 import * as dbBridge from '../db'
-import { Operation } from './operation'
-import { ApplicationOperation } from './application_operation'
-import { SwapApplicationOperation } from './swap_application_operation'
-import { ERC20ApplicationOperation } from './erc20_application_operation'
-import { AMSApplicationOperation } from './ams_application_operation'
 
 export class Microchain {
   static openChain = async (publicKey: string): Promise<ClaimOutcome> => {
@@ -68,7 +63,7 @@ export class Microchain {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { mutate } = provideApolloClient(apolloClient)(() =>
-      useMutation(WALLET_INIT_WITHOUT_KEYPAIR)
+      useMutation(WALLET_INIT_WITHOUT_SECRET_KEY)
     )
     return await mutate({
       publicKey: _hex.toHex(keyPair.public().to_bytes().bytes),
@@ -88,7 +83,7 @@ export class Microchain {
     const { /* result, refetch, fetchMore, */ onResult, onError } =
       provideApolloClient(apolloClient)(() =>
         useQuery(
-          CHAINS_WITH_PUBLIC_KEY,
+          OWNER_CHAINS,
           {
             publicKey
           },
@@ -101,8 +96,8 @@ export class Microchain {
     return new Promise((resolve, reject) => {
       onResult((res) => {
         resolve(
-          (graphqlResult.rootData(res) as ChainsWithPublicKeyQuery)
-            .chainsWithPublicKey
+          (graphqlResult.rootData(res) as OwnerChainsQuery)
+            .ownerChains
         )
       })
 
@@ -183,96 +178,5 @@ export class Microchain {
     )
 
     return microchain
-  }
-
-  static importPresetApplications = async (microchain: db.Microchain) => {
-    const _microchain = await dbBridge.Microchain.microchain(
-      microchain.microchain
-    )
-    if (!_microchain?.opened) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          Microchain.importPresetApplications(microchain)
-            .then(() => {
-              resolve(undefined)
-            })
-            .catch((e) => {
-              console.log('Failed import preset applications', e)
-              reject(e)
-            })
-        }, 1000)
-      })
-    }
-
-    let namedApplication =
-      (await dbBridge.NamedApplication.namedApplicationWithType(
-        db.ApplicationType.SWAP
-      )) as db.NamedApplication
-    if (!namedApplication) return Promise.reject('Invalid swap application')
-    let operationId = await Operation.requestApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      db.ApplicationType.SWAP
-    )
-    if (operationId) {
-      await Operation.waitOperation(operationId)
-    }
-    await ApplicationOperation.waitExistChainApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      60
-    )
-    await SwapApplicationOperation.subscribeCreationChain(microchain.microchain)
-
-    namedApplication =
-      (await dbBridge.NamedApplication.namedApplicationWithType(
-        db.ApplicationType.WLINERA
-      )) as db.NamedApplication
-    if (!namedApplication) return Promise.reject('Invalid wlinera application')
-    await ERC20ApplicationOperation.persistApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      db.ApplicationType.WLINERA
-    )
-
-    namedApplication =
-      (await dbBridge.NamedApplication.namedApplicationWithType(
-        db.ApplicationType.AMS
-      )) as db.NamedApplication
-    if (!namedApplication) return Promise.reject('Invalid ams application')
-    operationId = await Operation.requestApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      db.ApplicationType.AMS
-    )
-    if (operationId) {
-      await Operation.waitOperation(operationId)
-    }
-    await ApplicationOperation.waitExistChainApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      60
-    )
-    await AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
-
-    namedApplication =
-      (await dbBridge.NamedApplication.namedApplicationWithType(
-        db.ApplicationType.BLOB_GATEWAY
-      )) as db.NamedApplication
-    if (!namedApplication)
-      return Promise.reject('Invalid blob gateway application')
-    operationId = await Operation.requestApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      db.ApplicationType.BLOB_GATEWAY
-    )
-    if (operationId) {
-      await Operation.waitOperation(operationId)
-    }
-    await ApplicationOperation.waitExistChainApplication(
-      microchain.microchain,
-      namedApplication.applicationId,
-      60
-    )
   }
 }

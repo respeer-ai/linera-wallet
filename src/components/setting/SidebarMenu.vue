@@ -39,7 +39,7 @@
 import { localStore, settingDef } from 'src/localstores'
 import { computed } from 'vue'
 
-import { applicationManagementLogo, blobGatewayLogo, lineraLogo, lineraMemeLogo, lineraSwapLogo } from 'src/assets'
+import { applicationManagementLogo, blobGatewayLogo, lineraLogo, lineraSwapLogo } from 'src/assets'
 
 const emit = defineEmits<{(ev: 'clicked', value: settingDef.MenuItem): void}>()
 
@@ -52,7 +52,6 @@ const menus = computed(() => localStore.settingDef.SettingMenus.filter((el) => !
 const menuIcon = (menu: settingDef.MenuItem) => {
   switch (menu.menu) {
     case settingDef.Menu.SWAP: return lineraSwapLogo
-    case settingDef.Menu.WLINERA: return lineraMemeLogo
     case settingDef.Menu.BLOB_GATEWAY: return blobGatewayLogo
     case settingDef.Menu.AMS: return applicationManagementLogo
     case settingDef.Menu.GENESIS: return lineraLogo
@@ -62,7 +61,6 @@ const menuIcon = (menu: settingDef.MenuItem) => {
 
 const isImg = (menu: settingDef.MenuItem) => {
   return menu.menu === settingDef.Menu.SWAP ||
-         menu.menu === settingDef.Menu.WLINERA ||
          menu.menu === settingDef.Menu.BLOB_GATEWAY ||
          menu.menu === settingDef.Menu.AMS ||
          menu.menu === settingDef.Menu.GENESIS

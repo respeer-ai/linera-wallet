@@ -105,50 +105,6 @@ pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
 }
 
 #[wasm_bindgen]
-#[cfg(not(feature = "no-storage"))]
-pub async fn dapp_query_validators() -> Result<(), JsError> {
-    let mut client_context: ClientContext = get_client_context().await?;
-    let chain_id = client_context
-        .wallet()
-        .default_chain()
-        .expect("No default chain");
-
-    let mut chain_client = client_context.make_chain_client(chain_id);
-    log::info!(
-        "Querying the validators of the current epoch of chain {}",
-        chain_id
-    );
-    chain_client.synchronize_from_validators().await?;
-    log::info!("Synchronized state from validators");
-    let result = chain_client.local_committee().await;
-    client_context
-        .update_and_save_wallet(&mut chain_client)
-        .await;
-    let committee = result?;
-    log::info!("{:?}", committee.validators());
-    let node_provider = client_context.make_node_provider();
-    for (name, state) in committee.validators() {
-        match node_provider
-            .make_node(&state.network_address)?
-            .get_version_info()
-            .await
-        {
-            Ok(version_info) => {
-                log::info!(
-                    "Version information for validator {name:?}:{}",
-                    version_info
-                );
-            }
-            Err(e) => {
-                log::warn!("Failed to get version information for validator {name:?}:\n{e}")
-            }
-        }
-    }
-
-    Ok(())
-}
-
-#[wasm_bindgen]
 pub async fn executed_block_payload(
     block: &str,
     round: &str,
@@ -190,13 +146,13 @@ pub async fn construct_block(
     let operations: Vec<Operation> = serde_json::from_str(operations)?;
     let incoming_bundles: Vec<IncomingBundle> = serde_json::from_str(incoming_bundles)?;
     let client_context: SignClientContext = get_fake_client_context().await?;
-    let key_pair = AccountSecretKey::from_public_key(AccountPublicKey::from_str(public_key)?);
+    let secret_key = AccountSecretKey::from_public_key(AccountPublicKey::from_str(public_key)?);
     let admin_id: ChainId = ChainId::from_str(admin_id)?;
     let block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(block_hash)?);
 
     let chain_client = client_context.make_chain_client_ext(
         chain_id,
-        key_pair,
+        secret_key,
         admin_id,
         block_hash,
         Timestamp::from(local_time),
@@ -222,11 +178,11 @@ struct MnemonicKeyPair {
 }
 
 #[wasm_bindgen]
-pub async fn generate_key_pair(passphrase: &str) -> Result<String, JsError> {
+pub async fn generate_secret_key(passphrase: &str) -> Result<String, JsError> {
     let mut rng = bip39::rand::thread_rng();
     let mnemonic = bip39::Mnemonic::generate_in_with(&mut rng, bip39::Language::English, 24)?;
     let secret_key =
-        generate_key_pair_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?;
+        generate_secret_key_from_mnemonic(mnemonic.to_string().as_str(), passphrase).await?;
     let secret_key = secret_key.replace("\"", "");
     Ok(serde_json::to_string(&MnemonicKeyPair {
         mnemonic: mnemonic.clone(),
@@ -235,7 +191,7 @@ pub async fn generate_key_pair(passphrase: &str) -> Result<String, JsError> {
 }
 
 #[wasm_bindgen]
-pub async fn generate_key_pair_from_mnemonic(
+pub async fn generate_secret_key_from_mnemonic(
     mnemonic: &str,
     passphrase: &str,
 ) -> Result<String, JsError> {
@@ -245,8 +201,8 @@ pub async fn generate_key_pair_from_mnemonic(
     let mut _seed = [0u8; 32];
     _seed.copy_from_slice(&seed[0..32]);
     let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
-    let key_pair = AccountSecretKey::generate_from(&mut rng);
-    let key_str = format!("{}", serde_json::to_string(&key_pair)?);
+    let secret_key = AccountSecretKey::generate_from(&mut rng);
+    let key_str = format!("{}", serde_json::to_string(&secret_key)?);
     let key_str = key_str.replace("\"", "");
     Ok(key_str[..64].to_string())
 }

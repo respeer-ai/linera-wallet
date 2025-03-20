@@ -85,18 +85,6 @@
     </div>
     <div class='page-item-x-margin-left' />
   </div>
-  <div class='page-y-padding'>
-    <q-btn
-      flat
-      rounded
-      label='Mint now'
-      class='btn full-width'
-      @click='onMintNowClick'
-      no-caps
-      :disable='!canMint'
-      :loading='minting'
-    />
-  </div>
   <DbOwnerBridge v-model:selected-owner='selectedOwner' />
   <DbMicrochainBridge v-if='selectedOwner' :owner='selectedOwner?.owner' v-model:microchains='microchains' />
   <q-dialog v-model='selectingOwner'>
@@ -113,11 +101,10 @@
 </template>
 
 <script setup lang='ts'>
-import { computed, onMounted, ref, toRef, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
-import { db, rpc } from 'src/model'
-import { localStore } from 'src/localstores'
-import { useI18n } from 'vue-i18n'
+import { db } from 'src/model'
+import { dbBridge } from 'src/bridge'
 
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
@@ -127,15 +114,6 @@ import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBri
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 
 import { lineraLogo } from 'src/assets'
-import { dbBridge, rpcBridge } from 'src/bridge'
-
-const { t } = useI18n({ useScope: 'global' })
-
-interface Props {
-  token: db.Token
-}
-const props = defineProps<Props>()
-const token = toRef(props, 'token')
 
 const selectedOwner = defineModel<db.Owner>('selectedOwner')
 const selectedMicrochain = defineModel<db.Microchain>('selectedMicrochain')
@@ -149,7 +127,6 @@ const selectingMicrochain = ref(false)
 const amount = defineModel<number>({ default: 0 })
 const chainTokenBalance = ref(0)
 const accountTokenBalance = ref(0)
-const minting = ref(false)
 
 watch(amount, () => {
   if (amount.value.toString().startsWith('0.0')) {
@@ -176,53 +153,6 @@ const onMicrochainClick = () => {
 
 const onMicrochainSelected = () => {
   selectingMicrochain.value = false
-}
-
-const canMint = computed(() => {
-  return selectedOwner.value !== undefined &&
-         selectedMicrochain.value !== undefined &&
-         Number(amount.value) > 0
-})
-
-const emit = defineEmits<{(ev: 'minted'): void,
-  (ev: 'error'): void
-}>()
-
-const onMintNowClick = async () => {
-  if (!selectedMicrochain.value) return
-  const chainAccountOwner = {
-    chain_id: selectedMicrochain.value?.microchain
-  } as rpc.ChainAccountOwner
-  if (selectedOwner.value) {
-    chainAccountOwner.owner = `User:${selectedOwner.value.owner}`
-  }
-
-  minting.value = true
-
-  try {
-    const operationId = await rpcBridge.ERC20ApplicationOperation.mint(
-      selectedMicrochain.value?.microchain,
-      token.value.applicationId as string,
-      chainAccountOwner, amount.value)
-    localStore.notification.pushNotification({
-      Title: t('MSG_MINT_TOKEN'),
-      Message: t('MSG_SUCCESS_MINT_TOKEN'),
-      Popup: true,
-      Type: localStore.notify.NotifyType.Info
-    })
-    await rpcBridge.Operation.waitOperation(operationId)
-    emit('minted')
-  } catch (error) {
-    localStore.notification.pushNotification({
-      Title: t('MSG_MINT_TOKEN'),
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: t('MSG_FAILED_MINT_TOKEN', { ERROR: error }),
-      Popup: true,
-      Type: localStore.notify.NotifyType.Error
-    })
-    emit('error')
-  }
-  minting.value = false
 }
 
 const nativeTokenId = ref(undefined as unknown as number)

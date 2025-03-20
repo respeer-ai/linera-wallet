@@ -18,7 +18,7 @@ const password = toRef(props, 'password')
 
 const createAccount = () => {
   if (!password.value?.length) return
-  lineraWasm.generate_key_pair('').then((val) => {
+  lineraWasm.generate_secret_key('').then((val) => {
     const keyObj = JSON.parse(val) as Record<string, string>
     const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(keyObj.secret_key)))
 
@@ -33,7 +33,7 @@ const createAccount = () => {
 const createAccountWithMnemonic = async (mnemonic: string[], _password?: string) => {
   return new Promise((resolve, reject) => {
     if (!_password?.length) reject(new Error('Invalid password'))
-    lineraWasm.generate_key_pair_from_mnemonic(mnemonic.join(' '), '').then((val) => {
+    lineraWasm.generate_secret_key_from_mnemonic(mnemonic.join(' '), '').then((val) => {
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(val)))
       const _publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
       resolve({ publicKey: _publicKey, privateKey: val })

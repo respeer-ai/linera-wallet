@@ -135,14 +135,14 @@ export class BlockSigner {
           }
           // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const memeMessage = parse(memeMessageStr) as rpc.ERC20Message
+          const memeMessage = parse(memeMessageStr) as rpc.MemeMessage
           if (memeMessage?.Transfer) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await sharedStore.createActivity(
               microchain,
               tokenId,
-              memeMessage.Transfer.origin.chain_id,
-              memeMessage.Transfer.origin.owner,
+              memeMessage.Transfer.from.chain_id,
+              memeMessage.Transfer.from.owner,
               block.value.block.header.chainId as string,
               memeMessage.Transfer.to.owner,
               memeMessage.Transfer.amount,
@@ -281,9 +281,10 @@ export class BlockSigner {
         query: SIMULATE_EXECUTE_BLOCK.loc?.source?.body,
         variables: {
           chainId: microchain,
-          operations: operation ? [operation] : [],
-          incomingBundles: blockMaterial.incomingBundles,
-          localTime: blockMaterial.localTime
+          blockMaterial: {
+            operations: operation ? [operation] : [],
+            candidate: blockMaterial
+          }
         }
       }
     } as RpcGraphqlQuery
@@ -410,8 +411,7 @@ export class BlockSigner {
     executedBlock: ExecutedBlock,
     round: rpc.Round,
     signature: string,
-    retry: boolean,
-    validatedBlockCertificateHash?: string
+    validatedBlockCertificate?: unknown
   ): Promise<string> {
     const submitBlockAndSignatureQuery = {
       query: {
@@ -420,11 +420,12 @@ export class BlockSigner {
         variables: {
           chainId: microchain,
           height,
-          executedBlock,
-          round,
-          signature,
-          retry,
-          validatedBlockCertificateHash
+          block: {
+            executedBlock,
+            round,
+            signature,
+            validatedBlockCertificate
+          }
         }
       }
     } as RpcGraphqlQuery
@@ -464,16 +465,16 @@ export class BlockSigner {
       blockMaterial.incomingBundles.length >= maxProcessBundles
 
     const executedBlockMaterial =
-      await BlockSigner.executeBlockWithFullMaterials(
+      await BlockSigner.simulateExecuteBlock(
         microchain,
         blockMaterial,
         operation
       )
 
     const executedBlock = executedBlockMaterial?.executedBlock
-    const validatedBlockCertificateHash =
-      executedBlockMaterial?.validatedBlockCertificateHash as string
-    const isRetryBlock = executedBlockMaterial?.retry
+    const validatedBlockCertificate =
+      executedBlockMaterial?.validatedBlockCertificate as unknown
+    const isRetryBlock = !validatedBlockCertificate
 
     if (!executedBlock) return Promise.reject('Failed execute block')
     if (
@@ -520,8 +521,7 @@ export class BlockSigner {
         _executedBlock,
         blockMaterial.round as rpc.Round,
         signature,
-        isRetryBlock,
-        validatedBlockCertificateHash
+        validatedBlockCertificate
       )
 
       if (continueProcess) {

@@ -24,13 +24,6 @@ export const SettingMenus = [
   },
   {
     icon: 'bi-box-seam',
-    label: 'WTLinera',
-    menu: Menu.WLINERA,
-    disable: false,
-    separator: false
-  },
-  {
-    icon: 'bi-box-seam',
     label: 'Blob',
     menu: Menu.BLOB_GATEWAY,
     disable: false,

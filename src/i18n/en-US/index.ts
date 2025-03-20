@@ -211,7 +211,6 @@ export default {
     "I suggest you don't access this menu unless you know what you will do.",
   MSG_SWAP_APPLICATION: 'Swap application',
   MSG_APPLICATION_ID: 'Application ID',
-  MSG_WLINERA_APPLICATION: 'WTLINERA application',
   MSG_TESTNET_MUST_READ: 'Testnet must read',
   MSG_TESTNET_MUST_READ_CONTENT:
     '<p><strong>MUST READ</strong></p>' +
@@ -334,11 +333,5 @@ export default {
   MSG_REQUEST_NOW: 'Request now',
   MSG_BLOB_GATEWAY_APPLICATION: 'Blob gateway application',
   MSG_NAMED_APPLICATIONS: 'Named applications',
-  MSG_BLOB_GATEWAY_URL: 'Blob Gateway URL',
-  MSG_REQUESTING_THREE_DOTS: 'Requesting ...',
-  MSG_WAITING_THREE_DOTS: 'Waiting ...',
-  MSG_SUBSCRIBING_THREE_DOTS: 'Subscribing ...',
-  MSG_REQUEST_APPLICATION: 'Request application',
-  MSG_SUCCESS_REQUEST_APPLICATION: 'Success request application',
-  MSG_FAILED_REQUEST_APPLICATION: 'Failed request application'
+  MSG_BLOB_GATEWAY_URL: 'Blob Gateway URL'
 }

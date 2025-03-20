@@ -4,7 +4,6 @@ export enum Menu {
   NETWORKS = 'Networks',
   GENESIS = 'Genesis',
   SWAP = 'Swap',
-  WLINERA = 'WLinera',
   AMS = 'AMS',
   BLOB_GATEWAY = 'Blob',
   ABOUT_US = 'AboutUs',

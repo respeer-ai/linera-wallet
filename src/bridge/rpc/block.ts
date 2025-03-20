@@ -13,7 +13,7 @@ import { SUBMIT_BLOCK_AND_SIGNATURE, NOTIFICATIONS, BLOCK } from 'src/graphql'
 import {
   type BlockQuery,
   type NotificationsSubscription,
-  type HashedCertificateValue,
+  type HashedConfirmedBlock,
   type ExecutedBlock,
   type SubmitBlockAndSignatureMutation
 } from 'src/__generated__/graphql/service/graphql'
@@ -28,8 +28,7 @@ export class Block {
     executedBlock: ExecutedBlock,
     round: rpc.Round,
     signature: string,
-    retry: boolean,
-    validatedBlockCertificateHash?: string
+    validatedBlockCertificate?: unknown
   ): Promise<string> => {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return Promise.reject('Invalid network')
@@ -51,8 +50,7 @@ export class Block {
               executedBlock,
               round,
               signature,
-              retry,
-              validatedBlockCertificateHash
+              validatedBlockCertificate
             },
             operationName: 'submitBlockAndSignature'
           }),
@@ -147,7 +145,7 @@ export class Block {
   static getBlockWithHash = async (
     chainId: string,
     hash?: string
-  ): Promise<HashedCertificateValue> => {
+  ): Promise<HashedConfirmedBlock> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
@@ -170,7 +168,7 @@ export class Block {
       onResult((res) => {
         resolve(
           (graphqlResult.rootData(res) as BlockQuery)
-            .block as HashedCertificateValue
+            .block as HashedConfirmedBlock
         )
       })
 

@@ -1,6 +1,6 @@
-import { ADD_PENDING_BLOB } from 'src/graphql'
+import { PREPARE_BLOB } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
-import { type AddPendingBlobMutation } from 'src/__generated__/graphql/service/graphql'
+import { type PrepareBlobMutation } from 'src/__generated__/graphql/service/graphql'
 import { sharedStore } from 'app/src-bex/store'
 import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
@@ -16,12 +16,12 @@ export class PendingBlob {
         .post(
           rpcUrl,
           {
-            query: ADD_PENDING_BLOB.loc?.source.body,
+            query: PREPARE_BLOB.loc?.source.body,
             variables: {
               chainId,
               bytes
             },
-            operationName: 'addPendingBlob'
+            operationName: 'prepareBlob'
           },
           {
             responseType: 'text',
@@ -35,10 +35,10 @@ export class PendingBlob {
           if (errors && errors.length > 0) {
             return reject(stringify(errors))
           }
-          const addPendingBlob = (
-            data as Record<string, AddPendingBlobMutation>
+          const prepareBlob = (
+            data as Record<string, PrepareBlobMutation>
           ).data
-          resolve(addPendingBlob.addPendingBlob as string)
+          resolve(prepareBlob.prepareBlob as string)
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

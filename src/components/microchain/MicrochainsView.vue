@@ -113,13 +113,8 @@ const onImportMicrochainClick = () => {
   importingMicrochain.value = true
 }
 
-const onMicrochainImported = async (microchain: string) => {
+const onMicrochainImported = async () => {
   importingMicrochain.value = false
-
-  const _microchain = microchains.value.find((el) => el.microchain === microchain)
-  if (!_microchain) return
-  await rpcBridge.Microchain.importPresetApplications(_microchain)
-
   await loadMicrochains()
 }
 

@@ -48,15 +48,13 @@ const emit = defineEmits<{(ev: 'created', value: db.Microchain): void,
 const createMicrochain = async (): Promise<db.Microchain> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    rpcBridge.Microchain.openMicrochain().then(async (microchain: db.Microchain) => {
+    rpcBridge.Microchain.openMicrochain().then((microchain: db.Microchain) => {
       localStore.notification.pushNotification({
         Title: t('MSG_OPEN_CHAIN'),
         Message: t('MSG_SUCCESS_OPEN_MICROCHAIN'),
         Popup: true,
         Type: localStore.notify.NotifyType.Info
       })
-
-      await rpcBridge.Microchain.importPresetApplications(microchain)
 
       resolve(microchain)
     }).catch((error) => {

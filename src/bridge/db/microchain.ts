@@ -23,6 +23,10 @@ export class Microchain {
       .first()
   }
 
+  static anyMicrochain = async (): Promise<db.Microchain | undefined> => {
+    return await dbWallet.microchains.offset(0).first()
+  }
+
   static count = async (): Promise<number> => {
     return await dbWallet.microchains.count()
   }

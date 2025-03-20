@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { db, rpc } from 'src/model'
 import { dbBridge } from '..'
-import { ApplicationOperation } from './application_operation'
-import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { stringify } from 'lossless-json'
 
 export class Operation {
@@ -49,51 +47,6 @@ export class Operation {
       } as rpc.Operation)
     } as db.ChainOperation
     await dbBridge.ChainOperation.create({ ...operation })
-    return operationId
-  }
-
-  static requestApplication = async (
-    requesterChainId: string,
-    applicationId: string,
-    applicationType: db.ApplicationType
-  ): Promise<string | undefined> => {
-    // TODO: load application creation chain in our rpc endpoint firstly
-
-    const creationChainId = await lineraWasm.application_creation_chain_id(
-      applicationId
-    )
-
-    /*
-    let exist = await ApplicationOperation.existChainApplication(
-      creationChainId,
-      applicationId
-    )
-    if (!exist) return Promise.reject('Application not exists')
-    */
-
-    const exist = await ApplicationOperation.existChainApplication(
-      requesterChainId,
-      applicationId
-    )
-    if (exist) return undefined
-
-    const operationId = uuidv4()
-    const operation = {
-      operationType: db.OperationType.REQUEST_APPLICATION,
-      applicationType,
-      operationId,
-      microchain: requesterChainId,
-      operation: JSON.stringify({
-        System: {
-          RequestApplication: {
-            application_id: applicationId,
-            chain_id: creationChainId
-          }
-        }
-      } as rpc.Operation)
-    } as db.ChainOperation
-    await dbBridge.ChainOperation.create({ ...operation })
-
     return operationId
   }
 

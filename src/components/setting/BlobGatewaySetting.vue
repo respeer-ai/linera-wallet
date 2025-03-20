@@ -23,9 +23,6 @@
           v-else name='bi-pencil-square' size='16px' class='page-item-x-margin-left cursor-pointer'
           @click='editingBlobGatewayApplication = true'
         />
-        <div class='flex items-center justify-center cursor-pointer clickable page-item-x-margin-left' @click='onRefresh'>
-          <q-icon name='bi-arrow-clockwise' size='16px' />
-        </div>
       </div>
       <q-input
         v-model='blobGatewayApplicationId' v-if='editingBlobGatewayApplication' autogrow hide-bottom-space
@@ -49,8 +46,6 @@
 import { computed, ref, watch } from 'vue'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
-import { dbWallet } from 'src/controller'
-import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { dbBridge, rpcBridge } from 'src/bridge'
 
 import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
@@ -73,20 +68,9 @@ const onSaveBlobGatewayApplicationId = async () => {
   updatingBlobGatewayApplication.value = true
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(blobGatewayApplicationId.value)
-    const microchains = await dbWallet.microchains.toArray()
-
-    for (const microchain of microchains) {
-      try {
-        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, blobGatewayApplicationId.value, db.ApplicationType.BLOB_GATEWAY)
-        if (operationId) {
-          await rpcBridge.Operation.waitOperation(operationId)
-        }
-        await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, blobGatewayApplicationId.value, 60)
-      } catch (e) {
-        console.log('Failed refresh blobGateway application', e)
-      }
-    }
+    const microchain = await dbBridge.Microchain.anyMicrochain()
+    if (!microchain) return
+    const creationChain = await rpcBridge.ApplicationCreatorChain.id(microchain.microchain, blobGatewayApplicationId.value)
 
     await dbBridge.NamedApplication.update({
       ...blobGatewayApplication.value,
@@ -101,44 +85,4 @@ const onSaveBlobGatewayApplicationId = async () => {
     updatingBlobGatewayApplication.value = false
   }
 }
-
-const onRefresh = async () => {
-  if (!blobGatewayApplicationId.value?.length) return
-  updatingBlobGatewayApplication.value = true
-
-  try {
-    const microchains = await dbWallet.microchains.toArray()
-
-    for (const microchain of microchains) {
-      try {
-        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, blobGatewayApplicationId.value, db.ApplicationType.BLOB_GATEWAY)
-        if (operationId) {
-          await rpcBridge.Operation.waitOperation(operationId)
-        }
-        await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, blobGatewayApplicationId.value, 60)
-      } catch (e) {
-        console.log('Faled refresh blobGateway application', e)
-      }
-    }
-
-    localStore.notification.pushNotification({
-      Title: 'Refresh BlobGateway application',
-      Message: 'Success refresh blobGateway application.',
-      Popup: true,
-      Type: localStore.notify.NotifyType.Info
-    })
-
-    updatingBlobGatewayApplication.value = false
-  } catch (e) {
-    localStore.notification.pushNotification({
-      Title: 'Refresh BlobGateway application',
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed refresh blobGateway application: ${e}.`,
-      Popup: true,
-      Type: localStore.notify.NotifyType.Error
-    })
-    updatingBlobGatewayApplication.value = false
-  }
-}
-
 </script>

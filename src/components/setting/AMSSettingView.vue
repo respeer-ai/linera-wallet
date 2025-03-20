@@ -23,9 +23,6 @@
           v-else name='bi-pencil-square' size='16px' class='page-item-x-margin-left cursor-pointer'
           @click='editingAMSApplication = true'
         />
-        <div class='flex items-center justify-center cursor-pointer clickable page-item-x-margin-left' @click='onRefresh'>
-          <q-icon name='bi-arrow-clockwise' size='16px' />
-        </div>
       </div>
       <q-input
         v-model='amsApplicationId' v-if='editingAMSApplication' autogrow hide-bottom-space
@@ -49,8 +46,6 @@
 import { computed, ref, watch } from 'vue'
 import { localStore } from 'src/localstores'
 import { db } from 'src/model'
-import { dbWallet } from 'src/controller'
-import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { dbBridge, rpcBridge } from 'src/bridge'
 
 import NamedApplicationBridge from '../bridge/db/NamedApplicationBridge.vue'
@@ -75,21 +70,9 @@ const onSaveAMSApplicationId = async () => {
   updatingAMSApplication.value = true
 
   try {
-    const creationChain = await lineraWasm.application_creation_chain_id(amsApplicationId.value)
-    const microchains = await dbWallet.microchains.toArray()
-
-    for (const microchain of microchains) {
-      try {
-        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, db.ApplicationType.AMS)
-        if (operationId) {
-          await rpcBridge.Operation.waitOperation(operationId)
-        }
-        await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, amsApplicationId.value, 60)
-        await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
-      } catch (e) {
-        console.log('Faled save ams application', e)
-      }
-    }
+    const microchain = await dbBridge.Microchain.anyMicrochain()
+    if (!microchain) return
+    const creationChain = await rpcBridge.ApplicationCreatorChain.id(microchain.microchain, amsApplicationId.value)
 
     await dbBridge.NamedApplication.update({
       ...amsApplication.value,
@@ -101,46 +84,6 @@ const onSaveAMSApplicationId = async () => {
   } catch (error) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.log(`Failed update ams application: ${error}`)
-    updatingAMSApplication.value = false
-  }
-}
-
-const onRefresh = async () => {
-  if (!amsApplicationId.value?.length) return
-  updatingAMSApplication.value = true
-
-  try {
-    const microchains = await dbWallet.microchains.toArray()
-
-    for (const microchain of microchains) {
-      try {
-        const operationId = await rpcBridge.Operation.requestApplication(microchain.microchain, amsApplicationId.value, db.ApplicationType.AMS)
-        if (operationId) {
-          await rpcBridge.Operation.waitOperation(operationId)
-        }
-        await rpcBridge.ApplicationOperation.waitExistChainApplication(microchain.microchain, amsApplicationId.value, 60)
-        await rpcBridge.AMSApplicationOperation.subscribeCreationChain(microchain.microchain)
-      } catch (e) {
-        console.log('Failed refresh ams application', e)
-      }
-    }
-
-    localStore.notification.pushNotification({
-      Title: 'Refresh AMS application',
-      Message: 'Success refresh ams application.',
-      Popup: true,
-      Type: localStore.notify.NotifyType.Info
-    })
-
-    updatingAMSApplication.value = false
-  } catch (e) {
-    localStore.notification.pushNotification({
-      Title: 'Refresh AMS application',
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      Message: `Failed refresh ams application: ${e}.`,
-      Popup: true,
-      Type: localStore.notify.NotifyType.Error
-    })
     updatingAMSApplication.value = false
   }
 }

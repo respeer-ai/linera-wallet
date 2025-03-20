@@ -1,8 +1,9 @@
 import { dbBase } from 'src/controller'
 import { db } from 'src/model'
 import { Network } from './network'
-import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { NamedApplication } from './named_application'
+import { ApplicationCreatorChain } from '../rpc'
+import { Microchain } from './microchain'
 
 export class Token {
   static initialize = async (nativeLogo: string) => {
@@ -88,9 +89,9 @@ export class Token {
       db.ApplicationType.BLOB_GATEWAY
     )
     if (!namedApplication) return token.logo
-    const creationChain = await lineraWasm.application_creation_chain_id(
-      namedApplication.applicationId
-    )
+    const microchain = await Microchain.anyMicrochain()
+    if (!microchain) return token.logo
+    const creationChain = await ApplicationCreatorChain.id(microchain.microchain, namedApplication.applicationId)
     const blobGatewayUrl = network.blobGatewayUrl.endsWith('/')
       ? network.blobGatewayUrl.slice(0, network.blobGatewayUrl.length - 1)
       : network.blobGatewayUrl

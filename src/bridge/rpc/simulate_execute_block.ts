@@ -1,9 +1,9 @@
 import { graphqlResult } from 'src/utils'
 import { db, rpc } from 'src/model'
-import { EXECUTE_BLOCK_WITH_FULL_MATERIALS } from 'src/graphql'
+import { SIMULATE_EXECUTE_BLOCK } from 'src/graphql'
 import {
   type IncomingBundle,
-  type ExecuteBlockWithFullMaterialsMutation,
+  type SimulateExecuteBlockMutation,
   type ExecutedBlockMaterial
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
@@ -11,7 +11,7 @@ import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
 
 export class ExecutedBlock {
-  static executeBlockWithFullMaterials = async (
+  static simulateExecuteBlock = async (
     chainId: string,
     operations: rpc.Operation[],
     incomingBundles: IncomingBundle[],
@@ -30,14 +30,14 @@ export class ExecutedBlock {
         .post(
           applicationUrl,
           stringify({
-            query: EXECUTE_BLOCK_WITH_FULL_MATERIALS.loc?.source.body,
+            query: SIMULATE_EXECUTE_BLOCK.loc?.source.body,
             variables: {
               chainId,
               operations,
               incomingBundles,
               localTime
             },
-            operationName: 'executeBlockWithFullMaterials'
+            operationName: 'simulateExecuteBlock'
           }),
           {
             responseType: 'text',
@@ -51,10 +51,10 @@ export class ExecutedBlock {
           if (errors && errors.length > 0) {
             return reject(stringify(errors))
           }
-          const executeBlockWithFullMaterials = (
-            data as Record<string, ExecuteBlockWithFullMaterialsMutation>
+          const simulateExecuteBlock = (
+            data as Record<string, SimulateExecuteBlockMutation>
           ).data
-          resolve(executeBlockWithFullMaterials.executeBlockWithFullMaterials)
+          resolve(simulateExecuteBlock.simulateExecuteBlock as ExecutedBlockMaterial)
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

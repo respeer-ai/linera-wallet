@@ -302,8 +302,7 @@ export interface OriginRpcMicrochain {
 
 export enum ApplicationType {
   SWAP,
-  WLINERA,
-  ERC20,
+  MEME,
   ANONYMOUS,
   AMS,
   BLOB_GATEWAY
@@ -342,7 +341,7 @@ export const defaultNamedApplications = [
     creatorChain: defaultSwapCreatorChain
   },
   {
-    applicationType: ApplicationType.WLINERA,
+    applicationType: ApplicationType.MEME,
     name: 'wlinera',
     applicationId: defaultWLineraAppId,
     creatorChain: defaultWLineraCreatorChain
@@ -362,12 +361,9 @@ export const defaultNamedApplications = [
 ] as NamedApplication[]
 
 export enum OperationType {
-  LEGACY_REQUEST_SUBSCRIBE = 'requestSubscribe',
-  SUBSCRIBE_CREATOR_CHAIN = 'subscribeCreatorChain',
-  REQUEST_APPLICATION = 'requestApplication',
   TRANSFER = 'transfer',
   MINT = 'mint',
-  ANONYMOUS = 'ANONYMOUS'
+  ANONYMOUS = 'Anonymous'
 }
 
 export enum OperationState {

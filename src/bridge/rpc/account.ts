@@ -3,16 +3,16 @@ import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
-import { GET_ACCOUNT_BALANCE, GET_CHAIN_ACCOUNT_BALANCES } from 'src/graphql'
+import { BALANCE, BALANCES } from 'src/graphql'
 import {
-  type GetAccountBalanceQuery,
-  type GetChainAccountBalancesQuery
+  type BalanceQuery,
+  type BalancesQuery
 } from 'src/__generated__/graphql/service/graphql'
 
 export class Account {
-  static accountBalance = async (
+  static balance = async (
     chainId: string,
-    publicKey?: string
+    owner?: string
   ): Promise<number> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
@@ -21,10 +21,10 @@ export class Account {
     const { /* result, refetch, fetchMore, */ onResult, onError } =
       provideApolloClient(apolloClient)(() =>
         useQuery(
-          GET_ACCOUNT_BALANCE,
+          BALANCE,
           {
             chainId,
-            publicKey
+            owner
           },
           {
             fetchPolicy: 'network-only'
@@ -36,7 +36,7 @@ export class Account {
       onResult((res) => {
         resolve(
           Number(
-            (graphqlResult.rootData(res) as GetAccountBalanceQuery).balance
+            (graphqlResult.rootData(res) as BalanceQuery).balance
           )
         )
       })
@@ -48,10 +48,9 @@ export class Account {
     })
   }
 
-  static getChainAccountBalances = async (
-    chainIds: string[],
-    publicKeys: string[]
-  ): Promise<rpc.ChainAccountBalances> => {
+  static balances = async (
+    chainOwners: Map<string, Array<string>>
+  ): Promise<rpc.Balances> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
@@ -59,10 +58,9 @@ export class Account {
     const { /* result, refetch, fetchMore, */ onResult, onError } =
       provideApolloClient(apolloClient)(() =>
         useQuery(
-          GET_CHAIN_ACCOUNT_BALANCES,
+          BALANCES,
           {
-            chainIds,
-            publicKeys
+            chainOwners
           },
           {
             fetchPolicy: 'network-only'
@@ -73,8 +71,8 @@ export class Account {
     return new Promise((resolve, reject) => {
       onResult((res) => {
         resolve(
-          (graphqlResult.rootData(res) as GetChainAccountBalancesQuery)
-            .balances as rpc.ChainAccountBalances
+          (graphqlResult.rootData(res) as BalancesQuery)
+            .balances as rpc.Balances
         )
       })
 

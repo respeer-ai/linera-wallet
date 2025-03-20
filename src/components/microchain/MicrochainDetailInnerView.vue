@@ -18,35 +18,6 @@
         :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
       />
     </div>
-    <div v-if='namedApplications.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      {{ $t('MSG_NAMED_APPLICATIONS') }}
-    </div>
-    <div v-if='namedApplications.length > 0'>
-      <RequestNamedApplicationCardView
-        v-for='namedApplication in namedApplications' :key='namedApplication.id' :named-application='namedApplication' :microchain='microchain'
-        :x-padding='localStore.setting.extensionMode ? "8px" : "0"' :requested='chainApplications.findIndex((el) => el.id === namedApplication.applicationId) >= 0'
-        @requested='onNamedApplicationRequested'
-      />
-    </div>
-    <div v-if='requestedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      {{ $t('MSG_REQUESTED_TOKENS') }}
-    </div>
-    <div v-if='requestedTokens.length > 0'>
-      <MicrochainTokenBalanceCardView
-        v-for='token in requestedTokens' :key='token.id' :token='token' :microchain='microchain'
-        :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
-      />
-    </div>
-    <div v-if='importedTokens.length > 0' :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      {{ $t('MSG_IMPORTED_TOKENS') }}
-    </div>
-    <div v-if='importedTokens.length > 0'>
-      <RequestTokenCardView
-        v-for='token in importedTokens' :key='token.id' :token='token' :microchain='microchain'
-        :show-indicator='false' :x-padding='localStore.setting.extensionMode ? "8px" : "0"'
-        @requested='onTokenRequested' :requested='chainApplications.findIndex((el) => el.id === token.applicationId) >= 0'
-      />
-    </div>
     <div :class='[ "vertical-sections-margin text-bold label-text-large text-grey-9 decorate-underline", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       {{ $t('MSG_CHAIN_DETAILS') }}
     </div>
@@ -129,7 +100,6 @@ import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
 import { type ApplicationOverview } from 'src/__generated__/graphql/sdk/graphql'
 import { dbBridge, rpcBridge } from 'src/bridge'
-import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -138,9 +108,6 @@ import MicrochainCardView from './MicrochainCardView.vue'
 import ActivityBridge from '../bridge/db/ActivityBridge.vue'
 import ActivitiesView from '../activity/ActivitiesView.vue'
 import ChainOperationsView from '../activity/ChainOperationsView.vue'
-import MicrochainTokenBalanceCardView from './MicrochainTokenBalanceCardView.vue'
-import RequestTokenCardView from './RequestTokenCardView.vue'
-import RequestNamedApplicationCardView from './RequestNamedApplicationCardView.vue'
 
 interface Props {
   microchain: db.Microchain
@@ -157,45 +124,11 @@ const activities = ref([] as db.Activity[])
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
 const nativeTokenId = ref(undefined as unknown as number)
-const requestedTokens = ref([] as db.Token[])
-const importedTokens = ref([] as db.Token[])
-const namedApplications = ref([] as db.NamedApplication[])
 const chainApplications = ref([] as ApplicationOverview[])
-
-const formalizeRequestedTokens = async () => {
-  for (const token of requestedTokens.value) {
-    if (importedTokens.value.findIndex((el) => el.applicationId === token.applicationId) >= 0) continue
-    const exist = await rpcBridge.ApplicationOperation.existChainApplication(microchain.value.microchain, token.applicationId as string)
-    if (!exist) {
-      importedTokens.value.push(token)
-      continue
-    }
-    const creationChain = await lineraWasm.application_creation_chain_id(token.applicationId as string)
-    if (creationChain === microchain.value.microchain) {
-      continue
-    }
-    const subscribed = await rpcBridge.ApplicationOperation.subscribedCreatorChain(microchain.value.microchain, token.applicationId as string)
-    if (!subscribed) importedTokens.value.push(token)
-  }
-}
 
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
-  const applicationIds = (await rpcBridge.Application.applications([microchain.value.microchain])).map((app: ApplicationOverview) => app.id as string)
-  requestedTokens.value = (await dbBridge.Token.tokens(0, 1000, applicationIds)).filter((el) => !el.native)
-  importedTokens.value = (await dbBridge.Token.tokens(0, 1000)).filter((token: db.Token) => !token.native && !applicationIds.includes(token.applicationId as string))
-  namedApplications.value = (await dbBridge.NamedApplication.namedApplications()).filter((el) => el.applicationType !== db.ApplicationType.WLINERA)
   chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
-
-  await formalizeRequestedTokens()
 })
-
-const onNamedApplicationRequested = async () => {
-  chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
-}
-
-const onTokenRequested = async () => {
-  chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
-}
 
 </script>
