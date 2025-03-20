@@ -27,6 +27,8 @@ export type Scalars = {
   BlobId: { input: any; output: any; }
   /** A block height to identify blocks in a chain */
   BlockHeight: { input: any; output: any; }
+  /** Materials of a new block. */
+  BlockMaterial: { input: any; output: any; }
   /** A WebAssembly module's bytecode */
   Bytecode: { input: any; output: any; }
   /** How to create a chain */
@@ -73,6 +75,8 @@ export type Scalars = {
   Recipient: { input: any; output: any; }
   /** A number to identify successive attempts to decide a value in a consensus protocol. */
   Round: { input: any; output: any; }
+  /** A signed block which will be submitted to blockchain with its signature. */
+  SignedBlock: { input: any; output: any; }
   /** The name of an event stream */
   StreamName: { input: any; output: any; }
   /** The target of a message, relative to a particular application. Used to identify each outbox. */
@@ -81,8 +85,12 @@ export type Scalars = {
   Timestamp: { input: any; output: any; }
   /** Description of the necessary information to run a user application */
   UserApplicationDescription: { input: any; output: any; }
+  /** A validated block certificate. */
+  ValidatedBlockCertificate: { input: any; output: any; }
   VersionInfo: { input: any; output: any; }
   VmRuntime: { input: any; output: any; }
+  /** Input parameters of wallet initialization. */
+  WalletInitializer: { input: any; output: any; }
 };
 
 export type ApplicationOverview = {
@@ -151,6 +159,23 @@ export type BlockBody = {
   operations: Array<Scalars['Operation']['output']>;
   /** The record of oracle responses for each transaction. */
   oracleResponses: Array<Array<Scalars['OracleResponse']['output']>>;
+};
+
+/** The messages and the state hash resulting from a [`ProposedBlock`]'s execution. */
+export type BlockExecutionOutcome = {
+  __typename?: 'BlockExecutionOutcome';
+  /** The list of blobs created by each transaction. */
+  blobs: Array<Array<Scalars['Blob']['output']>>;
+  /** The list of events produced by each transaction. */
+  events: Array<Array<Event>>;
+  /** The list of outgoing messages for each transaction. */
+  messages: Array<Array<OutgoingMessage>>;
+  /** The execution result for each operation. */
+  operationResults: Array<Scalars['OperationResult']['output']>;
+  /** The record of oracle responses for each transaction. */
+  oracleResponses: Array<Array<Scalars['OracleResponse']['output']>>;
+  /** The hash of the chain's execution state after this block. */
+  stateHash: Scalars['CryptoHash']['output'];
 };
 
 /**
@@ -413,6 +438,20 @@ export type Event = {
   value: Array<Scalars['Int']['output']>;
 };
 
+/** A [`ProposedBlock`], together with the outcome from its execution. */
+export type ExecutedBlock = {
+  __typename?: 'ExecutedBlock';
+  block: ProposedBlock;
+  outcome: BlockExecutionOutcome;
+};
+
+export type ExecutedBlockMaterial = {
+  __typename?: 'ExecutedBlockMaterial';
+  blobIds: Array<Scalars['BlobId']['output']>;
+  executedBlock: ExecutedBlock;
+  validatedBlockCertificate?: Maybe<Scalars['ValidatedBlockCertificate']['output']>;
+};
+
 export type ExecutionStateView = {
   __typename?: 'ExecutionStateView';
   system: SystemExecutionStateView;
@@ -660,6 +699,8 @@ export type MutationRoot = {
    * This will automatically subscribe to the future committees created by `admin_id`.
    */
   openMultiOwnerChain: Scalars['ChainId']['output'];
+  /** It not actually execute operation to publish blob, but just put blob to local node */
+  prepareBlob: Scalars['CryptoHash']['output'];
   /** Processes the inbox and returns the lists of certificate hashes that were created, if any. */
   processInbox: Array<Scalars['CryptoHash']['output']>;
   /** Publishes a new data blob. */
@@ -676,6 +717,10 @@ export type MutationRoot = {
   removeCommittee: Scalars['CryptoHash']['output'];
   /** Retries the pending block that was unsuccessfully proposed earlier. */
   retryPendingBlock?: Maybe<Scalars['CryptoHash']['output']>;
+  /** Calculate block execution state hash */
+  simulateExecuteBlock?: Maybe<ExecutedBlockMaterial>;
+  /** Submit block proposal with signature */
+  submitBlockAndSignature: Scalars['CryptoHash']['output'];
   /** Subscribes to a system channel. */
   subscribe: Scalars['CryptoHash']['output'];
   /**
@@ -685,6 +730,8 @@ export type MutationRoot = {
   transfer: Scalars['CryptoHash']['output'];
   /** Unsubscribes from a system channel. */
   unsubscribe: Scalars['CryptoHash']['output'];
+  /** ResPeer::CheCko::Initialize offline wallet */
+  walletInitWithoutSecretKey: Scalars['ChainId']['output'];
 };
 
 
@@ -768,6 +815,12 @@ export type MutationRootOpenMultiOwnerChainArgs = {
 };
 
 
+export type MutationRootPrepareBlobArgs = {
+  bytes: Array<Scalars['Int']['input']>;
+  chainId: Scalars['ChainId']['input'];
+};
+
+
 export type MutationRootProcessInboxArgs = {
   chainId: Scalars['ChainId']['input'];
 };
@@ -804,6 +857,19 @@ export type MutationRootRetryPendingBlockArgs = {
 };
 
 
+export type MutationRootSimulateExecuteBlockArgs = {
+  blockMaterial: Scalars['BlockMaterial']['input'];
+  chainId: Scalars['ChainId']['input'];
+};
+
+
+export type MutationRootSubmitBlockAndSignatureArgs = {
+  block: Scalars['SignedBlock']['input'];
+  chainId: Scalars['ChainId']['input'];
+  height: Scalars['BlockHeight']['input'];
+};
+
+
 export type MutationRootSubscribeArgs = {
   channel: SystemChannel;
   publisherChainId: Scalars['ChainId']['input'];
@@ -823,6 +889,12 @@ export type MutationRootUnsubscribeArgs = {
   channel: SystemChannel;
   publisherChainId: Scalars['ChainId']['input'];
   subscriberChainId: Scalars['ChainId']['input'];
+};
+
+
+export type MutationRootWalletInitWithoutSecretKeyArgs = {
+  chainId: Scalars['ChainId']['input'];
+  initializer: Scalars['WalletInitializer']['input'];
 };
 
 /**
@@ -896,11 +968,56 @@ export type PostedMessage = {
   refundGrantTo?: Maybe<Scalars['Account']['output']>;
 };
 
+/**
+ * A block containing operations to apply on a given chain, as well as the
+ * acknowledgment of a number of incoming messages from other chains.
+ * * Incoming messages must be selected in the order they were
+ * produced by the sending chain, but can be skipped.
+ * * When a block is proposed to a validator, all cross-chain messages must have been
+ * received ahead of time in the inbox of the chain.
+ * * This constraint does not apply to the execution of confirmed blocks.
+ */
+export type ProposedBlock = {
+  __typename?: 'ProposedBlock';
+  /**
+   * The user signing for the operations in the block and paying for their execution
+   * fees. If set, this must be the `owner` in the block proposal. `None` means that
+   * the default account of the chain is used. This value is also used as recipient of
+   * potential refunds for the message grants created by the operations.
+   */
+  authenticatedSigner?: Maybe<Scalars['Owner']['output']>;
+  /** The chain to which this block belongs. */
+  chainId: Scalars['ChainId']['output'];
+  /** The number identifying the current configuration. */
+  epoch: Scalars['Epoch']['output'];
+  /** The block height. */
+  height: Scalars['BlockHeight']['output'];
+  /**
+   * A selection of incoming messages to be executed first. Successive messages of same
+   * sender and height are grouped together for conciseness.
+   */
+  incomingBundles: Array<IncomingBundle>;
+  /** The operations to execute. */
+  operations: Array<Scalars['Operation']['output']>;
+  /**
+   * Certified hash (see `Certificate` below) of the previous block in the
+   * chain, if any.
+   */
+  previousBlockHash?: Maybe<Scalars['CryptoHash']['output']>;
+  /**
+   * The timestamp when this block was created. This must be later than all messages received
+   * in this block, but no later than the current time.
+   */
+  timestamp: Scalars['Timestamp']['output'];
+};
+
 export type QueryRoot = {
   __typename?: 'QueryRoot';
   applications: Array<ApplicationOverview>;
   /** Returns the balance of given owner */
   balance: Scalars['Amount']['output'];
+  /** Returns the balances of given owners */
+  balances: Scalars['JSONObject']['output'];
   block?: Maybe<HashedConfirmedBlock>;
   /** Returns block material of the chain */
   blockMaterial: CandidateBlockMaterial;
@@ -924,6 +1041,11 @@ export type QueryRootApplicationsArgs = {
 export type QueryRootBalanceArgs = {
   chainId: Scalars['ChainId']['input'];
   owner?: InputMaybe<Scalars['AccountOwner']['input']>;
+};
+
+
+export type QueryRootBalancesArgs = {
+  chainOwners: Scalars['JSONObject']['input'];
 };
 
 

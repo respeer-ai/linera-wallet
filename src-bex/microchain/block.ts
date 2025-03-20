@@ -4,7 +4,7 @@ import { db, rpc } from '../../src/model'
 import {
   BLOCK,
   BLOCK_MATERIAL,
-  EXECUTE_BLOCK_WITH_FULL_MATERIALS,
+  SIMULATE_EXECUTE_BLOCK,
   SUBMIT_BLOCK_AND_SIGNATURE
 } from '../../src/graphql'
 import { queryApplication } from '../middleware/rpcimpl/lineragraphqldo'
@@ -22,7 +22,7 @@ import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbBase, dbWallet } from '../../src/controller'
 import { _hex, graphqlResult } from '../../src/utils'
-import { HashedCertificateValue } from 'src/__generated__/graphql/sdk/graphql'
+import { HashedConfirmedBlock } from 'src/__generated__/graphql/sdk/graphql'
 import { parse, stringify } from 'lossless-json'
 
 export class BlockSigner {
@@ -73,13 +73,13 @@ export class BlockSigner {
 
   static updateChainOperations = async (
     microchain: string,
-    block: HashedCertificateValue
+    block: HashedConfirmedBlock
   ) => {
     const operations = await sharedStore.getChainOperations(
       microchain,
       undefined,
       [db.OperationState.EXECUTING, db.OperationState.EXECUTED],
-      block.value.executedBlock?.outcome.stateHash as string
+      block.hash as string
     )
     for (const operation of operations) {
       if (operation.state !== db.OperationState.EXECUTED) {
@@ -94,11 +94,11 @@ export class BlockSigner {
 
   static updateActivities = async (
     microchain: string,
-    block: HashedCertificateValue
+    block: HashedConfirmedBlock
   ) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const nativeTokenId = (await sharedStore.nativeToken())?.id || 1
-    for (const bundle of block?.value?.executedBlock?.block?.incomingBundles ||
+    for (const bundle of block.value.block.body.incomingBundles ||
       []) {
       const origin = bundle.origin as rpc.Origin
       for (const message of bundle.bundle.messages) {
@@ -110,11 +110,11 @@ export class BlockSigner {
             nativeTokenId,
             origin.sender,
             _message?.System?.Credit?.source,
-            block.value.executedBlock?.block.chainId as string,
+            block.value.block.header.chainId as string,
             _message?.System?.Credit?.target,
             _message?.System?.Credit?.amount,
-            block.value.executedBlock?.block.height as number,
-            block.value.executedBlock?.block.timestamp as number,
+            block.value.block.header.height as number,
+            block.value.block.header.timestamp as number,
             block.hash as string,
             message.grant as string
           )
@@ -124,9 +124,9 @@ export class BlockSigner {
             _message.User.application_id
           )) as db.Token
           const tokenId = token?.id || 2
-          let erc20MessageStr = undefined as unknown as string
+          let memeMessageStr = undefined as unknown as string
           try {
-            erc20MessageStr = await lineraWasm.bcs_deserialize_erc20_message(
+            memeMessageStr = await lineraWasm.bcs_deserialize_meme_message(
               `[${_message.User.bytes.toString()}]`
             )
           } catch (e) {
@@ -135,19 +135,19 @@ export class BlockSigner {
           }
           // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const erc20Message = parse(erc20MessageStr) as rpc.ERC20Message
-          if (erc20Message?.Transfer) {
+          const memeMessage = parse(memeMessageStr) as rpc.ERC20Message
+          if (memeMessage?.Transfer) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await sharedStore.createActivity(
               microchain,
               tokenId,
-              erc20Message.Transfer.origin.chain_id,
-              erc20Message.Transfer.origin.owner,
-              block.value.executedBlock?.block.chainId as string,
-              erc20Message.Transfer.to.owner,
-              erc20Message.Transfer.amount,
-              block.value.executedBlock?.block.height as number,
-              block.value.executedBlock?.block.timestamp as number,
+              memeMessage.Transfer.origin.chain_id,
+              memeMessage.Transfer.origin.owner,
+              block.value.block.header.chainId as string,
+              memeMessage.Transfer.to.owner,
+              memeMessage.Transfer.amount,
+              block.value.block.header.height as number,
+              block.value.block.header.timestamp as number,
               block.hash as string,
               message.grant as string
             )
@@ -155,12 +155,12 @@ export class BlockSigner {
         }
       }
     }
-    for (const operation of block?.value?.executedBlock?.block.operations ||
+    for (const operation of block.value.block.body.operations ||
       []) {
       const _operation = operation as rpc.Operation
       if (_operation.System?.Transfer) {
         let grant = undefined as unknown as string | undefined
-        for (const messages of block?.value?.executedBlock?.outcome?.messages ||
+        for (const messages of block.value.block.body.messages ||
           []) {
           grant = messages.find((el) => {
             const destination = el.destination as rpc.Destination
@@ -180,13 +180,13 @@ export class BlockSigner {
         await sharedStore.createActivity(
           microchain,
           nativeTokenId,
-          block.value.executedBlock?.block.chainId as string,
+          block.value.block.header.chainId as string,
           _operation.System.Transfer.owner,
           _operation.System.Transfer.recipient.Account?.chain_id as string,
           _operation.System.Transfer.recipient.Account?.owner,
           _operation.System.Transfer.amount,
-          block.value.executedBlock?.block.height as number,
-          block.value.executedBlock?.block.timestamp as number,
+          block.value.block.header.height as number,
+          block.value.block.header.timestamp as number,
           block.hash as string,
           grant as string
         )
@@ -208,7 +208,7 @@ export class BlockSigner {
     const block = (await queryApplication(
       microchain,
       blockQuery
-    )) as HashedCertificateValue
+    )) as HashedConfirmedBlock
     await BlockSigner.updateChainOperations(microchain, block)
     await BlockSigner.updateActivities(microchain, block)
     await BlockSigner.updateMicrochainOpenState(microchain, block)
@@ -216,7 +216,7 @@ export class BlockSigner {
 
   static updateMicrochainOpenState = async (
     microchain: string,
-    block: HashedCertificateValue
+    block: HashedConfirmedBlock
   ) => {
     const _microchain = (await sharedStore.getMicrochain(
       microchain
@@ -270,15 +270,15 @@ export class BlockSigner {
     )) as CandidateBlockMaterial
   }
 
-  static async executeBlockWithFullMaterials(
+  static async simulateExecuteBlock(
     microchain: string,
     blockMaterial: CandidateBlockMaterial,
     operation?: rpc.Operation
   ) {
-    const executeBlockWithFullMaterialsQuery = {
+    const simulateExecuteBlockQuery = {
       query: {
-        operationName: 'executeBlockWithFullMaterials',
-        query: EXECUTE_BLOCK_WITH_FULL_MATERIALS.loc?.source?.body,
+        operationName: 'simulateExecuteBlock',
+        query: SIMULATE_EXECUTE_BLOCK.loc?.source?.body,
         variables: {
           chainId: microchain,
           operations: operation ? [operation] : [],
@@ -289,7 +289,7 @@ export class BlockSigner {
     } as RpcGraphqlQuery
     return (await queryApplication(
       microchain,
-      executeBlockWithFullMaterialsQuery
+      simulateExecuteBlockQuery
     )) as ExecutedBlockMaterial
   }
 

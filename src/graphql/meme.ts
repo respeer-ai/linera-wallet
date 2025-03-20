@@ -15,7 +15,7 @@ export const BALANCE_OF = gql`
   }
 `
 
-export const TRANSFER = gql`
+export const TRANSFER_MEME = gql`
   mutation transfer($to: Account, $amount: Amount!) {
     transfer(to: $to, amount: $amount)
   }

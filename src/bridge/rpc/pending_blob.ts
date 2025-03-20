@@ -1,9 +1,9 @@
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useMutation } from '@vue/apollo-composable'
-import { ADD_PENDING_BLOB } from 'src/graphql'
+import { PREPARE_BLOB } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
-import { type AddPendingBlobMutation } from 'src/__generated__/graphql/service/graphql'
+import { type PrepareBlobMutation } from 'src/__generated__/graphql/service/graphql'
 
 export class PendingBlob {
   static addPendingBlob = async (
@@ -15,14 +15,14 @@ export class PendingBlob {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { mutate } = provideApolloClient(apolloClient)(() =>
-      useMutation(ADD_PENDING_BLOB)
+      useMutation(PREPARE_BLOB)
     )
     const res = await mutate({
       chainId,
       bytes
     })
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return (graphqlResult.rootData(res) as AddPendingBlobMutation)
-      .addPendingBlob as string
+    return (graphqlResult.rootData(res) as PrepareBlobMutation)
+      .prepareBlob as string
   }
 }

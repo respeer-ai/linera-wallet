@@ -163,16 +163,66 @@ export const BLOCK_MATERIAL = gql`
 export const SIMULATE_EXECUTE_BLOCK = gql`
   mutation simulateExecuteBlock(
     $chainId: ChainId!
-    $operations: [Operation!]!
-    $incomingBundles: [UserIncomingBundle!]!
-    $localTime: Timestamp!
+    $blockMaterial: BlockMaterial!
   ) {
     simulateExecuteBlock(
       chainId: $chainId
-      operations: $operations
-      incomingBundles: $incomingBundles
-      localTime: $localTime
-    )
+      blockMaterial: $blockMaterial
+    ) {
+      executedBlock {
+        block {
+          chainId
+          epoch
+          incomingBundles {
+            origin
+            bundle {
+              height
+              timestamp
+              certificateHash
+              transactionIndex
+              messages {
+                authenticatedSigner
+                grant
+                refundGrantTo
+                kind
+                index
+                message
+              }
+            }
+            action
+          }
+          operations
+          height
+          timestamp
+          authenticatedSigner
+          previousBlockHash
+        }
+        outcome {
+          messages {
+            destination
+            authenticatedSigner
+            grant
+            refundGrantTo
+            kind
+            message
+          }
+          stateHash
+          oracleResponses
+          events {
+            streamId {
+              applicationId
+              streamName
+            }
+            key
+            value
+          }
+          blobs
+          operationResults
+        }
+      }
+      blobIds
+      validatedBlockCertificate
+    }
   }
 `
 
