@@ -54,7 +54,9 @@ export class ExecutedBlock {
           const simulateExecuteBlock = (
             data as Record<string, SimulateExecuteBlockMutation>
           ).data
-          resolve(simulateExecuteBlock.simulateExecuteBlock as ExecutedBlockMaterial)
+          resolve(
+            simulateExecuteBlock.simulateExecuteBlock as ExecutedBlockMaterial
+          )
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

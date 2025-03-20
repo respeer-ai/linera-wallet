@@ -95,10 +95,7 @@ export class Microchain {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        resolve(
-          (graphqlResult.rootData(res) as OwnerChainsQuery)
-            .ownerChains
-        )
+        resolve((graphqlResult.rootData(res) as OwnerChainsQuery).ownerChains)
       })
 
       onError((error) => {

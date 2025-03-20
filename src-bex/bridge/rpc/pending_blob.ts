@@ -35,9 +35,7 @@ export class PendingBlob {
           if (errors && errors.length > 0) {
             return reject(stringify(errors))
           }
-          const prepareBlob = (
-            data as Record<string, PrepareBlobMutation>
-          ).data
+          const prepareBlob = (data as Record<string, PrepareBlobMutation>).data
           resolve(prepareBlob.prepareBlob as string)
         })
         .catch((e) => {

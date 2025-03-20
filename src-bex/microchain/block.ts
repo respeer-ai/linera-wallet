@@ -98,8 +98,7 @@ export class BlockSigner {
   ) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const nativeTokenId = (await sharedStore.nativeToken())?.id || 1
-    for (const bundle of block.value.block.body.incomingBundles ||
-      []) {
+    for (const bundle of block.value.block.body.incomingBundles || []) {
       const origin = bundle.origin as rpc.Origin
       for (const message of bundle.bundle.messages) {
         const _message = message.message as rpc.Message
@@ -155,13 +154,11 @@ export class BlockSigner {
         }
       }
     }
-    for (const operation of block.value.block.body.operations ||
-      []) {
+    for (const operation of block.value.block.body.operations || []) {
       const _operation = operation as rpc.Operation
       if (_operation.System?.Transfer) {
         let grant = undefined as unknown as string | undefined
-        for (const messages of block.value.block.body.messages ||
-          []) {
+        for (const messages of block.value.block.body.messages || []) {
           grant = messages.find((el) => {
             const destination = el.destination as rpc.Destination
             const message = el.message as rpc.Message
@@ -464,12 +461,11 @@ export class BlockSigner {
     const continueProcess =
       blockMaterial.incomingBundles.length >= maxProcessBundles
 
-    const executedBlockMaterial =
-      await BlockSigner.simulateExecuteBlock(
-        microchain,
-        blockMaterial,
-        operation
-      )
+    const executedBlockMaterial = await BlockSigner.simulateExecuteBlock(
+      microchain,
+      blockMaterial,
+      operation
+    )
 
     const executedBlock = executedBlockMaterial?.executedBlock
     const validatedBlockCertificate =

@@ -7,9 +7,7 @@ export const BALANCE = gql`
 `
 
 export const BALANCES = gql`
-  query balances(
-    $chainOwners: JSONObject!
-  ) {
+  query balances($chainOwners: JSONObject!) {
     balances(chainOwners: $chainOwners)
   }
 `
@@ -34,13 +32,10 @@ export const OWNER_CHAINS = gql`
 
 export const WALLET_INIT_WITHOUT_SECRET_KEY = gql`
   mutation walletInitWithoutSecretKey(
-    $chainId: ChainId!,
-    $initializer: WalletInitializer!,
+    $chainId: ChainId!
+    $initializer: WalletInitializer!
   ) {
-    walletInitWithoutSecretKey(
-      chainId: $chainId
-      initializer: $initializer
-    )
+    walletInitWithoutSecretKey(chainId: $chainId, initializer: $initializer)
   }
 `
 
@@ -50,11 +45,7 @@ export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
     $height: BlockHeight!
     $block: SignedBlock!
   ) {
-    submitBlockAndSignature(
-      chainId: $chainId
-      height: $height
-      block: $block
-    )
+    submitBlockAndSignature(chainId: $chainId, height: $height, block: $block)
   }
 `
 
@@ -165,10 +156,7 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
     $chainId: ChainId!
     $blockMaterial: BlockMaterial!
   ) {
-    simulateExecuteBlock(
-      chainId: $chainId
-      blockMaterial: $blockMaterial
-    ) {
+    simulateExecuteBlock(chainId: $chainId, blockMaterial: $blockMaterial) {
       executedBlock {
         block {
           chainId

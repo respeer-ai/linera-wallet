@@ -91,7 +91,10 @@ export class Token {
     if (!namedApplication) return token.logo
     const microchain = await Microchain.anyMicrochain()
     if (!microchain) return token.logo
-    const creationChain = await ApplicationCreatorChain.id(microchain.microchain, namedApplication.applicationId)
+    const creationChain = await ApplicationCreatorChain.id(
+      microchain.microchain,
+      namedApplication.applicationId
+    )
     const blobGatewayUrl = network.blobGatewayUrl.endsWith('/')
       ? network.blobGatewayUrl.slice(0, network.blobGatewayUrl.length - 1)
       : network.blobGatewayUrl

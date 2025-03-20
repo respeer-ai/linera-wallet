@@ -10,10 +10,7 @@ import {
 } from 'src/__generated__/graphql/service/graphql'
 
 export class Account {
-  static balance = async (
-    chainId: string,
-    owner?: string
-  ): Promise<number> => {
+  static balance = async (chainId: string, owner?: string): Promise<number> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
@@ -34,11 +31,7 @@ export class Account {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        resolve(
-          Number(
-            (graphqlResult.rootData(res) as BalanceQuery).balance
-          )
-        )
+        resolve(Number((graphqlResult.rootData(res) as BalanceQuery).balance))
       })
 
       onError((error) => {

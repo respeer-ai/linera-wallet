@@ -1,7 +1,10 @@
-export type Balances = Record<string, {
-  chainBalance: number
-  ownerBalances: Record<string, number>
-}>
+export type Balances = Record<
+  string,
+  {
+    chainBalance: number
+    ownerBalances: Record<string, number>
+  }
+>
 
 export type Account = {
   chain_id: string
@@ -109,7 +112,7 @@ export type MemeToken = {
 
 export type MemeOperation = {
   Transfer: {
-    to: Account,
+    to: Account
     amount: string
   }
 }
