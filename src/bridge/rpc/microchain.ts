@@ -25,7 +25,7 @@ import { db } from 'src/model'
 import * as dbBridge from '../db'
 
 export class Microchain {
-  static openChain = async (publicKey: string): Promise<ClaimOutcome> => {
+  static openChain = async (owner: string): Promise<ClaimOutcome> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
     const apolloClient = new ApolloClient(options)
 
@@ -34,7 +34,7 @@ export class Microchain {
       useMutation(OPEN_CHAIN)
     )
     const res = await mutate({
-      publicKey
+      owner
     })
     return (graphqlResult.rootData(res) as OpenChainMutation).claim
   }
@@ -108,7 +108,7 @@ export class Microchain {
   static openMicrochain = async (): Promise<db.Microchain> => {
     const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return Promise.reject(new Error('Invalid owner'))
-    const resp = await Microchain.openChain(owner?.address)
+    const resp = await Microchain.openChain(owner?.owner)
     if (!resp) return Promise.reject(new Error('Invalid open chain'))
 
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
