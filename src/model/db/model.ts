@@ -116,10 +116,9 @@ export interface Network {
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
   name: 'Linera Testnet Archimedes ResPeer RPC',
-  faucetUrl: 'https://faucet.testnet-archimedes.linera.net',
-  // faucetUrl: 'http://faucet.testnet-archimedes.linera.net:40080',
-  blobGatewayUrl: 'https://testnet-archimedes.blobgateway.com',
-  // blobGatewayUrl: 'http://testnet-archimedes.blobgateway.com:9081',
+  // faucetUrl: 'https://faucet.testnet-archimedes.linera.net',
+  faucetUrl: 'http://api.faucet.respeer.ai/api/faucet',
+  blobGatewayUrl: 'https://api.blobgateway.com/api/blobs',
   rpcSchema: HTTPSchema.HTTPS,
   wsSchema: WSSchema.WSS,
   host: 'testnet-archimedes.respeer.ai',
