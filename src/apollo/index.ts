@@ -37,7 +37,7 @@ export async function getClientOptionsWithEndpointType(
     port = parseInt(
       url.port ? url.port : protocol === db.HTTPSchema.HTTP ? '80' : '443'
     )
-    path = undefined
+    path = url.pathname
     useAppHost = false
   }
 
