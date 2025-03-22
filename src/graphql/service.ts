@@ -33,9 +33,10 @@ export const OWNER_CHAINS = gql`
 export const WALLET_INIT_WITHOUT_SECRET_KEY = gql`
   mutation walletInitWithoutSecretKey(
     $chainId: ChainId!
-    $initializer: WalletInitializer!
+    $initializer: WalletInitializer!,
+    $messageId: MessageId!,
   ) {
-    walletInitWithoutSecretKey(chainId: $chainId, initializer: $initializer)
+    walletInitWithoutSecretKey(chainId: $chainId, initializer: $initializer, messageId: $messageId)
   }
 `
 

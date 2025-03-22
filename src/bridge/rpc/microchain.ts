@@ -56,12 +56,14 @@ export class Microchain {
     const signature = {
       Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
     }
+    const publicKey = {
+      Ed25519: _hex.toHex(keyPair.public().to_bytes().bytes)
+    }
 
     const initializer = {
-      public_key: _hex.toHex(keyPair.public().to_bytes().bytes),
+      publicKey,
       signature,
-      faucetUrl,
-      messageId
+      faucetUrl
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -70,7 +72,8 @@ export class Microchain {
     )
     return await mutate({
       chainId,
-      initializer
+      initializer,
+      messageId
     })
   }
 

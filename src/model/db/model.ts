@@ -1,5 +1,5 @@
 import CryptoJS, { AES, enc } from 'crypto-js'
-import { sha3 } from 'hash-wasm'
+import { keccak } from 'hash-wasm'
 // TODO: replace with web3.js utils
 import { _hex } from '../../utils'
 import Identicon from 'identicon.js'
@@ -40,9 +40,9 @@ export interface Application {
 
 export const ownerFromPublicKey = async (publicKey: string) => {
   const publicKeyBytes = _hex.toBytes(publicKey)
-  const typeNameBytes = new TextEncoder().encode('PublicKey::')
+  const typeNameBytes = new TextEncoder().encode('Ed25519PublicKey::')
   const bytes = new Uint8Array([...typeNameBytes, ...publicKeyBytes])
-  return await sha3(bytes, 256)
+  return await keccak(bytes, 256)
 }
 
 export interface Owner {
