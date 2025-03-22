@@ -49,19 +49,6 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        {{ $t('MSG_CREATION_CERTIFICATE_HASH') }}
-      </div>
-      <q-space />
-      <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
-        <q-space />
-        <div class='microchain-detail-value-text text-right'>
-          {{ microchain.certificateHash }}
-        </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(microchain.certificateHash, evt)' />
-      </div>
-    </div>
-    <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
-      <div class='microchain-detail-label text-grey-8 flex items-center'>
         {{ $t('MSG_DEFAULT_CHAIN') }}
       </div>
       <q-space />

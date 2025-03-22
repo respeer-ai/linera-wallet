@@ -42,8 +42,7 @@ export class Microchain {
   static initMicrochainStore = async (
     keyPair: Ed25519SigningKey,
     chainId: string,
-    messageId: string,
-    certificateHash: string
+    messageId: string
   ) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
@@ -53,25 +52,25 @@ export class Microchain {
     )?.faucetUrl
 
     const typeNameBytes = new TextEncoder().encode('Nonce::')
-    const bytes = new Uint8Array([
-      ...typeNameBytes,
-      ..._hex.toBytes(certificateHash)
-    ])
-    const signature = _hex.toHex(
-      keyPair.sign(new Memory(bytes)).to_bytes().bytes
-    )
+    const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(messageId)])
+    const signature = {
+      Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+    }
+
+    const initializer = {
+      public_key: _hex.toHex(keyPair.public().to_bytes().bytes),
+      signature,
+      faucetUrl,
+      messageId
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { mutate } = provideApolloClient(apolloClient)(() =>
       useMutation(WALLET_INIT_WITHOUT_SECRET_KEY)
     )
     return await mutate({
-      publicKey: _hex.toHex(keyPair.public().to_bytes().bytes),
-      signature,
-      faucetUrl,
       chainId,
-      messageId,
-      certificateHash
+      initializer
     })
   }
 
@@ -125,8 +124,7 @@ export class Microchain {
     await Microchain.initMicrochainStore(
       keyPair,
       resp.chainId as string,
-      resp.messageId as string,
-      resp.certificateHash as string
+      resp.messageId as string
     )
     // The first block will be signed in BlockView
 
@@ -159,12 +157,7 @@ export class Microchain {
       new Memory(_hex.toBytes(privateKey))
     )
 
-    await Microchain.initMicrochainStore(
-      keyPair,
-      chainId,
-      messageId,
-      certificateHash
-    )
+    await Microchain.initMicrochainStore(keyPair, chainId, messageId)
     // The first block will be signed in BlockView
 
     const microchain = await dbBridge.Microchain.create(

@@ -29,7 +29,7 @@ watch(networkId, async (newValue) => {
       const privateKey = db.privateKey(owner, password)
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
       try {
-        await rpcBridge.Microchain.initMicrochainStore(keyPair, microchain.microchain, microchain.messageId, microchain.certificateHash)
+        await rpcBridge.Microchain.initMicrochainStore(keyPair, microchain.microchain, microchain.messageId)
         microchain.imported = true
       } catch {
         microchain.imported = false

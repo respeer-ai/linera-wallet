@@ -15,7 +15,6 @@ export interface Microchain {
   id?: number
   microchain: string
   messageId: string
-  certificateHash: string
   name: string
   default: boolean
   imported: boolean // If it's imported in selected network
@@ -115,15 +114,13 @@ export interface Network {
 
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
-  name: 'Linera Testnet Archimedes ResPeer RPC',
-  // faucetUrl: 'https://faucet.testnet-archimedes.linera.net',
+  name: 'Linera ResPeer Local Net RPC',
   faucetUrl: 'http://api.faucet.respeer.ai/api/faucet',
   blobGatewayUrl: 'https://api.blobgateway.com/api/blobs',
-  rpcSchema: HTTPSchema.HTTPS,
-  wsSchema: WSSchema.WSS,
-  host: 'testnet-archimedes.respeer.ai',
-  // host: 'rpc.testnet-archimedes.respeer.ai',
-  port: 443,
+  rpcSchema: HTTPSchema.HTTP,
+  wsSchema: WSSchema.WS,
+  host: 'api.rpc.respeer.ai',
+  port: 80,
   path: '/rpc',
   selected: true,
   preset: true

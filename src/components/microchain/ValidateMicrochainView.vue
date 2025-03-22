@@ -18,13 +18,6 @@
       outlined v-model='messageId' type='textarea' :error='messageIdError'
       autogrow hide-bottom-space class='vertical-items-margin'
     />
-    <div class='text-bold vertical-menus-margin'>
-      {{ $t('MSG_CREATION_CERTIFICATE') }}
-    </div>
-    <q-input
-      outlined v-model='certificateHash' type='textarea' :error='certificateHashError'
-      autogrow hide-bottom-space class='vertical-items-margin'
-    />
     <q-btn
       class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
       @click='onValidateClick' :disabled='!canValidate'
@@ -46,25 +39,21 @@ const microchain = toRef(props, 'microchain')
 
 const microchainId = ref('')
 const messageId = ref('')
-const certificateHash = ref('')
 
 const microchainIdError = ref(false)
 const messageIdError = ref(false)
-const certificateHashError = ref(false)
 
 const emit = defineEmits<{(ev: 'validated'): void}>()
 
 const canValidate = computed(() => {
   return microchainId.value === microchain.value.microchain ||
-         messageId.value === microchain.value.messageId ||
-         certificateHash.value === microchain.value.certificateHash
+         messageId.value === microchain.value.messageId
 })
 
 const onValidateClick = () => {
   microchainIdError.value = microchainId.value !== microchain.value.microchain
   messageIdError.value = messageId.value !== microchain.value.messageId
-  certificateHashError.value = certificateHash.value !== microchain.value.certificateHash
-  if (microchainIdError.value || messageIdError.value || certificateHashError.value) return
+  if (microchainIdError.value || messageIdError.value) return
   emit('validated')
 }
 
