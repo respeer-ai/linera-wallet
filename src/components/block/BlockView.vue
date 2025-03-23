@@ -11,8 +11,8 @@ import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-import { toSnake } from 'ts-case-convert'
-import { type HashedConfirmedBlock, type CandidateBlockMaterial, type ExecutedBlock } from 'src/__generated__/graphql/service/graphql'
+// import { toSnake } from 'ts-case-convert'
+import { type HashedConfirmedBlock, type CandidateBlockMaterial /*, type ExecutedBlock */ } from 'src/__generated__/graphql/service/graphql'
 import { useI18n } from 'vue-i18n'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { Round } from 'src/model/rpc/model'
@@ -303,7 +303,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
       // const stateHash1 = await constructBlock.value?.constructBlock(microchain, operation, blockMaterial.incomingBundles, blockMaterial.localTime)
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const block = parse(stringify(executedBlock.block) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
+      /* const block = parse(stringify(executedBlock.block) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
         if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
           const _key = toSnake(key)
@@ -316,7 +316,8 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value
-      })
+      }) */
+      const block = executedBlock.block
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const payload = await lineraWasm.executed_block_payload(
@@ -330,6 +331,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
       if (!signature) reject('Failed generate signature')
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      /*
       const _executedBlock = parse(stringify(executedBlock) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
         if (value === null) return
         if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
@@ -344,6 +346,8 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value
       }) as ExecutedBlock
+      */
+      const _executedBlock = executedBlock
 
       if (_operation) {
         _operation.state = db.OperationState.EXECUTING
