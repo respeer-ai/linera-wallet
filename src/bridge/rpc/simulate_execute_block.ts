@@ -2,9 +2,9 @@ import { graphqlResult } from 'src/utils'
 import { db, rpc } from 'src/model'
 import { SIMULATE_EXECUTE_BLOCK } from 'src/graphql'
 import {
-  type IncomingBundle,
   type SimulateExecuteBlockMutation,
-  type ExecutedBlockMaterial
+  type ExecutedBlockMaterial,
+  type CandidateBlockMaterial
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
 import axios from 'axios'
@@ -14,8 +14,7 @@ export class ExecutedBlock {
   static simulateExecuteBlock = async (
     chainId: string,
     operations: rpc.Operation[],
-    incomingBundles: IncomingBundle[],
-    localTime: number
+    candidate: CandidateBlockMaterial
   ): Promise<ExecutedBlockMaterial> => {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return Promise.reject('Invalid network')
@@ -25,6 +24,11 @@ export class ExecutedBlock {
       : `${network?.rpcSchema}://${network?.host}:${network?.port}${
           network.path?.length ? network.path : ''
         }`
+    const blockMaterial = {
+      operations,
+      candidate
+    }
+
     return new Promise((resolve, reject) => {
       axios
         .post(
@@ -33,9 +37,7 @@ export class ExecutedBlock {
             query: SIMULATE_EXECUTE_BLOCK.loc?.source.body,
             variables: {
               chainId,
-              operations,
-              incomingBundles,
-              localTime
+              blockMaterial
             },
             operationName: 'simulateExecuteBlock'
           }),

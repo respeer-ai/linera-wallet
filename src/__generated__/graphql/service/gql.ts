@@ -26,6 +26,7 @@ const documents = {
     "\n  query pendingMessages($chainId: ChainId!) {\n    pendingMessages(chainId: $chainId) {\n      action\n      bundle {\n        height\n        timestamp\n        certificateHash\n        transactionIndex\n        messages {\n          authenticatedSigner\n          grant\n          refundGrantTo\n          kind\n          index\n          message\n        }\n      }\n      origin\n    }\n  }\n": types.PendingMessagesDocument,
     "\n  mutation transfer(\n    $chainId: ChainId!\n    $owner: Owner\n    $recipient: Recipient!\n    $amount: Amount!\n  ) {\n    transfer(\n      chainId: $chainId\n      owner: $owner\n      recipient: $recipient\n      amount: $amount\n    )\n  }\n": types.TransferDocument,
     "\n  mutation prepareBlob($chainId: ChainId!, $bytes: [Int!]!) {\n    prepareBlob(chainId: $chainId, bytes: $bytes)\n  }\n": types.PrepareBlobDocument,
+    "\n  mutation walletInitPublicKey(\n    $publicKey: AccountPublicKey!\n    $signature: AccountSignature!\n  ) {\n    walletInitPublicKey(publicKey: $publicKey, signature: $signature)\n  }\n": types.WalletInitPublicKeyDocument,
 };
 
 /**
@@ -94,6 +95,10 @@ export function graphql(source: "\n  mutation transfer(\n    $chainId: ChainId!\
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation prepareBlob($chainId: ChainId!, $bytes: [Int!]!) {\n    prepareBlob(chainId: $chainId, bytes: $bytes)\n  }\n"): (typeof documents)["\n  mutation prepareBlob($chainId: ChainId!, $bytes: [Int!]!) {\n    prepareBlob(chainId: $chainId, bytes: $bytes)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation walletInitPublicKey(\n    $publicKey: AccountPublicKey!\n    $signature: AccountSignature!\n  ) {\n    walletInitPublicKey(publicKey: $publicKey, signature: $signature)\n  }\n"): (typeof documents)["\n  mutation walletInitPublicKey(\n    $publicKey: AccountPublicKey!\n    $signature: AccountSignature!\n  ) {\n    walletInitPublicKey(publicKey: $publicKey, signature: $signature)\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

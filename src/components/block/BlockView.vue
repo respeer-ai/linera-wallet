@@ -270,8 +270,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
       const executedBlockMaterial = await rpcBridge.ExecutedBlock.simulateExecuteBlock(
         microchain,
         operation ? [operation] : [],
-        blockMaterial.incomingBundles,
-        blockMaterial.localTime as number
+        blockMaterial
       )
 
       const executedBlock = executedBlockMaterial?.executedBlock

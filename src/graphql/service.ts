@@ -259,3 +259,12 @@ export const PREPARE_BLOB = gql`
     prepareBlob(chainId: $chainId, bytes: $bytes)
   }
 `
+
+export const WALLET_INIT_PUBLIC_KEY = gql`
+  mutation walletInitPublicKey(
+    $publicKey: AccountPublicKey!
+    $signature: AccountSignature!
+  ) {
+    walletInitPublicKey(publicKey: $publicKey, signature: $signature)
+  }
+`

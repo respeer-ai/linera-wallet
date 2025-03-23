@@ -23,6 +23,7 @@ import {
 } from 'src/__generated__/graphql/service/graphql'
 import { db } from 'src/model'
 import * as dbBridge from '../db'
+import { Account } from './account'
 
 export class Microchain {
   static openChain = async (owner: string): Promise<ClaimOutcome> => {
@@ -40,6 +41,7 @@ export class Microchain {
   }
 
   static initMicrochainStore = async (
+    owner: string,
     keyPair: Ed25519SigningKey,
     chainId: string,
     messageId: string
@@ -56,12 +58,9 @@ export class Microchain {
     const signature = {
       Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
     }
-    const publicKey = {
-      Ed25519: _hex.toHex(keyPair.public().to_bytes().bytes)
-    }
 
     const initializer = {
-      publicKey,
+      owner,
       signature,
       faucetUrl
     }
@@ -110,8 +109,6 @@ export class Microchain {
   static openMicrochain = async (): Promise<db.Microchain> => {
     const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return Promise.reject(new Error('Invalid owner'))
-    const resp = await Microchain.openChain(owner?.owner)
-    if (!resp) return Promise.reject(new Error('Invalid open chain'))
 
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject(new Error('Invalid fingerprint'))
@@ -124,7 +121,14 @@ export class Microchain {
       new Memory(_hex.toBytes(privateKey))
     )
 
+    // Initialize public key to RPC wallet firstly
+    await Account.initPublicKey(keyPair)
+
+    const resp = await Microchain.openChain(owner?.owner)
+    if (!resp) return Promise.reject(new Error('Invalid open chain'))
+
     await Microchain.initMicrochainStore(
+      owner.owner,
       keyPair,
       resp.chainId as string,
       resp.messageId as string
@@ -160,7 +164,7 @@ export class Microchain {
       new Memory(_hex.toBytes(privateKey))
     )
 
-    await Microchain.initMicrochainStore(keyPair, chainId, messageId)
+    await Microchain.initMicrochainStore(owner.owner, keyPair, chainId, messageId)
     // The first block will be signed in BlockView
 
     const microchain = await dbBridge.Microchain.create(

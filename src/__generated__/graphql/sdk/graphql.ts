@@ -17,6 +17,10 @@ export type Scalars = {
   Account: { input: any; output: any; }
   /** An owner of an account. */
   AccountOwner: { input: any; output: any; }
+  /** A crypto public key. */
+  AccountPublicKey: { input: any; output: any; }
+  /** A crypto signature. */
+  AccountSignature: { input: any; output: any; }
   /** A non-negative amount of tokens. */
   Amount: { input: any; output: any; }
   /** A unique identifier for a user application */
@@ -55,6 +59,8 @@ export type Scalars = {
   Message: { input: any; output: any; }
   /** Whether an incoming message is accepted or rejected. */
   MessageAction: { input: any; output: any; }
+  /** The index of a message in a chain */
+  MessageId: { input: any; output: any; }
   /** The kind of outgoing message being sent */
   MessageKind: { input: any; output: any; }
   /** A unique identifier for an application module */
@@ -730,6 +736,8 @@ export type MutationRoot = {
   transfer: Scalars['CryptoHash']['output'];
   /** Unsubscribes from a system channel. */
   unsubscribe: Scalars['CryptoHash']['output'];
+  /** Add key pair info which only has public key */
+  walletInitPublicKey: Scalars['Owner']['output'];
   /** ResPeer::CheCko::Initialize offline wallet */
   walletInitWithoutSecretKey: Scalars['ChainId']['output'];
 };
@@ -892,9 +900,16 @@ export type MutationRootUnsubscribeArgs = {
 };
 
 
+export type MutationRootWalletInitPublicKeyArgs = {
+  publicKey: Scalars['AccountPublicKey']['input'];
+  signature: Scalars['AccountSignature']['input'];
+};
+
+
 export type MutationRootWalletInitWithoutSecretKeyArgs = {
   chainId: Scalars['ChainId']['input'];
   initializer: Scalars['WalletInitializer']['input'];
+  messageId: Scalars['MessageId']['input'];
 };
 
 /**
@@ -1028,6 +1043,8 @@ export type QueryRoot = {
   ownerChains: Chains;
   /** Returns the pending message of the chain */
   pendingMessages: Array<IncomingBundle>;
+  publicKeyPattern: Scalars['AccountPublicKey']['output'];
+  signaturePattern: Scalars['AccountSignature']['output'];
   /** Returns the version information on this node service. */
   version: Scalars['VersionInfo']['output'];
 };

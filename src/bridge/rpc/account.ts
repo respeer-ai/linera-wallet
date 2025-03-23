@@ -1,13 +1,14 @@
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
-import { provideApolloClient, useQuery } from '@vue/apollo-composable'
-import { graphqlResult } from 'src/utils'
+import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
+import { _hex, graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
-import { BALANCE, BALANCES } from 'src/graphql'
+import { BALANCE, BALANCES, WALLET_INIT_PUBLIC_KEY } from 'src/graphql'
 import {
   type BalanceQuery,
   type BalancesQuery
 } from 'src/__generated__/graphql/service/graphql'
+import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 
 export class Account {
   static balance = async (chainId: string, owner?: string): Promise<number> => {
@@ -73,6 +74,34 @@ export class Account {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         reject(new Error(`Get chain account balances: ${error}`))
       })
+    })
+  }
+
+  static initPublicKey = async (
+    keyPair: Ed25519SigningKey
+  ) => {
+    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    const apolloClient = new ApolloClient(options)
+
+    const typeNameBytes = new TextEncoder().encode('Nonce::')
+    const publicKeyBytes = keyPair.public().to_bytes().bytes
+    // Prefix '00' is for enum in public system
+    const bytes = new Uint8Array([...typeNameBytes, publicKeyBytes.length + 1, 0, ...publicKeyBytes])
+    console.log(11111, bytes)
+    const signature = {
+      Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+    }
+    const publicKey = {
+      Ed25519: _hex.toHex(keyPair.public().to_bytes().bytes)
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const { mutate } = provideApolloClient(apolloClient)(() =>
+      useMutation(WALLET_INIT_PUBLIC_KEY)
+    )
+    return await mutate({
+      publicKey,
+      signature
     })
   }
 }

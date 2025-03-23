@@ -11,7 +11,7 @@ const config: CodegenConfig = {
       plugins: []
     },
     './src/__generated__/graphql/faucet/': {
-      schema: 'http://172.16.31.73:8080',
+      schema: 'http://172.16.31.42:8080',
       documents: ['src/graphql/faucet.ts'],
       preset: 'client',
       plugins: []

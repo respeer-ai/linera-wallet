@@ -38,6 +38,16 @@ export class Block {
       : `${network?.rpcSchema}://${network?.host}:${network?.port}${
           network.path?.length ? network.path : ''
         }`
+    const sig = {
+      Ed25519: signature
+    }
+    const block = {
+      executedBlock,
+      round,
+      signature: sig,
+      validatedBlockCertificate
+    }
+
     return new Promise((resolve, reject) => {
       axios
         .post(
@@ -47,10 +57,7 @@ export class Block {
             variables: {
               chainId,
               height,
-              executedBlock,
-              round,
-              signature,
-              validatedBlockCertificate
+              block
             },
             operationName: 'submitBlockAndSignature'
           }),
