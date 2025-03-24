@@ -46,6 +46,14 @@ export class Account {
     })
   }
 
+  static ownerBalance = (
+    balances: rpc.Balances,
+    chainId: string,
+    owner: string
+  ) => {
+    return balances[chainId].ownerBalances[`User:${owner}`] | 0
+  }
+
   static balances = async (
     chainOwners: Map<string, Array<string>>
   ): Promise<rpc.Balances> => {

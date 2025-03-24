@@ -58,14 +58,14 @@ const updateAccountBalance = async (microchain: db.Microchain, tokenId: number, 
     : await dbBridge.MicrochainOwnerFungibleTokenBalance.update(microchainOwnerBalance)
 }
 
-const updateChainAccountBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
-  const balancesResp = await rpcBridge.Account.balances(new Map([[microchain.microchain, publicKeys]]))
-  if (!balancesResp[microchain.microchain]) return
+const updateChainAccountBalances = async (microchain: db.Microchain, owners: string[]) => {
+  const balances = await rpcBridge.Account.balances(new Map([[microchain.microchain, owners]]))
+  if (!balances[microchain.microchain]) return
   const nativeToken = (await dbBridge.Token.native()) as db.Token
   if (!nativeToken) return
-  await updateChainBalance(microchain, nativeToken.id as number, Number(balancesResp[microchain.microchain].chainBalance))
-  for (const publicKey of publicKeys) {
-    await updateAccountBalance(microchain, nativeToken.id as number, publicKey, Number(balancesResp[microchain.microchain].ownerBalances[publicKey]))
+  await updateChainBalance(microchain, nativeToken.id as number, Number(balances[microchain.microchain].chainBalance))
+  for (const owner of owners) {
+    await updateAccountBalance(microchain, nativeToken.id as number, owner, Number(rpcBridge.Account.ownerBalance(balances, microchain.microchain, owner)))
   }
 }
 
@@ -145,17 +145,17 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
   }
 }
 
-const updateFungibleBalances = async (microchain: db.Microchain, publicKeys: string[]) => {
+const updateFungibleBalances = async (microchain: db.Microchain, owners: string[]) => {
   const applications = await rpcBridge.Application.microchainApplications(microchain.microchain)
   const tokens = (await dbBridge.Token.fungibles()).filter((token) => applications.findIndex((el) => el.id === token.applicationId) >= 0)
   for (const token of tokens) {
     try {
       const balance = await rpcBridge.MemeApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string) || 0
       await updateChainBalance(microchain, token.id as number, balance)
-      for (const publicKey of publicKeys) {
+      for (const owner of owners) {
         try {
-          const balance = await rpcBridge.MemeApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string, publicKey) || 0
-          await updateAccountBalance(microchain, token.id as number, publicKey, balance)
+          const balance = await rpcBridge.MemeApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string, owner) || 0
+          await updateAccountBalance(microchain, token.id as number, owner, balance)
         } catch (e) {
           console.log('Failed process account balance', e)
         }
@@ -203,10 +203,10 @@ const processNewBlock = async (microchain: db.Microchain, hash?: string) => {
     const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
     if (!owners?.length) return
 
-    const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
+    const _owners = owners.reduce((keys: string[], a): string[] => { keys.push(a.owner); return keys }, [])
     try {
-      await updateChainAccountBalances(microchain, publicKeys)
-      await updateFungibleBalances(microchain, publicKeys)
+      await updateChainAccountBalances(microchain, _owners)
+      await updateFungibleBalances(microchain, _owners)
     } catch (error) {
       console.log('Failed update chain account balances', error)
     }
@@ -379,10 +379,10 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
   const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
   if (!owners.length) return Promise.reject('Invalid owners')
 
-  const publicKeys = owners.reduce((keys: string[], a): string[] => { keys.push(a.address); return keys }, [])
+  const _owners = owners.reduce((keys: string[], a): string[] => { keys.push(a.owner); return keys }, [])
   try {
-    await updateChainAccountBalances(microchain, publicKeys)
-    await updateFungibleBalances(microchain, publicKeys)
+    await updateChainAccountBalances(microchain, _owners)
+    await updateFungibleBalances(microchain, _owners)
   } catch {
     // DO NOTHING
   }
