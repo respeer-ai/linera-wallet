@@ -126,7 +126,7 @@ export const defaultNetwork = {
   wsSchema: WSSchema.WS,
   host: 'api.rpc.respeer.ai',
   port: 80,
-  path: '/rpc',
+  path: '/api/rpc',
   selected: true,
   preset: true
 } as Network

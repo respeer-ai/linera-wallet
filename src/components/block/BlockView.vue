@@ -477,7 +477,6 @@ const _handleOperations = async () => {
         // We don't know the reason of the failure, so we let user to choose if retry
         // TODO: processNewIncomingBundle return if retry
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        console.log(11111, isRetryBlock, certificateHash)
         if (isRetryBlock) continue
         operation.state = db.OperationState.EXECUTED
         operation.certificateHash = certificateHash
