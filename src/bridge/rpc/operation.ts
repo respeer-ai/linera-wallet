@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { db, rpc } from 'src/model'
 import { dbBridge } from '..'
 import { stringify } from 'lossless-json'
+import { Account } from './account'
 
 export class Operation {
   static transfer = async (
@@ -13,11 +14,11 @@ export class Operation {
   ): Promise<string> => {
     const fromOwner =
       fromPublicKey !== undefined
-        ? await db.ownerFromPublicKey(fromPublicKey)
+        ? Account.accountOwner(await db.ownerFromPublicKey(fromPublicKey))
         : undefined
     const toOwner =
       toPublicKey !== undefined
-        ? await db.ownerFromPublicKey(toPublicKey)
+        ? Account.accountOwner(await db.ownerFromPublicKey(toPublicKey))
         : undefined
     let amountStr = stringify(amount) || '0'
     if (Number(amountStr) === 0) return Promise.reject('Invalid amount')
