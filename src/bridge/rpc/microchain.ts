@@ -164,7 +164,12 @@ export class Microchain {
       new Memory(_hex.toBytes(privateKey))
     )
 
-    await Microchain.initMicrochainStore(owner.owner, keyPair, chainId, messageId)
+    await Microchain.initMicrochainStore(
+      owner.owner,
+      keyPair,
+      chainId,
+      messageId
+    )
     // The first block will be signed in BlockView
 
     const microchain = await dbBridge.Microchain.create(

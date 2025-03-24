@@ -11,8 +11,7 @@ import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-// import { toSnake } from 'ts-case-convert'
-import { type HashedConfirmedBlock, type CandidateBlockMaterial /*, type ExecutedBlock */ } from 'src/__generated__/graphql/service/graphql'
+import { type HashedConfirmedBlock, type CandidateBlockMaterial } from 'src/__generated__/graphql/service/graphql'
 import { useI18n } from 'vue-i18n'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { Round } from 'src/model/rpc/model'
@@ -298,25 +297,6 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
       // TODO: we actually should construct block with local rust code but it's too hard now, so we just validate executed block calculated by node service
       //       It has the same security level as local rust code
       // TODO: construct block locally and compare with block in executed block
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      // const stateHash1 = await constructBlock.value?.constructBlock(microchain, operation, blockMaterial.incomingBundles, blockMaterial.localTime)
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      /* const block = parse(stringify(executedBlock.block) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
-        if (value === null) return
-        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
-          const _key = toSnake(key)
-          if (!_key.includes('_') || _key === key) return value
-          if (this) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            this[_key] = value
-          }
-          return
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return value
-      }) */
       const block = executedBlock.block
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -330,39 +310,20 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
       const signature = await rpcBridge.Block.signPayload(owner, parse(payload) as Uint8Array)
       if (!signature) reject('Failed generate signature')
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      /*
-      const _executedBlock = parse(stringify(executedBlock) as string, function (this: Record<string, unknown>, key: string, value: unknown) {
-        if (value === null) return
-        if (key.length && typeof key === 'string' && key.slice(0, 1).toLowerCase() === key.slice(0, 1) && key.toLowerCase() !== key) {
-          const _key = toSnake(key)
-          if (!_key.includes('_') || _key === key) return value
-          if (this) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            this[_key] = value
-          }
-          return
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return value
-      }) as ExecutedBlock
-      */
-      const _executedBlock = executedBlock
-
       if (_operation) {
         _operation.state = db.OperationState.EXECUTING
-        _operation.stateHash = (_executedBlock.outcome.stateHash ||
-          (_executedBlock.outcome as unknown as Record<string, string>)
+        _operation.stateHash = (executedBlock.outcome.stateHash ||
+          (executedBlock.outcome as unknown as Record<string, string>)
             .state_hash) as string
         await dbBridge.ChainOperation.update(_operation)
       }
 
-      const isOpenChain = stringify(_executedBlock)?.includes('OpenChain')
+      const isOpenChain = stringify(executedBlock)?.includes('OpenChain')
 
       rpcBridge.Block.submitBlockAndSignature(
         microchain,
         executedBlock.block.height as number,
-        _executedBlock,
+        executedBlock,
         blockMaterial.round as Round,
         signature,
         validatedBlockCertificate
@@ -569,7 +530,7 @@ const delay = async (ms: number) => {
 const handleOperations = async () => {
   while (!_unmounted.value) {
     await _handleOperations()
-    await delay(1000)
+    await delay(10000)
   }
 }
 

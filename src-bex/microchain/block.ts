@@ -10,14 +10,12 @@ import {
 import { queryApplication } from '../middleware/rpcimpl/lineragraphqldo'
 import { RpcGraphqlQuery } from '../middleware/types'
 import {
-  type Block,
   type CandidateBlockMaterial,
   type ExecutedBlock,
   type ExecutedBlockMaterial,
   type NotificationsSubscription
 } from '../../src/__generated__/graphql/service/graphql'
 import { sha3 } from 'hash-wasm'
-import { toSnake } from 'ts-case-convert'
 import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbBase, dbWallet } from '../../src/controller'
@@ -336,56 +334,6 @@ export class BlockSigner {
     }
   }
 
-  static formalizeExecutedBlockBlock(executedBlock: ExecutedBlock) {
-    return parse(
-      stringify(executedBlock.block) as string,
-      function (this: Record<string, unknown>, key: string, value: unknown) {
-        if (value === null) return
-        if (
-          key.length &&
-          typeof key === 'string' &&
-          key.slice(0, 1).toLowerCase() === key.slice(0, 1) &&
-          key.toLowerCase() !== key
-        ) {
-          const _key = toSnake(key)
-          if (!_key.includes('_') || _key === key) return value
-          if (this) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            this[_key] = value
-          }
-          return
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return value
-      }
-    ) as Block
-  }
-
-  static formalizeExecutedBlock(executedBlock: ExecutedBlock) {
-    return parse(
-      stringify(executedBlock) as string,
-      function (this: Record<string, unknown>, key: string, value: unknown) {
-        if (value === null) return
-        if (
-          key.length &&
-          typeof key === 'string' &&
-          key.slice(0, 1).toLowerCase() === key.slice(0, 1) &&
-          key.toLowerCase() !== key
-        ) {
-          const _key = toSnake(key)
-          if (!_key.includes('_') || _key === key) return value
-          if (this) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            this[_key] = value
-          }
-          return
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return value
-      }
-    ) as ExecutedBlock
-  }
-
   static signPayload = async (
     owner: db.Owner,
     payload: Uint8Array
@@ -483,7 +431,7 @@ export class BlockSigner {
       await BlockSigner.validateOperation(executedBlock, operation)
     }
 
-    const block = BlockSigner.formalizeExecutedBlockBlock(executedBlock)
+    const block = executedBlock.block
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const payload = await lineraWasm.executed_block_payload(
       stringify(block, null, 2) as string,
@@ -498,23 +446,21 @@ export class BlockSigner {
     )
     if (!signature) return Promise.reject('Failed generate signature')
 
-    const _executedBlock = BlockSigner.formalizeExecutedBlock(executedBlock)
-
     if (_operation) {
       _operation.state = db.OperationState.EXECUTING
-      _operation.stateHash = (_executedBlock.outcome.stateHash ||
-        (_executedBlock.outcome as unknown as Record<string, string>)
+      _operation.stateHash = (executedBlock.outcome.stateHash ||
+        (executedBlock.outcome as unknown as Record<string, string>)
           .state_hash) as string
       await sharedStore.updateChainOperation(_operation)
     }
 
-    const isOpenChain = stringify(_executedBlock)?.includes('OpenChain')
+    const isOpenChain = stringify(executedBlock)?.includes('OpenChain')
 
     try {
       const certificateHash = await BlockSigner.submitBlockAndSignature(
         microchain,
         executedBlock.block.height as number,
-        _executedBlock,
+        executedBlock,
         blockMaterial.round as rpc.Round,
         signature,
         validatedBlockCertificate
@@ -677,11 +623,11 @@ export class BlockSigner {
   static execute() {
     BlockSigner.processOperations()
       .then(() => {
-        setTimeout(() => BlockSigner.execute(), 1000)
+        setTimeout(() => BlockSigner.execute(), 10000)
       })
       .catch((e) => {
         console.log('Failed process operations', e)
-        setTimeout(() => BlockSigner.execute(), 1000)
+        setTimeout(() => BlockSigner.execute(), 10000)
       })
   }
 

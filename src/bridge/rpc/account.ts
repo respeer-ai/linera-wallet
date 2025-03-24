@@ -1,6 +1,10 @@
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
-import { provideApolloClient, useMutation, useQuery } from '@vue/apollo-composable'
+import {
+  provideApolloClient,
+  useMutation,
+  useQuery
+} from '@vue/apollo-composable'
 import { _hex, graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { BALANCE, BALANCES, WALLET_INIT_PUBLIC_KEY } from 'src/graphql'
@@ -47,6 +51,9 @@ export class Account {
   ): Promise<rpc.Balances> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
+    const chainAccounts = new Map(
+      Array.from(chainOwners, ([k, v]) => [k, v.map((v) => `User:${v}`)])
+    )
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { /* result, refetch, fetchMore, */ onResult, onError } =
@@ -54,7 +61,7 @@ export class Account {
         useQuery(
           BALANCES,
           {
-            chainOwners
+            chainOwners: Object.fromEntries(chainAccounts)
           },
           {
             fetchPolicy: 'network-only'
@@ -77,17 +84,19 @@ export class Account {
     })
   }
 
-  static initPublicKey = async (
-    keyPair: Ed25519SigningKey
-  ) => {
+  static initPublicKey = async (keyPair: Ed25519SigningKey) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
     const typeNameBytes = new TextEncoder().encode('Nonce::')
     const publicKeyBytes = keyPair.public().to_bytes().bytes
     // Prefix '00' is for enum in public system
-    const bytes = new Uint8Array([...typeNameBytes, publicKeyBytes.length + 1, 0, ...publicKeyBytes])
-    console.log(11111, bytes)
+    const bytes = new Uint8Array([
+      ...typeNameBytes,
+      publicKeyBytes.length + 1,
+      0,
+      ...publicKeyBytes
+    ])
     const signature = {
       Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
     }
