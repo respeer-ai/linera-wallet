@@ -18,7 +18,7 @@
       {{ $t('MSG_VERSION') }}
     </div>
     <div class='vertical-items-margin text-grey-6 word-break-all'>
-      {{ networkInfo?.version?.crateVersion }} - {{ networkInfo?.version?.gitCommit }}
+      {{ networkInfo?.version?.crate_version }} - {{ networkInfo?.version?.git_commit }}
     </div>
     <div class='vertical-menus-margin text-grey-8 text-bold decorate-underline row flex items-center' :style='{ paddingBottom: "4px" }'>
       {{ $t('MSG_VALIDATORS') }}
