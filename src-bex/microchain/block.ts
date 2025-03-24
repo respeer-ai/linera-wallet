@@ -216,13 +216,16 @@ export class BlockSigner {
     const _microchain = (await sharedStore.getMicrochain(
       microchain
     )) as db.Microchain
-    if (!_microchain.opening || !_microchain.openChainCertificateHash) {
+    if (
+      _microchain.state === db.MicrochainState.CLAIMING ||
+      !_microchain.openChainCertificateHash
+    ) {
       return setTimeout(() => {
         void BlockSigner.updateMicrochainOpenState(microchain, block)
       }, 1000)
     }
     if (_microchain.openChainCertificateHash === block.hash) {
-      _microchain.opened = true
+      _microchain.state = db.MicrochainState.CREATED
       await sharedStore.updateMicrochain(_microchain)
     }
   }
@@ -487,7 +490,7 @@ export class BlockSigner {
           .getMicrochain(microchain)
           .then((_microchain?: db.Microchain) => {
             if (!_microchain) return
-            _microchain.opening = true
+            _microchain.state = db.MicrochainState.CLAIMED
             _microchain.openChainCertificateHash = certificateHash
             void sharedStore.updateMicrochain(_microchain)
           })
@@ -599,7 +602,10 @@ export class BlockSigner {
         microchain
       )) as db.Microchain
       if (!_microchain) continue
-      if (_microchain.openChainCertificateHash && !_microchain.opened) {
+      if (
+        _microchain.openChainCertificateHash &&
+        _microchain.state !== db.MicrochainState.CREATED
+      ) {
         try {
           await BlockSigner.processNewBlock(
             microchain,

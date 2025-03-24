@@ -51,7 +51,7 @@ export class Account {
     chainId: string,
     owner: string
   ) => {
-    return balances[chainId].ownerBalances[Account.accountOwner(owner)] | 0
+    return balances[chainId].ownerBalances[Account.accountOwner(owner)] || 0
   }
 
   static accountOwner = (owner: string) => {
@@ -64,7 +64,10 @@ export class Account {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
     const chainAccounts = new Map(
-      Array.from(chainOwners, ([k, v]) => [k, v.map((v) => Account.accountOwner(v))])
+      Array.from(chainOwners, ([k, v]) => [
+        k,
+        v.map((v) => Account.accountOwner(v))
+      ])
     )
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

@@ -11,6 +11,12 @@ export interface MicrochainOwner {
   owner: string
 }
 
+export enum MicrochainState {
+  CLAIMING = 'Claiming',
+  CLAIMED = 'Claimed',
+  CREATED = 'Created'
+}
+
 export interface Microchain {
   id?: number
   microchain: string
@@ -18,8 +24,7 @@ export interface Microchain {
   name: string
   default: boolean
   imported: boolean // If it's imported in selected network
-  opening: boolean
-  opened: boolean
+  state: MicrochainState
   openChainCertificateHash?: string
 }
 

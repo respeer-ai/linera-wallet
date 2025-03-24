@@ -43,9 +43,7 @@ const updateChainBalance = async (microchain: db.Microchain, tokenId: number, ba
     : await dbBridge.MicrochainFungibleTokenBalance.update(microchainBalance)
 }
 
-const updateAccountBalance = async (microchain: db.Microchain, tokenId: number, publicKey: string, balance: number) => {
-  const owner = await dbBridge.Owner.publicKey2Owner(publicKey) as string
-  if (!owner) return
+const updateAccountBalance = async (microchain: db.Microchain, tokenId: number, owner: string, balance: number) => {
   const microchainOwnerBalance = (await dbBridge.MicrochainOwnerFungibleTokenBalance.balance(microchain.microchain, owner, tokenId)) as db.MicrochainOwnerFungibleTokenBalance || {
     microchain: microchain.microchain,
     owner,
@@ -187,19 +185,19 @@ const updateChainOperations = async (microchain: db.Microchain, block: HashedCon
 
 const updateMicrochainOpenState = async (microchain: db.Microchain, block: HashedConfirmedBlock) => {
   const _microchain = await dbBridge.Microchain.microchain(microchain.microchain) as db.Microchain
-  if (!_microchain.opening || !_microchain.openChainCertificateHash) {
+  if (_microchain.state === db.MicrochainState.CLAIMING || !_microchain.openChainCertificateHash) {
     return setTimeout(() => {
       void updateMicrochainOpenState(_microchain, block)
     }, 1000)
   }
   if (_microchain.openChainCertificateHash === block.hash) {
-    _microchain.opened = true
+    _microchain.state = db.MicrochainState.CREATED
     await dbBridge.Microchain.update(_microchain)
   }
 }
 
 const processNewBlock = async (microchain: db.Microchain, hash?: string) => {
-  if (microchain.opened) {
+  if (microchain.state === db.MicrochainState.CREATED) {
     const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
     if (!owners?.length) return
 
@@ -354,7 +352,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         if (isOpenChain) {
           dbBridge.Microchain.microchain(microchain).then((_microchain?: db.Microchain) => {
             if (!_microchain) return
-            _microchain.opening = true
+            _microchain.state = db.MicrochainState.CLAIMED
             _microchain.openChainCertificateHash = certificateHash
             void dbBridge.Microchain.update(_microchain)
           }).catch((e) => {
@@ -504,7 +502,7 @@ const _handleOperations = async () => {
       }
     }
     for (const microchain of microchains.value) {
-      if (microchain.openChainCertificateHash && !microchain.opened) {
+      if (microchain.openChainCertificateHash && microchain.state !== db.MicrochainState.CREATED) {
         try {
           await processNewBlock(microchain, microchain.openChainCertificateHash)
         } catch (e) {
