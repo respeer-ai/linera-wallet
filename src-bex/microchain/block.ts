@@ -75,9 +75,8 @@ export class BlockSigner {
   ) => {
     const operations = await sharedStore.getChainOperations(
       microchain,
-      undefined,
-      [db.OperationState.EXECUTING, db.OperationState.EXECUTED],
-      block.hash as string
+      block.hash as string,
+      [db.OperationState.EXECUTING, db.OperationState.EXECUTED]
     )
     for (const operation of operations) {
       if (operation.state !== db.OperationState.EXECUTED) {
@@ -421,7 +420,7 @@ export class BlockSigner {
     const executedBlock = executedBlockMaterial?.executedBlock
     const validatedBlockCertificate =
       executedBlockMaterial?.validatedBlockCertificate as unknown
-    const isRetryBlock = !validatedBlockCertificate
+    const isRetryBlock = !!validatedBlockCertificate
 
     if (!executedBlock) return Promise.reject('Failed execute block')
     if (
@@ -451,9 +450,6 @@ export class BlockSigner {
 
     if (_operation) {
       _operation.state = db.OperationState.EXECUTING
-      _operation.stateHash = (executedBlock.outcome.stateHash ||
-        (executedBlock.outcome as unknown as Record<string, string>)
-          .state_hash) as string
       await sharedStore.updateChainOperation(_operation)
     }
 

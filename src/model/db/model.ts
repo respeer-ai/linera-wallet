@@ -380,13 +380,12 @@ export interface ChainOperation {
   operationId: string
   microchain: string
   operationType?: OperationType
-  applicationId: string
+  applicationId?: string
   applicationType?: ApplicationType
   operation: string
   graphqlQuery?: string
   graphqlVariables?: string
   certificateHash?: string
-  stateHash?: string
   state: OperationState
   createdAt?: number
   firstProcessedAt?: number

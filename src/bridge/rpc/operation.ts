@@ -14,7 +14,7 @@ export class Operation {
   ): Promise<string> => {
     const fromOwner =
       fromPublicKey !== undefined
-        ? Account.accountOwner(await db.ownerFromPublicKey(fromPublicKey))
+        ? await db.ownerFromPublicKey(fromPublicKey)
         : undefined
     const toOwner =
       toPublicKey !== undefined

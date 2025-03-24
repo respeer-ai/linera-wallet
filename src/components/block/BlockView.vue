@@ -272,7 +272,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
 
       const executedBlock = executedBlockMaterial?.executedBlock
       const validatedBlockCertificate = executedBlockMaterial?.validatedBlockCertificate as unknown
-      const isRetryBlock = !validatedBlockCertificate
+      const isRetryBlock = !!validatedBlockCertificate
 
       if (!executedBlock) return reject('Failed execute block')
 
@@ -310,9 +310,6 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
 
       if (_operation) {
         _operation.state = db.OperationState.EXECUTING
-        _operation.stateHash = (executedBlock.outcome.stateHash ||
-          (executedBlock.outcome as unknown as Record<string, string>)
-            .state_hash) as string
         await dbBridge.ChainOperation.update(_operation)
       }
 
@@ -480,6 +477,7 @@ const _handleOperations = async () => {
         // We don't know the reason of the failure, so we let user to choose if retry
         // TODO: processNewIncomingBundle return if retry
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        console.log(11111, isRetryBlock, certificateHash)
         if (isRetryBlock) continue
         operation.state = db.OperationState.EXECUTED
         operation.certificateHash = certificateHash

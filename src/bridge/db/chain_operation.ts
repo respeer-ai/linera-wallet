@@ -34,13 +34,13 @@ export class ChainOperation {
     limit: number,
     microchain?: string,
     states?: db.OperationState[],
-    stateHash?: string
+    certificateHash?: string
   ): Promise<db.ChainOperation[]> => {
     return await dbWallet.chainOperations
       .filter(
         (op) =>
           (!microchain || op.microchain === microchain) &&
-          (!stateHash || op.stateHash === stateHash) &&
+          (!certificateHash || op.certificateHash === certificateHash) &&
           (states === undefined ||
             states.length === 0 ||
             states.includes(op.state))
