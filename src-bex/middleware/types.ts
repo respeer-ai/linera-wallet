@@ -28,7 +28,7 @@ export enum RpcMethod {
 
   LINERA_GRAPHQL_MUTATION = 'linera_graphqlMutation',
   LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery',
-  LINERA_GRAPHQL_PUBLISH_DATA_BLOB = 'linera_graphqlPublishDataBlob',
+  // We don't need publish data blob any more, it's a mutation
 
   ETH_GET_BALANCE = 'eth_getBalance'
 }
@@ -68,6 +68,8 @@ export interface GraphqlQuery {
   operationName: string
   query: string
   variables: Record<string, unknown>
+  // For application query bytes
+  bytes?: Uint8Array
 }
 
 export interface RpcGraphqlQuery {
@@ -98,9 +100,6 @@ export const lineraGraphqlMutationQueryWithQuery = (query: string) => {
 }
 
 export const lineraGraphqlMutationOperation = (request: RpcRequest) => {
-  if (request.request.method === RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB) {
-    return 'PublishDataBlob'
-  }
   const query = (
     request?.request?.params as unknown as RpcGraphqlQuery
   )?.query?.query?.replace('\n', '')

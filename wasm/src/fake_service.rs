@@ -2,8 +2,7 @@ use std::str::FromStr;
 
 use async_graphql::{Error, Object};
 use linera_base::{
-    data_types::Amount,
-    identifiers::{ModuleId, ChainId, Owner, UserApplicationId},
+    crypto::CryptoHash, data_types::Amount, identifiers::{ChainId, ModuleId, Owner, UserApplicationId}
 };
 use linera_execution::{system::Recipient, Operation, SystemOperation};
 
@@ -20,10 +19,6 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
-    async fn parse_operation(&self, operation: Operation) -> Operation {
-        operation
-    }
-
     async fn transfer(
         &self,
         _chain_id: ChainId,
@@ -59,5 +54,9 @@ impl MutationRoot {
             instantiation_argument: create_instantiation_argument,
             required_application_ids: create_required_application_ids,
         }))
+    }
+
+    async fn publish_data_blob(&self, _chain_id: ChainId, blob_hash: CryptoHash) -> Result<Operation, Error> {
+        Ok(Operation::System(SystemOperation::PublishDataBlob { blob_hash }))
     }
 }

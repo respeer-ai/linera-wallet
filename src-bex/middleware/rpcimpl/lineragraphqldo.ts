@@ -4,8 +4,7 @@ import {
   RpcRequest,
   RpcGraphqlQuery,
   lineraGraphqlOperation,
-  GraphqlOperation,
-  lineraGraphqlMutationQueryWithQuery
+  GraphqlOperation
 } from '../types'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import { basebridge } from '../../../src-bex/event'
@@ -16,7 +15,6 @@ import { db, rpc } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
 import { graphqlResult } from '../../../src/utils'
 import { parse, stringify } from 'lossless-json'
-import { rpcBridge } from '../../../src-bex/bridge'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
@@ -63,64 +61,19 @@ export const queryDo = async (
   })
 }
 
-const graphqlResponseKeyValue = (data: unknown, key: string) => {
-  return (data as Record<string, unknown>)[key]
-}
-
-export const queryApplication = async (
-  microchain: string,
+export const applicationQueryBytes = (
   query: RpcGraphqlQuery
-): Promise<unknown> => {
-  const operationName = lineraGraphqlMutationQueryWithQuery(query.query.query)
-  if (!operationName) return Promise.reject('Invalid operation')
-
-  const graphqlUrl = await queryUrl(microchain, query)
-
-  // TODO: we can serialize locally
-
-  const variables = query.query.variables || {}
-  if (query.applicationId) {
-    variables.checko_query_only = true
-  }
-  return new Promise((resolve, reject) => {
-    axios
-      .post(
-        graphqlUrl,
-        stringify({
-          query: query.query.query,
-          variables,
-          operationName: query.query.operationName
-        }),
-        {
-          responseType: 'text',
-          transformResponse: [(data) => data as string]
-        }
-      )
-      .then((res) => {
-        const dataString = graphqlResult.rootData(res) as string
-        const data = parse(dataString)
-        const errors = (data as Record<string, unknown[]>).errors
-        if (errors && errors.length > 0) {
-          return reject(stringify(errors))
-        }
-        const _data = (data as Record<string, unknown>).data
-        const payload = graphqlResponseKeyValue(
-          _data,
-          operationName[0].toLowerCase() + operationName.slice(1)
-        )
-        resolve(payload)
-      })
-      .catch((e) => {
-        reject(e)
-      })
-  })
+): Uint8Array | undefined => {
+  // Application operation bytes must be serialized from caller side
+  return query.query.bytes
 }
 
 const queryApplicationMutation = async (
   microchain: string,
   query: RpcGraphqlQuery
 ) => {
-  const queryBytes = await queryApplication(microchain, query)
+  const queryBytes = applicationQueryBytes(query)
+  if (!queryBytes) return Promise.reject('Invalid application operation')
 
   const operation = {
     User: {
@@ -214,52 +167,6 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
     case GraphqlOperation.QUERY:
       return queryDo(microchain, query)
   }
-}
-
-export const lineraGraphqlPublishDataBlob = async (request?: RpcRequest) => {
-  if (!request) {
-    return await Promise.reject('Invalid request')
-  }
-  const query = request.request.params as unknown as RpcGraphqlQuery
-  if (!query || !query.query) {
-    return await Promise.reject('Invalid query')
-  }
-  const publicKey = query.publicKey
-  const microchain = await sharedStore.getRpcMicrochain(
-    request.origin,
-    publicKey as string
-  )
-  if (!microchain) {
-    return Promise.reject(new Error('Invalid microchain'))
-  }
-
-  const blobHash = await rpcBridge.PendingBlob.addPendingBlob(
-    microchain,
-    (query.query.variables as Record<string, Uint8Array>).bytes
-  )
-
-  const operationId = uuidv4()
-  const operation = JSON.stringify({
-    System: {
-      PublishDataBlob: {
-        blob_hash: blobHash
-      }
-    }
-  } as rpc.Operation)
-
-  await sharedStore.createChainOperation({
-    operationId,
-    microchain,
-    operationType: db.OperationType.ANONYMOUS,
-    applicationId: query.applicationId,
-    applicationType: db.ApplicationType.ANONYMOUS,
-    operation,
-    graphqlQuery: query.query.query,
-    graphqlVariables: stringify(query.query.variables),
-    state: db.OperationState.CREATED
-  } as db.ChainOperation)
-
-  return { operationId, operation, blobHash }
 }
 
 export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {

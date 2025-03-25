@@ -242,12 +242,3 @@ pub async fn graphql_deserialize_operation(
     let operation_str = serde_json::to_string(&operation)?;
     Ok(operation_str)
 }
-
-#[wasm_bindgen(start)]
-pub async fn main() {
-    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-
-    console_log::init_with_level(log::Level::Debug).unwrap();
-
-    log::info!("Hello World!");
-}

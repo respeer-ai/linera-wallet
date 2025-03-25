@@ -7,7 +7,7 @@ import {
   SIMULATE_EXECUTE_BLOCK,
   SUBMIT_BLOCK_AND_SIGNATURE
 } from '../../src/graphql'
-import { queryApplication } from '../middleware/rpcimpl/lineragraphqldo'
+import { queryDo } from '../middleware/rpcimpl/lineragraphqldo'
 import { RpcGraphqlQuery } from '../middleware/types'
 import {
   type CandidateBlockMaterial,
@@ -199,7 +199,7 @@ export class BlockSigner {
         }
       }
     } as RpcGraphqlQuery
-    const block = (await queryApplication(
+    const block = (await queryDo(
       microchain,
       blockQuery
     )) as HashedConfirmedBlock
@@ -261,7 +261,7 @@ export class BlockSigner {
         }
       }
     } as RpcGraphqlQuery
-    return (await queryApplication(
+    return (await queryDo(
       microchain,
       blockMaterialQuery
     )) as CandidateBlockMaterial
@@ -285,7 +285,7 @@ export class BlockSigner {
         }
       }
     } as RpcGraphqlQuery
-    return (await queryApplication(
+    return (await queryDo(
       microchain,
       simulateExecuteBlockQuery
     )) as ExecutedBlockMaterial
@@ -376,10 +376,7 @@ export class BlockSigner {
         }
       }
     } as RpcGraphqlQuery
-    return (await queryApplication(
-      microchain,
-      submitBlockAndSignatureQuery
-    )) as string
+    return (await queryDo(microchain, submitBlockAndSignatureQuery)) as string
   }
 
   static async processNewIncomingMessageWithOperation(
