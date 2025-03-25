@@ -1,4 +1,3 @@
-use bip39::Mnemonic;
 /**
 This module defines the client API for the Web extension.
 
@@ -9,6 +8,7 @@ callable from all Web pages to which the Web client has been
 connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
+use bip39::Mnemonic;
 use std::str::FromStr;
 
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
@@ -29,10 +29,7 @@ use web_sys::*;
 mod fake_service;
 use fake_service::{MutationRoot, QueryRoot};
 
-#[cfg(feature = "no-storage")]
 use linera_client::fake_wallet::FakeWallet;
-#[cfg(not(feature = "no-storage"))]
-use linera_client::wallet::Wallet;
 use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions};
 
 // TODO convert to IndexedDbStore once we refactor Context
@@ -48,14 +45,7 @@ pub async fn get_storage() -> Result<WebStorage, JsError> {
     .await?)
 }
 
-#[cfg(not(feature = "no-storage"))]
-type PersistentWallet = linera_client::persistent::LocalStorage<Wallet>;
-#[cfg(not(feature = "no-storage"))]
-type ClientContext = linera_client::client_context::ClientContext<WebStorage, PersistentWallet>;
-
-#[cfg(feature = "no-storage")]
 type MemoryFakeWallet = linera_client::persistent::Memory<FakeWallet>;
-#[cfg(feature = "no-storage")]
 type SignClientContext = linera_client::client_context::ClientContext<WebStorage, MemoryFakeWallet>;
 
 // TODO get from config
@@ -86,17 +76,6 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     storage_config: None,
     with_wallet: None
 };
-
-#[cfg(not(feature = "no-storage"))]
-pub async fn get_client_context() -> Result<ClientContext, JsError> {
-    let wallet = linera_client::config::WalletState::read_from_local_storage("linera-wallet")?;
-    let mut storage = get_storage().await?;
-    wallet
-        .genesis_config()
-        .initialize_storage(&mut storage)
-        .await?;
-    Ok(ClientContext::new(get_storage().await?, OPTIONS, wallet))
-}
 
 pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
     let wallet = linera_client::config::WalletState::new(FakeWallet::new());
@@ -131,7 +110,6 @@ pub async fn executed_block_payload(
 
 // Execute operation to get
 #[wasm_bindgen]
-#[cfg(feature = "no-storage")]
 pub async fn construct_block(
     chain_id: &str,
     public_key: &str,

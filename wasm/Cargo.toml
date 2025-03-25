@@ -41,43 +41,52 @@ version = "2.1.0"
 features = [ "rand" ]
 
 [dependencies.linera-base]
-path = "./linera-protocol/linera-base"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web"]
 
 [dependencies.linera-chain]
-path = "./linera-protocol/linera-chain"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web"]
 
 [dependencies.linera-client]
-path = "./linera-protocol/linera-client"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 default-features = false
 features = ["web"]
 
 [dependencies.linera-core]
-path = "./linera-protocol/linera-core"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web", "wasmer"]
 
 [dependencies.linera-execution]
-path = "./linera-protocol/linera-execution"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web", "wasmer"]
 
 [dependencies.linera-faucet-client]
-path = "./linera-protocol/linera-faucet/client"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 
 [dependencies.linera-rpc]
-path = "./linera-protocol/linera-rpc"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web"]
 
 [dependencies.linera-storage]
-path = "./linera-protocol/linera-storage"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web", "wasmer"]
 
 [dependencies.linera-views]
-path = "./linera-protocol/linera-views"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+branch = "respeer-maas-7b3ae0b6-2025_03_15"
 features = ["web", "indexeddb"]
 
 [dependencies.abi]
-path = "./linera-meme/abi"
+git = "https://github.com/respeer-ai/linera-meme.git"
 
 [dependencies.web-sys]
 version = "0.3"
