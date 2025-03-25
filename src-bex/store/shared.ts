@@ -129,6 +129,18 @@ export const createChainOperation = async (operation: db.ChainOperation) => {
   await dbWallet.chainOperations.add(operation)
 }
 
+export const createOperationBlobs = async (
+  operationId: string,
+  blobs: Array<Uint8Array>
+) => {
+  if (!blobs.length) return
+  await dbWallet.operationBlobs.bulkAdd(
+    blobs.map((blob) => {
+      return { operationId, blob }
+    })
+  )
+}
+
 export const getChainOperations = async (
   microchain: string | undefined,
   certificateHash: string | undefined,
@@ -146,6 +158,15 @@ export const getChainOperations = async (
 
 export const updateChainOperation = async (operation: db.ChainOperation) => {
   await dbWallet.chainOperations.update(operation.id, operation)
+}
+
+export const operationBlobs = async (operationId: string) => {
+  return (
+    await dbWallet.operationBlobs
+      .where('operationId')
+      .equals(operationId)
+      .toArray()
+  ).map((blob) => blob.blob)
 }
 
 export const nativeToken = async () => {

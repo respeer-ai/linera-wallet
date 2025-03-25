@@ -20,7 +20,7 @@ import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbBase, dbWallet } from '../../src/controller'
 import { _hex, graphqlResult } from '../../src/utils'
-import { HashedConfirmedBlock } from 'src/__generated__/graphql/sdk/graphql'
+import { HashedConfirmedBlock } from 'src/__generated__/graphql/service/graphql'
 import { parse, stringify } from 'lossless-json'
 
 export class BlockSigner {
@@ -358,7 +358,8 @@ export class BlockSigner {
     executedBlock: ExecutedBlock,
     round: rpc.Round,
     signature: string,
-    validatedBlockCertificate?: unknown
+    validatedBlockCertificate: unknown | undefined,
+    blobs: Array<Uint8Array>
   ): Promise<string> {
     const submitBlockAndSignatureQuery = {
       query: {
@@ -370,8 +371,11 @@ export class BlockSigner {
           block: {
             executedBlock,
             round,
-            signature,
-            validatedBlockCertificate
+            signature: {
+              Ed25519: signature
+            },
+            validatedBlockCertificate,
+            blobs: Array.from(blobs.map((blob) => [0, blob.length, ...blob]))
           }
         }
       }
@@ -459,7 +463,10 @@ export class BlockSigner {
         executedBlock,
         blockMaterial.round as rpc.Round,
         signature,
-        validatedBlockCertificate
+        validatedBlockCertificate,
+        _operation
+          ? await sharedStore.operationBlobs(_operation.operationId)
+          : []
       )
 
       if (continueProcess) {

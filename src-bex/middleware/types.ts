@@ -70,6 +70,8 @@ export interface GraphqlQuery {
   variables: Record<string, unknown>
   // For application query bytes
   bytes?: Uint8Array
+  // If it's publish data blob
+  blobs?: Array<Uint8Array>
 }
 
 export interface RpcGraphqlQuery {

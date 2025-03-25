@@ -258,12 +258,6 @@ export const TRANSFER = gql`
   }
 `
 
-export const PREPARE_BLOB = gql`
-  mutation prepareBlob($chainId: ChainId!, $bytes: [Int!]!) {
-    prepareBlob(chainId: $chainId, bytes: $bytes)
-  }
-`
-
 export const WALLET_INIT_PUBLIC_KEY = gql`
   mutation walletInitPublicKey(
     $publicKey: AccountPublicKey!

@@ -5,21 +5,14 @@ const config: CodegenConfig = {
   overwrite: true,
   generates: {
     './src/__generated__/graphql/service/': {
-      schema: 'http://172.16.31.73:30080',
+      schema: 'http://api.rpc.respeer.ai/api/rpc',
       documents: ['src/graphql/service.ts'],
       preset: 'client',
       plugins: []
     },
     './src/__generated__/graphql/faucet/': {
-      schema: 'http://172.16.31.42:8080',
+      schema: 'http://api.faucet.respeer.ai/api/faucet',
       documents: ['src/graphql/faucet.ts'],
-      preset: 'client',
-      plugins: []
-    },
-    './src/__generated__/graphql/sdk/': {
-      schema:
-        './wasm/linera-protocol/linera-service-graphql-client/gql/*.graphql',
-      documents: [],
       preset: 'client',
       plugins: []
     }

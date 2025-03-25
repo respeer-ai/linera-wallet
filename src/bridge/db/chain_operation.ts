@@ -84,4 +84,13 @@ export class ChainOperation {
         .first()) !== undefined
     )
   }
+
+  static operationBlobs = async (operationId: string) => {
+    return (
+      await dbWallet.operationBlobs
+        .where('operationId')
+        .equals(operationId)
+        .toArray()
+    ).map((blob) => blob.blob)
+  }
 }

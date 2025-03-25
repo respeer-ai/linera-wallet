@@ -392,3 +392,9 @@ export interface ChainOperation {
   failedAt?: number
   failReason?: string
 }
+
+export interface OperationBlob {
+  id?: number
+  operationId: string
+  blob: Uint8Array
+}

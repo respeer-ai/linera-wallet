@@ -85,7 +85,7 @@ import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
-import { type ApplicationOverview } from 'src/__generated__/graphql/sdk/graphql'
+import { type ApplicationOverview } from 'src/__generated__/graphql/service/graphql'
 import { dbBridge, rpcBridge } from 'src/bridge'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'

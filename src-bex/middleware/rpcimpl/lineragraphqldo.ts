@@ -4,7 +4,8 @@ import {
   RpcRequest,
   RpcGraphqlQuery,
   lineraGraphqlOperation,
-  GraphqlOperation
+  GraphqlOperation,
+  lineraGraphqlMutationQueryWithQuery
 } from '../types'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import { basebridge } from '../../../src-bex/event'
@@ -33,11 +34,18 @@ const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   return graphqlUrl
 }
 
+const graphqlResponseKeyValue = (data: unknown, key: string) => {
+  return (data as Record<string, unknown>)[key]
+}
+
 export const queryDo = async (
   microchain: string,
   query: RpcGraphqlQuery
 ): Promise<unknown> => {
   const graphqlUrl = await queryUrl(microchain, query)
+
+  const operationName = lineraGraphqlMutationQueryWithQuery(query.query.query)
+  if (!operationName) return Promise.reject('Invalid operation')
 
   return new Promise((resolve, reject) => {
     axios
@@ -53,7 +61,11 @@ export const queryDo = async (
           return reject(stringify(errors))
         }
         const _data = (data as Record<string, unknown>).data
-        resolve(_data)
+        const payload = graphqlResponseKeyValue(
+          _data,
+          operationName[0].toLowerCase() + operationName.slice(1)
+        )
+        resolve(payload)
       })
       .catch((e) => {
         reject(e)
@@ -96,6 +108,9 @@ const queryApplicationMutation = async (
     graphqlVariables: stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
+
+  // Create blob for operation
+  await sharedStore.createOperationBlobs(operationId, query.query.blobs || [])
 
   return { operationId }
 }
