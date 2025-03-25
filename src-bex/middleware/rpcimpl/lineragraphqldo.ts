@@ -97,6 +97,9 @@ const queryApplicationMutation = async (
 
   // TODO: parse application operation
 
+  // Create blob for operation
+  await sharedStore.createOperationBlobs(operationId, query.query.blobs || [])
+
   await sharedStore.createChainOperation({
     operationId,
     microchain,
@@ -108,9 +111,6 @@ const queryApplicationMutation = async (
     graphqlVariables: stringify(query.query.variables),
     state: db.OperationState.CREATED
   } as db.ChainOperation)
-
-  // Create blob for operation
-  await sharedStore.createOperationBlobs(operationId, query.query.blobs || [])
 
   return { operationId }
 }
