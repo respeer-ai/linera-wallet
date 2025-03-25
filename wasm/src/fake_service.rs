@@ -2,7 +2,9 @@ use std::str::FromStr;
 
 use async_graphql::{Error, Object};
 use linera_base::{
-    crypto::CryptoHash, data_types::Amount, identifiers::{ChainId, ModuleId, Owner, UserApplicationId}
+    crypto::CryptoHash,
+    data_types::Amount,
+    identifiers::{ChainId, ModuleId, Owner, UserApplicationId},
 };
 use linera_execution::{system::Recipient, Operation, SystemOperation};
 
@@ -56,7 +58,13 @@ impl MutationRoot {
         }))
     }
 
-    async fn publish_data_blob(&self, _chain_id: ChainId, blob_hash: CryptoHash) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::PublishDataBlob { blob_hash }))
+    async fn publish_data_blob(
+        &self,
+        _chain_id: ChainId,
+        blob_hash: CryptoHash,
+    ) -> Result<Operation, Error> {
+        Ok(Operation::System(SystemOperation::PublishDataBlob {
+            blob_hash,
+        }))
     }
 }

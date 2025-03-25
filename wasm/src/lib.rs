@@ -11,16 +11,18 @@ arguments to these functions cannot be trusted and _must_ be verified!
 use bip39::Mnemonic;
 use std::str::FromStr;
 
+use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
-    crypto::{CryptoHash, AccountSecretKey, AccountPublicKey},
+    crypto::{AccountPublicKey, AccountSecretKey, CryptoHash},
     data_types::{BlockHeight, Round, Timestamp},
     identifiers::ChainId,
 };
-use linera_chain::data_types::{BlockExecutionOutcome, IncomingBundle, ProposalContent, ProposedBlock};
+use linera_chain::data_types::{
+    BlockExecutionOutcome, IncomingBundle, ProposalContent, ProposedBlock,
+};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
-use abi::meme::{MemeMessage, MemeOperation};
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -74,7 +76,7 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     command: linera_client::client_options::ClientCommand::Keygen,
     wallet_state_path: None,
     storage_config: None,
-    with_wallet: None
+    with_wallet: None,
 };
 
 pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
@@ -93,11 +95,10 @@ pub async fn executed_block_payload(
     let block: ProposedBlock = serde_path_to_error::deserialize(deserializer)?;
 
     let round: Round = serde_json::from_str(round)?;
-    let outcome: Option<BlockExecutionOutcome> =
-        match serde_json::from_str(outcome) {
-            Ok(outcome) => Some(outcome),
-            Err(_) => None,
-        };
+    let outcome: Option<BlockExecutionOutcome> = match serde_json::from_str(outcome) {
+        Ok(outcome) => Some(outcome),
+        Err(_) => None,
+    };
     let content = ProposalContent {
         block,
         round,
