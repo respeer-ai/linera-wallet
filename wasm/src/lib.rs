@@ -221,3 +221,9 @@ pub async fn graphql_deserialize_operation(
     let operation_str = serde_json::to_string(&operation)?;
     Ok(operation_str)
 }
+
+#[wasm_bindgen(start)]
+pub fn main() {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    linera_base::tracing::init();
+}
