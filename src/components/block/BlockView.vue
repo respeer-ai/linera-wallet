@@ -322,7 +322,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         blockMaterial.round as Round,
         signature,
         validatedBlockCertificate,
-        _operation ? dbBridge.ChainOperation.operationBlobs(_operation.operationId) : []
+        _operation ? dbBridge.ChainOperation.operationBlobs(_operation.operationId) : new Uint8Array()
       ).then((certificateHash: string) => {
         if (operation) {
           localStore.notification.pushNotification({

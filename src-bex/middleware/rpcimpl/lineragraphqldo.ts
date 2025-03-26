@@ -77,7 +77,15 @@ export const applicationQueryBytes = (
   query: RpcGraphqlQuery
 ): Uint8Array | undefined => {
   // Application operation bytes must be serialized from caller side
-  return query.query.bytes
+  if (query.query.applicationOperationBytes) {
+    return new Uint8Array(
+      JSON.parse(
+        query.query.applicationOperationBytes as unknown as string
+      ) as number[]
+    )
+  } else {
+    return undefined
+  }
 }
 
 const queryApplicationMutation = async (
@@ -95,10 +103,7 @@ const queryApplicationMutation = async (
   } as rpc.Operation
   const operationId = uuidv4()
 
-  // TODO: parse application operation
-
-  // Create blob for operation
-  await sharedStore.createOperationBlobs(operationId, query.query.blobs || [])
+  // Normally we don't publish blob with application operation
 
   await sharedStore.createChainOperation({
     operationId,
@@ -126,6 +131,12 @@ const parseSystemMutation = async (
   )) as string
 
   const operationId = uuidv4()
+
+  // Create blob for operation
+  await sharedStore.createOperationBlobs(
+    operationId,
+    query.query.blobBytes || []
+  )
 
   await sharedStore.createChainOperation({
     operationId,
@@ -169,7 +180,9 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   if (!microchain) {
     return Promise.reject(new Error('Invalid microchain'))
   }
+
   if (!query.query.variables) {
+    // TODO: process all transferrable array in variables
     query.query.variables = {}
   }
 

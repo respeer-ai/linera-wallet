@@ -66,8 +66,7 @@ export class Engine {
 
     switch (req.request.method) {
       case RpcMethod.LINERA_SUBSCRIBE:
-      case RpcMethod.LINERA_GRAPHQL_MUTATION:
-      case RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB: {
+      case RpcMethod.LINERA_GRAPHQL_MUTATION: {
         const query = req.request.params as unknown as RpcGraphqlQuery
         if (query.publicKey === undefined) {
           const accounts = await sharedStore.getOriginPublicKeys(req.origin)
@@ -96,9 +95,7 @@ export class Engine {
                 .rpcHandler(req)
                 .then((res) => {
                   if (
-                    (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method ||
-                      RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB ===
-                        req.request.method) &&
+                    RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method &&
                     !req.silent
                   ) {
                     basebridge.EventBus.bridge
@@ -126,9 +123,7 @@ export class Engine {
                 })
                 .catch((e: Error) => {
                   if (
-                    (RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method ||
-                      RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB ===
-                        req.request.method) &&
+                    RpcMethod.LINERA_GRAPHQL_MUTATION === req.request.method &&
                     !req.silent
                   ) {
                     basebridge.EventBus.bridge

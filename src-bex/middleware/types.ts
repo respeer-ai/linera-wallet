@@ -64,14 +64,17 @@ export interface OriginRpcAuth {
   expiredAt: number
 }
 
+/// Uint8Array cannot be serialized by quasar bex, number[] cannot be transferred by postMessage
+/// Application has to serialize number[] to string, then it'll be converted to Uint8Array then store to db
+/// When submit to rpc, it should be converted to number[] again
 export interface GraphqlQuery {
-  operationName: string
   query: string
+  // TODO: how to process array in variables ?
   variables: Record<string, unknown>
   // For application query bytes
-  bytes?: Uint8Array
+  applicationOperationBytes?: Uint8Array
   // If it's publish data blob
-  blobs?: Array<Uint8Array>
+  blobBytes?: Array<Uint8Array>
 }
 
 export interface RpcGraphqlQuery {
@@ -79,6 +82,7 @@ export interface RpcGraphqlQuery {
   applicationId?: string
   query: GraphqlQuery
   topics?: string[]
+  operationName: string
 }
 
 export interface LineraOperation {

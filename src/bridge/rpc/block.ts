@@ -29,7 +29,7 @@ export class Block {
     round: rpc.Round,
     signature: string,
     validatedBlockCertificate: unknown | undefined,
-    blobs: Array<Uint8Array>
+    blobBytes: Array<Uint8Array>
   ): Promise<string> => {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return Promise.reject('Invalid network')
@@ -42,13 +42,12 @@ export class Block {
     const sig = {
       Ed25519: signature
     }
-    const _blobs = Array.from(blobs.map((blob) => [0, blob.length, ...blob]))
     const block = {
       executedBlock,
       round,
       signature: sig,
       validatedBlockCertificate,
-      blobs: _blobs
+      blobBytes
     }
 
     return new Promise((resolve, reject) => {

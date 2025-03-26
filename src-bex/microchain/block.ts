@@ -190,8 +190,8 @@ export class BlockSigner {
 
   static processNewBlock = async (microchain: string, hash?: string) => {
     const blockQuery = {
+      operationName: 'block',
       query: {
-        operationName: 'block',
         query: BLOCK.loc?.source?.body,
         variables: {
           chainId: microchain,
@@ -252,8 +252,8 @@ export class BlockSigner {
     maxPendingMessages: number
   ) {
     const blockMaterialQuery = {
+      operationName: 'blockMaterial',
       query: {
-        operationName: 'blockMaterial',
         query: BLOCK_MATERIAL.loc?.source?.body,
         variables: {
           chainId: microchain,
@@ -273,8 +273,8 @@ export class BlockSigner {
     operation?: rpc.Operation
   ) {
     const simulateExecuteBlockQuery = {
+      operationName: 'simulateExecuteBlock',
       query: {
-        operationName: 'simulateExecuteBlock',
         query: SIMULATE_EXECUTE_BLOCK.loc?.source?.body,
         variables: {
           chainId: microchain,
@@ -359,11 +359,10 @@ export class BlockSigner {
     round: rpc.Round,
     signature: string,
     validatedBlockCertificate: unknown | undefined,
-    blobs: Array<Uint8Array>
+    blobBytes: Array<Uint8Array>
   ): Promise<string> {
     const submitBlockAndSignatureQuery = {
       query: {
-        operationName: 'submitBlockAndSignature',
         query: SUBMIT_BLOCK_AND_SIGNATURE.loc?.source?.body,
         variables: {
           chainId: microchain,
@@ -375,10 +374,12 @@ export class BlockSigner {
               Ed25519: signature
             },
             validatedBlockCertificate,
-            blobs: Array.from(blobs.map((blob) => [0, blob.length, ...blob]))
+            // Uint8Array will be serialized to map so we use number array here
+            blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes)))
           }
         }
-      }
+      },
+      operationName: 'submitBlockAndSignature'
     } as RpcGraphqlQuery
     return (await queryDo(microchain, submitBlockAndSignatureQuery)) as string
   }

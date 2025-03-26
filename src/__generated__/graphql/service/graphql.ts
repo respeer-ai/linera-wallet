@@ -1027,7 +1027,6 @@ export type QueryRoot = {
   balance: Scalars['Amount']['output'];
   /** Returns the balances of given owners */
   balances: Scalars['JSONObject']['output'];
-  blobPattern: Scalars['Blob']['output'];
   block?: Maybe<HashedConfirmedBlock>;
   /** Returns block material of the chain */
   blockMaterial: CandidateBlockMaterial;

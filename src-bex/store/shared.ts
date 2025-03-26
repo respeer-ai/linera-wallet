@@ -136,7 +136,10 @@ export const createOperationBlobs = async (
   if (!blobs.length) return
   await dbWallet.operationBlobs.bulkAdd(
     blobs.map((blob) => {
-      return { operationId, blob }
+      return {
+        operationId,
+        blob: new Uint8Array(JSON.parse(blob as unknown as string) as number[])
+      }
     })
   )
 }
