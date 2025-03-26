@@ -75,14 +75,12 @@ export const queryDo = async (
 
 export const applicationQueryBytes = (
   query: RpcGraphqlQuery
-): Uint8Array | undefined => {
+): number[] | undefined => {
   // Application operation bytes must be serialized from caller side
   if (query.query.applicationOperationBytes) {
-    return new Uint8Array(
-      JSON.parse(
-        query.query.applicationOperationBytes as unknown as string
-      ) as number[]
-    )
+    return JSON.parse(
+      query.query.applicationOperationBytes as unknown as string
+    ) as number[]
   } else {
     return undefined
   }
@@ -158,7 +156,6 @@ const mutationDo = async (microchain: string, query: RpcGraphqlQuery) => {
   // If it's application operation, construct bytes
   // TODO: for application operation, we need to get its wasm code blob, then load into wrap, get it service type definition, then feed to async graphql. This will be done in rust
   // Then, add operation to database, wait for block signer process it
-
   if (query.applicationId)
     return await queryApplicationMutation(microchain, query)
   return await parseSystemMutation(microchain, query)

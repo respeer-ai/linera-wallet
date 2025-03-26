@@ -226,4 +226,6 @@ pub async fn graphql_deserialize_operation(
 pub fn main() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     linera_base::tracing::init();
+    console_log::init_with_level(log::Level::Debug).unwrap();
+    log::info!("Hello Linera!");
 }
