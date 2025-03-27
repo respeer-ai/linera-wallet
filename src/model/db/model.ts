@@ -225,7 +225,6 @@ export interface Token {
   twitter: string
   website: string
   github: string
-  mintable: boolean
 }
 
 export const lineraToken = {
@@ -242,8 +241,7 @@ export const lineraToken = {
   telegram: 'http://t.me/linera_official',
   twitter: 'https://x.com/linera_io',
   website: 'https://linera.io',
-  github: 'https://github.com/linera-io/linera-protocol',
-  mintable: false
+  github: 'https://github.com/linera-io/linera-protocol'
 } as Token
 
 export interface MicrochainFungibleTokenBalance {

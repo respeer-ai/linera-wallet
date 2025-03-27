@@ -7,7 +7,7 @@ export type Balances = Record<
 >
 
 export type Account = {
-  chain_id: string
+  chainId: string
   owner?: string
 }
 
@@ -36,7 +36,7 @@ export type Message = {
     }
   }
   User: {
-    application_id: string
+    applicationId: string
     bytes: Uint8Array
   }
 }
@@ -48,44 +48,11 @@ export type Operation = {
       recipient: Recipient
       amount: string
     }
-    Claim?: {
-      owner: string
-      target_id: string
-      recipient: Recipient
-      amount: string
-      user_data: Uint8Array | undefined
-    }
-    // TODO: OpenChain
-    // TODO: ChangeOwnership
-    // TODO: ChangeApplicationPermissions
-    // TODO: Subscribe
-    // TODO: Unsubscribe
-    // TODO: Admin
-    PublishByteCode?: {
-      bytecode_id: string
-    }
-    PublishDataBlob?: {
-      blob_hash: string
-    }
-    ReadBlob?: {
-      blob_id: string
-    }
-    CreateApplication?: {
-      bytecode_id: string
-      parameters: Uint8Array
-      instantiation_argument: Uint8Array
-      required_application_ids: string[]
-    }
-    RequestApplication?: {
-      chain_id: string
-      application_id: string
-    }
-    CloseChain?: unknown
   }
   User?: {
-    application_id: string
+    applicationId: string
     // Bytes in the operation will be stored into database with stringify. Uint8Array will be serialized to map so we just use number array
-    bytes: number[]
+    bytes: Uint8Array
   }
 }
 
@@ -100,14 +67,13 @@ export type MemeToken = {
   totalSupply: string
   tokenMetadata: {
     discord: string
-    logo_store_type: string
+    logoStoreType: string
     logo: string
     telegram: string
     twitter: string
     website: string
     github: string
     description: string
-    mintable: boolean
   }
 }
 

@@ -117,7 +117,7 @@ export class BlockSigner {
         } else if (_message?.User) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           const token = (await sharedStore.token(
-            _message.User.application_id
+            _message.User.applicationId
           )) as db.Token
           const tokenId = token?.id || 2
           let memeMessageStr = undefined as unknown as string
@@ -137,7 +137,7 @@ export class BlockSigner {
             await sharedStore.createActivity(
               microchain,
               tokenId,
-              memeMessage.Transfer.from.chain_id,
+              memeMessage.Transfer.from.chainId,
               memeMessage.Transfer.from.owner,
               block.value.block.header.chainId as string,
               memeMessage.Transfer.to.owner,
@@ -161,7 +161,7 @@ export class BlockSigner {
             const message = el.message as rpc.Message
             return (
               destination?.Recipient ===
-                _operation.System?.Transfer?.recipient.Account?.chain_id &&
+                _operation.System?.Transfer?.recipient.Account?.chainId &&
               message?.System?.Credit?.source ===
                 _operation.System?.Transfer.owner &&
               message?.System?.Credit?.target ===
@@ -176,7 +176,7 @@ export class BlockSigner {
           nativeTokenId,
           block.value.block.header.chainId as string,
           _operation.System.Transfer.owner,
-          _operation.System.Transfer.recipient.Account?.chain_id as string,
+          _operation.System.Transfer.recipient.Account?.chainId as string,
           _operation.System.Transfer.recipient.Account?.owner,
           _operation.System.Transfer.amount,
           block.value.block.header.height as number,

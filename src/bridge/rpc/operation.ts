@@ -38,7 +38,7 @@ export class Operation {
             owner: fromOwner,
             recipient: {
               Account: {
-                chain_id: toChainId,
+                chainId: toChainId,
                 owner: toOwner
               }
             },

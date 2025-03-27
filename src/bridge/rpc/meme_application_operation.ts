@@ -62,7 +62,7 @@ export class MemeApplicationOperation {
           totalSupply: Number(token.totalSupply),
           ticker: token.symbol,
           tokenType: db.TokenType.Fungible,
-          logoStoreType: token.tokenMetadata.logo_store_type as db.StoreType,
+          logoStoreType: token.tokenMetadata.logoStoreType as db.StoreType,
           logo: token.tokenMetadata.logo,
           applicationId,
           native: false,
@@ -72,8 +72,7 @@ export class MemeApplicationOperation {
           telegram: token.tokenMetadata.telegram,
           twitter: token.tokenMetadata.twitter,
           website: token.tokenMetadata.website,
-          github: token.tokenMetadata.github,
-          mintable: token.tokenMetadata.mintable
+          github: token.tokenMetadata.github
         })
         resolve(undefined)
       })
@@ -92,7 +91,7 @@ export class MemeApplicationOperation {
     publicKey?: string
   ): Promise<number> => {
     const chainAccountOwner = {
-      chain_id: chainId
+      chainId
     } as rpc.Account
     if (publicKey) {
       const owner = await db.ownerFromPublicKey(publicKey)
@@ -160,7 +159,7 @@ export class MemeApplicationOperation {
         microchain: chainId,
         operation: JSON.stringify({
           User: {
-            application_id: applicationId,
+            applicationId,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             bytes: queryRespBytes
           }

@@ -88,7 +88,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
           message.grant as string
         )
       } else if (_message?.User) {
-        const token = await dbBridge.Token.token(_message.User.application_id) as db.Token
+        const token = await dbBridge.Token.token(_message.User.applicationId) as db.Token
         const tokenId = token?.id || 2
         const memeMessageStr = await lineraWasm.bcs_deserialize_meme_message(`[${_message.User.bytes.toString()}]`)
         // TODO: it may not be Meme message here, we should deserialize it according to application bytecode
@@ -98,7 +98,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
           await dbBridge.Activity.create(
             microchain.microchain,
             tokenId,
-            memeMessage.Transfer.from.chain_id,
+            memeMessage.Transfer.from.chainId,
             memeMessage.Transfer.from.owner,
             block.value.block.header.chainId as string,
             memeMessage.Transfer.to.owner,
