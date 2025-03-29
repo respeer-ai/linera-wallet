@@ -42,7 +42,7 @@ const onRun = async () => {
             chainId: state.chainId.replace('0x', ''),
             recipient: {
               Account: {
-                chain_id: state.chainId.replace('0x', ''),
+                chainId: state.chainId.replace('0x', ''),
                 owner
               }
             } as rpc.Recipient,

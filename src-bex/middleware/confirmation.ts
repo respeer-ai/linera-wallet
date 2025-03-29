@@ -18,7 +18,6 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.ETH_REQUEST_ACCOUNTS, true],
   [RpcMethod.CHECKO_PING, false],
   [RpcMethod.LINERA_GRAPHQL_MUTATION, true],
-  [RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB, true],
   [RpcMethod.LINERA_GRAPHQL_QUERY, false],
   [RpcMethod.LINERA_SUBSCRIBE, false],
   [RpcMethod.LINERA_UNSUBSCRIBE, false],
@@ -38,8 +37,7 @@ export const needConfirm = async (req: RpcRequest) => {
       req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION
         ? lineraGraphqlQueryApplicationId(req)
         : undefined,
-      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION ||
-        req.request.method === RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB
+      req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION
         ? lineraGraphqlMutationOperation(req)
         : undefined
     ))
