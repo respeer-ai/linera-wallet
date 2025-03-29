@@ -13,7 +13,7 @@
       <EthRequestAccountsConfirmation v-model:title='title' />
     </div>
     <div
-      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && (popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION || popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB)'
+      v-if='popupType === middlewaretypes.PopupRequestType.CONFIRMATION && (popupRequest === middlewaretypes.RpcMethod.LINERA_GRAPHQL_MUTATION)'
       class='popup-body full-width'
     >
       <LineraGraphqlMutationConfirmation v-model:title='title' />

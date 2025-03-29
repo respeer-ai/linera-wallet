@@ -114,7 +114,7 @@ const onTransferConfirmed = async () => {
   try {
     if (!selectedToken.value.native) {
       const chainAccountOwner = {
-        chain_id: selectedToMicrochain.value?.microchain || toMicrochain.value,
+        chainId: selectedToMicrochain.value?.microchain || toMicrochain.value,
         owner: `User:${selectedToOwner.value?.owner || await db.ownerFromPublicKey(toAddress.value)}`
       } as rpc.Account
       const operationId = await rpcBridge.MemeApplicationOperation.transfer(

@@ -75,12 +75,12 @@ export const queryDo = async (
 
 export const applicationQueryBytes = (
   query: RpcGraphqlQuery
-): number[] | undefined => {
+): Uint8Array | undefined => {
   // Application operation bytes must be serialized from caller side
   if (query.query.applicationOperationBytes) {
-    return JSON.parse(
+    return new Uint8Array(JSON.parse(
       query.query.applicationOperationBytes as unknown as string
-    ) as number[]
+    ) as number[])
   } else {
     return undefined
   }
@@ -95,7 +95,7 @@ const queryApplicationMutation = async (
 
   const operation = {
     User: {
-      application_id: query.applicationId,
+      applicationId: query.applicationId,
       bytes: queryBytes
     }
   } as rpc.Operation

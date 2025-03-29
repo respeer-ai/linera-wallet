@@ -77,7 +77,6 @@ import { commontypes } from 'src/types'
 import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey, LineraOperation } from '../../../../src-bex/middleware/types'
 import { db } from 'src/model'
 import { dbBridge } from 'src/bridge'
-import * as middlewaretypes from '../../../../src-bex/middleware/types'
 
 import CheckboxView from '../CheckboxView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
@@ -93,9 +92,6 @@ const request = computed(() => localStore.popup._popupPayload?.data)
 const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.value?.request) as string)
 const operation = computed(() => lineraGraphqlMutationOperation(request.value?.request) as string)
 const graphqlQuery = computed(() => {
-  if (method.value === middlewaretypes.RpcMethod.LINERA_GRAPHQL_PUBLISH_DATA_BLOB) {
-    return 'PublishDataBlob'
-  }
   return lineraGraphqlQuery(request.value?.request)?.query
 })
 const graphqlVariables = computed(() => lineraGraphqlQuery(request.value?.request)?.variables)

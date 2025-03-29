@@ -120,7 +120,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
         grant = messages.find((el) => {
           const destination = el.destination as rpc.Destination
           const message = el.message as rpc.Message
-          return destination?.Recipient === _operation.System?.Transfer?.recipient.Account?.chain_id &&
+          return destination?.Recipient === _operation.System?.Transfer?.recipient.Account?.chainId &&
                      message?.System?.Credit?.source === _operation.System?.Transfer.owner &&
                      message?.System?.Credit?.target === _operation?.System.Transfer.recipient?.Account?.owner
         })?.grant as string
@@ -131,7 +131,7 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
         nativeTokenId,
         block.value.block.header.chainId as string,
         _operation.System.Transfer.owner,
-        _operation.System.Transfer.recipient.Account?.chain_id as string,
+        _operation.System.Transfer.recipient.Account?.chainId as string,
         _operation.System.Transfer.recipient.Account?.owner,
         _operation.System.Transfer.amount,
         block.value.block.header.height as number,
@@ -322,7 +322,7 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         blockMaterial.round as Round,
         signature,
         validatedBlockCertificate,
-        _operation ? dbBridge.ChainOperation.operationBlobs(_operation.operationId) : new Uint8Array()
+        _operation ? await dbBridge.ChainOperation.operationBlobs(_operation.operationId) : []
       ).then((certificateHash: string) => {
         if (operation) {
           localStore.notification.pushNotification({

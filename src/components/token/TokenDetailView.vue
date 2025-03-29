@@ -56,14 +56,6 @@
             {{ $t('MSG_STAKE') }}
           </div>
         </div>
-        <div v-if='!token.native && token.mintable' class='home-token-action-btn cursor-pointer' @click='onMintClick'>
-          <q-avatar color='red-2' size='36px'>
-            <q-icon name='bi-plus-circle' size='24px' />
-          </q-avatar>
-          <div class='page-item-y-margin-top'>
-            {{ $t('MSG_MINT') }}
-          </div>
-        </div>
         <q-space />
       </div>
     </div>
@@ -73,14 +65,6 @@
   </div>
   <OwnerBalanceBridge :token-id='token?.id' v-model:token-balance='accountTokenBalance' v-model:usd-balance='accountUsdBalance' />
   <OwnerBridge v-model:selected-owner='selectedOwner' />
-  <q-dialog v-model='minting'>
-    <q-card class='dialog transfer-card page-x-padding'>
-      <h5 class='onboarding-page-title text-center page-title'>
-        {{ $t('MSG_MINT') }} {{ token.ticker }}
-      </h5>
-      <MintTokenView @minted='onTokenMinted' :token='token' />
-    </q-card>
-  </q-dialog>
 </template>
 
 <script setup lang='ts'>
@@ -94,7 +78,6 @@ import { _copyToClipboard } from 'src/utils/copycontent'
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import TokenDetailInnerView from './TokenDetailInnerView.vue'
 import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
-import MintTokenView from './MintTokenView.vue'
 
 interface Props {
   token: db.Token
@@ -104,7 +87,6 @@ const token = toRef(props, 'token')
 
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
-const minting = ref(false)
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
 
@@ -129,14 +111,6 @@ const onTransferClick = () => {
       applicationId: token.value.applicationId
     }
   })
-}
-
-const onMintClick = () => {
-  minting.value = true
-}
-
-const onTokenMinted = () => {
-  minting.value = false
 }
 
 const onSwapClick = () => {
