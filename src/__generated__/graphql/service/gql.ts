@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  query balance($chainId: ChainId!, $owner: AccountOwner) {\n    balance(chainId: $chainId, owner: $owner)\n  }\n": types.BalanceDocument,
-    "\n  query balances($chainOwners: JSONObject!) {\n    balances(chainOwners: $chainOwners)\n  }\n": types.BalancesDocument,
+    "\n  query balances($chainOwners: [ChainOwners!]!) {\n    balances(chainOwners: $chainOwners)\n  }\n": types.BalancesDocument,
     "\n  query applications($chainId: ChainId!) {\n    applications(chainId: $chainId) {\n      id\n      link\n    }\n  }\n": types.ApplicationsDocument,
     "\n  query ownerChains($owner: Owner!) {\n    ownerChains(owner: $owner) {\n      list\n      default\n    }\n  }\n": types.OwnerChainsDocument,
     "\n  mutation walletInitWithoutSecretKey(\n    $chainId: ChainId!\n    $initializer: WalletInitializer!\n    $messageId: MessageId!\n  ) {\n    walletInitWithoutSecretKey(\n      chainId: $chainId\n      initializer: $initializer\n      messageId: $messageId\n    )\n  }\n": types.WalletInitWithoutSecretKeyDocument,
@@ -49,7 +49,7 @@ export function graphql(source: "\n  query balance($chainId: ChainId!, $owner: A
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query balances($chainOwners: JSONObject!) {\n    balances(chainOwners: $chainOwners)\n  }\n"): (typeof documents)["\n  query balances($chainOwners: JSONObject!) {\n    balances(chainOwners: $chainOwners)\n  }\n"];
+export function graphql(source: "\n  query balances($chainOwners: [ChainOwners!]!) {\n    balances(chainOwners: $chainOwners)\n  }\n"): (typeof documents)["\n  query balances($chainOwners: [ChainOwners!]!) {\n    balances(chainOwners: $chainOwners)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

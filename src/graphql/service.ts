@@ -7,7 +7,7 @@ export const BALANCE = gql`
 `
 
 export const BALANCES = gql`
-  query balances($chainOwners: JSONObject!) {
+  query balances($chainOwners: [ChainOwners!]!) {
     balances(chainOwners: $chainOwners)
   }
 `

@@ -276,6 +276,11 @@ export type ChainManager = {
   seed: Scalars['Int']['output'];
 };
 
+export type ChainOwners = {
+  chainId: Scalars['ChainId']['input'];
+  owners: Array<Scalars['AccountOwner']['input']>;
+};
+
 export type ChainStateExtendedView = {
   __typename?: 'ChainStateExtendedView';
   chainId: Scalars['ChainId']['output'];
@@ -1022,6 +1027,7 @@ export type ProposedBlock = {
 export type QueryRoot = {
   __typename?: 'QueryRoot';
   accountOwnerPattern: Scalars['AccountOwner']['output'];
+  accountPattern: Scalars['Account']['output'];
   applications: Array<ApplicationOverview>;
   /** Returns the balance of given owner */
   balance: Scalars['Amount']['output'];
@@ -1057,7 +1063,7 @@ export type QueryRootBalanceArgs = {
 
 
 export type QueryRootBalancesArgs = {
-  chainOwners: Scalars['JSONObject']['input'];
+  chainOwners: Array<ChainOwners>;
 };
 
 
@@ -1304,7 +1310,7 @@ export type BalanceQueryVariables = Exact<{
 export type BalanceQuery = { __typename?: 'QueryRoot', balance: any };
 
 export type BalancesQueryVariables = Exact<{
-  chainOwners: Scalars['JSONObject']['input'];
+  chainOwners: Array<ChainOwners> | ChainOwners;
 }>;
 
 
@@ -1400,7 +1406,7 @@ export type WalletInitPublicKeyMutation = { __typename?: 'MutationRoot', walletI
 
 
 export const BalanceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"balance"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountOwner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"balance"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}]}]}}]} as unknown as DocumentNode<BalanceQuery, BalanceQueryVariables>;
-export const BalancesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"balances"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JSONObject"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"balances"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainOwners"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}}}]}]}}]} as unknown as DocumentNode<BalancesQuery, BalancesQueryVariables>;
+export const BalancesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"balances"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainOwners"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"balances"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainOwners"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}}}]}]}}]} as unknown as DocumentNode<BalancesQuery, BalancesQueryVariables>;
 export const ApplicationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"applications"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"link"}}]}}]}}]} as unknown as DocumentNode<ApplicationsQuery, ApplicationsQueryVariables>;
 export const OwnerChainsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ownerChains"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Owner"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ownerChains"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"list"}},{"kind":"Field","name":{"kind":"Name","value":"default"}}]}}]}}]} as unknown as DocumentNode<OwnerChainsQuery, OwnerChainsQueryVariables>;
 export const WalletInitWithoutSecretKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"walletInitWithoutSecretKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"initializer"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"WalletInitializer"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MessageId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"walletInitWithoutSecretKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"initializer"},"value":{"kind":"Variable","name":{"kind":"Name","value":"initializer"}}},{"kind":"Argument","name":{"kind":"Name","value":"messageId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}}}]}]}}]} as unknown as DocumentNode<WalletInitWithoutSecretKeyMutation, WalletInitWithoutSecretKeyMutationVariables>;
