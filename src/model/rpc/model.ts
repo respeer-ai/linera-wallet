@@ -52,7 +52,7 @@ export type Operation = {
   User?: {
     applicationId: string
     // Bytes in the operation will be stored into database with stringify. Uint8Array will be serialized to map so we just use number array
-    bytes: Uint8Array
+    bytes: number[]
   }
 }
 
