@@ -78,9 +78,11 @@ export const applicationQueryBytes = (
 ): Uint8Array | undefined => {
   // Application operation bytes must be serialized from caller side
   if (query.query.applicationOperationBytes) {
-    return new Uint8Array(JSON.parse(
-      query.query.applicationOperationBytes as unknown as string
-    ) as number[])
+    return new Uint8Array(
+      JSON.parse(
+        query.query.applicationOperationBytes as unknown as string
+      ) as number[]
+    )
   } else {
     return undefined
   }

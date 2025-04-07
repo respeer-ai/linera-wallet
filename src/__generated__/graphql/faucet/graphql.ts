@@ -14,6 +14,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  /** A unique identifier for a user or an application. */
+  AccountOwner: { input: any; output: any; }
   /** The unique identifier (UID) of a chain. This is currently computed as the hash value of a ChainDescription. */
   ChainId: { input: any; output: any; }
   /** A Keccak256 value */
@@ -22,8 +24,6 @@ export type Scalars = {
   JSON: { input: any; output: any; }
   /** The index of a message in a chain */
   MessageId: { input: any; output: any; }
-  /** The owner of a chain. This is currently the hash of the owner's public key used to verify signatures. */
-  Owner: { input: any; output: any; }
   /** A secp256k1 public key value */
   Secp256k1PublicKey: { input: any; output: any; }
   VersionInfo: { input: any; output: any; }
@@ -48,7 +48,7 @@ export type MutationRoot = {
 
 
 export type MutationRootClaimArgs = {
-  owner: Scalars['Owner']['input'];
+  owner: Scalars['AccountOwner']['input'];
 };
 
 export type QueryRoot = {
@@ -68,7 +68,7 @@ export type Validator = {
 };
 
 export type OpenChainMutationVariables = Exact<{
-  owner: Scalars['Owner']['input'];
+  owner: Scalars['AccountOwner']['input'];
 }>;
 
 
@@ -80,5 +80,5 @@ export type NetworkInfoQueryVariables = Exact<{ [key: string]: never; }>;
 export type NetworkInfoQuery = { __typename?: 'QueryRoot', genesisConfig: any, version: any, currentValidators: Array<{ __typename?: 'Validator', publicKey: any, networkAddress: string }> };
 
 
-export const OpenChainDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"openChain"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Owner"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"claim"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messageId"}},{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}}]}}]}}]} as unknown as DocumentNode<OpenChainMutation, OpenChainMutationVariables>;
+export const OpenChainDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"openChain"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountOwner"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"claim"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messageId"}},{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}}]}}]}}]} as unknown as DocumentNode<OpenChainMutation, OpenChainMutationVariables>;
 export const NetworkInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"networkInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genesisConfig"}},{"kind":"Field","name":{"kind":"Name","value":"version"}},{"kind":"Field","name":{"kind":"Name","value":"currentValidators"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"publicKey"}},{"kind":"Field","name":{"kind":"Name","value":"networkAddress"}}]}}]}}]} as unknown as DocumentNode<NetworkInfoQuery, NetworkInfoQueryVariables>;

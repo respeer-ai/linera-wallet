@@ -11,7 +11,7 @@ import { db, rpc } from 'src/model'
 import { localStore } from 'src/localstores'
 import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-import { type HashedConfirmedBlock, type CandidateBlockMaterial } from 'src/__generated__/graphql/service/graphql'
+import { type ConfirmedBlock, type CandidateBlockMaterial } from 'src/__generated__/graphql/service/graphql'
 import { useI18n } from 'vue-i18n'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { Round } from 'src/model/rpc/model'
@@ -67,9 +67,9 @@ const updateChainAccountBalances = async (microchain: db.Microchain, owners: str
   }
 }
 
-const parseActivities = async (microchain: db.Microchain, block: HashedConfirmedBlock) => {
+const parseActivities = async (microchain: db.Microchain, block: ConfirmedBlock) => {
   const nativeTokenId = (await dbBridge.Token.native())?.id || 1
-  for (const bundle of block.value.block.body.incomingBundles || []) {
+  for (const bundle of block.block.body.incomingBundles || []) {
     const origin = bundle.origin as rpc.Origin
     for (const message of bundle.bundle.messages) {
       const _message = message.message as rpc.Message
@@ -79,11 +79,11 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
           nativeTokenId,
           origin.sender,
           _message?.System?.Credit?.source,
-          block.value.block.header.chainId as string,
+          block.block.header.chainId as string,
           _message?.System?.Credit?.target,
           _message?.System?.Credit?.amount,
-          block.value.block.header.height as number,
-          block.value.block.header.timestamp as number,
+          block.block.header.height as number,
+          block.block.header.timestamp as number,
           block.hash as string,
           message.grant as string
         )
@@ -100,11 +100,11 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
             tokenId,
             memeMessage.Transfer.from.chainId,
             memeMessage.Transfer.from.owner,
-            block.value.block.header.chainId as string,
+            block.block.header.chainId as string,
             memeMessage.Transfer.to.owner,
             memeMessage.Transfer.amount,
-            block.value.block.header.height as number,
-            block.value.block.header.timestamp as number,
+            block.block.header.height as number,
+            block.block.header.timestamp as number,
             block.hash as string,
             message.grant as string
           )
@@ -112,11 +112,11 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
       }
     }
   }
-  for (const operation of block.value.block.body.operations || []) {
+  for (const operation of block.block.body.operations || []) {
     const _operation = operation as rpc.Operation
     if (_operation.System?.Transfer) {
       let grant = undefined as unknown as string | undefined
-      for (const messages of block.value.block.body.messages || []) {
+      for (const messages of block.block.body.messages || []) {
         grant = messages.find((el) => {
           const destination = el.destination as rpc.Destination
           const message = el.message as rpc.Message
@@ -129,13 +129,13 @@ const parseActivities = async (microchain: db.Microchain, block: HashedConfirmed
       await dbBridge.Activity.create(
         microchain.microchain,
         nativeTokenId,
-        block.value.block.header.chainId as string,
+        block.block.header.chainId as string,
         _operation.System.Transfer.owner,
         _operation.System.Transfer.recipient.Account?.chainId as string,
         _operation.System.Transfer.recipient.Account?.owner,
         _operation.System.Transfer.amount,
-        block.value.block.header.height as number,
-        block.value.block.header.timestamp as number,
+        block.block.header.height as number,
+        block.block.header.timestamp as number,
         block.hash as string,
         grant as string
       )
@@ -164,7 +164,7 @@ const updateFungibleBalances = async (microchain: db.Microchain, owners: string[
   }
 }
 
-const updateChainOperations = async (microchain: db.Microchain, block: HashedConfirmedBlock) => {
+const updateChainOperations = async (microchain: db.Microchain, block: ConfirmedBlock) => {
   const operations = await dbBridge.ChainOperation.chainOperations(
     0,
     0,
@@ -183,7 +183,7 @@ const updateChainOperations = async (microchain: db.Microchain, block: HashedCon
   }
 }
 
-const updateMicrochainOpenState = async (microchain: db.Microchain, block: HashedConfirmedBlock) => {
+const updateMicrochainOpenState = async (microchain: db.Microchain, block: ConfirmedBlock) => {
   const _microchain = await dbBridge.Microchain.microchain(microchain.microchain) as db.Microchain
   if (_microchain.state === db.MicrochainState.CLAIMING || !_microchain.openChainCertificateHash) {
     return setTimeout(() => {
@@ -264,21 +264,22 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
 
       const continueProcess = blockMaterial?.incomingBundles?.length >= maxProcessBundles
 
-      const executedBlockMaterial = await rpcBridge.ExecutedBlock.simulateExecuteBlock(
+      const simulatedBlockMaterial = await rpcBridge.SimulatedBlock.simulateExecuteBlock(
         microchain,
         operation ? [operation] : [],
+        _operation ? await dbBridge.ChainOperation.operationBlobs(_operation.operationId) : [],
         blockMaterial
       )
 
-      const executedBlock = executedBlockMaterial?.executedBlock
-      const validatedBlockCertificate = executedBlockMaterial?.validatedBlockCertificate as unknown
+      const block = simulatedBlockMaterial?.block
+      const validatedBlockCertificate = simulatedBlockMaterial?.validatedBlockCertificate as unknown
       const isRetryBlock = !!validatedBlockCertificate
 
-      if (!executedBlock) return reject('Failed execute block')
+      if (!block) return reject('Failed execute block')
 
-      if (!isRetryBlock && executedBlock.block.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
+      if (!isRetryBlock && block.body.operations.length !== (operation ? 1 : 0)) return reject('Invalid operation count')
       if (operation && !isRetryBlock) {
-        const executedOperation = executedBlock.block.operations[0] as rpc.Operation
+        const executedOperation = block.body.operations[0] as rpc.Operation
         const operationHash = await sha3(stringify(sortedObject(operation), (key, value) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           if (value !== null) return value
@@ -295,13 +296,12 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
       // TODO: we actually should construct block with local rust code but it's too hard now, so we just validate executed block calculated by node service
       //       It has the same security level as local rust code
       // TODO: construct block locally and compare with block in executed block
-      const block = executedBlock.block
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      const payload = await lineraWasm.executed_block_payload(
+      const payload = await lineraWasm.block_payload(
         stringify(block, null, 2) as string,
         stringify(blockMaterial.round) as string,
-        ''
+        stringify(simulatedBlockMaterial.outcome) as string
       )
       const owner = await dbBridge.Microchain.microchainOwner(microchain) as db.Owner
       if (!owner) reject('Invalid owner')
@@ -313,16 +313,17 @@ const processNewIncomingBundle = async (microchain: string, _operation?: db.Chai
         await dbBridge.ChainOperation.update(_operation)
       }
 
-      const isOpenChain = stringify(executedBlock)?.includes('OpenChain')
+      const isOpenChain = stringify(block)?.includes('OpenChain')
+      const blobBytes = (isRetryBlock ? (simulatedBlockMaterial.blobBytes || []) : _operation ? await dbBridge.ChainOperation.operationBlobs(_operation.operationId) : [])as Array<Uint8Array>
 
       rpcBridge.Block.submitBlockAndSignature(
         microchain,
-        executedBlock.block.height as number,
-        executedBlock,
+        block.header.height as number,
+        block,
         blockMaterial.round as Round,
         signature,
         validatedBlockCertificate,
-        _operation ? await dbBridge.ChainOperation.operationBlobs(_operation.operationId) : []
+        blobBytes
       ).then((certificateHash: string) => {
         if (operation) {
           localStore.notification.pushNotification({

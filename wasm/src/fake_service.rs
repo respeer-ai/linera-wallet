@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
 use async_graphql::{Error, Object};
 use linera_base::{
     crypto::CryptoHash,
     data_types::Amount,
-    identifiers::{ChainId, ModuleId, Owner, UserApplicationId},
+    identifiers::{ChainId, ModuleId, AccountOwner, ApplicationId},
 };
 use linera_execution::{system::Recipient, Operation, SystemOperation};
 
@@ -24,11 +22,11 @@ impl MutationRoot {
     async fn transfer(
         &self,
         _chain_id: ChainId,
-        owner: Option<Owner>,
+        owner: AccountOwner,
         recipient: Recipient,
         amount: Amount,
     ) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::Transfer {
+        Ok(Operation::system(SystemOperation::Transfer {
             owner,
             recipient,
             amount,
@@ -41,20 +39,15 @@ impl MutationRoot {
         module_id: ModuleId,
         parameters: String,
         instantiation_argument: String,
-        required_application_ids: Vec<String>,
+        required_application_ids: Vec<ApplicationId>,
     ) -> Result<Operation, Error> {
         let create_parameters: Vec<u8> = Vec::from(parameters);
         let create_instantiation_argument: Vec<u8> = Vec::from(instantiation_argument);
-        let create_required_application_ids: Vec<UserApplicationId> = required_application_ids
-            .iter()
-            .map(|s| UserApplicationId::from_str(s.as_str()))
-            .filter_map(Result::ok)
-            .collect();
-        Ok(Operation::System(SystemOperation::CreateApplication {
+        Ok(Operation::system(SystemOperation::CreateApplication {
             module_id,
             parameters: create_parameters,
             instantiation_argument: create_instantiation_argument,
-            required_application_ids: create_required_application_ids,
+            required_application_ids,
         }))
     }
 
@@ -63,7 +56,7 @@ impl MutationRoot {
         _chain_id: ChainId,
         blob_hash: CryptoHash,
     ) -> Result<Operation, Error> {
-        Ok(Operation::System(SystemOperation::PublishDataBlob {
+        Ok(Operation::system(SystemOperation::PublishDataBlob {
             blob_hash,
         }))
     }

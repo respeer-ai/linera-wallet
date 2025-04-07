@@ -7,7 +7,7 @@ export const BALANCE = gql`
 `
 
 export const BALANCES = gql`
-  query balances($chainOwners: JSONObject!) {
+  query balances($chainOwners: [ChainOwners!]!) {
     balances(chainOwners: $chainOwners)
   }
 `
@@ -22,7 +22,7 @@ export const APPLICATIONS = gql`
 `
 
 export const OWNER_CHAINS = gql`
-  query ownerChains($owner: Owner!) {
+  query ownerChains($owner: AccountOwner!) {
     ownerChains(owner: $owner) {
       list
       default
@@ -63,66 +63,66 @@ export const NOTIFICATIONS = gql`
 export const BLOCK = gql`
   query block($hash: CryptoHash, $chainId: ChainId!) {
     block(hash: $hash, chainId: $chainId) {
+      status
       hash
-      value {
-        status
-        block {
-          header {
-            chainId
-            epoch
-            height
-            timestamp
-            stateHash
-            previousBlockHash
+      block {
+        header {
+          chainId
+          epoch
+          height
+          timestamp
+          stateHash
+          previousBlockHash
+          authenticatedSigner
+          bundlesHash
+          operationsHash
+          messagesHash
+          previousMessageBlocksHash
+          oracleResponsesHash
+          eventsHash
+          blobsHash
+          operationResultsHash
+        }
+        body {
+          incomingBundles {
+            origin
+            bundle {
+              height
+              timestamp
+              certificateHash
+              transactionIndex
+              messages {
+                authenticatedSigner
+                grant
+                refundGrantTo
+                kind
+                index
+                message
+              }
+            }
+            action
+          }
+          operations
+          messages {
+            destination
             authenticatedSigner
-            bundlesHash
-            operationsHash
-            messagesHash
-            oracleResponsesHash
-            eventsHash
-            blobsHash
-            operationResultsHash
+            grant
+            refundGrantTo
+            kind
+            message
           }
-          body {
-            incomingBundles {
-              origin
-              bundle {
-                height
-                timestamp
-                certificateHash
-                transactionIndex
-                messages {
-                  authenticatedSigner
-                  grant
-                  refundGrantTo
-                  kind
-                  index
-                  message
-                }
-              }
-              action
+          previousMessageBlocks
+          oracleResponses
+          events {
+            streamId {
+              applicationId
+              streamName
             }
-            operations
-            messages {
-              destination
-              authenticatedSigner
-              grant
-              refundGrantTo
-              kind
-              message
-            }
-            oracleResponses
-            events {
-              streamId {
-                applicationId
-                streamName
-              }
-              key
-              value
-            }
-            blobs
-            operationResults
+            index
+            value
           }
+          blobs
+          operationResults
         }
       }
     }
@@ -162,10 +162,25 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
     $blockMaterial: BlockMaterial!
   ) {
     simulateExecuteBlock(chainId: $chainId, blockMaterial: $blockMaterial) {
-      executedBlock {
-        block {
+      block {
+        header {
           chainId
           epoch
+          height
+          timestamp
+          stateHash
+          previousBlockHash
+          authenticatedSigner
+          bundlesHash
+          operationsHash
+          messagesHash
+          previousMessageBlocksHash
+          oracleResponsesHash
+          eventsHash
+          blobsHash
+          operationResultsHash
+        }
+        body {
           incomingBundles {
             origin
             bundle {
@@ -185,12 +200,6 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
             action
           }
           operations
-          height
-          timestamp
-          authenticatedSigner
-          previousBlockHash
-        }
-        outcome {
           messages {
             destination
             authenticatedSigner
@@ -199,21 +208,44 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
             kind
             message
           }
-          stateHash
+          previousMessageBlocks
           oracleResponses
           events {
             streamId {
               applicationId
               streamName
             }
-            key
+            index
             value
           }
           blobs
           operationResults
         }
       }
-      blobIds
+      outcome {
+        messages {
+          destination
+          authenticatedSigner
+          grant
+          refundGrantTo
+          kind
+          message
+        }
+        previousMessageBlocks
+        stateHash
+        oracleResponses
+        events {
+          streamId {
+            applicationId
+            streamName
+          }
+          index
+          value
+        }
+        blobs
+        operationResults
+      }
+      blobBytes
       validatedBlockCertificate
     }
   }
@@ -245,7 +277,7 @@ export const PENDING_MESSAGES = gql`
 export const TRANSFER = gql`
   mutation transfer(
     $chainId: ChainId!
-    $owner: Owner
+    $owner: AccountOwner!
     $recipient: Recipient!
     $amount: Amount!
   ) {

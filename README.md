@@ -36,9 +36,9 @@ web3.eth.requestAccounts().then((accounts) => {
 - [x] Construct block with rust
 - [x] Move block signer to background
 - [x] Implement web3.js apis
-- [ ] Remove request application (depends on linera-protocol implementation)
+- [x] Remove request application (depends on linera-protocol implementation)
 - [ ] Implement load chain, then we can query chain state from RPC directly
-- [ ] Remove subscribe creator chain, just keep application state on creator chain
+- [x] Remove subscribe creator chain, just keep application state on creator chain
 - [ ] Event driven implementation of message process
 - [ ] Multiple popup implementation and accurate popup closing
 - [ ] Dynamic loading of application bytecode to serialize and deserialize application operations

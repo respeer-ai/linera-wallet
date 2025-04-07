@@ -15,12 +15,12 @@ use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
     crypto::{AccountPublicKey, AccountSecretKey, CryptoHash},
-    data_types::{BlockHeight, Round, Timestamp},
+    data_types::{BlockHeight, Round, Timestamp, Blob as _Blob},
     identifiers::ChainId,
 };
-use linera_chain::data_types::{
-    BlockExecutionOutcome, IncomingBundle, ProposalContent, ProposedBlock,
-};
+use linera_chain::{data_types::{
+    BlockExecutionOutcome, IncomingBundle, ProposalContent,
+}, types::Block};
 use linera_execution::Operation;
 use linera_views::crypto::Hashable;
 
@@ -59,7 +59,9 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     max_concurrent_queries: None,
     max_loaded_chains: nonzero_lit::usize!(40),
     max_stream_queries: 10,
-    cache_size: 1000,
+    max_cache_size: 1000,
+    max_entry_size: 1000,
+    max_cache_entries: 1000,
     retry_delay: std::time::Duration::from_millis(1000),
     max_retries: 10,
     wait_for_outgoing_messages: false,
@@ -86,13 +88,14 @@ pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
 }
 
 #[wasm_bindgen]
-pub async fn executed_block_payload(
+pub async fn block_payload(
     block: &str,
     round: &str,
     outcome: &str,
 ) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(block);
-    let block: ProposedBlock = serde_path_to_error::deserialize(deserializer)?;
+    let block: Block = serde_path_to_error::deserialize(deserializer)?;
+    let (proposed_block, _) = block.into_proposal();
 
     let round: Round = serde_json::from_str(round)?;
     let outcome: Option<BlockExecutionOutcome> = match serde_json::from_str(outcome) {
@@ -100,7 +103,7 @@ pub async fn executed_block_payload(
         Err(_) => None,
     };
     let content = ProposalContent {
-        block,
+        block: proposed_block,
         round,
         outcome,
     };
@@ -116,14 +119,16 @@ pub async fn construct_block(
     public_key: &str,
     admin_id: &str,
     block_hash: &str,
-    operations: &str,
     incoming_bundles: &str,
+    operations: &str,
+    blob_bytes: &str,
     local_time: u64,
     next_block_height: u64,
 ) -> Result<Option<String>, JsError> {
     let chain_id: ChainId = ChainId::from_str(chain_id)?;
     let operations: Vec<Operation> = serde_json::from_str(operations)?;
     let incoming_bundles: Vec<IncomingBundle> = serde_json::from_str(incoming_bundles)?;
+    let blob_bytes: Vec<Vec<u8>> = serde_json::from_str(blob_bytes)?;
     let client_context: SignClientContext = get_fake_client_context().await?;
     let secret_key = AccountSecretKey::from_public_key(AccountPublicKey::from_str(public_key)?);
     let admin_id: ChainId = ChainId::from_str(admin_id)?;
@@ -138,10 +143,13 @@ pub async fn construct_block(
         BlockHeight::from(next_block_height),
     )?;
 
+    let blobs = blob_bytes.into_iter().map(_Blob::new_data).collect();
+
     let executed_block = chain_client
         .simulate_execute_block(
             operations.clone(),
             incoming_bundles,
+            blobs,
             Timestamp::from(local_time),
         )
         .await?;

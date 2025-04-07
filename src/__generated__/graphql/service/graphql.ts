@@ -16,7 +16,7 @@ export type Scalars = {
   Float: { input: number; output: number; }
   /** An account */
   Account: { input: any; output: any; }
-  /** An owner of an account. */
+  /** A unique identifier for a user or an application. */
   AccountOwner: { input: any; output: any; }
   /** A crypto public key. */
   AccountPublicKey: { input: any; output: any; }
@@ -24,6 +24,8 @@ export type Scalars = {
   AccountSignature: { input: any; output: any; }
   /** A non-negative amount of tokens. */
   Amount: { input: any; output: any; }
+  /** Description of a user application */
+  ApplicationDescription: { input: any; output: any; }
   /** A unique identifier for a user application */
   ApplicationId: { input: any; output: any; }
   /** A blob of binary data, with its content-addressed blob ID. */
@@ -44,8 +46,6 @@ export type Scalars = {
   ChainOwnership: { input: any; output: any; }
   /** A channel name together with its application ID. */
   ChannelFullName: { input: any; output: any; }
-  /** The name of a subscription channel */
-  ChannelName: { input: any; output: any; }
   /** A Keccak256 value */
   CryptoHash: { input: any; output: any; }
   /** The destination of a message, relative to a particular application. */
@@ -76,8 +76,6 @@ export type Scalars = {
   OracleResponse: { input: any; output: any; }
   /** The origin of a message, relative to a particular application. Used to identify each inbox. */
   Origin: { input: any; output: any; }
-  /** The owner of a chain. This is currently the hash of the owner's public key used to verify signatures. */
-  Owner: { input: any; output: any; }
   /** The recipient of a transfer */
   Recipient: { input: any; output: any; }
   /** A number to identify successive attempts to decide a value in a consensus protocol. */
@@ -90,8 +88,6 @@ export type Scalars = {
   Target: { input: any; output: any; }
   /** A timestamp, in microseconds since the Unix epoch */
   Timestamp: { input: any; output: any; }
-  /** Description of the necessary information to run a user application */
-  UserApplicationDescription: { input: any; output: any; }
   /** A validated block certificate. */
   ValidatedBlockCertificate: { input: any; output: any; }
   VersionInfo: { input: any; output: any; }
@@ -102,7 +98,7 @@ export type Scalars = {
 
 export type ApplicationOverview = {
   __typename?: 'ApplicationOverview';
-  description: Scalars['UserApplicationDescription']['output'];
+  description: Scalars['ApplicationDescription']['output'];
   id: Scalars['ApplicationId']['output'];
   link: Scalars['String']['output'];
 };
@@ -166,6 +162,8 @@ export type BlockBody = {
   operations: Array<Scalars['Operation']['output']>;
   /** The record of oracle responses for each transaction. */
   oracleResponses: Array<Array<Scalars['OracleResponse']['output']>>;
+  /** The hashes of previous blocks that sent messages to the same recipients. */
+  previousMessageBlocks: Scalars['JSONObject']['output'];
 };
 
 /** The messages and the state hash resulting from a [`ProposedBlock`]'s execution. */
@@ -181,6 +179,8 @@ export type BlockExecutionOutcome = {
   operationResults: Array<Scalars['OperationResult']['output']>;
   /** The record of oracle responses for each transaction. */
   oracleResponses: Array<Array<Scalars['OracleResponse']['output']>>;
+  /** The hashes of previous blocks that sent messages to the same recipients. */
+  previousMessageBlocks: Scalars['JSONObject']['output'];
   /** The hash of the chain's execution state after this block. */
   stateHash: Scalars['CryptoHash']['output'];
 };
@@ -198,7 +198,7 @@ export type BlockHeader = {
    * the default account of the chain is used. This value is also used as recipient of
    * potential refunds for the message grants created by the operations.
    */
-  authenticatedSigner?: Maybe<Scalars['Owner']['output']>;
+  authenticatedSigner?: Maybe<Scalars['AccountOwner']['output']>;
   /** Cryptographic hash of all the created blobs in the block. */
   blobsHash: Scalars['CryptoHash']['output'];
   /** Cryptographic hash of all the incoming bundles in the block. */
@@ -221,6 +221,8 @@ export type BlockHeader = {
   oracleResponsesHash: Scalars['CryptoHash']['output'];
   /** Certified hash of the previous block in the chain, if any. */
   previousBlockHash?: Maybe<Scalars['CryptoHash']['output']>;
+  /** Cryptographic hash of the lookup table for previous sending blocks. */
+  previousMessageBlocksHash: Scalars['CryptoHash']['output'];
   /** The hash of the chain's execution state after this block. */
   stateHash: Scalars['CryptoHash']['output'];
   /** The timestamp when this block was created. */
@@ -276,6 +278,11 @@ export type ChainManager = {
   seed: Scalars['Int']['output'];
 };
 
+export type ChainOwners = {
+  chainId: Scalars['ChainId']['input'];
+  owners: Array<Scalars['AccountOwner']['input']>;
+};
+
 export type ChainStateExtendedView = {
   __typename?: 'ChainStateExtendedView';
   chainId: Scalars['ChainId']['output'];
@@ -302,12 +309,14 @@ export type ChainStateExtendedView = {
   /** Mailboxes used to send messages, indexed by their target. */
   outboxes: ReentrantCollectionView_Target_OutboxStateView_3966872819;
   /** The incomplete sets of blobs for upcoming proposals. */
-  pendingProposedBlobs: ReentrantCollectionView_Owner_PendingBlobsView_2231084335;
+  pendingProposedBlobs: ReentrantCollectionView_AccountOwner_PendingBlobsView_3683749805;
   /**
    * Pending validated block that is still missing blobs.
    * The incomplete set of blobs for the pending validated block.
    */
   pendingValidatedBlobs: PendingBlobsView;
+  /** The heights of previous blocks that sent messages to the same recipients. */
+  previousMessageBlocks: MapView_ChainId_BlockHeight_F2e56e12;
   /** The number of `received_log` entries we have synchronized, for each validator. */
   receivedCertificateTrackers: Scalars['JSONObject']['output'];
   /** Sender chain and height of all certified blocks known as a receiver (local ordering). */
@@ -350,15 +359,6 @@ export type ChannelStateView = {
   subscribers: Array<Scalars['ChainId']['output']>;
 };
 
-/** The identifier of a channel, relative to a particular application. */
-export type ChannelSubscription = {
-  __typename?: 'ChannelSubscription';
-  /** The chain ID broadcasting on this channel. */
-  chainId: Scalars['ChainId']['output'];
-  /** The name of the channel. */
-  name: Scalars['ChannelName']['output'];
-};
-
 /** A set of validators (identified by their public keys) and their voting rights. */
 export type Committee = {
   /** The policy agreed on for this epoch. */
@@ -376,6 +376,7 @@ export type Committee = {
 export type ConfirmedBlock = {
   __typename?: 'ConfirmedBlock';
   block: Block;
+  hash: Scalars['CryptoHash']['output'];
   status: Scalars['String']['output'];
 };
 
@@ -393,6 +394,13 @@ export type Entry_AccountOwner_Amount_Aaf96548 = {
 };
 
 /** A GraphQL-visible map item, complete with key. */
+export type Entry_AccountOwner_PendingBlobsView_A1918fe0 = {
+  __typename?: 'Entry_AccountOwner_PendingBlobsView_a1918fe0';
+  key: Scalars['AccountOwner']['output'];
+  value: PendingBlobsView;
+};
+
+/** A GraphQL-visible map item, complete with key. */
 export type Entry_BlobId_Blob_9f0b41f3 = {
   __typename?: 'Entry_BlobId_Blob_9f0b41f3';
   key: Scalars['BlobId']['output'];
@@ -404,6 +412,13 @@ export type Entry_BlobId_Blob_50b95aa1 = {
   __typename?: 'Entry_BlobId_Blob_50b95aa1';
   key: Scalars['BlobId']['output'];
   value?: Maybe<Scalars['Blob']['output']>;
+};
+
+/** A GraphQL-visible map item, complete with key. */
+export type Entry_ChainId_BlockHeight_2fe78645 = {
+  __typename?: 'Entry_ChainId_BlockHeight_2fe78645';
+  key: Scalars['ChainId']['output'];
+  value?: Maybe<Scalars['BlockHeight']['output']>;
 };
 
 /** A GraphQL-visible map item, complete with key. */
@@ -421,53 +436,26 @@ export type Entry_Origin_InboxStateView_9e8611cf = {
 };
 
 /** A GraphQL-visible map item, complete with key. */
-export type Entry_Owner_PendingBlobsView_C20bccc6 = {
-  __typename?: 'Entry_Owner_PendingBlobsView_c20bccc6';
-  key: Scalars['Owner']['output'];
-  value: PendingBlobsView;
-};
-
-/** A GraphQL-visible map item, complete with key. */
 export type Entry_Target_OutboxStateView_087933dd = {
   __typename?: 'Entry_Target_OutboxStateView_087933dd';
   key: Scalars['Target']['output'];
   value: OutboxStateView;
 };
 
-/** An event recorded in an executed block. */
+/** An event recorded in a block. */
 export type Event = {
   __typename?: 'Event';
-  /** The event key. */
-  key: Array<Scalars['Int']['output']>;
+  /** The event index, i.e. the number of events in the stream before this one. */
+  index: Scalars['Int']['output'];
   /** The ID of the stream this event belongs to. */
   streamId: StreamId;
   /** The payload data. */
   value: Array<Scalars['Int']['output']>;
 };
 
-/** A [`ProposedBlock`], together with the outcome from its execution. */
-export type ExecutedBlock = {
-  __typename?: 'ExecutedBlock';
-  block: ProposedBlock;
-  outcome: BlockExecutionOutcome;
-};
-
-export type ExecutedBlockMaterial = {
-  __typename?: 'ExecutedBlockMaterial';
-  blobIds: Array<Scalars['BlobId']['output']>;
-  executedBlock: ExecutedBlock;
-  validatedBlockCertificate?: Maybe<Scalars['ValidatedBlockCertificate']['output']>;
-};
-
 export type ExecutionStateView = {
   __typename?: 'ExecutionStateView';
   system: SystemExecutionStateView;
-};
-
-export type HashedConfirmedBlock = {
-  __typename?: 'HashedConfirmedBlock';
-  hash: Scalars['CryptoHash']['output'];
-  value: ConfirmedBlock;
 };
 
 /**
@@ -551,16 +539,16 @@ export type MapFilters_BlobId_4d2a0555 = {
   keys?: InputMaybe<Array<Scalars['BlobId']['input']>>;
 };
 
+export type MapFilters_ChainId_37f83aa9 = {
+  keys?: InputMaybe<Array<Scalars['ChainId']['input']>>;
+};
+
 export type MapFilters_ChannelFullName_7b67e184 = {
   keys?: InputMaybe<Array<Scalars['ChannelFullName']['input']>>;
 };
 
 export type MapFilters_Origin_742d451b = {
   keys?: InputMaybe<Array<Scalars['Origin']['input']>>;
-};
-
-export type MapFilters_Owner_6898ce22 = {
-  keys?: InputMaybe<Array<Scalars['Owner']['input']>>;
 };
 
 export type MapFilters_Target_7aac1e1c = {
@@ -575,16 +563,16 @@ export type MapInput_BlobId_4d2a0555 = {
   filters?: InputMaybe<MapFilters_BlobId_4d2a0555>;
 };
 
+export type MapInput_ChainId_37f83aa9 = {
+  filters?: InputMaybe<MapFilters_ChainId_37f83aa9>;
+};
+
 export type MapInput_ChannelFullName_7b67e184 = {
   filters?: InputMaybe<MapFilters_ChannelFullName_7b67e184>;
 };
 
 export type MapInput_Origin_742d451b = {
   filters?: InputMaybe<MapFilters_Origin_742d451b>;
-};
-
-export type MapInput_Owner_6898ce22 = {
-  filters?: InputMaybe<MapFilters_Owner_6898ce22>;
 };
 
 export type MapInput_Target_7aac1e1c = {
@@ -657,6 +645,28 @@ export type MapView_BlobId_Blob_3711e760KeysArgs = {
   count?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type MapView_ChainId_BlockHeight_F2e56e12 = {
+  __typename?: 'MapView_ChainId_BlockHeight_f2e56e12';
+  entries: Array<Entry_ChainId_BlockHeight_2fe78645>;
+  entry: Entry_ChainId_BlockHeight_2fe78645;
+  keys: Array<Scalars['ChainId']['output']>;
+};
+
+
+export type MapView_ChainId_BlockHeight_F2e56e12EntriesArgs = {
+  input?: InputMaybe<MapInput_ChainId_37f83aa9>;
+};
+
+
+export type MapView_ChainId_BlockHeight_F2e56e12EntryArgs = {
+  key: Scalars['ChainId']['input'];
+};
+
+
+export type MapView_ChainId_BlockHeight_F2e56e12KeysArgs = {
+  count?: InputMaybe<Scalars['Int']['input']>;
+};
+
 /** A set of messages from a single block, for a single destination. */
 export type MessageBundle = {
   __typename?: 'MessageBundle';
@@ -723,20 +733,16 @@ export type MutationRoot = {
   /** Retries the pending block that was unsuccessfully proposed earlier. */
   retryPendingBlock?: Maybe<Scalars['CryptoHash']['output']>;
   /** Calculate block execution state hash */
-  simulateExecuteBlock?: Maybe<ExecutedBlockMaterial>;
+  simulateExecuteBlock?: Maybe<SimulatedBlockMaterial>;
   /** Submit block proposal with signature */
   submitBlockAndSignature: Scalars['CryptoHash']['output'];
-  /** Subscribes to a system channel. */
-  subscribe: Scalars['CryptoHash']['output'];
   /**
    * Transfers `amount` units of value from the given owner's account to the recipient.
-   * If no owner is given, try to take the units out of the unattributed account.
+   * If no owner is given, try to take the units out of the chain account.
    */
   transfer: Scalars['CryptoHash']['output'];
-  /** Unsubscribes from a system channel. */
-  unsubscribe: Scalars['CryptoHash']['output'];
   /** Add key pair info which only has public key */
-  walletInitPublicKey: Scalars['Owner']['output'];
+  walletInitPublicKey: Scalars['AccountOwner']['output'];
   /** ResPeer::CheCko::Initialize offline wallet */
   walletInitWithoutSecretKey: Scalars['ChainId']['output'];
 };
@@ -759,7 +765,7 @@ export type MutationRootChangeMultipleOwnersArgs = {
   fallbackDurationMs?: Scalars['Int']['input'];
   fastRoundMs?: InputMaybe<Scalars['Int']['input']>;
   multiLeaderRounds: Scalars['Int']['input'];
-  newOwners: Array<Scalars['Owner']['input']>;
+  newOwners: Array<Scalars['AccountOwner']['input']>;
   newWeights: Array<Scalars['Int']['input']>;
   openMultiLeaderRounds: Scalars['Boolean']['input'];
   timeoutIncrementMs?: Scalars['Int']['input'];
@@ -768,14 +774,14 @@ export type MutationRootChangeMultipleOwnersArgs = {
 
 export type MutationRootChangeOwnerArgs = {
   chainId: Scalars['ChainId']['input'];
-  newOwner: Scalars['Owner']['input'];
+  newOwner: Scalars['AccountOwner']['input'];
 };
 
 
 export type MutationRootClaimArgs = {
   amount: Scalars['Amount']['input'];
   chainId: Scalars['ChainId']['input'];
-  owner: Scalars['Owner']['input'];
+  owner: Scalars['AccountOwner']['input'];
   recipient: Scalars['Recipient']['input'];
   targetId: Scalars['ChainId']['input'];
 };
@@ -804,7 +810,7 @@ export type MutationRootCreateCommitteeArgs = {
 export type MutationRootOpenChainArgs = {
   balance?: InputMaybe<Scalars['Amount']['input']>;
   chainId: Scalars['ChainId']['input'];
-  owner: Scalars['Owner']['input'];
+  owner: Scalars['AccountOwner']['input'];
 };
 
 
@@ -816,7 +822,7 @@ export type MutationRootOpenMultiOwnerChainArgs = {
   fallbackDurationMs?: Scalars['Int']['input'];
   fastRoundMs?: InputMaybe<Scalars['Int']['input']>;
   multiLeaderRounds?: InputMaybe<Scalars['Int']['input']>;
-  owners: Array<Scalars['Owner']['input']>;
+  owners: Array<Scalars['AccountOwner']['input']>;
   timeoutIncrementMs?: Scalars['Int']['input'];
   weights?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
@@ -871,25 +877,11 @@ export type MutationRootSubmitBlockAndSignatureArgs = {
 };
 
 
-export type MutationRootSubscribeArgs = {
-  channel: SystemChannel;
-  publisherChainId: Scalars['ChainId']['input'];
-  subscriberChainId: Scalars['ChainId']['input'];
-};
-
-
 export type MutationRootTransferArgs = {
   amount: Scalars['Amount']['input'];
   chainId: Scalars['ChainId']['input'];
-  owner?: InputMaybe<Scalars['Owner']['input']>;
+  owner: Scalars['AccountOwner']['input'];
   recipient: Scalars['Recipient']['input'];
-};
-
-
-export type MutationRootUnsubscribeArgs = {
-  channel: SystemChannel;
-  publisherChainId: Scalars['ChainId']['input'];
-  subscriberChainId: Scalars['ChainId']['input'];
 };
 
 
@@ -929,7 +921,7 @@ export type OutboxStateView = {
 export type OutgoingMessage = {
   __typename?: 'OutgoingMessage';
   /** The user authentication carried by the message, if any. */
-  authenticatedSigner?: Maybe<Scalars['Owner']['output']>;
+  authenticatedSigner?: Maybe<Scalars['AccountOwner']['output']>;
   /** The destination of the message. */
   destination: Scalars['Destination']['output'];
   /** A grant to pay for the message execution. */
@@ -963,7 +955,7 @@ export type PendingBlobsView = {
 export type PostedMessage = {
   __typename?: 'PostedMessage';
   /** The user authentication carried by the message, if any. */
-  authenticatedSigner?: Maybe<Scalars['Owner']['output']>;
+  authenticatedSigner?: Maybe<Scalars['AccountOwner']['output']>;
   /** A grant to pay for the message execution. */
   grant: Scalars['Amount']['output'];
   /** The index of the message in the sending block. */
@@ -976,61 +968,19 @@ export type PostedMessage = {
   refundGrantTo?: Maybe<Scalars['Account']['output']>;
 };
 
-/**
- * A block containing operations to apply on a given chain, as well as the
- * acknowledgment of a number of incoming messages from other chains.
- * * Incoming messages must be selected in the order they were
- * produced by the sending chain, but can be skipped.
- * * When a block is proposed to a validator, all cross-chain messages must have been
- * received ahead of time in the inbox of the chain.
- * * This constraint does not apply to the execution of confirmed blocks.
- */
-export type ProposedBlock = {
-  __typename?: 'ProposedBlock';
-  /**
-   * The user signing for the operations in the block and paying for their execution
-   * fees. If set, this must be the `owner` in the block proposal. `None` means that
-   * the default account of the chain is used. This value is also used as recipient of
-   * potential refunds for the message grants created by the operations.
-   */
-  authenticatedSigner?: Maybe<Scalars['Owner']['output']>;
-  /** The chain to which this block belongs. */
-  chainId: Scalars['ChainId']['output'];
-  /** The number identifying the current configuration. */
-  epoch: Scalars['Epoch']['output'];
-  /** The block height. */
-  height: Scalars['BlockHeight']['output'];
-  /**
-   * A selection of incoming messages to be executed first. Successive messages of same
-   * sender and height are grouped together for conciseness.
-   */
-  incomingBundles: Array<IncomingBundle>;
-  /** The operations to execute. */
-  operations: Array<Scalars['Operation']['output']>;
-  /**
-   * Certified hash (see `Certificate` below) of the previous block in the
-   * chain, if any.
-   */
-  previousBlockHash?: Maybe<Scalars['CryptoHash']['output']>;
-  /**
-   * The timestamp when this block was created. This must be later than all messages received
-   * in this block, but no later than the current time.
-   */
-  timestamp: Scalars['Timestamp']['output'];
-};
-
 export type QueryRoot = {
   __typename?: 'QueryRoot';
   accountOwnerPattern: Scalars['AccountOwner']['output'];
+  accountPattern: Scalars['Account']['output'];
   applications: Array<ApplicationOverview>;
   /** Returns the balance of given owner */
   balance: Scalars['Amount']['output'];
   /** Returns the balances of given owners */
   balances: Scalars['JSONObject']['output'];
-  block?: Maybe<HashedConfirmedBlock>;
+  block?: Maybe<ConfirmedBlock>;
   /** Returns block material of the chain */
   blockMaterial: CandidateBlockMaterial;
-  blocks: Array<HashedConfirmedBlock>;
+  blocks: Array<ConfirmedBlock>;
   chain: ChainStateExtendedView;
   chains: Chains;
   /** Returns the maintained chains of given owner */
@@ -1057,7 +1007,7 @@ export type QueryRootBalanceArgs = {
 
 
 export type QueryRootBalancesArgs = {
-  chainOwners: Scalars['JSONObject']['input'];
+  chainOwners: Array<ChainOwners>;
 };
 
 
@@ -1086,7 +1036,7 @@ export type QueryRootChainArgs = {
 
 
 export type QueryRootOwnerChainsArgs = {
-  owner: Scalars['Owner']['input'];
+  owner: Scalars['AccountOwner']['input'];
 };
 
 
@@ -1124,6 +1074,23 @@ export type QueueView_TimestampedBundleInInbox_5a630c55EntriesArgs = {
   count?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type ReentrantCollectionView_AccountOwner_PendingBlobsView_3683749805 = {
+  __typename?: 'ReentrantCollectionView_AccountOwner_PendingBlobsView_3683749805';
+  entries: Array<Entry_AccountOwner_PendingBlobsView_A1918fe0>;
+  entry: Entry_AccountOwner_PendingBlobsView_A1918fe0;
+  keys: Array<Scalars['AccountOwner']['output']>;
+};
+
+
+export type ReentrantCollectionView_AccountOwner_PendingBlobsView_3683749805EntriesArgs = {
+  input?: InputMaybe<MapInput_AccountOwner_D6668c53>;
+};
+
+
+export type ReentrantCollectionView_AccountOwner_PendingBlobsView_3683749805EntryArgs = {
+  key: Scalars['AccountOwner']['input'];
+};
+
 export type ReentrantCollectionView_ChannelFullName_ChannelStateView_1007095758 = {
   __typename?: 'ReentrantCollectionView_ChannelFullName_ChannelStateView_1007095758';
   entries: Array<Entry_ChannelFullName_ChannelStateView_8677ec10>;
@@ -1158,23 +1125,6 @@ export type ReentrantCollectionView_Origin_InboxStateView_3932346065EntryArgs = 
   key: Scalars['Origin']['input'];
 };
 
-export type ReentrantCollectionView_Owner_PendingBlobsView_2231084335 = {
-  __typename?: 'ReentrantCollectionView_Owner_PendingBlobsView_2231084335';
-  entries: Array<Entry_Owner_PendingBlobsView_C20bccc6>;
-  entry: Entry_Owner_PendingBlobsView_C20bccc6;
-  keys: Array<Scalars['Owner']['output']>;
-};
-
-
-export type ReentrantCollectionView_Owner_PendingBlobsView_2231084335EntriesArgs = {
-  input?: InputMaybe<MapInput_Owner_6898ce22>;
-};
-
-
-export type ReentrantCollectionView_Owner_PendingBlobsView_2231084335EntryArgs = {
-  key: Scalars['Owner']['input'];
-};
-
 export type ReentrantCollectionView_Target_OutboxStateView_3966872819 = {
   __typename?: 'ReentrantCollectionView_Target_OutboxStateView_3966872819';
   entries: Array<Entry_Target_OutboxStateView_087933dd>;
@@ -1194,6 +1144,14 @@ export type ReentrantCollectionView_Target_OutboxStateView_3966872819EntryArgs =
 
 /** A collection of prices and limits associated with block execution. */
 export type ResourceControlPolicy = {
+  /** The price to publish a blob, per byte. */
+  blobBytePublished: Scalars['Amount']['input'];
+  /** The price to read a blob, per byte. */
+  blobByteRead: Scalars['Amount']['input'];
+  /** The base price to publish a blob. */
+  blobPublished: Scalars['Amount']['input'];
+  /** The base price to read a blob. */
+  blobRead: Scalars['Amount']['input'];
   /** The base price for creating a new block. */
   block: Scalars['Amount']['input'];
   /** The price of reading a byte. */
@@ -1214,21 +1172,23 @@ export type ResourceControlPolicy = {
   maximumBlobSize: Scalars['Int']['input'];
   /** The maximum size of a block proposal. */
   maximumBlockProposalSize: Scalars['Int']['input'];
+  /**
+   * The maximum size of a block. This includes the block proposal itself as well as
+   * the execution outcome.
+   */
+  maximumBlockSize: Scalars['Int']['input'];
   /** The maximum size of decompressed contract or service bytecode, in bytes. */
   maximumBytecodeSize: Scalars['Int']['input'];
   /** The maximum data to read per block */
   maximumBytesReadPerBlock: Scalars['Int']['input'];
   /** The maximum data to write per block */
   maximumBytesWrittenPerBlock: Scalars['Int']['input'];
-  /**
-   * The maximum size of an executed block. This includes the block proposal itself as well as
-   * the execution outcome.
-   */
-  maximumExecutedBlockSize: Scalars['Int']['input'];
   /** The maximum amount of fuel a block can consume. */
   maximumFuelPerBlock: Scalars['Int']['input'];
   /** The maximum size in bytes of a received HTTP response. */
   maximumHttpResponseBytes: Scalars['Int']['input'];
+  /** The maximum size in bytes of an oracle response. */
+  maximumOracleResponseBytes: Scalars['Int']['input'];
   /** The maximum number of published blobs per block. */
   maximumPublishedBlobs: Scalars['Int']['input'];
   /** The maximum time in milliseconds that a block can spend executing services as oracles. */
@@ -1243,8 +1203,18 @@ export type ResourceControlPolicy = {
   operationByte: Scalars['Amount']['input'];
   /** The price of one read operation. */
   readOperation: Scalars['Amount']['input'];
+  /** The price per query to a service as an oracle. */
+  serviceAsOracleQuery: Scalars['Amount']['input'];
   /** The price of one write operation. */
   writeOperation: Scalars['Amount']['input'];
+};
+
+export type SimulatedBlockMaterial = {
+  __typename?: 'SimulatedBlockMaterial';
+  blobBytes: Array<Array<Scalars['Int']['output']>>;
+  block: Block;
+  outcome?: Maybe<BlockExecutionOutcome>;
+  validatedBlockCertificate?: Maybe<Scalars['ValidatedBlockCertificate']['output']>;
 };
 
 /** An event stream ID. */
@@ -1267,12 +1237,6 @@ export type SubscriptionRootNotificationsArgs = {
   chainId: Scalars['ChainId']['input'];
 };
 
-/** The channels available in the system application. */
-export enum SystemChannel {
-  /** Channel used to broadcast reconfigurations. */
-  Admin = 'ADMIN'
-}
-
 export type SystemExecutionStateView = {
   __typename?: 'SystemExecutionStateView';
   adminId?: Maybe<Scalars['ChainId']['output']>;
@@ -1282,7 +1246,6 @@ export type SystemExecutionStateView = {
   description?: Maybe<Scalars['ChainDescription']['output']>;
   epoch?: Maybe<Scalars['Epoch']['output']>;
   ownership: Scalars['ChainOwnership']['output'];
-  subscriptions: Array<ChannelSubscription>;
   timestamp: Scalars['Timestamp']['output'];
 };
 
@@ -1304,7 +1267,7 @@ export type BalanceQueryVariables = Exact<{
 export type BalanceQuery = { __typename?: 'QueryRoot', balance: any };
 
 export type BalancesQueryVariables = Exact<{
-  chainOwners: Scalars['JSONObject']['input'];
+  chainOwners: Array<ChainOwners> | ChainOwners;
 }>;
 
 
@@ -1318,7 +1281,7 @@ export type ApplicationsQueryVariables = Exact<{
 export type ApplicationsQuery = { __typename?: 'QueryRoot', applications: Array<{ __typename?: 'ApplicationOverview', id: any, link: string }> };
 
 export type OwnerChainsQueryVariables = Exact<{
-  owner: Scalars['Owner']['input'];
+  owner: Scalars['AccountOwner']['input'];
 }>;
 
 
@@ -1355,7 +1318,7 @@ export type BlockQueryVariables = Exact<{
 }>;
 
 
-export type BlockQuery = { __typename?: 'QueryRoot', block?: { __typename?: 'HashedConfirmedBlock', hash: any, value: { __typename?: 'ConfirmedBlock', status: string, block: { __typename?: 'Block', header: { __typename?: 'BlockHeader', chainId: any, epoch: any, height: any, timestamp: any, stateHash: any, previousBlockHash?: any | null, authenticatedSigner?: any | null, bundlesHash: any, operationsHash: any, messagesHash: any, oracleResponsesHash: any, eventsHash: any, blobsHash: any, operationResultsHash: any }, body: { __typename?: 'BlockBody', operations: Array<any>, oracleResponses: Array<Array<any>>, blobs: Array<Array<any>>, operationResults: Array<any>, incomingBundles: Array<{ __typename?: 'IncomingBundle', origin: any, action: any, bundle: { __typename?: 'MessageBundle', height: any, timestamp: any, certificateHash: any, transactionIndex: number, messages: Array<{ __typename?: 'PostedMessage', authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, index: number, message: any }> } }>, messages: Array<Array<{ __typename?: 'OutgoingMessage', destination: any, authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, message: any }>>, events: Array<Array<{ __typename?: 'Event', key: Array<number>, value: Array<number>, streamId: { __typename?: 'StreamId', applicationId: any, streamName: any } }>> } } } } | null };
+export type BlockQuery = { __typename?: 'QueryRoot', block?: { __typename?: 'ConfirmedBlock', status: string, hash: any, block: { __typename?: 'Block', header: { __typename?: 'BlockHeader', chainId: any, epoch: any, height: any, timestamp: any, stateHash: any, previousBlockHash?: any | null, authenticatedSigner?: any | null, bundlesHash: any, operationsHash: any, messagesHash: any, previousMessageBlocksHash: any, oracleResponsesHash: any, eventsHash: any, blobsHash: any, operationResultsHash: any }, body: { __typename?: 'BlockBody', operations: Array<any>, previousMessageBlocks: any, oracleResponses: Array<Array<any>>, blobs: Array<Array<any>>, operationResults: Array<any>, incomingBundles: Array<{ __typename?: 'IncomingBundle', origin: any, action: any, bundle: { __typename?: 'MessageBundle', height: any, timestamp: any, certificateHash: any, transactionIndex: number, messages: Array<{ __typename?: 'PostedMessage', authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, index: number, message: any }> } }>, messages: Array<Array<{ __typename?: 'OutgoingMessage', destination: any, authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, message: any }>>, events: Array<Array<{ __typename?: 'Event', index: number, value: Array<number>, streamId: { __typename?: 'StreamId', applicationId: any, streamName: any } }>> } } } | null };
 
 export type BlockMaterialQueryVariables = Exact<{
   chainId: Scalars['ChainId']['input'];
@@ -1371,7 +1334,7 @@ export type SimulateExecuteBlockMutationVariables = Exact<{
 }>;
 
 
-export type SimulateExecuteBlockMutation = { __typename?: 'MutationRoot', simulateExecuteBlock?: { __typename?: 'ExecutedBlockMaterial', blobIds: Array<any>, validatedBlockCertificate?: any | null, executedBlock: { __typename?: 'ExecutedBlock', block: { __typename?: 'ProposedBlock', chainId: any, epoch: any, operations: Array<any>, height: any, timestamp: any, authenticatedSigner?: any | null, previousBlockHash?: any | null, incomingBundles: Array<{ __typename?: 'IncomingBundle', origin: any, action: any, bundle: { __typename?: 'MessageBundle', height: any, timestamp: any, certificateHash: any, transactionIndex: number, messages: Array<{ __typename?: 'PostedMessage', authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, index: number, message: any }> } }> }, outcome: { __typename?: 'BlockExecutionOutcome', stateHash: any, oracleResponses: Array<Array<any>>, blobs: Array<Array<any>>, operationResults: Array<any>, messages: Array<Array<{ __typename?: 'OutgoingMessage', destination: any, authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, message: any }>>, events: Array<Array<{ __typename?: 'Event', key: Array<number>, value: Array<number>, streamId: { __typename?: 'StreamId', applicationId: any, streamName: any } }>> } } } | null };
+export type SimulateExecuteBlockMutation = { __typename?: 'MutationRoot', simulateExecuteBlock?: { __typename?: 'SimulatedBlockMaterial', blobBytes: Array<Array<number>>, validatedBlockCertificate?: any | null, block: { __typename?: 'Block', header: { __typename?: 'BlockHeader', chainId: any, epoch: any, height: any, timestamp: any, stateHash: any, previousBlockHash?: any | null, authenticatedSigner?: any | null, bundlesHash: any, operationsHash: any, messagesHash: any, previousMessageBlocksHash: any, oracleResponsesHash: any, eventsHash: any, blobsHash: any, operationResultsHash: any }, body: { __typename?: 'BlockBody', operations: Array<any>, previousMessageBlocks: any, oracleResponses: Array<Array<any>>, blobs: Array<Array<any>>, operationResults: Array<any>, incomingBundles: Array<{ __typename?: 'IncomingBundle', origin: any, action: any, bundle: { __typename?: 'MessageBundle', height: any, timestamp: any, certificateHash: any, transactionIndex: number, messages: Array<{ __typename?: 'PostedMessage', authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, index: number, message: any }> } }>, messages: Array<Array<{ __typename?: 'OutgoingMessage', destination: any, authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, message: any }>>, events: Array<Array<{ __typename?: 'Event', index: number, value: Array<number>, streamId: { __typename?: 'StreamId', applicationId: any, streamName: any } }>> } }, outcome?: { __typename?: 'BlockExecutionOutcome', previousMessageBlocks: any, stateHash: any, oracleResponses: Array<Array<any>>, blobs: Array<Array<any>>, operationResults: Array<any>, messages: Array<Array<{ __typename?: 'OutgoingMessage', destination: any, authenticatedSigner?: any | null, grant: any, refundGrantTo?: any | null, kind: any, message: any }>>, events: Array<Array<{ __typename?: 'Event', index: number, value: Array<number>, streamId: { __typename?: 'StreamId', applicationId: any, streamName: any } }>> } | null } | null };
 
 export type PendingMessagesQueryVariables = Exact<{
   chainId: Scalars['ChainId']['input'];
@@ -1382,7 +1345,7 @@ export type PendingMessagesQuery = { __typename?: 'QueryRoot', pendingMessages: 
 
 export type TransferMutationVariables = Exact<{
   chainId: Scalars['ChainId']['input'];
-  owner?: InputMaybe<Scalars['Owner']['input']>;
+  owner: Scalars['AccountOwner']['input'];
   recipient: Scalars['Recipient']['input'];
   amount: Scalars['Amount']['input'];
 }>;
@@ -1400,15 +1363,15 @@ export type WalletInitPublicKeyMutation = { __typename?: 'MutationRoot', walletI
 
 
 export const BalanceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"balance"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountOwner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"balance"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}]}]}}]} as unknown as DocumentNode<BalanceQuery, BalanceQueryVariables>;
-export const BalancesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"balances"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JSONObject"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"balances"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainOwners"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}}}]}]}}]} as unknown as DocumentNode<BalancesQuery, BalancesQueryVariables>;
+export const BalancesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"balances"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainOwners"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"balances"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainOwners"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainOwners"}}}]}]}}]} as unknown as DocumentNode<BalancesQuery, BalancesQueryVariables>;
 export const ApplicationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"applications"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"link"}}]}}]}}]} as unknown as DocumentNode<ApplicationsQuery, ApplicationsQueryVariables>;
-export const OwnerChainsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ownerChains"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Owner"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ownerChains"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"list"}},{"kind":"Field","name":{"kind":"Name","value":"default"}}]}}]}}]} as unknown as DocumentNode<OwnerChainsQuery, OwnerChainsQueryVariables>;
+export const OwnerChainsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ownerChains"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountOwner"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ownerChains"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"list"}},{"kind":"Field","name":{"kind":"Name","value":"default"}}]}}]}}]} as unknown as DocumentNode<OwnerChainsQuery, OwnerChainsQueryVariables>;
 export const WalletInitWithoutSecretKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"walletInitWithoutSecretKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"initializer"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"WalletInitializer"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MessageId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"walletInitWithoutSecretKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"initializer"},"value":{"kind":"Variable","name":{"kind":"Name","value":"initializer"}}},{"kind":"Argument","name":{"kind":"Name","value":"messageId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}}}]}]}}]} as unknown as DocumentNode<WalletInitWithoutSecretKeyMutation, WalletInitWithoutSecretKeyMutationVariables>;
 export const SubmitBlockAndSignatureDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"submitBlockAndSignature"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"height"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BlockHeight"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"block"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SignedBlock"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"submitBlockAndSignature"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"height"},"value":{"kind":"Variable","name":{"kind":"Name","value":"height"}}},{"kind":"Argument","name":{"kind":"Name","value":"block"},"value":{"kind":"Variable","name":{"kind":"Name","value":"block"}}}]}]}}]} as unknown as DocumentNode<SubmitBlockAndSignatureMutation, SubmitBlockAndSignatureMutationVariables>;
 export const NotificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"notifications"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}]}]}}]} as unknown as DocumentNode<NotificationsSubscription, NotificationsSubscriptionVariables>;
-export const BlockDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"block"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"hash"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CryptoHash"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"block"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"hash"},"value":{"kind":"Variable","name":{"kind":"Name","value":"hash"}}},{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hash"}},{"kind":"Field","name":{"kind":"Name","value":"value"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"block"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"header"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"epoch"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"stateHash"}},{"kind":"Field","name":{"kind":"Name","value":"previousBlockHash"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"bundlesHash"}},{"kind":"Field","name":{"kind":"Name","value":"operationsHash"}},{"kind":"Field","name":{"kind":"Name","value":"messagesHash"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponsesHash"}},{"kind":"Field","name":{"kind":"Name","value":"eventsHash"}},{"kind":"Field","name":{"kind":"Name","value":"blobsHash"}},{"kind":"Field","name":{"kind":"Name","value":"operationResultsHash"}}]}},{"kind":"Field","name":{"kind":"Name","value":"body"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBundles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"origin"}},{"kind":"Field","name":{"kind":"Name","value":"bundle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}},{"kind":"Field","name":{"kind":"Name","value":"transactionIndex"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"action"}}]}},{"kind":"Field","name":{"kind":"Name","value":"operations"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"destination"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponses"}},{"kind":"Field","name":{"kind":"Name","value":"events"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"streamId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"streamName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobs"}},{"kind":"Field","name":{"kind":"Name","value":"operationResults"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<BlockQuery, BlockQueryVariables>;
+export const BlockDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"block"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"hash"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CryptoHash"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"block"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"hash"},"value":{"kind":"Variable","name":{"kind":"Name","value":"hash"}}},{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hash"}},{"kind":"Field","name":{"kind":"Name","value":"block"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"header"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"epoch"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"stateHash"}},{"kind":"Field","name":{"kind":"Name","value":"previousBlockHash"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"bundlesHash"}},{"kind":"Field","name":{"kind":"Name","value":"operationsHash"}},{"kind":"Field","name":{"kind":"Name","value":"messagesHash"}},{"kind":"Field","name":{"kind":"Name","value":"previousMessageBlocksHash"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponsesHash"}},{"kind":"Field","name":{"kind":"Name","value":"eventsHash"}},{"kind":"Field","name":{"kind":"Name","value":"blobsHash"}},{"kind":"Field","name":{"kind":"Name","value":"operationResultsHash"}}]}},{"kind":"Field","name":{"kind":"Name","value":"body"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBundles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"origin"}},{"kind":"Field","name":{"kind":"Name","value":"bundle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}},{"kind":"Field","name":{"kind":"Name","value":"transactionIndex"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"action"}}]}},{"kind":"Field","name":{"kind":"Name","value":"operations"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"destination"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"previousMessageBlocks"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponses"}},{"kind":"Field","name":{"kind":"Name","value":"events"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"streamId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"streamName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobs"}},{"kind":"Field","name":{"kind":"Name","value":"operationResults"}}]}}]}}]}}]}}]} as unknown as DocumentNode<BlockQuery, BlockQueryVariables>;
 export const BlockMaterialDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"blockMaterial"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxPendingMessages"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"blockMaterial"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxPendingMessages"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxPendingMessages"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBundles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"bundle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}},{"kind":"Field","name":{"kind":"Name","value":"transactionIndex"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"origin"}}]}},{"kind":"Field","name":{"kind":"Name","value":"localTime"}},{"kind":"Field","name":{"kind":"Name","value":"round"}}]}}]}}]} as unknown as DocumentNode<BlockMaterialQuery, BlockMaterialQueryVariables>;
-export const SimulateExecuteBlockDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"simulateExecuteBlock"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"blockMaterial"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BlockMaterial"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"simulateExecuteBlock"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"blockMaterial"},"value":{"kind":"Variable","name":{"kind":"Name","value":"blockMaterial"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"executedBlock"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"block"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"epoch"}},{"kind":"Field","name":{"kind":"Name","value":"incomingBundles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"origin"}},{"kind":"Field","name":{"kind":"Name","value":"bundle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}},{"kind":"Field","name":{"kind":"Name","value":"transactionIndex"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"action"}}]}},{"kind":"Field","name":{"kind":"Name","value":"operations"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"previousBlockHash"}}]}},{"kind":"Field","name":{"kind":"Name","value":"outcome"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"destination"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"stateHash"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponses"}},{"kind":"Field","name":{"kind":"Name","value":"events"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"streamId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"streamName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobs"}},{"kind":"Field","name":{"kind":"Name","value":"operationResults"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobIds"}},{"kind":"Field","name":{"kind":"Name","value":"validatedBlockCertificate"}}]}}]}}]} as unknown as DocumentNode<SimulateExecuteBlockMutation, SimulateExecuteBlockMutationVariables>;
+export const SimulateExecuteBlockDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"simulateExecuteBlock"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"blockMaterial"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BlockMaterial"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"simulateExecuteBlock"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"blockMaterial"},"value":{"kind":"Variable","name":{"kind":"Name","value":"blockMaterial"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"block"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"header"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chainId"}},{"kind":"Field","name":{"kind":"Name","value":"epoch"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"stateHash"}},{"kind":"Field","name":{"kind":"Name","value":"previousBlockHash"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"bundlesHash"}},{"kind":"Field","name":{"kind":"Name","value":"operationsHash"}},{"kind":"Field","name":{"kind":"Name","value":"messagesHash"}},{"kind":"Field","name":{"kind":"Name","value":"previousMessageBlocksHash"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponsesHash"}},{"kind":"Field","name":{"kind":"Name","value":"eventsHash"}},{"kind":"Field","name":{"kind":"Name","value":"blobsHash"}},{"kind":"Field","name":{"kind":"Name","value":"operationResultsHash"}}]}},{"kind":"Field","name":{"kind":"Name","value":"body"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBundles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"origin"}},{"kind":"Field","name":{"kind":"Name","value":"bundle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}},{"kind":"Field","name":{"kind":"Name","value":"transactionIndex"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"action"}}]}},{"kind":"Field","name":{"kind":"Name","value":"operations"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"destination"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"previousMessageBlocks"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponses"}},{"kind":"Field","name":{"kind":"Name","value":"events"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"streamId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"streamName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobs"}},{"kind":"Field","name":{"kind":"Name","value":"operationResults"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"outcome"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"destination"}},{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}},{"kind":"Field","name":{"kind":"Name","value":"previousMessageBlocks"}},{"kind":"Field","name":{"kind":"Name","value":"stateHash"}},{"kind":"Field","name":{"kind":"Name","value":"oracleResponses"}},{"kind":"Field","name":{"kind":"Name","value":"events"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"streamId"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"streamName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobs"}},{"kind":"Field","name":{"kind":"Name","value":"operationResults"}}]}},{"kind":"Field","name":{"kind":"Name","value":"blobBytes"}},{"kind":"Field","name":{"kind":"Name","value":"validatedBlockCertificate"}}]}}]}}]} as unknown as DocumentNode<SimulateExecuteBlockMutation, SimulateExecuteBlockMutationVariables>;
 export const PendingMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"pendingMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pendingMessages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"bundle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"certificateHash"}},{"kind":"Field","name":{"kind":"Name","value":"transactionIndex"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedSigner"}},{"kind":"Field","name":{"kind":"Name","value":"grant"}},{"kind":"Field","name":{"kind":"Name","value":"refundGrantTo"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"index"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"origin"}}]}}]}}]} as unknown as DocumentNode<PendingMessagesQuery, PendingMessagesQueryVariables>;
-export const TransferDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"transfer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Owner"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"recipient"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Recipient"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"amount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Amount"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"transfer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}},{"kind":"Argument","name":{"kind":"Name","value":"recipient"},"value":{"kind":"Variable","name":{"kind":"Name","value":"recipient"}}},{"kind":"Argument","name":{"kind":"Name","value":"amount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"amount"}}}]}]}}]} as unknown as DocumentNode<TransferMutation, TransferMutationVariables>;
+export const TransferDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"transfer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChainId"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"owner"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountOwner"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"recipient"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Recipient"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"amount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Amount"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"transfer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}},{"kind":"Argument","name":{"kind":"Name","value":"owner"},"value":{"kind":"Variable","name":{"kind":"Name","value":"owner"}}},{"kind":"Argument","name":{"kind":"Name","value":"recipient"},"value":{"kind":"Variable","name":{"kind":"Name","value":"recipient"}}},{"kind":"Argument","name":{"kind":"Name","value":"amount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"amount"}}}]}]}}]} as unknown as DocumentNode<TransferMutation, TransferMutationVariables>;
 export const WalletInitPublicKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"walletInitPublicKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"publicKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountPublicKey"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"signature"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountSignature"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"walletInitPublicKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"publicKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"publicKey"}}},{"kind":"Argument","name":{"kind":"Name","value":"signature"},"value":{"kind":"Variable","name":{"kind":"Name","value":"signature"}}}]}]}}]} as unknown as DocumentNode<WalletInitPublicKeyMutation, WalletInitPublicKeyMutationVariables>;

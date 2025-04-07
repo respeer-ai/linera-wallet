@@ -13,8 +13,8 @@ import { SUBMIT_BLOCK_AND_SIGNATURE, NOTIFICATIONS, BLOCK } from 'src/graphql'
 import {
   type BlockQuery,
   type NotificationsSubscription,
-  type HashedConfirmedBlock,
-  type ExecutedBlock,
+  type ConfirmedBlock,
+  type Block as _Block,
   type SubmitBlockAndSignatureMutation
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
@@ -25,7 +25,7 @@ export class Block {
   static submitBlockAndSignature = async (
     chainId: string,
     height: number,
-    executedBlock: ExecutedBlock,
+    block: _Block,
     round: rpc.Round,
     signature: string,
     validatedBlockCertificate: unknown | undefined,
@@ -42,8 +42,8 @@ export class Block {
     const sig = {
       Ed25519: signature
     }
-    const block = {
-      executedBlock,
+    const _block = {
+      block,
       round,
       signature: sig,
       validatedBlockCertificate,
@@ -59,7 +59,7 @@ export class Block {
             variables: {
               chainId,
               height,
-              block
+              block: _block
             },
             operationName: 'submitBlockAndSignature'
           }),
@@ -154,7 +154,7 @@ export class Block {
   static getBlockWithHash = async (
     chainId: string,
     hash?: string
-  ): Promise<HashedConfirmedBlock> => {
+  ): Promise<ConfirmedBlock> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
 
@@ -176,8 +176,7 @@ export class Block {
     return new Promise((resolve, reject) => {
       onResult((res) => {
         resolve(
-          (graphqlResult.rootData(res) as BlockQuery)
-            .block as HashedConfirmedBlock
+          (graphqlResult.rootData(res) as BlockQuery).block as ConfirmedBlock
         )
       })
 

@@ -11,8 +11,9 @@ import { queryDo } from '../middleware/rpcimpl/lineragraphqldo'
 import { RpcGraphqlQuery } from '../middleware/types'
 import {
   type CandidateBlockMaterial,
-  type ExecutedBlock,
-  type ExecutedBlockMaterial,
+  type Block,
+  type SimulatedBlockMaterial,
+  type ConfirmedBlock,
   type NotificationsSubscription
 } from '../../src/__generated__/graphql/service/graphql'
 import { sha3 } from 'hash-wasm'
@@ -20,7 +21,6 @@ import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbBase, dbWallet } from '../../src/controller'
 import { _hex, graphqlResult } from '../../src/utils'
-import { HashedConfirmedBlock } from 'src/__generated__/graphql/service/graphql'
 import { parse, stringify } from 'lossless-json'
 
 export class BlockSigner {
@@ -71,7 +71,7 @@ export class BlockSigner {
 
   static updateChainOperations = async (
     microchain: string,
-    block: HashedConfirmedBlock
+    block: ConfirmedBlock
   ) => {
     const operations = await sharedStore.getChainOperations(
       microchain,
@@ -91,11 +91,11 @@ export class BlockSigner {
 
   static updateActivities = async (
     microchain: string,
-    block: HashedConfirmedBlock
+    block: ConfirmedBlock
   ) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const nativeTokenId = (await sharedStore.nativeToken())?.id || 1
-    for (const bundle of block.value.block.body.incomingBundles || []) {
+    for (const bundle of block.block.body.incomingBundles || []) {
       const origin = bundle.origin as rpc.Origin
       for (const message of bundle.bundle.messages) {
         const _message = message.message as rpc.Message
@@ -106,11 +106,11 @@ export class BlockSigner {
             nativeTokenId,
             origin.sender,
             _message?.System?.Credit?.source,
-            block.value.block.header.chainId as string,
+            block.block.header.chainId as string,
             _message?.System?.Credit?.target,
             _message?.System?.Credit?.amount,
-            block.value.block.header.height as number,
-            block.value.block.header.timestamp as number,
+            block.block.header.height as number,
+            block.block.header.timestamp as number,
             block.hash as string,
             message.grant as string
           )
@@ -139,11 +139,11 @@ export class BlockSigner {
               tokenId,
               memeMessage.Transfer.from.chainId,
               memeMessage.Transfer.from.owner,
-              block.value.block.header.chainId as string,
+              block.block.header.chainId as string,
               memeMessage.Transfer.to.owner,
               memeMessage.Transfer.amount,
-              block.value.block.header.height as number,
-              block.value.block.header.timestamp as number,
+              block.block.header.height as number,
+              block.block.header.timestamp as number,
               block.hash as string,
               message.grant as string
             )
@@ -151,11 +151,11 @@ export class BlockSigner {
         }
       }
     }
-    for (const operation of block.value.block.body.operations || []) {
+    for (const operation of block.block.body.operations || []) {
       const _operation = operation as rpc.Operation
       if (_operation.System?.Transfer) {
         let grant = undefined as unknown as string | undefined
-        for (const messages of block.value.block.body.messages || []) {
+        for (const messages of block.block.body.messages || []) {
           grant = messages.find((el) => {
             const destination = el.destination as rpc.Destination
             const message = el.message as rpc.Message
@@ -174,13 +174,13 @@ export class BlockSigner {
         await sharedStore.createActivity(
           microchain,
           nativeTokenId,
-          block.value.block.header.chainId as string,
+          block.block.header.chainId as string,
           _operation.System.Transfer.owner,
           _operation.System.Transfer.recipient.Account?.chainId as string,
           _operation.System.Transfer.recipient.Account?.owner,
           _operation.System.Transfer.amount,
-          block.value.block.header.height as number,
-          block.value.block.header.timestamp as number,
+          block.block.header.height as number,
+          block.block.header.timestamp as number,
           block.hash as string,
           grant as string
         )
@@ -199,10 +199,7 @@ export class BlockSigner {
         }
       }
     } as RpcGraphqlQuery
-    const block = (await queryDo(
-      microchain,
-      blockQuery
-    )) as HashedConfirmedBlock
+    const block = (await queryDo(microchain, blockQuery)) as ConfirmedBlock
     await BlockSigner.updateChainOperations(microchain, block)
     await BlockSigner.updateActivities(microchain, block)
     await BlockSigner.updateMicrochainOpenState(microchain, block)
@@ -210,7 +207,7 @@ export class BlockSigner {
 
   static updateMicrochainOpenState = async (
     microchain: string,
-    block: HashedConfirmedBlock
+    block: ConfirmedBlock
   ) => {
     const _microchain = (await sharedStore.getMicrochain(
       microchain
@@ -270,7 +267,8 @@ export class BlockSigner {
   static async simulateExecuteBlock(
     microchain: string,
     blockMaterial: CandidateBlockMaterial,
-    operation?: rpc.Operation
+    operation?: rpc.Operation,
+    blobBytes?: Array<Uint8Array>
   ) {
     const simulateExecuteBlockQuery = {
       operationName: 'simulateExecuteBlock',
@@ -280,6 +278,7 @@ export class BlockSigner {
           chainId: microchain,
           blockMaterial: {
             operations: operation ? [operation] : [],
+            blobBytes: blobBytes || [],
             candidate: blockMaterial
           }
         }
@@ -288,7 +287,7 @@ export class BlockSigner {
     return (await queryDo(
       microchain,
       simulateExecuteBlockQuery
-    )) as ExecutedBlockMaterial
+    )) as SimulatedBlockMaterial
   }
 
   static sortedObject = (
@@ -314,11 +313,8 @@ export class BlockSigner {
     return _sortedObject
   }
 
-  static async validateOperation(
-    executedBlock: ExecutedBlock,
-    operation: rpc.Operation
-  ) {
-    const executedOperation = executedBlock.block.operations[0] as rpc.Operation
+  static async validateOperation(block: Block, operation: rpc.Operation) {
+    const executedOperation = block.body.operations[0] as rpc.Operation
     const operationHash = await sha3(
       stringify(BlockSigner.sortedObject(operation), (key, value) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -355,7 +351,7 @@ export class BlockSigner {
   static async submitBlockAndSignature(
     microchain: string,
     height: number,
-    executedBlock: ExecutedBlock,
+    block: Block,
     round: rpc.Round,
     signature: string,
     validatedBlockCertificate: unknown | undefined,
@@ -368,7 +364,7 @@ export class BlockSigner {
           chainId: microchain,
           height,
           block: {
-            executedBlock,
+            block,
             round,
             signature: {
               Ed25519: signature
@@ -413,34 +409,31 @@ export class BlockSigner {
     const continueProcess =
       blockMaterial.incomingBundles.length >= maxProcessBundles
 
-    const executedBlockMaterial = await BlockSigner.simulateExecuteBlock(
+    const simulatedBlockMaterial = await BlockSigner.simulateExecuteBlock(
       microchain,
       blockMaterial,
-      operation
+      operation,
+      _operation ? await sharedStore.operationBlobs(_operation.operationId) : []
     )
 
-    const executedBlock = executedBlockMaterial?.executedBlock
+    const block = simulatedBlockMaterial?.block
     const validatedBlockCertificate =
-      executedBlockMaterial?.validatedBlockCertificate as unknown
+      simulatedBlockMaterial?.validatedBlockCertificate as unknown
     const isRetryBlock = !!validatedBlockCertificate
 
-    if (!executedBlock) return Promise.reject('Failed execute block')
-    if (
-      !isRetryBlock &&
-      executedBlock.block.operations.length !== (operation ? 1 : 0)
-    )
+    if (!block) return Promise.reject('Failed execute block')
+    if (!isRetryBlock && block.body.operations.length !== (operation ? 1 : 0))
       return Promise.reject('Invalid operation count')
 
     if (operation && !isRetryBlock) {
-      await BlockSigner.validateOperation(executedBlock, operation)
+      await BlockSigner.validateOperation(block, operation)
     }
 
-    const block = executedBlock.block
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const payload = await lineraWasm.executed_block_payload(
+    const payload = await lineraWasm.block_payload(
       stringify(block, null, 2) as string,
       stringify(blockMaterial.round) as string,
-      ''
+      stringify(simulatedBlockMaterial.outcome) as string
     )
     const owner = (await sharedStore.microchainOwner(microchain)) as db.Owner
     if (!owner) return Promise.reject('Invalid owner')
@@ -455,19 +448,26 @@ export class BlockSigner {
       await sharedStore.updateChainOperation(_operation)
     }
 
-    const isOpenChain = stringify(executedBlock)?.includes('OpenChain')
+    const isOpenChain = stringify(block)?.includes('OpenChain')
+    const blobBytes = (
+      isRetryBlock
+        ? simulatedBlockMaterial.blobBytes || []
+        : _operation
+        // eslint-disable-next-line indent
+        ? await sharedStore.operationBlobs(_operation.operationId)
+        // eslint-disable-next-line indent
+        : []
+    ) as Array<Uint8Array>
 
     try {
       const certificateHash = await BlockSigner.submitBlockAndSignature(
         microchain,
-        executedBlock.block.height as number,
-        executedBlock,
+        block.header.height as number,
+        block,
         blockMaterial.round as rpc.Round,
         signature,
         validatedBlockCertificate,
-        _operation
-          ? await sharedStore.operationBlobs(_operation.operationId)
-          : []
+        blobBytes
       )
 
       if (continueProcess) {

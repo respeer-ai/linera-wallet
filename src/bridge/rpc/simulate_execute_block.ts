@@ -3,19 +3,20 @@ import { db, rpc } from 'src/model'
 import { SIMULATE_EXECUTE_BLOCK } from 'src/graphql'
 import {
   type SimulateExecuteBlockMutation,
-  type ExecutedBlockMaterial,
+  type SimulatedBlockMaterial,
   type CandidateBlockMaterial
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
 import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
 
-export class ExecutedBlock {
+export class SimulatedBlock {
   static simulateExecuteBlock = async (
     chainId: string,
     operations: rpc.Operation[],
+    blobs: Array<Uint8Array>,
     candidate: CandidateBlockMaterial
-  ): Promise<ExecutedBlockMaterial> => {
+  ): Promise<SimulatedBlockMaterial> => {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return Promise.reject('Invalid network')
 
@@ -26,6 +27,7 @@ export class ExecutedBlock {
         }`
     const blockMaterial = {
       operations,
+      blobs,
       candidate
     }
 
@@ -57,7 +59,7 @@ export class ExecutedBlock {
             data as Record<string, SimulateExecuteBlockMutation>
           ).data
           resolve(
-            simulateExecuteBlock.simulateExecuteBlock as ExecutedBlockMaterial
+            simulateExecuteBlock.simulateExecuteBlock as SimulatedBlockMaterial
           )
         })
         .catch((e) => {
