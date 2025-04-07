@@ -449,14 +449,11 @@ export class BlockSigner {
     }
 
     const isOpenChain = stringify(block)?.includes('OpenChain')
+    const operationBlobBytes = _operation
+      ? await sharedStore.operationBlobs(_operation.operationId)
+      : []
     const blobBytes = (
-      isRetryBlock
-        ? simulatedBlockMaterial.blobBytes || []
-        : _operation
-        ? // eslint-disable-next-line indent
-          await sharedStore.operationBlobs(_operation.operationId)
-        : // eslint-disable-next-line indent
-          []
+      isRetryBlock ? simulatedBlockMaterial.blobBytes || [] : operationBlobBytes
     ) as Array<Uint8Array>
 
     try {
