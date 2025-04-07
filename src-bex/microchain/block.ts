@@ -453,10 +453,10 @@ export class BlockSigner {
       isRetryBlock
         ? simulatedBlockMaterial.blobBytes || []
         : _operation
-        // eslint-disable-next-line indent
-        ? await sharedStore.operationBlobs(_operation.operationId)
-        // eslint-disable-next-line indent
-        : []
+        ? // eslint-disable-next-line indent
+          await sharedStore.operationBlobs(_operation.operationId)
+        : // eslint-disable-next-line indent
+          []
     ) as Array<Uint8Array>
 
     try {

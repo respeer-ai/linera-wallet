@@ -56,7 +56,7 @@ export class Account {
   }
 
   static accountOwner = (owner: string) => {
-    return `User:${owner}`
+    return owner.startsWith('0x') ? owner : '0x' + owner
   }
 
   static balances = async (

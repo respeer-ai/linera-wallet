@@ -7,6 +7,7 @@ import { graphqlResult } from 'src/utils'
 import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
 import { ApplicationOperation } from './application_operation'
+import { Account } from './account'
 
 export class MemeApplicationOperation {
   static persistApplication = async (
@@ -95,7 +96,7 @@ export class MemeApplicationOperation {
     } as rpc.Account
     if (publicKey) {
       const owner = await db.ownerFromPublicKey(publicKey)
-      chainAccountOwner.owner = `User:${owner}`
+      chainAccountOwner.owner = Account.accountOwner(owner)
     }
     const options = await getClientOptionsWithEndpointType(
       EndpointType.Application,

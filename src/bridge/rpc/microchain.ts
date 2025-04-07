@@ -34,6 +34,7 @@ export class Microchain {
     const { mutate } = provideApolloClient(apolloClient)(() =>
       useMutation(OPEN_CHAIN)
     )
+    owner = Account.accountOwner(owner)
     const res = await mutate({
       owner
     })
@@ -59,6 +60,7 @@ export class Microchain {
       Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
     }
 
+    owner = Account.accountOwner(owner)
     const initializer = {
       owner,
       signature,

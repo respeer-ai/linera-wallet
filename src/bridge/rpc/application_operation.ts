@@ -80,10 +80,7 @@ export class ApplicationOperation {
         })
         .then((res) => {
           const data = graphqlResult.data(res, 'data')
-          const bytes = graphqlResult.keyValue(
-            data,
-            operationName
-          ) as number[]
+          const bytes = graphqlResult.keyValue(data, operationName) as number[]
           resolve(bytes)
         })
         .catch((e) => {

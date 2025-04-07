@@ -59,7 +59,7 @@ const updateAccountBalance = async (microchain: db.Microchain, tokenId: number, 
 const updateChainAccountBalances = async (microchain: db.Microchain, owners: string[]) => {
   const balances = await rpcBridge.Account.balances([{
     chainId: microchain.microchain,
-    owners: Array.from(owners.map((el) => `User:${el}`))
+    owners: Array.from(owners.map((el) => rpcBridge.Account.accountOwner(el)))
   }])
   if (!balances[microchain.microchain]) return
   const nativeToken = (await dbBridge.Token.native()) as db.Token

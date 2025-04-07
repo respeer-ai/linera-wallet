@@ -12,6 +12,7 @@ import { stringify } from 'lossless-json'
 const constructBlock = async (
   microchain: string,
   operation: rpc.Operation | undefined,
+  blobBytes: Array<Array<number>>,
   incomingBundles: IncomingBundle[],
   localTime: number
 ): Promise<string> => {
@@ -26,8 +27,9 @@ const constructBlock = async (
         owner?.address as string,
         microchain,
         microchain,
-        stringify(operation ? [operation] : []) as string,
         stringify(incomingBundles) as string,
+        stringify(operation ? [operation] : []) as string,
+        stringify(blobBytes) as string,
         BigInt(localTime),
         BigInt(1)
       ).then((v) => {
