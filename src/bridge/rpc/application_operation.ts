@@ -55,7 +55,7 @@ export class ApplicationOperation {
     query: DocumentNode,
     operationName: string,
     variables?: Record<string, unknown>
-  ): Promise<Uint8Array | undefined> => {
+  ): Promise<number[] | undefined> => {
     const network = (await dbBridge.Network.selected()) as db.Network
     if (!network) return
 
@@ -83,7 +83,7 @@ export class ApplicationOperation {
           const bytes = graphqlResult.keyValue(
             data,
             operationName
-          ) as Uint8Array
+          ) as number[]
           resolve(bytes)
         })
         .catch((e) => {

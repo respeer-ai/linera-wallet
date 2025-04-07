@@ -142,6 +142,7 @@ export class MemeApplicationOperation {
         to,
         amount: amount.toString()
       }
+      // TODO: integrate meme serialization locally here
       const queryRespBytes = await ApplicationOperation.queryApplication(
         chainId,
         applicationId,

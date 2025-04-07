@@ -9,6 +9,7 @@ import { _hex, graphqlResult } from 'src/utils'
 import { rpc } from 'src/model'
 import { BALANCE, BALANCES, WALLET_INIT_PUBLIC_KEY } from 'src/graphql'
 import {
+  type ChainOwners,
   type BalanceQuery,
   type BalancesQuery
 } from 'src/__generated__/graphql/service/graphql'
@@ -59,16 +60,10 @@ export class Account {
   }
 
   static balances = async (
-    chainOwners: Map<string, Array<string>>
+    chainOwners: Array<ChainOwners>
   ): Promise<rpc.Balances> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
-    const chainAccounts = new Map(
-      Array.from(chainOwners, ([k, v]) => [
-        k,
-        v.map((v) => Account.accountOwner(v))
-      ])
-    )
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { /* result, refetch, fetchMore, */ onResult, onError } =
@@ -76,7 +71,7 @@ export class Account {
         useQuery(
           BALANCES,
           {
-            chainOwners: Object.fromEntries(chainAccounts)
+            chainOwners
           },
           {
             fetchPolicy: 'network-only'
