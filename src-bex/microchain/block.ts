@@ -5,7 +5,7 @@ import {
   BLOCK,
   BLOCK_MATERIAL,
   SIMULATE_EXECUTE_BLOCK,
-  SUBMIT_BLOCK_AND_SIGNATURE
+  SUBMIT_BLOCK_AND_SIGNATURE_BCS
 } from '../../src/graphql'
 import { queryDo } from '../middleware/rpcimpl/lineragraphqldo'
 import { RpcGraphqlQuery } from '../middleware/types'
@@ -278,7 +278,7 @@ export class BlockSigner {
           chainId: microchain,
           blockMaterial: {
             operations: operation ? [operation] : [],
-            blobBytes: blobBytes || [],
+            blobBytes: (blobBytes || []).map((el) => Array.from(el)),
             candidate: blockMaterial
           }
         }
@@ -357,12 +357,32 @@ export class BlockSigner {
     validatedBlockCertificate: unknown | undefined,
     blobBytes: Array<Uint8Array>
   ): Promise<string> {
+    const signedBlock = {
+      block,
+      round,
+      signature: {
+        Ed25519: signature
+      },
+      validatedBlockCertificate,
+      // Uint8Array will be serialized to map so we use number array here
+      blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes)))
+    }
+    const bcsStr = await lineraWasm.bcs_serialize_signed_block(
+      stringify(signedBlock) as string
+    )
+    const bcsBytes = Array.from(parse(bcsStr) as number[])
+    const bcsHex = _hex.toHex(new Uint8Array(bcsBytes))
+
     const submitBlockAndSignatureQuery = {
       query: {
-        query: SUBMIT_BLOCK_AND_SIGNATURE.loc?.source?.body,
+        // query: SUBMIT_BLOCK_AND_SIGNATURE.loc?.source?.body,
+        query: SUBMIT_BLOCK_AND_SIGNATURE_BCS.loc?.source?.body,
         variables: {
           chainId: microchain,
           height,
+          // TODO: we have to use bcs here due to issue https://github.com/linera-io/linera-protocol/issues/3734
+          block: bcsHex
+          /*
           block: {
             block,
             round,
@@ -373,9 +393,10 @@ export class BlockSigner {
             // Uint8Array will be serialized to map so we use number array here
             blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes)))
           }
+          */
         }
       },
-      operationName: 'submitBlockAndSignature'
+      operationName: 'submitBlockAndSignatureBcs'
     } as RpcGraphqlQuery
     return (await queryDo(microchain, submitBlockAndSignatureQuery)) as string
   }

@@ -54,6 +54,20 @@ export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
   }
 `
 
+export const SUBMIT_BLOCK_AND_SIGNATURE_BCS = gql`
+  mutation submitBlockAndSignatureBcs(
+    $chainId: ChainId!
+    $height: BlockHeight!
+    $block: SignedBlockBcs!
+  ) {
+    submitBlockAndSignatureBcs(
+      chainId: $chainId
+      height: $height
+      block: $block
+    )
+  }
+`
+
 export const NOTIFICATIONS = gql`
   subscription notifications($chainId: ChainId!) {
     notifications(chainId: $chainId)

@@ -31,6 +31,9 @@ use web_sys::*;
 mod fake_service;
 use fake_service::{MutationRoot, QueryRoot};
 
+mod signed_block;
+use signed_block::SignedBlockBcs;
+
 use linera_client::fake_wallet::FakeWallet;
 use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions};
 
@@ -85,6 +88,14 @@ pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
     let wallet = linera_client::config::WalletState::new(FakeWallet::new());
     let storage = get_storage().await?;
     Ok(SignClientContext::new(storage, OPTIONS, wallet))
+}
+
+#[wasm_bindgen]
+pub async fn bcs_serialize_signed_block(bytes_str: &str) -> Result<String, JsError> {
+    let block: SignedBlockBcs = serde_json::from_str(bytes_str)?;
+    let block_bytes = bcs::to_bytes(&block)?;
+    let block_str = serde_json::to_string(&block_bytes)?;
+    Ok(block_str)
 }
 
 #[wasm_bindgen]
