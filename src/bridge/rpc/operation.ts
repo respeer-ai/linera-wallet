@@ -27,6 +27,10 @@ export class Operation {
     }
 
     const operationId = uuidv4()
+    const _fromOwner = fromOwner
+      ? Account.accountOwner(fromOwner)
+      : Account.CHAIN
+    const _toOwner = toOwner ? Account.accountOwner(toOwner) : Account.CHAIN
 
     const operation = {
       operationType: db.OperationType.TRANSFER,
@@ -35,11 +39,11 @@ export class Operation {
       operation: stringify({
         System: {
           Transfer: {
-            owner: fromOwner,
+            owner: _fromOwner,
             recipient: {
               Account: {
                 chainId: toChainId,
-                owner: toOwner
+                owner: _toOwner
               }
             },
             amount: amountStr

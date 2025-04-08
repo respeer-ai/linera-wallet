@@ -14,7 +14,7 @@ export class SimulatedBlock {
   static simulateExecuteBlock = async (
     chainId: string,
     operations: rpc.Operation[],
-    blobs: Array<Uint8Array>,
+    blobBytes: Array<Uint8Array>,
     candidate: CandidateBlockMaterial
   ): Promise<SimulatedBlockMaterial> => {
     const network = (await dbBridge.Network.selected()) as db.Network
@@ -27,7 +27,7 @@ export class SimulatedBlock {
         }`
     const blockMaterial = {
       operations,
-      blobs,
+      blobBytes,
       candidate
     }
 

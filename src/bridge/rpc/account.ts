@@ -16,6 +16,8 @@ import {
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 
 export class Account {
+  static CHAIN = '0x00'
+
   static balance = async (chainId: string, owner?: string): Promise<number> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     const apolloClient = new ApolloClient(options)
