@@ -44,3 +44,7 @@ web3.eth.requestAccounts().then((accounts) => {
 - [ ] Dynamic loading of application bytecode to serialize and deserialize application operations
 - [ ] Serialize application operation locally
 - [ ] Refactor architecture of block process
+
+### Note
+
+- `curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh`
