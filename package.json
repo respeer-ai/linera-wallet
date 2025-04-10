@@ -17,7 +17,7 @@
     "build:wasm": "wasm-pack build --out-dir ../src-bex/wasm --target web wasm",
     "build:wasm:debug": "wasm-pack build --debug --out-dir ../src-bex/wasm --target web wasm",
     "bindgen:prepare": "cargo install wasm-bindgen-cli@0.2.100",
-    "build:wasm:bindgen": "cd wasm; cargo update --package wasm-bindgen --precise 0.2.100; cargo build --lib --target wasm32-unknown-unknown --release; wasm-bindgen --version; wasm-bindgen target/wasm32-unknown-unknown/release/linera_wasm.wasm --out-dir ../src-bex/wasm --typescript --target web --split-linked-modules",
+    "build:wasm:bindgen": "cd wasm && cargo update --package wasm-bindgen --precise 0.2.100 && cargo build --lib --target wasm32-unknown-unknown --release && wasm-bindgen --version && wasm-bindgen target/wasm32-unknown-unknown/release/linera_wasm.wasm --out-dir ../src-bex/wasm --typescript --target web --split-linked-modules",
     "graphql:generate": "graphql-codegen --config graphql-codegen.ts",
     "prettier:check": "prettier --check \"**/*.{js,json,md,ts,yml}\"",
     "prettier:write": "prettier --write \"**/*.{js,json,md,ts,yml}\"",
