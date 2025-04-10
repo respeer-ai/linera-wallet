@@ -73,7 +73,8 @@ onMounted(() => {
   createMicrochain().then((microchain) => {
     createdMicrochain.value = microchain
     step.value++
-  }).catch(() => {
+  }).catch((e) => {
+    console.log('Failed create microchain', e)
     emit('error')
   })
 })
