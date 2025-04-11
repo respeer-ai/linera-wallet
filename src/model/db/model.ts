@@ -309,7 +309,6 @@ export enum ApplicationType {
 
 export enum OperationType {
   TRANSFER = 'transfer',
-  MINT = 'mint',
   ANONYMOUS = 'Anonymous'
 }
 

@@ -6,10 +6,11 @@ import { BALANCE_OF, MEME, TRANSFER_MEME } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
 import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
-import { ApplicationOperation } from './application_operation'
 import { Account } from './account'
 import { ApplicationCreatorChain } from './application_creator_chain'
 import * as constant from '../../const'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { stringify } from 'lossless-json'
 
 export class MemeApplicationOperation {
   static persistApplication = async (applicationId: string) => {
@@ -138,18 +139,15 @@ export class MemeApplicationOperation {
         amount: amount.toString()
       }
       // TODO: integrate meme serialization locally here
-      const queryRespBytes = await ApplicationOperation.queryApplication(
-        chainId,
-        applicationId,
-        TRANSFER_MEME,
-        'transfer',
-        variables
+      const _queryBytes = await lineraWasm.graphql_deserialize_meme_operation(
+        TRANSFER_MEME.loc?.source?.body as string,
+        stringify(variables) as string
       )
-
+      const queryBytes = JSON.parse(_queryBytes) as number[]
       const operationId = uuidv4()
 
       const operation = {
-        operationType: db.OperationType.MINT,
+        operationType: db.OperationType.TRANSFER,
         applicationType: db.ApplicationType.MEME,
         operationId,
         microchain: chainId,
@@ -157,7 +155,7 @@ export class MemeApplicationOperation {
           User: {
             applicationId,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            bytes: queryRespBytes
+            bytes: queryBytes
           }
         } as rpc.Operation),
         graphqlQuery: TRANSFER_MEME.loc?.source?.body,

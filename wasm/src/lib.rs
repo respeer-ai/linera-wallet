@@ -29,7 +29,10 @@ use wasm_bindgen::prelude::*;
 use web_sys::*;
 
 mod fake_service;
-use fake_service::{MutationRoot, QueryRoot};
+use fake_service::{MutationRoot as ServiceMutationRoot, QueryRoot as ServiceQueryRoot};
+
+mod fake_meme;
+use fake_meme::{MutationRoot as MemeMutationRoot, QueryRoot as MemeQueryRoot};
 
 mod signed_block;
 use signed_block::SignedBlockBcs;
@@ -222,12 +225,30 @@ pub async fn bcs_deserialize_meme_message(bytes_str: &str) -> Result<String, JsE
 }
 
 #[wasm_bindgen]
+pub async fn graphql_deserialize_meme_operation(
+    query: &str,
+    variables: &str,
+) -> Result<String, JsError> {
+    let request = parse_query_string(&format!("query={}&variables={}", query, variables))?;
+    let schema = Schema::new(MemeQueryRoot, MemeMutationRoot, EmptySubscription);
+    let value = schema.execute(request).await.into_result().unwrap().data;
+    let async_graphql::Value::Object(object) = value else {
+        todo!()
+    };
+    let values = object.values().collect::<Vec<&async_graphql::Value>>();
+    if values.len() == 0 {
+        todo!()
+    }
+    Ok(serde_json::to_string(&values[0])?)
+}
+
+#[wasm_bindgen]
 pub async fn graphql_deserialize_operation(
     query: &str,
     variables: &str,
 ) -> Result<String, JsError> {
     let request = parse_query_string(&format!("query={}&variables={}", query, variables))?;
-    let schema = Schema::new(QueryRoot, MutationRoot, EmptySubscription);
+    let schema = Schema::new(ServiceQueryRoot, ServiceMutationRoot, EmptySubscription);
     let value = schema.execute(request).await.into_result().unwrap().data;
     let async_graphql::Value::Object(object) = value else {
         todo!()

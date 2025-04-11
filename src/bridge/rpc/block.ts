@@ -9,7 +9,11 @@ import { graphqlResult, _hex } from 'src/utils'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { db, rpc } from 'src/model'
 import { dbBase } from 'src/controller'
-import { SUBMIT_BLOCK_AND_SIGNATURE, NOTIFICATIONS, BLOCK } from 'src/graphql'
+import {
+  NOTIFICATIONS,
+  BLOCK,
+  SUBMIT_BLOCK_AND_SIGNATURE_BCS
+} from 'src/graphql'
 import {
   type BlockQuery,
   type NotificationsSubscription,
@@ -20,6 +24,7 @@ import {
 import * as dbBridge from '../db'
 import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 
 export class Block {
   static submitBlockAndSignature = async (
@@ -42,26 +47,32 @@ export class Block {
     const sig = {
       Ed25519: signature
     }
-    const _block = {
+    const signedBlock = {
       block,
       round,
       signature: sig,
       validatedBlockCertificate,
-      blobBytes
+      blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes)))
     }
+    // TODO: we have to use bcs here due to issue https://github.com/linera-io/linera-protocol/issues/3734
+    const bcsStr = await lineraWasm.bcs_serialize_signed_block(
+      stringify(signedBlock) as string
+    )
+    const bcsBytes = Array.from(parse(bcsStr) as number[])
+    const bcsHex = _hex.toHex(new Uint8Array(bcsBytes))
 
     return new Promise((resolve, reject) => {
       axios
         .post(
           applicationUrl,
           stringify({
-            query: SUBMIT_BLOCK_AND_SIGNATURE.loc?.source.body,
+            query: SUBMIT_BLOCK_AND_SIGNATURE_BCS.loc?.source.body,
             variables: {
               chainId,
               height,
-              block: _block
+              block: bcsHex
             },
-            operationName: 'submitBlockAndSignature'
+            operationName: 'submitBlockAndSignatureBcs'
           }),
           {
             responseType: 'text',
