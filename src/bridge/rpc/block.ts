@@ -19,7 +19,7 @@ import {
   type NotificationsSubscription,
   type ConfirmedBlock,
   type Block as _Block,
-  type SubmitBlockAndSignatureMutation
+  type SubmitBlockAndSignatureBcsMutation
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
 import axios from 'axios'
@@ -86,10 +86,12 @@ export class Block {
           if (errors && errors.length > 0) {
             return reject(stringify(errors))
           }
-          const submitBlockAndSignature = (
-            data as Record<string, SubmitBlockAndSignatureMutation>
+          const submitBlockAndSignatureBcs = (
+            data as Record<string, SubmitBlockAndSignatureBcsMutation>
           ).data
-          resolve(submitBlockAndSignature.submitBlockAndSignature as string)
+          resolve(
+            submitBlockAndSignatureBcs.submitBlockAndSignatureBcs as string
+          )
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
