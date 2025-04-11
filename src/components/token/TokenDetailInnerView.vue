@@ -9,23 +9,23 @@
         <div v-html='token.description?.length > 0 ? token.description : "The creator <strong>DID NOT</strong> leave any description to the token! Please make sure you know the <strong>RISK</strong> to interact with the token!"' />
         <div class='row vertical-sections-margin'>
           <q-img
-            v-if='token.github?.length > 0' :src='githubLogo' width='20px' height='20px'
+            v-if='token.github?.length' :src='githubLogo' width='20px' height='20px'
             class='cursor-pointer clickable selector-margin-x-right'
           />
           <q-img
-            v-if='token.discord?.length > 0' :src='discordLogo' width='20px' height='20px'
+            v-if='token.discord?.length' :src='discordLogo' width='20px' height='20px'
             class='cursor-pointer clickable selector-margin-x-right'
           />
           <q-img
-            v-if='token.twitter?.length > 0' :src='twitterLogo' width='20px' height='20px'
+            v-if='token.twitter?.length' :src='twitterLogo' width='20px' height='20px'
             class='cursor-pointer clickable selector-margin-x-right'
           />
           <q-img
-            v-if='token.telegram?.length > 0' :src='telegramLogo' width='20px' height='20px'
+            v-if='token.telegram?.length' :src='telegramLogo' width='20px' height='20px'
             class='cursor-pointer clickable selector-margin-x-right'
           />
           <q-img
-            v-if='token.website?.length > 0' :src='githubLogo' width='20px' height='20px'
+            v-if='token.website?.length' :src='githubLogo' width='20px' height='20px'
             class='cursor-pointer clickable'
           />
         </div>

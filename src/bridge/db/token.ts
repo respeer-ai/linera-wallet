@@ -1,9 +1,6 @@
 import { dbBase } from 'src/controller'
 import { db } from 'src/model'
-import { Network } from './network'
-import { NamedApplication } from './named_application'
-import { ApplicationCreatorChain } from '../rpc'
-import { Microchain } from './microchain'
+import * as constant from '../../const'
 
 export class Token {
   static initialize = async (nativeLogo: string) => {
@@ -83,32 +80,8 @@ export class Token {
     const token = await dbBase.tokens.get(tokenId)
     if (!token) return undefined
     if (token.native) return token.logo
-    const network = await Network.selected()
-    if (!network) return token.logo
-    const namedApplication = await NamedApplication.namedApplicationWithType(
-      db.ApplicationType.BLOB_GATEWAY
-    )
-    if (!namedApplication) return token.logo
-    const microchain = await Microchain.anyMicrochain()
-    if (!microchain) return token.logo
-    const creationChain = await ApplicationCreatorChain.id(
-      microchain.microchain,
-      namedApplication.applicationId
-    )
-    const blobGatewayUrl = network.blobGatewayUrl.endsWith('/')
-      ? network.blobGatewayUrl.slice(0, network.blobGatewayUrl.length - 1)
-      : network.blobGatewayUrl
-    return (
-      (process.env.DEV ? '' : blobGatewayUrl) +
-      '/api' +
-      (token.logoStoreType === db.StoreType.S3
-        ? '/file/v1'
-        : '/blobs/chains/' +
-          creationChain +
-          '/applications/' +
-          namedApplication.applicationId) +
-      '/images/' +
-      token.logo
-    )
+
+    const blobGatewayUrl = constant.APPLICATION_URLS.BLOB_GATEWAY
+    return blobGatewayUrl + '/images/' + token.logo
   }
 }

@@ -85,8 +85,7 @@ import { db } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
-import { type ApplicationOverview } from 'src/__generated__/graphql/service/graphql'
-import { dbBridge, rpcBridge } from 'src/bridge'
+import { dbBridge } from 'src/bridge'
 
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
@@ -109,13 +108,10 @@ const accountUsdBalance = ref(0)
 const activities = ref([] as db.Activity[])
 
 const selectedOwner = ref(undefined as unknown as db.Owner)
-
 const nativeTokenId = ref(undefined as unknown as number)
-const chainApplications = ref([] as ApplicationOverview[])
 
 onMounted(async () => {
   nativeTokenId.value = (await dbBridge.Token.native())?.id as number
-  chainApplications.value = await rpcBridge.Application.microchainApplications(microchain.value.microchain)
 })
 
 </script>

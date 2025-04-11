@@ -76,3 +76,8 @@ export enum MicrochainsImportState {
   MicrochainsImporting,
   MicrochainsImported
 }
+
+export enum TokensImportState {
+  TokensImporting,
+  TokensImported
+}

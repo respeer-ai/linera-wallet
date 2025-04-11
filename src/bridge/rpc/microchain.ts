@@ -26,8 +26,11 @@ import * as dbBridge from '../db'
 import { Account } from './account'
 
 export class Microchain {
-  static openChain = async (owner: string): Promise<ClaimOutcome> => {
+  static openChain = async (
+    owner: string
+  ): Promise<ClaimOutcome | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -48,6 +51,7 @@ export class Microchain {
     messageId: string
   ) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     const faucetUrl = (await dbBase.networks.toArray()).find(
@@ -78,9 +82,12 @@ export class Microchain {
     })
   }
 
-  static chains = async (publicKey: string): Promise<Chains> => {
+  static chains = async (owner: string): Promise<Chains | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
+
+    owner = Account.accountOwner(owner)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { /* result, refetch, fetchMore, */ onResult, onError } =
@@ -88,7 +95,7 @@ export class Microchain {
         useQuery(
           OWNER_CHAINS,
           {
-            publicKey
+            owner
           },
           {
             fetchPolicy: 'network-only'

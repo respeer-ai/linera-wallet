@@ -109,8 +109,9 @@ export class Block {
     onNewRawBlock?: (height: number) => void,
     onNewBlock?: (hash: string) => void,
     onNewIncomingBundle?: () => void
-  ): Promise<() => void> => {
+  ): Promise<(() => void) | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -154,8 +155,9 @@ export class Block {
   static getBlockWithHash = async (
     chainId: string,
     hash?: string
-  ): Promise<ConfirmedBlock> => {
+  ): Promise<ConfirmedBlock | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

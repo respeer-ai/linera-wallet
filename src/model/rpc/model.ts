@@ -1,3 +1,5 @@
+import { StoreType } from '../db/model'
+
 export type Balances = Record<
   string,
   {
@@ -8,7 +10,7 @@ export type Balances = Record<
 
 export type Account = {
   chainId: string
-  owner?: string
+  owner: string
 }
 
 export type Round =
@@ -62,18 +64,26 @@ export type Destination = {
 }
 
 export type MemeToken = {
-  name: string
-  symbol: string
+  initialSupply: string
   totalSupply: string
-  tokenMetadata: {
-    discord: string
-    logoStoreType: string
+  name: string
+  ticker: string
+  decimal: number
+  metadata: {
+    logoStoreType: StoreType
     logo: string
-    telegram: string
-    twitter: string
-    website: string
-    github: string
     description: string
+    twitter?: string
+    telegram?: string
+    discord?: string
+    website?: string
+    github?: string
+    liveStream?: string
+  }
+  virtualInitialLiquidity: boolean
+  initialLiquidity: {
+    fungibleAmount: string
+    nativeAmount: string
   }
 }
 

@@ -13,6 +13,7 @@ export class PendingMessage {
     chainId: string
   ): Promise<IncomingBundle[]> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return []
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

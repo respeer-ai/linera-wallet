@@ -6,8 +6,9 @@ import { NETWORK_INFO } from 'src/graphql'
 import { type NetworkInfoQuery } from 'src/__generated__/graphql/faucet/graphql'
 
 export class GenesisInfo {
-  static getNetworkInfo = async (): Promise<NetworkInfoQuery> => {
+  static getNetworkInfo = async (): Promise<NetworkInfoQuery | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

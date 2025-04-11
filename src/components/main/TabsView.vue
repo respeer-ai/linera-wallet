@@ -55,7 +55,6 @@ const tab = computed({
 onMounted(async () => {
   await dbBridge.Token.initialize(lineraLogo)
   await dbBridge.Network.initialize()
-  await dbBridge.NamedApplication.initialize()
 })
 
 </script>

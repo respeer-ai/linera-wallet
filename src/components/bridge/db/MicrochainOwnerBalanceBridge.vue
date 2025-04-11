@@ -29,8 +29,8 @@ const usdBalance = defineModel<number>('usdBalance')
 const _balances = useObservable<db.MicrochainOwnerFungibleTokenBalance[]>(
   liveQuery(async () => {
     return tokenId.value !== undefined
-      ? (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.tokenId === tokenId.value && el.microchain === microchainId.value && el.owner === owner.value)
-      : (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.microchain === microchainId.value && el.owner === owner.value)
+      ? (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.tokenId === tokenId.value && el.microchain === microchainId.value && (!owner.value || el.owner.includes(owner.value) || owner.value?.includes(el.owner)))
+      : (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.microchain === microchainId.value && (!owner.value || el.owner.includes(owner.value) || owner.value?.includes(el.owner)))
   }) as never
 )
 

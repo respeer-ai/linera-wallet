@@ -33,8 +33,8 @@
 
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { dbWallet } from 'src/controller'
 import { rpcBridge } from 'src/bridge'
+import { localStore } from 'src/localstores'
 
 const applicationId = ref('')
 const applicationIdError = ref(false)
@@ -54,18 +54,18 @@ const onImportClick = async () => {
   if (applicationIdError.value) return
 
   importing.value = true
-  const microchains = await dbWallet.microchains.toArray()
+  localStore.setting.TokensImportState = localStore.settingDef.TokensImportState.TokensImporting
 
-  for (const microchain of microchains) {
-    try {
-      await rpcBridge.MemeApplicationOperation.persistApplication(microchain.microchain, applicationId.value)
-    } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Failed import erc20 application: ${e}`)
-    }
+  try {
+    await rpcBridge.MemeApplicationOperation.persistApplication(applicationId.value)
+  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.log(`Failed import erc20 application: ${e}`)
   }
 
   importing.value = false
+  localStore.setting.TokensImportState = localStore.settingDef.TokensImportState.TokensImported
+
   emit('imported')
 }
 

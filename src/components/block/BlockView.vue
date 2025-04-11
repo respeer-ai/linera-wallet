@@ -26,6 +26,7 @@ const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 
 const microchains = ref([] as db.Microchain[])
 const microchainsImportState = computed(() => localStore.setting.MicrochainsImportState)
+const tokensImportState = computed(() => localStore.setting.TokensImportState)
 const microchainCompensates = new Map<string, number>()
 
 type stopFunc = () => void
@@ -61,6 +62,7 @@ const updateChainAccountBalances = async (microchain: db.Microchain, owners: str
     chainId: microchain.microchain,
     owners: Array.from(owners.map((el) => rpcBridge.Account.accountOwner(el)))
   }])
+  if (!balances) return
   if (!balances[microchain.microchain]) return
   const nativeToken = (await dbBridge.Token.native()) as db.Token
   if (!nativeToken) return
@@ -147,15 +149,14 @@ const parseActivities = async (microchain: db.Microchain, block: ConfirmedBlock)
 }
 
 const updateFungibleBalances = async (microchain: db.Microchain, owners: string[]) => {
-  const applications = await rpcBridge.Application.microchainApplications(microchain.microchain)
-  const tokens = (await dbBridge.Token.fungibles()).filter((token) => applications.findIndex((el) => el.id === token.applicationId) >= 0)
+  const tokens = await dbBridge.Token.fungibles()
   for (const token of tokens) {
     try {
-      const balance = await rpcBridge.MemeApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string) || 0
+      const balance = await rpcBridge.MemeApplicationOperation.balanceOf(token.applicationId as string, microchain.microchain, rpcBridge.Account.CHAIN) || 0
       await updateChainBalance(microchain, token.id as number, balance)
       for (const owner of owners) {
         try {
-          const balance = await rpcBridge.MemeApplicationOperation.balanceOf(microchain.microchain, token.applicationId as string, owner) || 0
+          const balance = await rpcBridge.MemeApplicationOperation.balanceOf(token.applicationId as string, microchain.microchain, owner) || 0
           await updateAccountBalance(microchain, token.id as number, owner, balance)
         } catch (e) {
           console.log('Failed process account balance', e)
@@ -214,6 +215,7 @@ const processNewBlock = async (microchain: db.Microchain, hash?: string) => {
   }
 
   const block = await rpcBridge.Block.getBlockWithHash(microchain.microchain, hash)
+  if (!block) return
 
   if (window.location.origin.startsWith('http')) {
     try {
@@ -449,75 +451,91 @@ watch(microchainsImportState, async () => {
   }
 })
 
+watch(tokensImportState, async () => {
+  switch (tokensImportState.value) {
+    case localStore.settingDef.TokensImportState.TokensImported:
+      for (const microchain of microchains.value) {
+        const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
+        if (!owners.length) continue
+        const _owners = owners.reduce((keys: string[], a): string[] => { keys.push(a.owner); return keys }, [])
+        try {
+          await updateFungibleBalances(microchain, _owners)
+        } catch {
+          // DO NOTHING
+        }
+      }
+  }
+})
+
 const _unmounted = ref(false)
 
 const _handleOperations = async () => {
-  if (window.location.origin.startsWith('http')) {
-    const processedMicrochains = new Map<string, boolean>()
+  if (!window.location.origin.startsWith('http')) return
 
-    const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING, db.OperationState.EXECUTED])
-    // TODO: merge operations of the same microchain
-    for (const operation of operations) {
-      if (operation.certificateHash && operation.state === db.OperationState.EXECUTED) {
-        try {
-          const microchain = await dbBridge.Microchain.microchain(operation.microchain) as db.Microchain
-          await processNewBlock(microchain, operation.certificateHash)
-        } catch (e) {
-          // DO NOTHING
-        }
+  const processedMicrochains = new Map<string, boolean>()
+  const operations = await dbBridge.ChainOperation.chainOperations(0, 0, undefined, [db.OperationState.CREATED, db.OperationState.EXECUTING, db.OperationState.EXECUTED])
+
+  // TODO: merge operations of the same microchain
+  for (const operation of operations) {
+    if (operation.certificateHash && operation.state === db.OperationState.EXECUTED) {
+      try {
+        const microchain = await dbBridge.Microchain.microchain(operation.microchain) as db.Microchain
+        await processNewBlock(microchain, operation.certificateHash)
+      } catch (e) {
+        // DO NOTHING
+      }
+      continue
+    }
+
+    if (!operation.firstProcessedAt) {
+      operation.firstProcessedAt = Date.now()
+      await dbBridge.ChainOperation.update(operation)
+      console.log(`Operation created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
+    }
+
+    processedMicrochains.set(operation.microchain, true)
+
+    try {
+      const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, operation)
+      // TODO: get operation certificate hash
+      // We don't know the reason of the failure, so we let user to choose if retry
+      // TODO: processNewIncomingBundle return if retry
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (isRetryBlock) continue
+      operation.state = db.OperationState.EXECUTED
+      operation.certificateHash = certificateHash
+      await dbBridge.ChainOperation.update(operation)
+    } catch (e) {
+      if (stringify(e)?.includes('Was expecting block height')) {
         continue
       }
-
-      if (!operation.firstProcessedAt) {
-        operation.firstProcessedAt = Date.now()
-        await dbBridge.ChainOperation.update(operation)
-        console.log(`Operation created at ${operation.createdAt || 0}, processing at ${operation.firstProcessedAt}`)
+      if (stringify(e)?.includes('is out of order compared to previous messages from')) {
+        continue
       }
-
-      processedMicrochains.set(operation.microchain, true)
-
-      try {
-        const { certificateHash, isRetryBlock } = await processNewIncomingBundle(operation.microchain, operation)
-        // TODO: get operation certificate hash
-        // We don't know the reason of the failure, so we let user to choose if retry
-        // TODO: processNewIncomingBundle return if retry
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        if (isRetryBlock) continue
-        operation.state = db.OperationState.EXECUTED
-        operation.certificateHash = certificateHash
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`Failed process incoming bundle: ${e}`)
+      if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
+        operation.state = db.OperationState.FAILED
+        operation.failedAt = Date.now()
+        operation.failReason = stringify(e)
         await dbBridge.ChainOperation.update(operation)
-      } catch (e) {
-        if (stringify(e)?.includes('Was expecting block height')) {
-          continue
-        }
-        if (stringify(e)?.includes('is out of order compared to previous messages from')) {
-          continue
-        }
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Failed process incoming bundle: ${e}`)
-        if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
-          operation.state = db.OperationState.FAILED
-          operation.failedAt = Date.now()
-          operation.failReason = stringify(e)
-          await dbBridge.ChainOperation.update(operation)
-        }
       }
     }
-    for (const microchain of microchains.value) {
-      if (microchain.openChainCertificateHash && microchain.state !== db.MicrochainState.CREATED) {
-        try {
-          await processNewBlock(microchain, microchain.openChainCertificateHash)
-        } catch (e) {
-          // DO NOTHING
-        }
+  }
+  for (const microchain of microchains.value) {
+    if (microchain.openChainCertificateHash && microchain.state !== db.MicrochainState.CREATED) {
+      try {
+        await processNewBlock(microchain, microchain.openChainCertificateHash)
+      } catch (e) {
+        // DO NOTHING
       }
-      if (!processedMicrochains.get(microchain.microchain)) {
-        try {
-          await processNewIncomingBundle(microchain.microchain)
-        } catch (e) {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          console.log(`Failed process incoming bundle: ${e}`)
-        }
+    }
+    if (!processedMicrochains.get(microchain.microchain)) {
+      try {
+        await processNewIncomingBundle(microchain.microchain)
+      } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed process incoming bundle: ${e}`)
       }
     }
   }

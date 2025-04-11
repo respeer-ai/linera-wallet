@@ -3,52 +3,8 @@ import { db } from 'src/model'
 import { graphqlResult } from 'src/utils'
 import * as dbBridge from '../db'
 import axios from 'axios'
-import { Application } from './application'
 
 export class ApplicationOperation {
-  static existChainApplication = async (
-    chainId: string,
-    applicationId: string
-  ): Promise<boolean> => {
-    return (
-      (await Application.microchainApplications(chainId)).findIndex(
-        (el) => el.id === applicationId
-      ) >= 0
-    )
-  }
-
-  static waitExistChainApplication = async (
-    chainId: string,
-    applicationId: string,
-    timeoutSeconds: number
-  ): Promise<boolean> => {
-    if (
-      (await Application.microchainApplications(chainId)).findIndex(
-        (el) => el.id === applicationId
-      ) >= 0
-    ) {
-      return true
-    }
-    if (timeoutSeconds <= 0) {
-      return Promise.reject('Wait timeout')
-    }
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        ApplicationOperation.waitExistChainApplication(
-          chainId,
-          applicationId,
-          timeoutSeconds - 1
-        )
-          .then((exists) => {
-            resolve(exists)
-          })
-          .catch((e) => {
-            reject(e)
-          })
-      }, 1000)
-    })
-  }
-
   static queryApplication = async (
     chainId: string,
     applicationId: string,
@@ -60,9 +16,6 @@ export class ApplicationOperation {
     if (!network) return
 
     // TODO: we can serialize locally
-
-    variables = variables || {}
-    variables.checko_query_only = true
 
     const applicationUrl = process.env.DEV
       ? `${

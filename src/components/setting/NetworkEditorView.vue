@@ -36,15 +36,6 @@
         :disable='network.preset || network.selected'
       />
     </div>
-    <div class='text-bold vertical-menus-margin'>
-      {{ $t('MSG_BLOB_GATEWAY_URL') }}
-    </div>
-    <div class='page-item-y-margin-top'>
-      <q-input
-        autogrow dense outlined v-model='network.blobGatewayUrl'
-        :disable='network.preset || network.selected'
-      />
-    </div>
     <div class='vertical-sections-margin'>
       <q-btn
         flat class='btn full-width vertical-menus-margin' no-caps

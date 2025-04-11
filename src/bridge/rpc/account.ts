@@ -6,7 +6,7 @@ import {
   useQuery
 } from '@vue/apollo-composable'
 import { _hex, graphqlResult } from 'src/utils'
-import { rpc } from 'src/model'
+import { rpc, rpc as rpcModel } from 'src/model'
 import { BALANCE, BALANCES, WALLET_INIT_PUBLIC_KEY } from 'src/graphql'
 import {
   type ChainOwners,
@@ -20,6 +20,7 @@ export class Account {
 
   static balance = async (chainId: string, owner?: string): Promise<number> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return 0
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -63,8 +64,9 @@ export class Account {
 
   static balances = async (
     chainOwners: Array<ChainOwners>
-  ): Promise<rpc.Balances> => {
+  ): Promise<rpc.Balances | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -98,6 +100,7 @@ export class Account {
 
   static initPublicKey = async (keyPair: Ed25519SigningKey) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     const typeNameBytes = new TextEncoder().encode('Nonce::')
@@ -124,5 +127,9 @@ export class Account {
       publicKey,
       signature
     })
+  }
+
+  static accountDescription = (account: rpcModel.Account) => {
+    return `${account.chainId}:${Account.accountOwner(account.owner)}`
   }
 }

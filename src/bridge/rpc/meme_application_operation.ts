@@ -1,25 +1,33 @@
 import { db, rpc } from 'src/model'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
-import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
-import { BALANCE_OF, TOKEN_METADATA, TRANSFER_MEME } from 'src/graphql'
+import { getClientOptionsWithBaseUrl } from 'src/apollo'
+import { BALANCE_OF, MEME, TRANSFER_MEME } from 'src/graphql'
 import { graphqlResult } from 'src/utils'
 import { v4 as uuidv4 } from 'uuid'
 import * as dbBridge from '../db'
 import { ApplicationOperation } from './application_operation'
 import { Account } from './account'
+import { ApplicationCreatorChain } from './application_creator_chain'
+import * as constant from '../../const'
 
 export class MemeApplicationOperation {
-  static persistApplication = async (
-    chainId: string,
-    applicationId: string,
-    applicationType?: db.ApplicationType
-  ) => {
+  static persistApplication = async (applicationId: string) => {
     if (await dbBridge.Token.exists(applicationId)) return
 
-    const options = await getClientOptionsWithEndpointType(
-      EndpointType.Application,
-      chainId,
+    const microchain = await dbBridge.Microchain.anyMicrochain()
+    if (!microchain) return
+
+    const creatorChainId = await ApplicationCreatorChain.id(
+      microchain.microchain,
+      applicationId
+    )
+    if (!creatorChainId) return
+
+    const options = getClientOptionsWithBaseUrl(
+      constant.APPLICATION_URLS.PROXY_BASE,
+      undefined as unknown as string,
+      creatorChainId,
       applicationId
     )
     const apolloClient = new ApolloClient(options)
@@ -28,7 +36,7 @@ export class MemeApplicationOperation {
     const { /* result, refetch, fetchMore, */ onResult, onError } =
       provideApolloClient(apolloClient)(() =>
         useQuery(
-          TOKEN_METADATA,
+          MEME,
           {
             // NO PARAMETER
           },
@@ -40,40 +48,25 @@ export class MemeApplicationOperation {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        const token = graphqlResult.rootData(res) as rpc.MemeToken
-        if (!token.tokenMetadata) {
-          // Add to ticker run let block subscription run it
-          return setTimeout(() => {
-            MemeApplicationOperation.persistApplication(
-              chainId,
-              applicationId,
-              applicationType
-            )
-              .then(() => {
-                resolve(undefined)
-              })
-              .catch((e) => {
-                console.log('Failed get token metadata', e)
-              })
-          }, 1000)
-        }
+        const token = graphqlResult.data(res, 'meme') as rpc.MemeToken
         void dbBridge.Token.create({
           name: token.name,
-          description: token.tokenMetadata.description,
+          description: token.metadata.description,
           totalSupply: Number(token.totalSupply),
-          ticker: token.symbol,
+          ticker: token.ticker,
           tokenType: db.TokenType.Fungible,
-          logoStoreType: token.tokenMetadata.logoStoreType as db.StoreType,
-          logo: token.tokenMetadata.logo,
+          logoStoreType: token.metadata.logoStoreType,
+          logo: token.metadata.logo,
           applicationId,
+          creatorChainId,
           native: false,
           usdCurrency: 0,
-          mono: true,
-          discord: token.tokenMetadata.discord,
-          telegram: token.tokenMetadata.telegram,
-          twitter: token.tokenMetadata.twitter,
-          website: token.tokenMetadata.website,
-          github: token.tokenMetadata.github
+          discord: token.metadata.discord,
+          telegram: token.metadata.telegram,
+          twitter: token.metadata.twitter,
+          website: token.metadata.website,
+          github: token.metadata.github,
+          liveStream: token.metadata.liveStream
         })
         resolve(undefined)
       })
@@ -87,22 +80,23 @@ export class MemeApplicationOperation {
   }
 
   static balanceOf = async (
-    chainId: string,
     applicationId: string,
-    publicKey?: string
+    chainId: string,
+    owner: string
   ): Promise<number> => {
     const chainAccountOwner = {
-      chainId
-    } as rpc.Account
-    if (publicKey) {
-      const owner = await db.ownerFromPublicKey(publicKey)
-      chainAccountOwner.owner = Account.accountOwner(owner)
-    }
-    const options = await getClientOptionsWithEndpointType(
-      EndpointType.Application,
       chainId,
+      owner: Account.accountOwner(owner)
+    } as rpc.Account
+    const token = await dbBridge.Token.token(applicationId)
+    if (!token) return 0
+    const options = getClientOptionsWithBaseUrl(
+      constant.APPLICATION_URLS.PROXY_BASE,
+      undefined as unknown as string,
+      token.creatorChainId,
       applicationId
     )
+    if (!options) return 0
     const apolloClient = new ApolloClient(options)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -111,7 +105,7 @@ export class MemeApplicationOperation {
         useQuery(
           BALANCE_OF,
           {
-            owner: chainAccountOwner
+            owner: Account.accountDescription(chainAccountOwner)
           },
           {
             fetchPolicy: 'network-only'

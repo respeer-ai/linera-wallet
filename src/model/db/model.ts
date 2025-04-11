@@ -107,7 +107,6 @@ export interface Network {
   icon: string
   name: string
   faucetUrl: string
-  blobGatewayUrl: string
   rpcSchema: HTTPSchema
   wsSchema: WSSchema
   host: string
@@ -121,7 +120,6 @@ export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
   name: 'Linera ResPeer Local Net RPC',
   faucetUrl: 'http://api.faucet.respeer.ai/api/faucet',
-  blobGatewayUrl: 'https://api.blobgateway.com/api/blobs',
   rpcSchema: HTTPSchema.HTTP,
   wsSchema: WSSchema.WS,
   host: 'api.rpc.respeer.ai',
@@ -217,14 +215,15 @@ export interface Token {
   logoStoreType?: StoreType
   logo: string
   applicationId?: string
+  creatorChainId?: string
   native: boolean
   usdCurrency: number
-  mono: boolean
-  discord: string
-  telegram: string
-  twitter: string
-  website: string
-  github: string
+  discord?: string
+  telegram?: string
+  twitter?: string
+  website?: string
+  github?: string
+  liveStream?: string
 }
 
 export const lineraToken = {
@@ -236,7 +235,6 @@ export const lineraToken = {
   tokenType: TokenType.Native,
   logo: '',
   native: true,
-  mono: true,
   discord: 'https://discord.com/invite/linera',
   telegram: 'http://t.me/linera_official',
   twitter: 'https://x.com/linera_io',
@@ -301,63 +299,13 @@ export interface OriginRpcMicrochain {
 
 export enum ApplicationType {
   SWAP,
+  POOL,
   MEME,
+  MEME_PROXY,
   ANONYMOUS,
   AMS,
   BLOB_GATEWAY
 }
-
-export interface NamedApplication {
-  id?: number
-  applicationType: ApplicationType
-  name: string
-  applicationId: string
-  creatorChain: string
-}
-
-const defaultSwapAppId =
-  '0a53c50a4012157bccba877b890b778f684b58da172605da49d357c732f1361eaabeee56a723e29481416b86a8ba18a4d7012dfda927d56339b96fdc3d25b89b7f430ede6a5fbf9a8aa59286fb94e3b3490c0451826583a6a98b20b8cba1a0ab060000000000000000000000'
-const defaultSwapCreatorChain =
-  '7f430ede6a5fbf9a8aa59286fb94e3b3490c0451826583a6a98b20b8cba1a0ab'
-const defaultWLineraAppId =
-  '8f35d0a1a1ecec3406ce05f9b58809204c4b81a60512f42983950e077392eb03e09686709ef93e02de5689565008be6b57555877c8ea663fc039718d85f3ad2ad2040af57277cbc64d4d585535d0ec0a4e28fdbf58eba23c7d769673e541352c060000000000000000000000'
-const defaultWLineraCreatorChain =
-  'd2040af57277cbc64d4d585535d0ec0a4e28fdbf58eba23c7d769673e541352c'
-const defaultAMSAppId =
-  'bf9b75f4ad24a9940b1f0dc4dec6cbb89e72ca8b391ef4e8dd6357a84d28e5566478527ea66be16313d7ec46334a8293b8254ffc87e1267f1bf6d2e899e220d1a7fcebee0c372daafeec2cdb76b34e32caa9d8be1d2d6e9d9d597d6a314d52a2030000000000000000000000'
-const defaultAMSCreatorChain =
-  'a7fcebee0c372daafeec2cdb76b34e32caa9d8be1d2d6e9d9d597d6a314d52a2'
-const defaultBlobGatewayAppId =
-  '1792c2f3699e48288081499b0455b494cb5883eb9423aa186c89714ed106c6043af42487fe70116e7375c88c4fb24743bd734d209f53b952937148e726fa7041e24f3d30875f3f7e6e9830536b98b48a9b0538ee0ffcf8bf0722f9b8a724b2f20f0000000000000000000000'
-const defaultBlobGatewayCreatorChain =
-  'e24f3d30875f3f7e6e9830536b98b48a9b0538ee0ffcf8bf0722f9b8a724b2f2'
-
-export const defaultNamedApplications = [
-  {
-    applicationType: ApplicationType.SWAP,
-    name: 'swap',
-    applicationId: defaultSwapAppId,
-    creatorChain: defaultSwapCreatorChain
-  },
-  {
-    applicationType: ApplicationType.MEME,
-    name: 'wlinera',
-    applicationId: defaultWLineraAppId,
-    creatorChain: defaultWLineraCreatorChain
-  },
-  {
-    applicationType: ApplicationType.AMS,
-    name: 'ams',
-    applicationId: defaultAMSAppId,
-    creatorChain: defaultAMSCreatorChain
-  },
-  {
-    applicationType: ApplicationType.BLOB_GATEWAY,
-    name: 'blob',
-    applicationId: defaultBlobGatewayAppId,
-    creatorChain: defaultBlobGatewayCreatorChain
-  }
-] as NamedApplication[]
 
 export enum OperationType {
   TRANSFER = 'transfer',

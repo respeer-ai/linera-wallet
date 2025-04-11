@@ -16,7 +16,7 @@ dbBase.version(1).stores({
     '++id, icon, name, faucetUrl, rpcSchema, wsSchema, host, port, path, selected, preset',
   passwords: '++id, password, salt, createdAt',
   tokens:
-    '++id, name, ticker, tokenType, description, applicationId, native, usdCurrency, mono, discord, telegram, twitter, website, github, totalSupply, mintable',
+    '++id, name, ticker, tokenType, description, applicationId, creatorChainId, native, usdCurrency, discord, telegram, twitter, website, github, totalSupply',
   lastLogin: '++id, timestamp',
   rpcAuths:
     '++id, origin, publicKey, chainId, method, applicationId, operation, expiredAt',
@@ -39,7 +39,6 @@ export const dbWallet = new Dexie('CheCkoWalletDatabase') as Dexie & {
   nfts: EntityTable<dbModel.NFT, 'id'>
   applications: EntityTable<dbModel.Application, 'id'>
   activities: EntityTable<dbModel.Activity, 'id'>
-  namedApplications: EntityTable<dbModel.NamedApplication, 'id'>
   chainOperations: EntityTable<dbModel.ChainOperation, 'id'>
   operationBlobs: EntityTable<dbModel.OperationBlob, 'id'>
 }
@@ -57,7 +56,6 @@ dbWallet.version(1).stores({
     '++id, applicationId, creationMicrochain, creationHeight, applicationIndex',
   activities:
     '++id, sourceChain, sourceAddress, targetChain, targetAddress, amount, blockHeight, timestamp, certificateHash, grant, tokenId, microchain',
-  namedApplications: '++id, applicationType, name, applicationId, creatorChain',
   chainOperations:
     '++id, operationType, applicationType, operationId, microchain, operation, state, certificateHash, createdAt, failedAt, failReason, graphqlQuery, graphqlVariables',
   operationBlobs: '++id, operationId, blob'

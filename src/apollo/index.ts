@@ -19,12 +19,13 @@ export async function getClientOptionsWithEndpointType(
   applicationId?: string
 ) {
   const network = (await dbBase.networks.toArray()).find((el) => el.selected)
+  if (!network) return
 
-  let schema = network?.rpcSchema
-  let wsSchema = network?.wsSchema
-  let host = network?.host
-  let port = network?.port
-  let path = network?.path?.length ? network?.path : undefined
+  let schema = network.rpcSchema
+  let wsSchema = network.wsSchema
+  let host = network.host
+  let port = network.port
+  let path = network.path?.length ? network?.path : undefined
   let useAppHost = true
 
   if (endpointType === EndpointType.Faucet && network) {
@@ -54,28 +55,44 @@ export async function getClientOptionsWithEndpointType(
 }
 
 export /* async */ function getClientOptions(
-  schema?: string,
-  wsSchema?: string,
-  host?: string,
-  port?: number,
+  schema: db.HTTPSchema,
+  wsSchema: db.WSSchema,
+  host: string,
+  port: number,
   path?: string,
   chainId?: string,
   applicationId?: string,
   useAppHost?: boolean
 ) {
-  const schema1 = schema || 'https'
-  const port1 = port?.toString() || '8080'
-  const host1 = host || 'localhost'
-  const path1 = path || ''
-  const wsSchema1 = wsSchema || 'ws'
+  const httpBaseUrl = schema + '://' + host + ':' + `${port}`
+  const wsBaseUrl = wsSchema + '://' + host + ':' + `${port}` + '/ws'
 
-  const httpBaseUrl = schema1 + '://' + host1 + ':' + port1
+  return getClientOptionsWithBaseUrl(
+    httpBaseUrl,
+    wsBaseUrl,
+    chainId,
+    applicationId,
+    path,
+    useAppHost
+  )
+}
+
+export function getClientOptionsWithBaseUrl(
+  baseUrl: string,
+  wsBaseUrl: string,
+  chainId?: string,
+  applicationId?: string,
+  path?: string,
+  useAppHost?: boolean
+) {
+  const httpBaseUrl = baseUrl
+  const path1 = path || ''
+
   const httpApiBaseUrl =
     (!useAppHost ? httpBaseUrl : process.env.DEV ? '' : httpBaseUrl) +
     path1 +
     (chainId ? `/chains/${chainId}` : '') +
     (applicationId ? `/applications/${applicationId}` : '')
-  const wsBaseUrl = wsSchema1 + '://' + host1 + ':' + port1 + '/ws'
 
   const wsLink = new GraphQLWsLink(
     createClient({

@@ -1,4 +1,4 @@
 export * from './service'
 export * from './faucet'
-export * from './meme'
+export * from './meme_raw'
 export * from './application'

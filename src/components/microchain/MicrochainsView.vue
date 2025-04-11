@@ -133,9 +133,9 @@ const onViewMoreClick = () => {
 
 const onSynchronizeMicrochainsClick = () => {
   if (!selectedOwner.value) return
-  rpcBridge.Microchain.chains(selectedOwner.value?.address).then(async (chains: Chains) => {
-    for (const microchain of chains.list) {
-      await dbBridge.Microchain.create(selectedOwner.value.owner, microchain as string, undefined, undefined, undefined, chains.default === microchain)
+  rpcBridge.Microchain.chains(selectedOwner.value?.owner).then(async (chains: Chains | undefined) => {
+    for (const microchain of chains?.list || []) {
+      await dbBridge.Microchain.create(selectedOwner.value.owner, microchain as string, undefined, undefined, undefined, chains?.default === microchain)
     }
     await loadMicrochains()
     localStore.notification.pushNotification({
