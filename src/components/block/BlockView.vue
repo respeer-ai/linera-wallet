@@ -30,6 +30,16 @@ const subscribed = ref(new Map<string, stopFunc>())
 const subscribeMicrochain = async (microchain: dbModel.Microchain) => {
   const memeChain = tokens.value.findIndex((el) => el.creatorChainId === microchain.microchain) >= 0
 
+  blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
+    microchain: microchain.microchain,
+    memeChain
+  })
+  if (window.location.origin.startsWith('http')) {
+    blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_INCOMING_BUNDLE, {
+      microchain: microchain.microchain
+    })
+  }
+
   const unsubscribe = await rpcBridge.Block.subscribe(
     microchain.microchain, memeChain, (hash: string) => {
       blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
@@ -45,40 +55,22 @@ const subscribeMicrochain = async (microchain: dbModel.Microchain) => {
       }
     }) as () => void
 
-  try {
-    if (window.location.origin.startsWith('http')) {
-      blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_INCOMING_BUNDLE, {
-        microchain: microchain.microchain
-      })
-    }
-  } catch {
-    // DO NOTHING
-  }
-
   return unsubscribe
 }
 
 const subscribeMicrochains = async () => {
   for (const microchain of microchains.value) {
     if (subscribed.value.get(microchain.microchain)) continue
-    try {
-      const stop = await subscribeMicrochain({ ...microchain })
-      subscribed.value.set(microchain.microchain, stop)
-    } catch (e) {
-      console.log('Failed subscribe microchain', microchain.microchain, e)
-    }
+    const stop = await subscribeMicrochain({ ...microchain })
+    subscribed.value.set(microchain.microchain, stop)
   }
   for (const token of tokens.value) {
     if (!token.creatorChainId) continue
     if (subscribed.value.get(token.creatorChainId)) continue
     const microchain = await dbBridge.Microchain.microchain(token.creatorChainId)
     if (!microchain) continue
-    try {
-      const stop = await subscribeMicrochain({ ...microchain })
-      subscribed.value.set(microchain.microchain, stop)
-    } catch (e) {
-      console.log('Failed subscribe microchain', microchain.microchain, e)
-    }
+    const stop = await subscribeMicrochain({ ...microchain })
+    subscribed.value.set(microchain.microchain, stop)
   }
 }
 
