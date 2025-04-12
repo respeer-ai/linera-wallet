@@ -130,7 +130,7 @@ export class Block {
   ): Promise<(() => void) | undefined> => {
     const baseUrlOptions = getClientOptionsWithBaseUrl(
       constant.APPLICATION_URLS.PROXY_BASE,
-      undefined as unknown as string,
+      constant.APPLICATION_URLS.PROXY_BASE_WS,
       undefined,
       undefined,
       undefined
@@ -179,9 +179,19 @@ export class Block {
 
   static getBlockWithHash = async (
     chainId: string,
-    hash?: string
+    hash?: string,
+    memeChain?: boolean
   ): Promise<ConfirmedBlock | undefined> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    const baseUrlOptions = getClientOptionsWithBaseUrl(
+      constant.APPLICATION_URLS.PROXY_BASE,
+      constant.APPLICATION_URLS.PROXY_BASE_WS,
+      undefined,
+      undefined,
+      undefined
+    )
+    const options = memeChain
+      ? baseUrlOptions
+      : await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 

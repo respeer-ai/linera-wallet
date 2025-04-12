@@ -11,7 +11,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 import { blockWorker } from 'src/worker'
-import { dbBridge, rpcBridge } from 'src/bridge'
+import { rpcBridge } from 'src/bridge'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
@@ -27,30 +27,26 @@ const tokensImportState = computed(() => localStore.setting.TokensImportState)
 type stopFunc = () => void
 const subscribed = ref(new Map<string, stopFunc>())
 
-const subscribeMicrochain = async (microchain: dbModel.Microchain) => {
-  const memeChain = tokens.value.findIndex((el) => el.creatorChainId === microchain.microchain) >= 0
+const subscribeMicrochain = async (microchain: string) => {
+  const memeChain = tokens.value.findIndex((el) => el.creatorChainId === microchain) >= 0
 
-  blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
-    microchain: microchain.microchain,
-    memeChain
-  })
   if (window.location.origin.startsWith('http')) {
     blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_INCOMING_BUNDLE, {
-      microchain: microchain.microchain
+      microchain
     })
   }
 
   const unsubscribe = await rpcBridge.Block.subscribe(
-    microchain.microchain, memeChain, (hash: string) => {
+    microchain, memeChain, (hash: string) => {
       blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
-        microchain: microchain.microchain,
+        microchain,
         hash,
         memeChain
       })
     }, () => {
       if (window.location.origin.startsWith('http')) {
         blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_INCOMING_BUNDLE, {
-          microchain: microchain.microchain
+          microchain
         })
       }
     }) as () => void
@@ -61,16 +57,14 @@ const subscribeMicrochain = async (microchain: dbModel.Microchain) => {
 const subscribeMicrochains = async () => {
   for (const microchain of microchains.value) {
     if (subscribed.value.get(microchain.microchain)) continue
-    const stop = await subscribeMicrochain({ ...microchain })
+    const stop = await subscribeMicrochain(microchain.microchain)
     subscribed.value.set(microchain.microchain, stop)
   }
   for (const token of tokens.value) {
     if (!token.creatorChainId) continue
     if (subscribed.value.get(token.creatorChainId)) continue
-    const microchain = await dbBridge.Microchain.microchain(token.creatorChainId)
-    if (!microchain) continue
-    const stop = await subscribeMicrochain({ ...microchain })
-    subscribed.value.set(microchain.microchain, stop)
+    const stop = await subscribeMicrochain(token.creatorChainId)
+    subscribed.value.set(token.creatorChainId, stop)
   }
 }
 
@@ -85,6 +79,13 @@ watch(microchains, async () => {
 })
 
 watch(tokens, async () => {
+  for (const token of tokens.value) {
+    if (!token.creatorChainId) continue
+    blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
+      microchain: token.creatorChainId,
+      memeChain: true
+    })
+  }
   await subscribeMicrochains()
 })
 

@@ -6,12 +6,9 @@ import { parse } from 'lossless-json'
 
 export class ActivityHelper {
   static updateBlockActivities = async (
-    microchainId: string,
+    microchain: string,
     block: ConfirmedBlock
   ) => {
-    const microchain = await dbBridge.Microchain.microchain(microchainId)
-    if (!microchain) return
-
     const nativeTokenId = (await dbBridge.Token.native())?.id || 1
     for (const bundle of block.block.body.incomingBundles || []) {
       const origin = bundle.origin as rpcModel.Origin
@@ -19,7 +16,7 @@ export class ActivityHelper {
         const _message = message.message as rpcModel.Message
         if (_message?.System?.Credit) {
           await dbBridge.Activity.create(
-            microchain.microchain,
+            microchain,
             nativeTokenId,
             origin.sender,
             _message?.System?.Credit?.source,
@@ -44,7 +41,7 @@ export class ActivityHelper {
           const memeMessage = parse(memeMessageStr) as rpcModel.MemeMessage
           if (memeMessage?.Transfer) {
             await dbBridge.Activity.create(
-              microchain.microchain,
+              microchain,
               tokenId,
               memeMessage.Transfer.from.chainId,
               memeMessage.Transfer.from.owner,
@@ -80,7 +77,7 @@ export class ActivityHelper {
           if (grant?.length) break
         }
         await dbBridge.Activity.create(
-          microchain.microchain,
+          microchain,
           nativeTokenId,
           block.block.header.chainId as string,
           _operation.System.Transfer.owner,

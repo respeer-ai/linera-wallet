@@ -96,22 +96,24 @@ export class BlockRunner {
 
   static handleConfirmedBlock = async (
     microchain: string,
-    block: ConfirmedBlock
+    block: ConfirmedBlock,
+    memeChain: boolean
   ) => {
     if (!block) return
-    // TODO: update activities
     await ActivityHelper.updateBlockActivities(microchain, block)
-    // TODO: update chain operations
-    let needRetry = await ChainOperationHelper.executedInBlock(
-      microchain,
-      block
-    )
-    // TODO: update microchain open state
-    needRetry ||= !(await MicrochainHelper.openedInBlock(microchain, block))
+
+    let needRetry = false
+    if (!memeChain) {
+      needRetry = await ChainOperationHelper.executedInBlock(
+        microchain,
+        block
+      )
+      needRetry ||= !(await MicrochainHelper.openedInBlock(microchain, block))
+    }
 
     if (needRetry) {
       setTimeout(() => {
-        void BlockRunner.handleConfirmedBlock(microchain, block)
+        void BlockRunner.handleConfirmedBlock(microchain, block, memeChain)
       }, 1000)
     }
   }
@@ -126,10 +128,10 @@ export class BlockRunner {
       await BalanceHelper.updateNativeBalances(microchain)
     }
 
-    const block = await rpcBridge.Block.getBlockWithHash(microchain, hash)
+    const block = await rpcBridge.Block.getBlockWithHash(microchain, hash, memeChain)
     if (!block) return
 
-    await BlockRunner.handleConfirmedBlock(microchain, block)
+    await BlockRunner.handleConfirmedBlock(microchain, block, memeChain)
   }
 
   static handleIncomingBundle = async (payload: NewIncomingBundlePayload) => {

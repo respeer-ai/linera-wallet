@@ -103,9 +103,9 @@ export class BalanceHelper {
     const microchains = await dbBridge.Microchain.microchains(0, 0)
 
     for (const token of tokens) {
-      for (const microchain of microchains) {
+      for (const _microchain of microchains) {
         const owners = await dbBridge.MicrochainOwner.microchainOwners(
-          microchain.microchain
+          _microchain.microchain
         )
         // We should query all owners
         for (const owner of owners) {
@@ -113,11 +113,11 @@ export class BalanceHelper {
             const balance =
               (await rpcBridge.MemeApplicationOperation.balanceOf(
                 token.applicationId as string,
-                microchain.microchain,
+                _microchain.microchain,
                 owner.owner
               )) || 0
             await BalanceHelper.updateAccountBalance(
-              microchain.microchain,
+              _microchain.microchain,
               token.id as number,
               owner.owner,
               balance
