@@ -173,6 +173,9 @@ export class Microchain {
       new Memory(_hex.toBytes(privateKey))
     )
 
+    // Initialize public key to RPC wallet firstly
+    await Account.initPublicKey(keyPair)
+
     await Microchain.initMicrochainStore(
       owner.owner,
       keyPair,
