@@ -88,7 +88,7 @@ const onNextStepClick = async () => {
       } as commontypes.PopupResponse)
       void dbBridge.RpcAuth.create(origin.value, owner.value?.address, method.value, undefined, undefined, true)
       localStore.popup.removeRequest(localStore.popup.popupRequestId)
-    }, 2000)
+    }, 100)
   }
 }
 

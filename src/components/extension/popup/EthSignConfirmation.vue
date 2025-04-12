@@ -94,7 +94,7 @@ const signResponse = async () => {
     } as commontypes.PopupResponse)
     void dbBridge.RpcAuth.create(origin.value, publicKey.value, method.value)
     localStore.popup.removeRequest(localStore.popup.popupRequestId)
-  }, 2000)
+  }, 100)
 }
 
 const onPasswordVerified = async () => {

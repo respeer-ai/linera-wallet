@@ -147,14 +147,14 @@ const checkOperationState = async (): Promise<{ operation: dbModel.ChainOperatio
 
 const checkOperation = () => {
   if (!popupUpdated.value) {
-    return window.setTimeout(checkOperation, 1000)
+    return window.setTimeout(checkOperation, 100)
   }
   checkOperationState().then(({ operation, executed }) => {
     if (!operation || executed) {
       processing.value = false
       return
     }
-    window.setTimeout(checkOperation, 1000)
+    window.setTimeout(checkOperation, 100)
   }).catch((e) => {
     processing.value = false
     console.log('Failed check operation', e)
@@ -196,7 +196,7 @@ const onNextStepClick = async () => {
       step.value += 1
       processing.value = true
       checkOperation()
-    }, 2000)
+    }, 100)
   }
   if (step.value === 3) {
     respondOperation()
