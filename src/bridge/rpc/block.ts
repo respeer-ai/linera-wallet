@@ -128,14 +128,15 @@ export class Block {
     onNewBlock?: (hash: string) => void,
     onNewIncomingBundle?: () => void
   ): Promise<(() => void) | undefined> => {
+    const baseUrlOptions = getClientOptionsWithBaseUrl(
+      constant.APPLICATION_URLS.PROXY_BASE,
+      undefined as unknown as string,
+      undefined,
+      undefined,
+      undefined
+    )
     const options = memeChain
-      ? getClientOptionsWithBaseUrl(
-          constant.APPLICATION_URLS.PROXY_BASE,
-          undefined as unknown as string,
-          undefined,
-          undefined,
-          undefined
-        )
+      ? baseUrlOptions
       : await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)

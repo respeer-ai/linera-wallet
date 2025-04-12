@@ -27,7 +27,7 @@ const count = defineModel<number>('count')
 const _microchains = useObservable<dbModel.Microchain[]>(
   liveQuery(async () => {
     if (owner.value !== undefined) {
-      return await dbBridge.Microchain.ownerMicrochains(0, 1000, owner.value)
+      return await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, owner.value)
     }
     return await dbWallet.microchains.toArray()
   }) as never
@@ -36,7 +36,7 @@ const _microchains = useObservable<dbModel.Microchain[]>(
 const _count = useObservable<number>(
   liveQuery(async () => {
     if (owner.value !== undefined) {
-      return (await dbBridge.Microchain.ownerMicrochains(0, 1000, owner.value)).length
+      return (await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, owner.value)).length
     }
     return await dbBridge.Microchain.count()
   }) as never
@@ -61,7 +61,7 @@ watch(_count, () => {
 
 watch(owner, async () => {
   if (owner.value === undefined) return
-  const __microchains = await dbBridge.Microchain.ownerMicrochains(0, 1000, owner.value)
+  const __microchains = await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, owner.value)
   updateMicrochains(__microchains)
 })
 

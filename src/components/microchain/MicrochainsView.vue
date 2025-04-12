@@ -160,7 +160,7 @@ const loadMicrochainsRecursive = async (total: number, offset: number, limit: nu
     microchains.value = _microchains
     return
   }
-  _microchains.push(...await dbBridge.Microchain.ownerMicrochains(offset, limit, selectedOwner.value?.owner, true))
+  _microchains.push(...await dbBridge.Microchain.microchains(offset, limit, true, undefined, selectedOwner.value?.owner))
   void loadMicrochainsRecursive(total, offset + limit, limit, _microchains)
 }
 

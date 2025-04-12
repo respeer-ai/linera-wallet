@@ -1,4 +1,3 @@
-import { sharedStore } from '../../../src-bex/store'
 import axios from 'axios'
 import {
   RpcRequest,
@@ -16,11 +15,12 @@ import { dbModel, rpcModel } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
 import { graphqlResult } from '../../../src/utils'
 import { parse, stringify } from 'lossless-json'
+import { dbBridge } from '../../../src/bridge'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
   try {
-    graphqlUrl = await sharedStore.getRpcEndpoint()
+    graphqlUrl = await dbBridge.Network.rpcEndpoint()
   } catch (e) {
     return await Promise.reject(e)
   }
@@ -103,7 +103,7 @@ const queryApplicationMutation = async (
 
   // Normally we don't publish blob with application operation
 
-  await sharedStore.createChainOperation({
+  await dbBridge.ChainOperation.create({
     operationId,
     microchain,
     operationType: dbModel.OperationType.ANONYMOUS,
@@ -131,12 +131,12 @@ const parseSystemMutation = async (
   const operationId = uuidv4()
 
   // Create blob for operation
-  await sharedStore.createOperationBlobs(
+  await dbBridge.ChainOperation.createOperationBlobs(
     operationId,
     query.query.blobBytes || []
   )
 
-  await sharedStore.createChainOperation({
+  await dbBridge.ChainOperation.create({
     operationId,
     microchain,
     operationType: dbModel.OperationType.ANONYMOUS,
@@ -170,7 +170,7 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
     return await Promise.reject('Invalid query')
   }
   const publicKey = query.publicKey
-  const microchain = await sharedStore.getRpcMicrochain(
+  const microchain = await dbBridge.RpcAuth.rpcMicrochain(
     request.origin,
     publicKey as string
   )
@@ -214,7 +214,7 @@ export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
   const subscriptionId = subscription.Subscription.subscribe(
     query.topics as string[],
     async (subscriptionId: string, data: unknown) => {
-      const microchain = await sharedStore.getRpcMicrochain(
+      const microchain = await dbBridge.RpcAuth.rpcMicrochain(
         request.origin,
         publicKey as string
       )
@@ -266,9 +266,8 @@ export const setupLineraSubscription = () => {
   const subscribed = new Map<string, unsubscribeFunc>()
 
   setInterval(() => {
-    sharedStore
-      .getSubscriptionEndpoint()
-      .then((endpoint) => {
+    dbBridge.Network.subscriptionEndpoint()
+      .then(async (endpoint) => {
         if (!endpoint?.length) return
         if (subscriptionEndpoint !== endpoint) {
           subscriptionEndpoint = endpoint
@@ -286,39 +285,36 @@ export const setupLineraSubscription = () => {
           })
           subscribed.clear()
         }
-        sharedStore
-          .getMicrochains()
-          .then((microchains) => {
-            microchains.forEach((microchain) => {
-              if (subscribed.has(microchain)) return
-              const _subscribed = client
-                .request({
-                  query: `subscription notifications($chainId: String!) {
+
+        const microchains = (await dbBridge.Microchain.microchains(0, 0)).map(
+          (el) => el.microchain
+        )
+        microchains.forEach((microchain) => {
+          if (subscribed.has(microchain)) return
+          const _subscribed = client
+            .request({
+              query: `subscription notifications($chainId: String!) {
                   notifications(chainId: $chainId)
                 }`,
-                  variables: {
-                    chainId: microchain
-                  }
-                })
-                .subscribe({
-                  next(data: unknown) {
-                    try {
-                      subscription.Subscription.handle(data)
-                    } catch (e) {
-                      console.log('Failed process data', e, data)
-                    }
-                  }
-                })
-              subscription.Subscription.handle({
-                topic: 'Initialized',
-                microchain
-              })
-              subscribed.set(microchain, _subscribed.unsubscribe)
+              variables: {
+                chainId: microchain
+              }
             })
+            .subscribe({
+              next(data: unknown) {
+                try {
+                  subscription.Subscription.handle(data)
+                } catch (e) {
+                  console.log('Failed process data', e, data)
+                }
+              }
+            })
+          subscription.Subscription.handle({
+            topic: 'Initialized',
+            microchain
           })
-          .catch((e) => {
-            console.log('Failed get microchains', e)
-          })
+          subscribed.set(microchain, _subscribed.unsubscribe)
+        })
       })
       .catch((e) => {
         console.log('Failed get subscription endpoint', e)

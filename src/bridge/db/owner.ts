@@ -79,7 +79,7 @@ export class Owner {
     if (!token) return Promise.reject('Invalid token')
 
     const microchains = (
-      await Microchain.ownerMicrochains(0, 1000, owner.owner, true)
+      await Microchain.microchains(0, 1000, true, undefined, owner.owner)
     ).filter(
       (_microchain) => !microchain || _microchain.microchain === microchain
     )
@@ -119,7 +119,7 @@ export class Owner {
     return (await dbWallet.owners.toArray()).find((el) => el.owner === owner)
   }
 
-  static getOwnerWithPublicKeyPrefix = async (prefix: string) => {
+  static ownerWithPublicKeyPrefix = async (prefix: string) => {
     return (await dbWallet.owners.toArray()).find((el) =>
       el.address.includes(prefix.slice(prefix.startsWith('0x') ? 2 : 0))
     )
@@ -145,5 +145,9 @@ export class Owner {
         .and((owner) => id === undefined || owner.id === id)
         .count()) > 0
     )
+  }
+
+  static addresses = async () => {
+    return (await dbWallet.owners.toArray()).map((el) => el.address)
   }
 }

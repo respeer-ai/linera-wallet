@@ -8,11 +8,23 @@ export class Microchain {
     offset: number,
     limit: number,
     imported?: boolean,
-    states?: dbModel.MicrochainState[]
+    states?: dbModel.MicrochainState[],
+    owner?: string
   ): Promise<dbModel.Microchain[]> => {
+    let microchainOwners = undefined as unknown as dbModel.MicrochainOwner[]
+    if (owner) {
+      microchainOwners = await dbWallet.microchainOwners
+        .where('owner')
+        .equals(owner)
+        .toArray()
+    }
     return await dbWallet.microchains
       .filter(
         (op) =>
+          (!owner ||
+            microchainOwners.findIndex(
+              (el) => el.owner === owner && el.microchain === op.microchain
+            ) >= 0) &&
           (imported === undefined || op.imported === imported) &&
           (states === undefined ||
             states.length === 0 ||
@@ -38,28 +50,6 @@ export class Microchain {
 
   static count = async (): Promise<number> => {
     return await dbWallet.microchains.count()
-  }
-
-  static ownerMicrochains = async (
-    offset: number,
-    limit: number,
-    owner: string,
-    imported?: boolean
-  ): Promise<dbModel.Microchain[]> => {
-    const microchainOwners = await dbWallet.microchainOwners
-      .where('owner')
-      .equals(owner)
-      .toArray()
-    return (
-      await dbWallet.microchains.offset(offset).limit(limit).toArray()
-    ).filter((microchain) => {
-      return (
-        microchainOwners.findIndex(
-          (el) => el.owner === owner && el.microchain === microchain.microchain
-        ) >= 0 &&
-        (!imported || microchain.imported)
-      )
-    })
   }
 
   static microchainOwner = async (

@@ -18,13 +18,15 @@ export class BalanceHelper {
         balance: 0
       } as dbModel.MicrochainFungibleTokenBalance)
     microchainBalance.balance = Number(balance)
-    microchainBalance.id === undefined
-      ? await dbBridge.MicrochainFungibleTokenBalance.create(
-          microchain,
-          microchainBalance.tokenId,
-          microchainBalance.balance
-        )
-      : await dbBridge.MicrochainFungibleTokenBalance.update(microchainBalance)
+    if (microchainBalance.id === undefined) {
+      await dbBridge.MicrochainFungibleTokenBalance.create(
+        microchain,
+        microchainBalance.tokenId,
+        microchainBalance.balance
+      )
+    } else {
+      await dbBridge.MicrochainFungibleTokenBalance.update(microchainBalance)
+    }
   }
 
   static updateAccountBalance = async (
@@ -46,16 +48,18 @@ export class BalanceHelper {
         balance: 0
       } as dbModel.MicrochainOwnerFungibleTokenBalance)
     microchainOwnerBalance.balance = balance
-    microchainOwnerBalance.id === undefined
-      ? await dbBridge.MicrochainOwnerFungibleTokenBalance.create(
-          microchain,
-          owner,
-          tokenId,
-          microchainOwnerBalance.balance
-        )
-      : await dbBridge.MicrochainOwnerFungibleTokenBalance.update(
-          microchainOwnerBalance
-        )
+    if (microchainOwnerBalance.id === undefined) {
+      await dbBridge.MicrochainOwnerFungibleTokenBalance.create(
+        microchain,
+        owner,
+        tokenId,
+        microchainOwnerBalance.balance
+      )
+    } else {
+      await dbBridge.MicrochainOwnerFungibleTokenBalance.update(
+        microchainOwnerBalance
+      )
+    }
   }
 
   static updateNativeBalances = async (microchain: string) => {

@@ -1,6 +1,6 @@
 import { RpcRequest, RpcMethod } from './types'
-import { sharedStore } from '../store'
 import InstallationManager from '../manager/installationmanager'
+import { dbBridge } from '../../src/bridge'
 
 const accountInterceptors = new Map<RpcMethod, boolean>([
   [RpcMethod.ETH_REQUEST_ACCOUNTS, true]
@@ -13,7 +13,7 @@ export const accountInterceptorHandler = async (
 ): Promise<void> => {
   const needAccount = accountInterceptors.get(req.request.method as RpcMethod)
   if (needAccount) {
-    if (!(await sharedStore.getAccounts()).length) {
+    if (!(await dbBridge.Owner.addresses()).length) {
       void installationManager.openExtensionInBrowser()
       return Promise.reject('No available account')
     }

@@ -1,8 +1,8 @@
-import { sharedStore } from '../../store'
 import { RpcRequest } from '../types'
 import gql from 'graphql-tag'
 import { lineraGraphqlQueryHandler } from './lineragraphqldo'
 import type { JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
+import { dbBridge } from '../../../src/bridge'
 
 export const ethGetBalanceHandler = async (request?: RpcRequest) => {
   if (!request) {
@@ -12,11 +12,20 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
   if (!account) {
     return Promise.reject(new Error('Invalid address'))
   }
-  const _account = await sharedStore.getAccountWithPrefix(account)
-  if (!_account) {
+  const owner = await dbBridge.Owner.ownerWithPublicKeyPrefix(account)
+  if (!owner) {
     return Promise.reject(new Error('Invalid address'))
   }
-  const microchains = await sharedStore.getMicrochains(_account)
+
+  const microchains = (
+    await dbBridge.Microchain.microchains(
+      0,
+      0,
+      undefined,
+      undefined,
+      owner.owner
+    )
+  ).map((el) => el.microchain)
   if (!microchains.length) {
     return Promise.reject(new Error('Invalid microchains'))
   }
@@ -41,9 +50,9 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
             query: query.loc?.source?.body,
             variables: {
               chainIds: microchains,
-              publicKeys: [_account]
+              publicKeys: [owner.address]
             },
-            operationName: 'getChainAccountBalances'
+            operationName: 'Balances'
           }
         } as JsonRpcParams
       } as JsonRpcRequest<JsonRpcParams>

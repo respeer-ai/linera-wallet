@@ -1,4 +1,4 @@
-import { sharedStore } from '../../../src-bex/store'
+import { dbBridge } from '../../../src/bridge'
 import { RpcRequest } from '../types'
 
 export const getProviderStateHandler = async (request?: RpcRequest) => {
@@ -6,8 +6,8 @@ export const getProviderStateHandler = async (request?: RpcRequest) => {
     return Promise.reject(new Error('Invalid request'))
   }
   try {
-    const accounts = await sharedStore.getOriginPublicKeys(request.origin)
-    const microchains = await sharedStore.getRpcMicrochains(request.origin)
+    const accounts = await dbBridge.RpcAuth.originPublicKeys(request.origin)
+    const microchains = await dbBridge.RpcAuth.originMicrochains(request.origin)
     if (!microchains.length) {
       return Promise.reject(new Error('Invalid microchain'))
     }

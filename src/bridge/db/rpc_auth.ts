@@ -29,4 +29,49 @@ export class RpcAuth {
   static delete = async (id: number) => {
     await dbBase.rpcAuths.delete(id)
   }
+
+  static rpcMicrochain = async (
+    origin: string,
+    publicKey: string
+  ): Promise<string | undefined> => {
+    return (await dbBase.rpcMicrochains.toArray()).find(
+      (el) => el.origin === origin && el.publicKey === publicKey
+    )?.microchain
+  }
+
+  static originPublicKeys = async (origin: string): Promise<string[]> => {
+    return (await dbBase.rpcMicrochains.toArray())
+      .filter((el) => el.origin === origin)
+      .map((el) => el.publicKey)
+      .reduce((ids: string[], el): string[] => {
+        if (!ids.includes(el)) ids.push(el)
+        return ids
+      }, [])
+  }
+
+  static authenticated = async (
+    origin: string,
+    method: RpcMethod,
+    applicationId?: string,
+    operation?: string
+  ) => {
+    if (method === RpcMethod.LINERA_GRAPHQL_MUTATION && !operation)
+      return Promise.reject('Invalid operation')
+    return (
+      (await dbBase.rpcAuths.toArray()).findIndex(
+        (el) =>
+          el.origin === origin &&
+          el.method === method &&
+          (applicationId === undefined || el.applicationId === applicationId) &&
+          (operation === undefined || el.operation === operation) &&
+          el.expiredAt > Date.now()
+      ) >= 0
+    )
+  }
+
+  static originMicrochains = async (origin: string): Promise<string[]> => {
+    return (await dbBase.rpcMicrochains.toArray())
+      .filter((el) => el.origin === origin)
+      .map((el) => el.microchain)
+  }
 }

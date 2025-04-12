@@ -9,7 +9,7 @@ import {
 } from './types'
 import { commontypes } from '../../src/types'
 import { BexPayload } from '@quasar/app-vite'
-import { sharedStore } from '../store'
+import { dbBridge } from '../../src/bridge'
 
 const notificationManager = new NotificationManager()
 
@@ -31,7 +31,7 @@ export const needConfirm = async (req: RpcRequest) => {
   let shouldConfirm = confirmations.get(req.request.method as RpcMethod)
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   if (shouldConfirm) {
-    shouldConfirm = !(await sharedStore.authenticated(
+    shouldConfirm = !(await dbBridge.RpcAuth.authenticated(
       req.origin,
       req.request.method as RpcMethod,
       req.request.method === RpcMethod.LINERA_GRAPHQL_MUTATION

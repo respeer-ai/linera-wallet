@@ -335,13 +335,13 @@ const canGotoNext = computed(() => {
 
 watch(selectedFromOwner, async () => {
   if (!selectedFromOwner.value) return
-  fromMicrochains.value = await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedFromOwner.value?.owner)
+  fromMicrochains.value = await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, selectedFromOwner.value?.owner)
   selectedFromMicrochain.value = fromMicrochains.value.find((el) => el.default) || fromMicrochains.value[0]
 })
 
 watch(selectedToOwner, async () => {
   if (!selectedToOwner.value) return
-  const microchains = await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedToOwner.value?.owner)
+  const microchains = await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, selectedToOwner.value?.owner)
   selectedToMicrochain.value = microchains.find((el) => el.default) || microchains[0]
 })
 
@@ -356,12 +356,12 @@ onMounted(async () => {
     selectedFromOwner.value = await dbBridge.Owner.selected()
   }
   if (selectedFromOwner.value) {
-    fromMicrochains.value = await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedFromOwner.value?.owner)
+    fromMicrochains.value = await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, selectedFromOwner.value?.owner)
     selectedFromMicrochain.value = fromMicrochains.value.find((el) => el.default) || fromMicrochains.value[0]
   }
 
   if (selectedToOwner.value) {
-    const microchains = await dbBridge.Microchain.ownerMicrochains(0, 1000, selectedToOwner.value?.owner)
+    const microchains = await dbBridge.Microchain.microchains(0, 1000, undefined, undefined, selectedToOwner.value?.owner)
     selectedFromMicrochain.value = microchains.find((el) => el.default) || microchains[0]
   }
   if (selectedToken.value) {

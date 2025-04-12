@@ -50,4 +50,30 @@ export class Network {
         .count()) > 0
     )
   }
+
+  static rpcEndpoint = async () => {
+    const network = await Network.selected()
+    if (!network) return ''
+    return (
+      network.rpcSchema +
+      '://' +
+      network.host +
+      ':' +
+      network.port.toString() +
+      (network.path.length ? network.path : '')
+    )
+  }
+
+  static subscriptionEndpoint = async () => {
+    const network = await Network.selected()
+    if (!network) return ''
+    return (
+      network.wsSchema +
+      '://' +
+      network.host +
+      ':' +
+      network.port.toString() +
+      '/ws'
+    )
+  }
 }

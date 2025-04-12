@@ -77,7 +77,7 @@ const onVerifyPasswordError = () => {
 }
 
 const signResponse = async () => {
-  const _account = await dbBridge.Owner.getOwnerWithPublicKeyPrefix(publicKey.value) as dbModel.Owner
+  const _account = await dbBridge.Owner.ownerWithPublicKeyPrefix(publicKey.value) as dbModel.Owner
   if (!_account) {
     return onCancelClick()
   }

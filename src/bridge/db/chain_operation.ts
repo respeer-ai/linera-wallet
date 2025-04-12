@@ -96,4 +96,21 @@ export class ChainOperation {
         .toArray()
     ).map((blob) => blob.blob)
   }
+
+  static createOperationBlobs = async (
+    operationId: string,
+    blobs: Array<Uint8Array>
+  ) => {
+    if (!blobs.length) return
+    await dbWallet.operationBlobs.bulkAdd(
+      blobs.map((blob) => {
+        return {
+          operationId,
+          blob: new Uint8Array(
+            JSON.parse(blob as unknown as string) as number[]
+          )
+        }
+      })
+    )
+  }
 }

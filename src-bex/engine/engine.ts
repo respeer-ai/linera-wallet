@@ -7,10 +7,10 @@ import {
   RpcMethods,
   RpcRequest
 } from '../middleware/types'
-import { sharedStore } from '../store'
 import type { PendingJsonRpcResponse, Json } from '@metamask/utils'
 import { basebridge } from '../event'
 import { commontypes } from '../../src/types'
+import { dbBridge } from '../../src/bridge'
 
 export class Engine {
   middlewareHandlers = [] as Array<types.MiddlewareImplHandler>
@@ -69,7 +69,7 @@ export class Engine {
       case RpcMethod.LINERA_GRAPHQL_MUTATION: {
         const query = req.request.params as unknown as RpcGraphqlQuery
         if (query.publicKey === undefined) {
-          const accounts = await sharedStore.getOriginPublicKeys(req.origin)
+          const accounts = await dbBridge.RpcAuth.originPublicKeys(req.origin)
           if (accounts.length > 0) {
             query.publicKey = accounts[0]
           }
