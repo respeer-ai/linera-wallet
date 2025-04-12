@@ -27,7 +27,7 @@ export class SimulatedBlock {
         }`
     const blockMaterial = {
       operations,
-      blobBytes,
+      blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes))),
       candidate
     }
 
