@@ -18,7 +18,6 @@ self.onmessage = async (message: MessageEvent) => {
   if (!wasmInitialized) {
     await mutex.runExclusive(async () => {
       if (wasmInitialized) return
-      void BlockRunner.handleTicker()
       let _wasmModuleUrl = wasmModuleUrl.startsWith('/')
         ? wasmModuleUrl
         : `/www/${wasmModuleUrl}`
@@ -41,10 +40,14 @@ self.onmessage = async (message: MessageEvent) => {
     case BlockEventType.NEW_BLOCK:
       return await BlockRunner.handleBlock(event.payload as NewBlockPayload)
     case BlockEventType.NEW_INCOMING_BUNDLE:
-      return BlockRunner.handleIncomingBundle(
+      return await BlockRunner.handleIncomingBundle(
         event.payload as NewIncomingBundlePayload
       )
     case BlockEventType.NEW_OPERATION:
-      return BlockRunner.handleOperation(event.payload as NewOperationPayload)
+      return await BlockRunner.handleOperation(
+        event.payload as NewOperationPayload
+      )
+    case BlockEventType.RUN_TICKER:
+      return await BlockRunner.handleTicker()
   }
 }

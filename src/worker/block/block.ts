@@ -20,6 +20,11 @@ export class BlockWorker {
   public static getBlockWorker = () => {
     if (BlockWorker._instance) return BlockWorker._instance
     BlockWorker._instance = new BlockWorker()
+
+    if (window.location.origin.startsWith('http')) {
+      BlockWorker.send(BlockEventType.RUN_TICKER)
+    }
+
     return BlockWorker._instance
   }
 

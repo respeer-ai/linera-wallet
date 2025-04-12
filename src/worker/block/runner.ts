@@ -12,7 +12,8 @@ import { dbModel } from 'src/model'
 export enum BlockEventType {
   NEW_OPERATION = 'NewOperation',
   NEW_INCOMING_BUNDLE = 'NewIncomingBundle',
-  NEW_BLOCK = 'NewBlock'
+  NEW_BLOCK = 'NewBlock',
+  RUN_TICKER = 'RunTicker'
 }
 
 export interface BasePayload {
