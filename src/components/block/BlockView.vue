@@ -451,18 +451,22 @@ watch(microchainsImportState, async () => {
   }
 })
 
+const updateMicrochainFungibleBalances = async (microchain: db.Microchain) => {
+  const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
+  if (!owners.length) return
+  const _owners = owners.reduce((keys: string[], a): string[] => { keys.push(a.owner); return keys }, [])
+  try {
+    await updateFungibleBalances(microchain, _owners)
+  } catch {
+    // DO NOTHING
+  }
+}
+
 watch(tokensImportState, async () => {
   switch (tokensImportState.value) {
     case localStore.settingDef.TokensImportState.TokensImported:
       for (const microchain of microchains.value) {
-        const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
-        if (!owners.length) continue
-        const _owners = owners.reduce((keys: string[], a): string[] => { keys.push(a.owner); return keys }, [])
-        try {
-          await updateFungibleBalances(microchain, _owners)
-        } catch {
-          // DO NOTHING
-        }
+        await updateMicrochainFungibleBalances(microchain)
       }
   }
 })
