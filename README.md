@@ -39,11 +39,11 @@ web3.eth.requestAccounts().then((accounts) => {
 - [x] Remove request application (depends on linera-protocol implementation)
 - [ ] Implement load chain, then we can query chain state from RPC directly
 - [x] Remove subscribe creator chain, just keep application state on creator chain
-- [ ] Event driven implementation of message process
+- [x] Event driven implementation of message process
 - [ ] Multiple popup implementation and accurate popup closing
 - [ ] Dynamic loading of application bytecode to serialize and deserialize application operations
-- [ ] Serialize application operation locally
-- [ ] Refactor architecture of block process
+- [x] Serialize application operation locally
+- [x] Refactor architecture of block process
 
 ### Note
 
