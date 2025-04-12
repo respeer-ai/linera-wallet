@@ -3,6 +3,7 @@ import { type NotificationsSubscription } from '../../src/__generated__/graphql/
 import { graphqlResult } from '../../src/utils'
 import { blockWorker } from '../../src/worker'
 import { dbBridge } from '../../src/bridge'
+import { BexBridge, BexPayload } from '@quasar/app-vite'
 
 export class BlockSigner {
   static running = false
@@ -83,11 +84,39 @@ export class BlockSigner {
     }
   }
 
-  public static run() {
+  static async onNewOperation(subscriptionId: string, data: unknown) {
+    const _data = data as Record<string, string>
+    if (
+      !_data ||
+      !_data.topic ||
+      _data.topic !== 'NewOperation' ||
+      !_data.microchain
+    )
+      return
+
+    await blockWorker.BlockRunner.handleOperation(
+      data as blockWorker.NewOperationPayload
+    )
+  }
+
+  public static run(bridge: BexBridge) {
     if (BlockSigner.running) return
     BlockSigner.running = true
 
     void blockWorker.BlockRunner.handleTicker()
+    bridge.on(
+      'new-operation',
+      (payload: BexPayload<blockWorker.NewOperationPayload, unknown>) => {
+        blockWorker.BlockRunner.handleOperation(payload.data)
+          .then(() => {
+            void payload.respond({})
+          })
+          .catch((e) => {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            console.log(`Failed process operation ${e}`)
+          })
+      }
+    )
 
     // Subscribe message and block
     subscription.Subscription.subscribe(
@@ -108,6 +137,13 @@ export class BlockSigner {
       ['Initialized'],
       (subscriptionId: string, data: unknown) =>
         BlockSigner.onInitialized(subscriptionId, data)
+    )
+
+    // Subscribe new operation
+    subscription.Subscription.subscribe(
+      ['NewOperation'],
+      (subscriptionId: string, data: unknown) =>
+        BlockSigner.onNewOperation(subscriptionId, data)
     )
   }
 }

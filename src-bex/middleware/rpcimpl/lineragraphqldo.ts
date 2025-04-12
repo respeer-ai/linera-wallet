@@ -115,6 +115,12 @@ const queryApplicationMutation = async (
     state: dbModel.OperationState.CREATED
   } as dbModel.ChainOperation)
 
+  subscription.Subscription.handle({
+    topic: 'NewOperation',
+    microchain,
+    operationId
+  })
+
   return { operationId }
 }
 
@@ -147,6 +153,12 @@ const parseSystemMutation = async (
     graphqlVariables: stringify(query.query.variables),
     state: dbModel.OperationState.CREATED
   } as dbModel.ChainOperation)
+
+  subscription.Subscription.handle({
+    topic: 'NewOperation',
+    microchain,
+    operationId
+  })
 
   return { operationId, operation }
 }

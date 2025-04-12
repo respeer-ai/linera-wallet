@@ -67,6 +67,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { dbModel, rpcModel } from 'src/model'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { blockWorker } from 'src/worker'
+import { useQuasar } from 'quasar'
 
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
@@ -80,6 +81,8 @@ interface Query {
 const route = useRoute()
 const fromMicrochainId = ref((route.query as unknown as Query).fromMicrochainId)
 const applicationId = ref((route.query as unknown as Query).applicationId)
+
+const _quasar = useQuasar()
 
 const step = ref(1)
 
@@ -134,12 +137,15 @@ const onTransferConfirmed = async () => {
       )
     }
 
+    const payload = {
+      microchain: selectedFromMicrochain.value?.microchain,
+      operationId
+    }
     if (window.location.origin.startsWith('http')) {
       // Notify new operation
-      blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_OPERATION, {
-        microchain: selectedFromMicrochain.value?.microchain,
-        operationId
-      })
+      blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_OPERATION, payload)
+    } else {
+      await _quasar.bex?.send('new-operation', payload)
     }
 
     await rpcBridge.Operation.waitOperation(operationId)
