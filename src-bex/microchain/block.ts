@@ -23,15 +23,12 @@ export class BlockSigner {
       tokens.findIndex((el) => el.creatorChainId === _data.microchain) >= 0
 
     if (!memeChain) {
-      blockWorker.BlockWorker.send(
-        blockWorker.BlockEventType.NEW_INCOMING_BUNDLE,
-        {
-          microchain: _data.microchain
-        }
-      )
+      await blockWorker.BlockRunner.handleIncomingBundle({
+        microchain: _data.microchain
+      })
     }
 
-    blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
+    await blockWorker.BlockRunner.handleBlock({
       microchain: _data.microchain,
       memeChain
     })
@@ -54,12 +51,9 @@ export class BlockSigner {
         tokens.findIndex((el) => el.creatorChainId === microchain) >= 0
 
       if (!memeChain) {
-        blockWorker.BlockWorker.send(
-          blockWorker.BlockEventType.NEW_INCOMING_BUNDLE,
-          {
-            microchain
-          }
-        )
+        await blockWorker.BlockRunner.handleIncomingBundle({
+          microchain
+        })
       }
     }
   }
@@ -68,8 +62,7 @@ export class BlockSigner {
     const tokens = await dbBridge.Token.fungibles()
     const memeChain =
       tokens.findIndex((el) => el.creatorChainId === microchain) >= 0
-
-    blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
+    await blockWorker.BlockRunner.handleBlock({
       microchain,
       hash,
       memeChain
@@ -94,8 +87,7 @@ export class BlockSigner {
     if (BlockSigner.running) return
     BlockSigner.running = true
 
-    // Start web worker
-    blockWorker.BlockWorker.getBlockWorker()
+    void blockWorker.BlockRunner.handleTicker()
 
     // Subscribe message and block
     subscription.Subscription.subscribe(

@@ -5,7 +5,7 @@ const config: CodegenConfig = {
   overwrite: true,
   generates: {
     './src/__generated__/graphql/service/': {
-      schema: 'http://api.rpcModel.respeer.ai/api/rpc',
+      schema: 'http://api.rpc.respeer.ai/api/rpc',
       documents: ['src/graphql/service.ts'],
       preset: 'client',
       plugins: []

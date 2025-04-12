@@ -130,7 +130,7 @@ module.exports = configure(function (ctx) {
     devServer: {
       proxy: {
         '/rpc': {
-          target: 'http://api.rpcModel.respeer.ai',
+          target: 'http://api.rpc.respeer.ai',
           pathRewrite: {
             '^/rpc': '/rpc'
           },

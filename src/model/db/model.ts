@@ -122,7 +122,7 @@ export const defaultNetwork = {
   faucetUrl: 'http://api.faucet.respeer.ai/api/faucet',
   rpcSchema: HTTPSchema.HTTP,
   wsSchema: WSSchema.WS,
-  host: 'api.rpcModel.respeer.ai',
+  host: 'api.rpc.respeer.ai',
   port: 80,
   path: '/api/rpc',
   selected: true,

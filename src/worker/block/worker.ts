@@ -11,10 +11,6 @@ import wasmModuleUrl from '../../../src-bex/wasm/linera_wasm_bg.wasm?url'
 import { Berith } from '@hazae41/berith'
 import { Mutex } from 'async-mutex'
 
-setTimeout(() => {
-  void BlockRunner.handleTicker()
-}, 30000)
-
 const mutex = new Mutex()
 let wasmInitialized = false
 
@@ -22,6 +18,7 @@ self.onmessage = async (message: MessageEvent) => {
   if (!wasmInitialized) {
     await mutex.runExclusive(async () => {
       if (wasmInitialized) return
+      void BlockRunner.handleTicker()
       await initWasm(await fetch(wasmModuleUrl))
       await Berith.initBundledOnce()
       wasmInitialized = true
