@@ -6,7 +6,7 @@ import {
   useQuery
 } from '@vue/apollo-composable'
 import { _hex, graphqlResult } from 'src/utils'
-import { rpc, rpc as rpcModel } from 'src/model'
+import { rpcModel } from 'src/model'
 import { BALANCE, BALANCES, WALLET_INIT_PUBLIC_KEY } from 'src/graphql'
 import {
   type ChainOwners,
@@ -51,7 +51,7 @@ export class Account {
   }
 
   static ownerBalance = (
-    balances: rpc.Balances,
+    balances: rpcModel.Balances,
     chainId: string,
     owner: string
   ) => {
@@ -64,7 +64,7 @@ export class Account {
 
   static balances = async (
     chainOwners: Array<ChainOwners>
-  ): Promise<rpc.Balances | undefined> => {
+  ): Promise<rpcModel.Balances | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
@@ -87,7 +87,7 @@ export class Account {
       onResult((res) => {
         resolve(
           (graphqlResult.rootData(res) as BalancesQuery)
-            .balances as rpc.Balances
+            .balances as rpcModel.Balances
         )
       })
 

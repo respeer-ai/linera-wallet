@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { useRouter } from 'vue-router'
@@ -80,7 +80,7 @@ import TokenDetailInnerView from './TokenDetailInnerView.vue'
 import OwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 
 interface Props {
-  token: db.Token
+  token: dbModel.Token
 }
 const props = defineProps<Props>()
 const token = toRef(props, 'token')
@@ -88,7 +88,7 @@ const token = toRef(props, 'token')
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const emit = defineEmits<{(ev: 'back'): void,
   (ev: 'close'): void

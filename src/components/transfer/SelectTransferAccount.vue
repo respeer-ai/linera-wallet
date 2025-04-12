@@ -46,7 +46,7 @@
     <template #label>
       <div class='row full-width'>
         <q-avatar>
-          <q-img v-if='selectedFromOwner' :src='db.ownerAvatar(selectedFromOwner)' width='36px' height='36px' />
+          <q-img v-if='selectedFromOwner' :src='dbModel.ownerAvatar(selectedFromOwner)' width='36px' height='36px' />
         </q-avatar>
         <div v-if='selectedFromOwner' class='header-items-margin-x-left text-left'>
           <div>
@@ -71,7 +71,7 @@
     <template #label>
       <div class='row full-width'>
         <q-avatar>
-          <q-img v-if='selectedFromMicrochain' :src='db.microchainAvatar(selectedFromMicrochain)' width='36px' height='36px' />
+          <q-img v-if='selectedFromMicrochain' :src='dbModel.microchainAvatar(selectedFromMicrochain)' width='36px' height='36px' />
         </q-avatar>
         <div v-if='selectedFromMicrochain' class='header-items-margin-x-left text-left'>
           <div>
@@ -119,7 +119,7 @@
       <template #label>
         <div class='row full-width'>
           <q-avatar>
-            <q-img v-if='selectedToOwner' :src='db.ownerAvatar(selectedToOwner)' width='36px' height='36px' />
+            <q-img v-if='selectedToOwner' :src='dbModel.ownerAvatar(selectedToOwner)' width='36px' height='36px' />
           </q-avatar>
           <div class='header-items-margin-x-left text-left'>
             <div>
@@ -163,7 +163,7 @@
       <template #label>
         <div class='row full-width'>
           <q-avatar>
-            <q-img v-if='selectedToMicrochain' :src='db.microchainAvatar(selectedToMicrochain)' width='36px' height='36px' />
+            <q-img v-if='selectedToMicrochain' :src='dbModel.microchainAvatar(selectedToMicrochain)' width='36px' height='36px' />
           </q-avatar>
           <div class='header-items-margin-x-left text-left'>
             <div>
@@ -221,26 +221,26 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { dbBridge } from 'src/bridge'
 
 import OwnerSelector from '../selector/OwnerSelector.vue'
 import MicrochainSelector from '../selector/MicrochainSelector.vue'
 import TokenSelector from '../selector/TokenSelector.vue'
 
-const selectedFromOwner = defineModel<db.Owner>('selectedFromOwner')
-const selectedFromMicrochain = defineModel<db.Microchain>('selectedFromMicrochain')
-const fromMicrochains = ref([] as db.Microchain[])
+const selectedFromOwner = defineModel<dbModel.Owner>('selectedFromOwner')
+const selectedFromMicrochain = defineModel<dbModel.Microchain>('selectedFromMicrochain')
+const fromMicrochains = ref([] as dbModel.Microchain[])
 
-const selectedToOwner = defineModel<db.Owner>('selectedToOwner')
-const selectedToMicrochain = defineModel<db.Microchain>('selectedToMicrochain')
+const selectedToOwner = defineModel<dbModel.Owner>('selectedToOwner')
+const selectedToMicrochain = defineModel<dbModel.Microchain>('selectedToMicrochain')
 const toAddress = defineModel<string>('toAddress')
 const toMicrochain = defineModel<string>('toMicrochain')
 
 const fromChainBalance = defineModel<boolean>('fromChainBalance')
 const toChainBalance = defineModel<boolean>('toChainBalance')
 
-const selectedToken = defineModel<db.Token>('selectedToken')
+const selectedToken = defineModel<dbModel.Token>('selectedToken')
 
 const selectingFromOwner = ref(false)
 const selectingFromMicrochain = ref(false)
@@ -248,7 +248,7 @@ const selectingToOwner = ref(false)
 const selectingToMicrochain = ref(false)
 const selectingToken = ref(false)
 const selectedTokenLogo = ref('')
-const toMicrochainOwners = ref([] as db.MicrochainOwner[])
+const toMicrochainOwners = ref([] as dbModel.MicrochainOwner[])
 
 const onFromAccountClick = () => {
   selectingFromOwner.value = true
@@ -298,7 +298,7 @@ const onClearToAccountClick = () => {
   toMicrochain.value = ''
 }
 
-const onToOwnerSelected = (owner?: db.Owner) => {
+const onToOwnerSelected = (owner?: dbModel.Owner) => {
   selectingToOwner.value = false
   toAddress.value = owner?.address || ''
 }

@@ -1,6 +1,6 @@
 import { subscription } from '../subscription'
 import { sharedStore } from '../store'
-import { db, rpc } from '../../src/model'
+import { dbModel, rpcModel } from '../../src/model'
 import {
   BLOCK,
   BLOCK_MATERIAL,
@@ -76,15 +76,15 @@ export class BlockSigner {
     const operations = await sharedStore.getChainOperations(
       microchain,
       block.hash as string,
-      [db.OperationState.EXECUTING, db.OperationState.EXECUTED]
+      [dbModel.OperationState.EXECUTING, dbModel.OperationState.EXECUTED]
     )
     for (const operation of operations) {
-      if (operation.state !== db.OperationState.EXECUTED) {
+      if (operation.state !== dbModel.OperationState.EXECUTED) {
         return setTimeout(() => {
           void BlockSigner.updateChainOperations(microchain, block)
         }, 1000)
       }
-      operation.state = db.OperationState.CONFIRMED
+      operation.state = dbModel.OperationState.CONFIRMED
       await dbWallet.chainOperations.update(operation.id, operation)
     }
   }
@@ -96,9 +96,9 @@ export class BlockSigner {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const nativeTokenId = (await sharedStore.nativeToken())?.id || 1
     for (const bundle of block.block.body.incomingBundles || []) {
-      const origin = bundle.origin as rpc.Origin
+      const origin = bundle.origin as rpcModel.Origin
       for (const message of bundle.bundle.messages) {
-        const _message = message.message as rpc.Message
+        const _message = message.message as rpcModel.Message
         if (_message?.System?.Credit) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           await sharedStore.createActivity(
@@ -118,7 +118,7 @@ export class BlockSigner {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           const token = (await sharedStore.token(
             _message.User.applicationId
-          )) as db.Token
+          )) as dbModel.Token
           const tokenId = token?.id || 2
           let memeMessageStr = undefined as unknown as string
           try {
@@ -131,7 +131,7 @@ export class BlockSigner {
           }
           // TODO: it may not be ERC20 message here, we should deserialize it according to application bytecode
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const memeMessage = parse(memeMessageStr) as rpc.MemeMessage
+          const memeMessage = parse(memeMessageStr) as rpcModel.MemeMessage
           if (memeMessage?.Transfer) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             await sharedStore.createActivity(
@@ -152,13 +152,13 @@ export class BlockSigner {
       }
     }
     for (const operation of block.block.body.operations || []) {
-      const _operation = operation as rpc.Operation
+      const _operation = operation as rpcModel.Operation
       if (_operation.System?.Transfer) {
         let grant = undefined as unknown as string | undefined
         for (const messages of block.block.body.messages || []) {
           grant = messages.find((el) => {
-            const destination = el.destination as rpc.Destination
-            const message = el.message as rpc.Message
+            const destination = el.destination as rpcModel.Destination
+            const message = el.message as rpcModel.Message
             return (
               destination?.Recipient ===
                 _operation.System?.Transfer?.recipient.Account?.chainId &&
@@ -211,9 +211,9 @@ export class BlockSigner {
   ) => {
     const _microchain = (await sharedStore.getMicrochain(
       microchain
-    )) as db.Microchain
+    )) as dbModel.Microchain
     if (
-      _microchain.state === db.MicrochainState.CLAIMING ||
+      _microchain.state === dbModel.MicrochainState.CLAIMING ||
       !_microchain.openChainCertificateHash
     ) {
       return setTimeout(() => {
@@ -221,7 +221,7 @@ export class BlockSigner {
       }, 1000)
     }
     if (_microchain.openChainCertificateHash === block.hash) {
-      _microchain.state = db.MicrochainState.CREATED
+      _microchain.state = dbModel.MicrochainState.CREATED
       await sharedStore.updateMicrochain(_microchain)
     }
   }
@@ -267,7 +267,7 @@ export class BlockSigner {
   static async simulateExecuteBlock(
     microchain: string,
     blockMaterial: CandidateBlockMaterial,
-    operation?: rpc.Operation,
+    operation?: rpcModel.Operation,
     blobBytes?: Array<Uint8Array>
   ) {
     const simulateExecuteBlockQuery = {
@@ -313,8 +313,8 @@ export class BlockSigner {
     return _sortedObject
   }
 
-  static async validateOperation(block: Block, operation: rpc.Operation) {
-    const executedOperation = block.body.operations[0] as rpc.Operation
+  static async validateOperation(block: Block, operation: rpcModel.Operation) {
+    const executedOperation = block.body.operations[0] as rpcModel.Operation
     const operationHash = await sha3(
       stringify(BlockSigner.sortedObject(operation), (key, value) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -333,15 +333,15 @@ export class BlockSigner {
   }
 
   static signPayload = async (
-    owner: db.Owner,
+    owner: dbModel.Owner,
     payload: Uint8Array
   ): Promise<string> => {
     const password = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!password) return Promise.reject('Invalid password')
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid fingerprint')
-    const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = db.privateKey(owner, _password)
+    const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
+    const privateKey = dbModel.privateKey(owner, _password)
     const keyPair = Ed25519SigningKey.from_bytes(
       new Memory(_hex.toBytes(privateKey))
     )
@@ -352,7 +352,7 @@ export class BlockSigner {
     microchain: string,
     height: number,
     block: Block,
-    round: rpc.Round,
+    round: rpcModel.Round,
     signature: string,
     validatedBlockCertificate: unknown | undefined,
     blobBytes: Array<Uint8Array>
@@ -403,10 +403,10 @@ export class BlockSigner {
 
   static async processNewIncomingMessageWithOperation(
     microchain: string,
-    _operation?: db.ChainOperation
+    _operation?: dbModel.ChainOperation
   ): Promise<{ certificateHash: string; isRetryBlock: boolean }> {
     const operation = _operation
-      ? (parse(_operation?.operation) as rpc.Operation)
+      ? (parse(_operation?.operation) as rpcModel.Operation)
       : undefined
 
     if (BlockSigner.messageCompensates.has(microchain)) {
@@ -456,7 +456,9 @@ export class BlockSigner {
       stringify(blockMaterial.round) as string,
       stringify(simulatedBlockMaterial.outcome) as string
     )
-    const owner = (await sharedStore.microchainOwner(microchain)) as db.Owner
+    const owner = (await sharedStore.microchainOwner(
+      microchain
+    )) as dbModel.Owner
     if (!owner) return Promise.reject('Invalid owner')
     const signature = await BlockSigner.signPayload(
       owner,
@@ -465,7 +467,7 @@ export class BlockSigner {
     if (!signature) return Promise.reject('Failed generate signature')
 
     if (_operation) {
-      _operation.state = db.OperationState.EXECUTING
+      _operation.state = dbModel.OperationState.EXECUTING
       await sharedStore.updateChainOperation(_operation)
     }
 
@@ -482,7 +484,7 @@ export class BlockSigner {
         microchain,
         block.header.height as number,
         block,
-        blockMaterial.round as rpc.Round,
+        blockMaterial.round as rpcModel.Round,
         signature,
         validatedBlockCertificate,
         blobBytes
@@ -507,9 +509,9 @@ export class BlockSigner {
       if (isOpenChain) {
         sharedStore
           .getMicrochain(microchain)
-          .then((_microchain?: db.Microchain) => {
+          .then((_microchain?: dbModel.Microchain) => {
             if (!_microchain) return
-            _microchain.state = db.MicrochainState.CLAIMED
+            _microchain.state = dbModel.MicrochainState.CLAIMED
             _microchain.openChainCertificateHash = certificateHash
             void sharedStore.updateMicrochain(_microchain)
           })
@@ -529,9 +531,9 @@ export class BlockSigner {
       undefined,
       undefined,
       [
-        db.OperationState.CREATED,
-        db.OperationState.EXECUTING,
-        db.OperationState.EXECUTED
+        dbModel.OperationState.CREATED,
+        dbModel.OperationState.EXECUTING,
+        dbModel.OperationState.EXECUTED
       ]
     )
 
@@ -541,7 +543,7 @@ export class BlockSigner {
     for (const operation of operations) {
       if (
         operation.certificateHash &&
-        operation.state === db.OperationState.EXECUTED
+        operation.state === dbModel.OperationState.EXECUTED
       ) {
         try {
           await BlockSigner.processNewBlock(
@@ -564,10 +566,10 @@ export class BlockSigner {
         )
       }
 
-      const _operation = parse(operation.operation) as rpc.Operation
+      const _operation = parse(operation.operation) as rpcModel.Operation
 
       if (_operation.User && !_operation.User.bytes) {
-        operation.state = db.OperationState.FAILED
+        operation.state = dbModel.OperationState.FAILED
         operation.failReason = 'Invalid operation'
         operation.failedAt = Date.now()
         await sharedStore.updateChainOperation(operation)
@@ -583,7 +585,7 @@ export class BlockSigner {
             operation
           )
         if (isRetryBlock) continue
-        operation.state = db.OperationState.EXECUTED
+        operation.state = dbModel.OperationState.EXECUTED
         operation.certificateHash = certificateHash
         await sharedStore.updateChainOperation(operation)
       } catch (e) {
@@ -605,7 +607,7 @@ export class BlockSigner {
               operation.firstProcessedAt
             }, timeout at ${Date.now()}`
           )
-          operation.state = db.OperationState.FAILED
+          operation.state = dbModel.OperationState.FAILED
           operation.failedAt = Date.now()
           operation.failReason = stringify(e)
           await sharedStore.updateChainOperation(operation)
@@ -619,11 +621,11 @@ export class BlockSigner {
     for (const microchain of microchains) {
       const _microchain = (await sharedStore.getMicrochain(
         microchain
-      )) as db.Microchain
+      )) as dbModel.Microchain
       if (!_microchain) continue
       if (
         _microchain.openChainCertificateHash &&
-        _microchain.state !== db.MicrochainState.CREATED
+        _microchain.state !== dbModel.MicrochainState.CREATED
       ) {
         try {
           await BlockSigner.processNewBlock(

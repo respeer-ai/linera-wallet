@@ -4,7 +4,7 @@
 
 <script setup lang='ts'>
 import { ref, computed, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { _hex } from 'src/utils'
 import { localStore } from 'src/localstores'
@@ -12,7 +12,7 @@ import { localStore } from 'src/localstores'
 import DbNetworkBridge from '../bridge/db/NetworkBridge.vue'
 import { dbBridge, rpcBridge } from 'src/bridge'
 
-const selectedNetwork = ref(undefined as unknown as db.Network)
+const selectedNetwork = ref(undefined as unknown as dbModel.Network)
 const networkId = computed(() => selectedNetwork.value?.id)
 
 watch(networkId, async (newValue) => {
@@ -26,7 +26,7 @@ watch(networkId, async (newValue) => {
   for (const microchain of microchains) {
     const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
     for (const owner of owners) {
-      const privateKey = db.privateKey(owner, password)
+      const privateKey = dbModel.privateKey(owner, password)
       const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
       try {
         await rpcBridge.Microchain.initMicrochainStore(owner.owner, keyPair, microchain.microchain, microchain.messageId)

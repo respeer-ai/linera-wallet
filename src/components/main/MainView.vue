@@ -4,23 +4,23 @@
       <MainInnerView />
     </div>
     <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_MICROCHAIN'>
-      <MicrochainDetailView :microchain='(localStore.setting.homeActionParams as db.Microchain)' @back='onMicrochainDetailBack' @close='onMicrochainDetailClosed' />
+      <MicrochainDetailView :microchain='(localStore.setting.homeActionParams as dbModel.Microchain)' @back='onMicrochainDetailBack' @close='onMicrochainDetailClosed' />
     </div>
     <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_TOKEN'>
-      <TokenDetailView :token='(localStore.setting.homeActionParams as db.Token)' @back='onTokenDetailBack' @close='onTokenDetailClosed' />
+      <TokenDetailView :token='(localStore.setting.homeActionParams as dbModel.Token)' @back='onTokenDetailBack' @close='onTokenDetailClosed' />
     </div>
     <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_ACTIVITY'>
-      <ActivityDetailView :activity='(localStore.setting.homeActionParams as db.Activity)' @back='onActivityDetailBack' @close='onActivityDetailClosed' />
+      <ActivityDetailView :activity='(localStore.setting.homeActionParams as dbModel.Activity)' @back='onActivityDetailBack' @close='onActivityDetailClosed' />
     </div>
     <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_OPERATION'>
-      <ChainOperationDetailView :operation='(localStore.setting.homeActionParams as db.ChainOperation)' @back='onChainOperationDetailBack' @close='onChainOperationDetailClosed' />
+      <ChainOperationDetailView :operation='(localStore.setting.homeActionParams as dbModel.ChainOperation)' @back='onChainOperationDetailBack' @close='onChainOperationDetailClosed' />
     </div>
   </div>
 </template>
 
 <script setup lang='ts'>
 import { localStore } from 'src/localstores'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import MainInnerView from './MainInnerView.vue'
 import MicrochainDetailView from '../microchain/MicrochainDetailView.vue'

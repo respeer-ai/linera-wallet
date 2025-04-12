@@ -50,7 +50,7 @@ import { commontypes } from 'src/types'
 import type { Json } from '@metamask/utils'
 import { Web3 } from 'web3'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import VerifyPassword from '../..//password/VerifyPassword.vue'
 import SignInfoView from '../SignInfoView.vue'
@@ -77,11 +77,11 @@ const onVerifyPasswordError = () => {
 }
 
 const signResponse = async () => {
-  const _account = await dbBridge.Owner.getOwnerWithPublicKeyPrefix(publicKey.value) as db.Owner
+  const _account = await dbBridge.Owner.getOwnerWithPublicKeyPrefix(publicKey.value) as dbModel.Owner
   if (!_account) {
     return onCancelClick()
   }
-  const privateKey = db.privateKey(_account, password.value)
+  const privateKey = dbModel.privateKey(_account, password.value)
   console.log(_account, password.value, privateKey)
   const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
   const bytes = Web3.utils.hexToBytes(hexContent.value as string)

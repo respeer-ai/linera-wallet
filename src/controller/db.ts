@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import { db as dbModel } from '../model'
+import { dbModel } from '../model'
 
 export const dbBase = new Dexie('CheCkoBaseDatabase') as Dexie & {
   networks: EntityTable<dbModel.Network, 'id'>

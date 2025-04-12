@@ -1,6 +1,6 @@
 import { RpcMethod } from '../middleware/types'
 import { dbBase, dbWallet } from '../../src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export const getAccounts = async () => {
   return (await dbWallet.owners.toArray()).map((el) => el.address)
@@ -19,7 +19,7 @@ export const getMicrochain = async (microchain: string) => {
     .first()
 }
 
-export const updateMicrochain = async (microchain: db.Microchain) => {
+export const updateMicrochain = async (microchain: dbModel.Microchain) => {
   return await dbWallet.microchains.update(microchain.id, microchain)
 }
 
@@ -96,7 +96,7 @@ export const getOriginPublicKeys = async (
 export const getRpcEndpoint = async () => {
   const network = (await dbBase.networks.toArray()).find(
     (el) => el.selected
-  ) as db.Network
+  ) as dbModel.Network
   if (!network) return ''
   return (
     network.rpcSchema +
@@ -111,7 +111,7 @@ export const getRpcEndpoint = async () => {
 export const getSubscriptionEndpoint = async () => {
   const network = (await dbBase.networks.toArray()).find(
     (el) => el.selected
-  ) as db.Network
+  ) as dbModel.Network
   if (!network) return ''
   return (
     network.wsSchema +
@@ -123,8 +123,10 @@ export const getSubscriptionEndpoint = async () => {
   )
 }
 
-export const createChainOperation = async (operation: db.ChainOperation) => {
-  operation.state = db.OperationState.CREATED
+export const createChainOperation = async (
+  operation: dbModel.ChainOperation
+) => {
+  operation.state = dbModel.OperationState.CREATED
   operation.createdAt = Date.now()
   await dbWallet.chainOperations.add(operation)
 }
@@ -147,7 +149,7 @@ export const createOperationBlobs = async (
 export const getChainOperations = async (
   microchain: string | undefined,
   certificateHash: string | undefined,
-  states: db.OperationState[]
+  states: dbModel.OperationState[]
 ) => {
   let query = dbWallet.chainOperations.where('state').anyOf(states)
   if (microchain) {
@@ -159,7 +161,9 @@ export const getChainOperations = async (
   return await query.toArray()
 }
 
-export const updateChainOperation = async (operation: db.ChainOperation) => {
+export const updateChainOperation = async (
+  operation: dbModel.ChainOperation
+) => {
   await dbWallet.chainOperations.update(operation.id, operation)
 }
 
@@ -194,7 +198,7 @@ export const createActivity = async (
   timestamp: number,
   certificateHash: string,
   grant: string
-): Promise<db.Activity> => {
+): Promise<dbModel.Activity> => {
   const exist = (await dbWallet.activities.toArray()).find((el) => {
     return (
       el.sourceChain === sourceChain &&
@@ -219,7 +223,7 @@ export const createActivity = async (
     timestamp,
     certificateHash,
     grant
-  } as db.Activity
+  } as dbModel.Activity
   await dbWallet.activities.add(activity)
   return activity
 }

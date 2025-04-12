@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 import { dbBridge } from 'src/bridge'
 
@@ -47,9 +47,9 @@ import OwnerBridge from '../bridge/db/OwnerBridge.vue'
 import AccountDetailView from '../account/AccountDetailView.vue'
 import TokenBridge from '../bridge/db/TokenBridge.vue'
 
-const tokens = ref([] as db.Token[])
+const tokens = ref([] as dbModel.Token[])
 const count = ref(0)
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const displayingAccount = ref(false)
 const importingToken = ref(false)
@@ -82,12 +82,12 @@ const onDisplayAccountDone = () => {
   displayingAccount.value = false
 }
 
-const onTokenClick = (token: db.Token) => {
+const onTokenClick = (token: dbModel.Token) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_TOKEN
   localStore.setting.HomeActionParams = token
 }
 
-const loadTokensRecursive = async (total: number, offset: number, limit: number, _tokens: db.Token[]) => {
+const loadTokensRecursive = async (total: number, offset: number, limit: number, _tokens: dbModel.Token[]) => {
   if (offset >= total) {
     tokens.value = _tokens
     return

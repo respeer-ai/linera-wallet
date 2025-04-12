@@ -4,7 +4,7 @@
 
 <script setup lang='ts'>
 import { ref, toRef, watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -19,11 +19,11 @@ const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
 const owner = toRef(props, 'owner')
 
-const selectedNetwork = ref(undefined as unknown as db.Network)
+const selectedNetwork = ref(undefined as unknown as dbModel.Network)
 
-const microchainOwners = defineModel<db.MicrochainOwner[]>('microchainOwners')
+const microchainOwners = defineModel<dbModel.MicrochainOwner[]>('microchainOwners')
 
-const _microchainOwners = useObservable<db.MicrochainOwner[]>(
+const _microchainOwners = useObservable<dbModel.MicrochainOwner[]>(
   liveQuery(async () => {
     return microchain.value?.length
       ? await dbWallet.microchainOwners.where('microchain').equals(microchain.value).toArray()

@@ -1,12 +1,12 @@
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class MicrochainOwnerFungibleTokenBalance {
   static balance = async (
     microchain: string,
     owner: string,
     token: number
-  ): Promise<db.MicrochainOwnerFungibleTokenBalance | undefined> => {
+  ): Promise<dbModel.MicrochainOwnerFungibleTokenBalance | undefined> => {
     return (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).find(
       (el) =>
         el.microchain === microchain &&
@@ -18,7 +18,7 @@ export class MicrochainOwnerFungibleTokenBalance {
   static balances = async (
     owner: string,
     token: number
-  ): Promise<db.MicrochainOwnerFungibleTokenBalance[]> => {
+  ): Promise<dbModel.MicrochainOwnerFungibleTokenBalance[]> => {
     return (
       await dbWallet.microchainOwnerFungibleTokenBalances.toArray()
     ).filter(
@@ -40,7 +40,9 @@ export class MicrochainOwnerFungibleTokenBalance {
     })
   }
 
-  static update = async (balance: db.MicrochainOwnerFungibleTokenBalance) => {
+  static update = async (
+    balance: dbModel.MicrochainOwnerFungibleTokenBalance
+  ) => {
     return await dbWallet.microchainOwnerFungibleTokenBalances.update(
       balance.id,
       balance

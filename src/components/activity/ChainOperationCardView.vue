@@ -25,13 +25,13 @@
       </div>
       <q-space />
       <div>
-        <div v-if='operation.operationType === db.OperationType.TRANSFER' class='page-item-x-margin-left text-bold'>
+        <div v-if='operation.operationType === dbModel.OperationType.TRANSFER' class='page-item-x-margin-left text-bold'>
           {{ transferAmount.toFixed(4) }} {{ token?.ticker }}
         </div>
         <div class='row'>
           <q-space />
-          <div :class='[ operation.state === db.OperationState.FAILED ? "text-red-6" : "text-green" ]'>
-            {{ db.OperationState[operation.state] }}
+          <div :class='[ operation.state === dbModel.OperationState.FAILED ? "text-red-6" : "text-green" ]'>
+            {{ dbModel.OperationState[operation.state] }}
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
@@ -51,7 +51,7 @@ import { lineraLogo } from 'src/assets'
 import { dbBridge } from 'src/bridge'
 
 interface Props {
-  operation: db.ChainOperation
+  operation: dbModel.ChainOperation
   xPadding?: string
 }
 const props = defineProps<Props>()
@@ -59,10 +59,10 @@ const operation = toRef(props, 'operation')
 const xPadding = toRef(props, 'xPadding')
 
 const operationType = computed(() => {
-  if (operation.value.operationType && operation.value.operationType !== db.OperationType.ANONYMOUS) {
+  if (operation.value.operationType && operation.value.operationType !== dbModel.OperationType.ANONYMOUS) {
     return operation.value.operationType[0].toUpperCase() + operation.value.operationType.slice(1)
   }
-  const _operation = JSON.parse(operation.value.operation) as rpc.Operation
+  const _operation = JSON.parse(operation.value.operation) as rpcModel.Operation
   if (_operation.System) {
     return 'System:' + Object.keys(_operation.System)[0]
   }
@@ -73,13 +73,13 @@ const operationType = computed(() => {
 })
 
 const transferAmount = ref(0)
-const token = ref(undefined as unknown as db.Token)
+const token = ref(undefined as unknown as dbModel.Token)
 
 onMounted(async () => {
-  if (operation.value.operationType === db.OperationType.TRANSFER) {
-    const _operation = JSON.parse(operation.value.operation) as rpc.Operation
+  if (operation.value.operationType === dbModel.OperationType.TRANSFER) {
+    const _operation = JSON.parse(operation.value.operation) as rpcModel.Operation
     transferAmount.value = Number(_operation.System?.Transfer?.amount)
-    token.value = await dbBridge.Token.native() as db.Token
+    token.value = await dbBridge.Token.native() as dbModel.Token
   }
 })
 

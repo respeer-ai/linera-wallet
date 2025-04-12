@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef, watch } from 'vue'
 import { dbBridge } from 'src/bridge'
 
@@ -42,11 +42,11 @@ import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import { lineraLogo } from 'src/assets'
 
 interface Props {
-  token: db.Token
+  token: dbModel.Token
   showIndicator?: boolean
   active?: boolean
   activeNative?: boolean
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
   xPadding?: string
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -66,7 +66,7 @@ const ownerTokenBalance = ref(0)
 const ownerUsdBalance = ref(0)
 const tokenLogo = ref('')
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const getBalance = async () => {
   if (!selectedOwner.value) return

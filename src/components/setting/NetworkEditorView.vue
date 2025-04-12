@@ -58,57 +58,57 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { computed, ref, watch } from 'vue'
 import { localStore } from 'src/localstores'
 import { dbBridge } from 'src/bridge'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 
-const network = defineModel<db.Network>({ default: {} as db.Network })
+const network = defineModel<dbModel.Network>({ default: {} as dbModel.Network })
 
 const rpcUrl = computed({
-  get: () => network.value ? db.rpcUrl(network.value, true) : '',
+  get: () => network.value ? dbModel.rpcUrl(network.value, true) : '',
   set: (val: string) => {
     const v = new URL(val)
     const protocol = v.protocol.replace(':', '')
     network.value = {
       ...network.value,
-      icon: db.defaultNetwork.icon,
+      icon: dbModel.defaultNetwork.icon,
       rpcSchema: protocol,
-      wsSchema: protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS,
+      wsSchema: protocol === dbModel.HTTPSchema.HTTP ? dbModel.WSSchema.WS : dbModel.WSSchema.WSS,
       host: v.hostname,
       port: parseInt(v.port),
       path: v.pathname
-    } as db.Network
+    } as dbModel.Network
   }
 })
 
 const wsUrl = computed({
-  get: () => network.value ? db.wsUrl(network.value) : '',
+  get: () => network.value ? dbModel.wsUrl(network.value) : '',
   set: (val: string) => {
     const v = new URL(val)
     const protocol = v.protocol.replace(':', '')
     network.value = {
       ...network.value,
-      icon: db.defaultNetwork.icon,
+      icon: dbModel.defaultNetwork.icon,
       wsSchema: protocol,
-      rpcSchema: protocol === db.WSSchema.WS ? db.HTTPSchema.HTTP : db.HTTPSchema.HTTPS,
+      rpcSchema: protocol === dbModel.WSSchema.WS ? dbModel.HTTPSchema.HTTP : dbModel.HTTPSchema.HTTPS,
       host: v.hostname,
       port: parseInt(v.port),
       path: v.pathname
-    } as db.Network
+    } as dbModel.Network
   }
 })
 
 watch([network.value.name, network.value.faucetUrl, rpcUrl.value], () => {
   network.value = {
     ...network.value
-  } as db.Network
+  } as dbModel.Network
 })
 
-const emit = defineEmits<{(ev: 'saved', value: db.Network): void,
-  (ev: 'deleted', value: db.Network): void
+const emit = defineEmits<{(ev: 'saved', value: dbModel.Network): void,
+  (ev: 'deleted', value: dbModel.Network): void
 }>()
 
 const networkBridge = ref<InstanceType<typeof NetworkBridge>>()

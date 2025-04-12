@@ -7,7 +7,7 @@
 
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -18,19 +18,19 @@ import PasswordBridge from './PasswordBridge.vue'
 import MicrochainBridge from './MicrochainBridge.vue'
 import MicrochainOwnerBridge from './MicrochainOwnerBridge.vue'
 
-const selectedNetwork = ref(undefined as unknown as db.Network)
+const selectedNetwork = ref(undefined as unknown as dbModel.Network)
 const password = ref(undefined as unknown as string)
-const microchains = ref([] as db.Microchain[])
-const microchainOwners = ref([] as db.MicrochainOwner[])
+const microchains = ref([] as dbModel.Microchain[])
+const microchainOwners = ref([] as dbModel.MicrochainOwner[])
 
-const owners = defineModel<db.Owner[]>('owners')
-const selectedOwner = defineModel<db.Owner>('selectedOwner')
+const owners = defineModel<dbModel.Owner[]>('owners')
+const selectedOwner = defineModel<dbModel.Owner>('selectedOwner')
 const nativeTokenBalance = defineModel<number>('nativeTokenBalance')
 const nativeUsdBalance = defineModel<number>('nativeUsdBalance')
 
 const microchainBridge = ref<InstanceType<typeof MicrochainBridge>>()
 
-const _owners = useObservable<db.Owner[]>(
+const _owners = useObservable<dbModel.Owner[]>(
   liveQuery(async () => {
     return [...await dbWallet.owners.toArray()]
   }) as never

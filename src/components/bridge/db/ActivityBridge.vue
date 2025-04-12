@@ -3,7 +3,7 @@
 </template>
 <script setup lang='ts'>
 import { toRef, watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -17,11 +17,11 @@ const props = defineProps<Props>()
 const publicKey = toRef(props, 'publicKey')
 const microchain = toRef(props, 'microchain')
 
-const activities = defineModel<db.Activity[]>('activities')
+const activities = defineModel<dbModel.Activity[]>('activities')
 
-const _activities = useObservable<db.Activity[]>(
+const _activities = useObservable<dbModel.Activity[]>(
   liveQuery(async () => {
-    const acts = [] as db.Activity[]
+    const acts = [] as dbModel.Activity[]
     if (publicKey.value) {
       acts.push(...await dbWallet.activities.where('targetAddress').equalsIgnoreCase(publicKey.value).toArray())
       acts.push(...await dbWallet.activities.where('sourceAddress').equalsIgnoreCase(publicKey.value).toArray())

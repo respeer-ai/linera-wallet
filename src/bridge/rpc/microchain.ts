@@ -21,7 +21,7 @@ import {
   type Chains,
   type OwnerChainsQuery
 } from 'src/__generated__/graphql/service/graphql'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import * as dbBridge from '../db'
 import { Account } from './account'
 
@@ -115,7 +115,7 @@ export class Microchain {
     })
   }
 
-  static openMicrochain = async (): Promise<db.Microchain> => {
+  static openMicrochain = async (): Promise<dbModel.Microchain> => {
     const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return Promise.reject(new Error('Invalid owner'))
 
@@ -124,8 +124,8 @@ export class Microchain {
 
     const password = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!password) return Promise.reject(new Error('Invalid password'))
-    const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = db.privateKey(owner, _password)
+    const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
+    const privateKey = dbModel.privateKey(owner, _password)
     const keyPair = Ed25519SigningKey.from_bytes(
       new Memory(_hex.toBytes(privateKey))
     )
@@ -158,7 +158,7 @@ export class Microchain {
     chainId: string,
     messageId: string,
     certificateHash: string
-  ): Promise<db.Microchain> => {
+  ): Promise<dbModel.Microchain> => {
     const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return Promise.reject(new Error('Invalid owner'))
 
@@ -167,8 +167,8 @@ export class Microchain {
 
     const password = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!password) return Promise.reject(new Error('Invalid password'))
-    const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = db.privateKey(owner, _password)
+    const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
+    const privateKey = dbModel.privateKey(owner, _password)
     const keyPair = Ed25519SigningKey.from_bytes(
       new Memory(_hex.toBytes(privateKey))
     )

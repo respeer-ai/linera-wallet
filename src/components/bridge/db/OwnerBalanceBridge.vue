@@ -4,7 +4,7 @@
 
 <script setup lang='ts'>
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef, watch } from 'vue'
 import { dbBridge } from 'src/bridge'
 import { liveQuery } from 'dexie'
@@ -12,7 +12,7 @@ import { useObservable } from '@vueuse/rxjs'
 
 import DbOwnerBridge from './OwnerBridge.vue'
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 interface Props {
   tokenId?: number

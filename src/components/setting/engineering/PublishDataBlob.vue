@@ -9,7 +9,7 @@
 
 <script setup lang='ts'>
 import Web3 from 'web3'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 const onRun = async () => {
   try {
@@ -22,7 +22,7 @@ const onRun = async () => {
       method: 'metamask_getProviderState'
     }) as Record<string, string>
 
-    const owner = await db.ownerFromPublicKey(accounts[0])
+    const owner = await dbModel.ownerFromPublicKey(accounts[0])
     console.log(accounts, state, owner)
 
     const result = await window.linera.request({

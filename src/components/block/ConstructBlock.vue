@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang='ts'>
-import { rpc } from 'src/model'
+import { rpcModel } from 'src/model'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { type IncomingBundle } from 'src/__generated__/graphql/service/graphql'
 import { dbBridge } from 'src/bridge'
@@ -11,7 +11,7 @@ import { stringify } from 'lossless-json'
 
 const constructBlock = async (
   microchain: string,
-  operation: rpc.Operation | undefined,
+  operation: rpcModel.Operation | undefined,
   blobBytes: Array<Array<number>>,
   incomingBundles: IncomingBundle[],
   localTime: number

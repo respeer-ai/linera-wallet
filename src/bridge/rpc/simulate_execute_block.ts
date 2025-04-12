@@ -1,5 +1,5 @@
 import { graphqlResult } from 'src/utils'
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
 import { SIMULATE_EXECUTE_BLOCK } from 'src/graphql'
 import {
   type SimulateExecuteBlockMutation,
@@ -13,11 +13,11 @@ import { parse, stringify } from 'lossless-json'
 export class SimulatedBlock {
   static simulateExecuteBlock = async (
     chainId: string,
-    operations: rpc.Operation[],
+    operations: rpcModel.Operation[],
     blobBytes: Array<Uint8Array>,
     candidate: CandidateBlockMaterial
   ): Promise<SimulatedBlockMaterial> => {
-    const network = (await dbBridge.Network.selected()) as db.Network
+    const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
     const applicationUrl = process.env.DEV

@@ -1,11 +1,11 @@
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { MicrochainOwner } from './microchain_owner'
 import { dbWallet } from 'src/controller'
 
 export class Application {
   static ownerApplications = async (
     owner: string
-  ): Promise<db.Application[]> => {
+  ): Promise<dbModel.Application[]> => {
     const microchainOwners = await MicrochainOwner.ownerMicrochainOwners(owner)
     return (
       (await dbWallet.applications.toArray()).filter((application) => {
@@ -25,7 +25,7 @@ export class Application {
     microchain: string,
     height: number,
     index: number
-  ): Promise<db.Application> => {
+  ): Promise<dbModel.Application> => {
     let application = await dbWallet.applications
       .where('applicationId')
       .equals(applicationId)
@@ -36,7 +36,7 @@ export class Application {
       creationMicrochain: microchain,
       creationHeight: height,
       applicationIndex: index
-    } as db.Application
+    } as dbModel.Application
     await dbWallet.applications.add(application)
     return application
   }

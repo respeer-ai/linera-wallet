@@ -12,9 +12,9 @@
       <AccountDetailAvatarView v-if='owner' :owner='owner' :editable='false' />
       <div v-if='password?.length > 0' class='row bg-red-1 tip vertical-sections-margin flex justify-center items-center cursor-pointer'>
         <div class='word-break-all' :style='{width: "calc(100% - 16px)", padding: "8px"}'>
-          {{ db.privateKey(owner, password) }}
+          {{ dbModel.privateKey(owner, password) }}
         </div>
-        <q-icon name='bi-copy' size='16px' @click.stop='(evt) => _copyToClipboard(db.privateKey(owner, password), evt)' />
+        <q-icon name='bi-copy' size='16px' @click.stop='(evt) => _copyToClipboard(dbModel.privateKey(owner, password), evt)' />
       </div>
       <div class='row warn vertical-sections-margin private-key-warn'>
         <q-icon name='bi-exclamation-triangle-fill' color='red-8' size='24px' />
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { ref, toRef } from 'vue'
 import { _copyToClipboard } from 'src/utils/copycontent'
 
@@ -43,7 +43,7 @@ import AccountDetailAvatarView from './AccountDetailAvatarView.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 interface Props {
-  owner: db.Owner
+  owner: dbModel.Owner
 }
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')

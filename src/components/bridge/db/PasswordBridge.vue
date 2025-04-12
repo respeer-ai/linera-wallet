@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -13,7 +13,7 @@ const _password = useObservable<string | undefined>(
     if (!passwd) return undefined
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return undefined
-    return db.decryptPassword(passwd, fingerPrint.fingerPrint)
+    return dbModel.decryptPassword(passwd, fingerPrint.fingerPrint)
   }) as never
 )
 

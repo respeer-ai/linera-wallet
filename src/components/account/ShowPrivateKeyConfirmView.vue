@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { _copyToClipboard } from 'src/utils/copycontent'
@@ -64,7 +64,7 @@ import AccountDetailAvatarView from './AccountDetailAvatarView.vue'
 import PasswordBridge from '../bridge/db/PasswordBridge.vue'
 
 interface Props {
-  owner: db.Owner
+  owner: dbModel.Owner
 }
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')

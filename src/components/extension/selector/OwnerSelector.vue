@@ -5,10 +5,10 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import AccountsInnerView from '../../account/AccountsInnerView.vue'
 
-const owner = defineModel<db.Owner>()
+const owner = defineModel<dbModel.Owner>()
 
 </script>

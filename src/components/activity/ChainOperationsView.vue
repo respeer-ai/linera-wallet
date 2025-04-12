@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, toRef } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 
 import ChainOperationCardView from './ChainOperationCardView.vue'
@@ -39,7 +39,7 @@ const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
 const xPadding = toRef(props, 'xPadding')
 
-const chainOperations = ref([] as db.ChainOperation[])
+const chainOperations = ref([] as dbModel.ChainOperation[])
 const displayCount = ref(4)
 
 const displayChainOperations = computed(() => {
@@ -62,7 +62,7 @@ onMounted(() => {
   void loadChainOperations()
 })
 
-const onChainOperationClick = (operation: db.ChainOperation) => {
+const onChainOperationClick = (operation: dbModel.ChainOperation) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_OPERATION
   localStore.setting.HomeActionParams = operation
 }

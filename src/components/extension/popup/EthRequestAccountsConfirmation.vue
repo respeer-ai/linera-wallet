@@ -49,7 +49,7 @@ import { localStore } from 'src/localstores'
 import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { dbBridge } from 'src/bridge'
 
 import OwnerSelector from '../selector/OwnerSelector.vue'
@@ -67,8 +67,8 @@ const processing = ref(false)
 
 const title = defineModel<string>('title')
 
-const owner = ref(undefined as unknown as db.Owner)
-const microchain = ref(undefined as unknown as db.Microchain)
+const owner = ref(undefined as unknown as dbModel.Owner)
+const microchain = ref(undefined as unknown as dbModel.Microchain)
 
 const onNextStepClick = async () => {
   step.value += 1
@@ -126,9 +126,9 @@ const onActionResize = (size: Size) => {
 
 onMounted(async () => {
   title.value = 'Select Linera account'
-  const rpcMicrochain = await dbBridge.OriginRpcMicrochain.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
+  const rpcMicrochain = await dbBridge.OriginRpcMicrochain.getOriginRpcMicrochain(origin.value) as dbModel.OriginRpcMicrochain
   if (!rpcMicrochain) return
-  microchain.value = await dbBridge.Microchain.microchain(rpcMicrochain.microchain) as db.Microchain
+  microchain.value = await dbBridge.Microchain.microchain(rpcMicrochain.microchain) as dbModel.Microchain
 })
 
 watch(step, () => {

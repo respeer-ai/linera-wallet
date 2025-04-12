@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { shortid } from 'src/utils'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
@@ -50,16 +50,16 @@ import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
 import { lineraLogo } from 'src/assets'
 
 interface Props {
-  activity: db.Activity
+  activity: dbModel.Activity
   xPadding?: string
 }
 const props = defineProps<Props>()
 const activity = toRef(props, 'activity')
 const xPadding = toRef(props, 'xPadding')
 
-const owner = ref(undefined as unknown as db.Owner)
-const microchainOwners = ref([] as db.MicrochainOwner[])
-const token = ref(undefined as unknown as db.Token)
+const owner = ref(undefined as unknown as dbModel.Owner)
+const microchainOwners = ref([] as dbModel.MicrochainOwner[])
+const token = ref(undefined as unknown as dbModel.Token)
 
 const action = computed(() => {
   if (activity.value.sourceAddress === activity.value.targetAddress) {
@@ -160,7 +160,7 @@ const icon = computed(() => {
 })
 
 onMounted(async () => {
-  token.value = await dbBridge.Token.tokenWithId(activity.value.tokenId) as db.Token
+  token.value = await dbBridge.Token.tokenWithId(activity.value.tokenId) as dbModel.Token
 })
 
 </script>

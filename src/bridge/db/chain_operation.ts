@@ -1,23 +1,26 @@
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class ChainOperation {
-  static create = async (chainOperation: db.ChainOperation) => {
-    chainOperation.state = db.OperationState.CREATED
+  static create = async (chainOperation: dbModel.ChainOperation) => {
+    chainOperation.state = dbModel.OperationState.CREATED
     chainOperation.createdAt = Date.now()
     await dbWallet.chainOperations.add(chainOperation)
   }
 
   static get = async (
     operationId: string
-  ): Promise<db.ChainOperation | undefined> => {
+  ): Promise<dbModel.ChainOperation | undefined> => {
     return await dbWallet.chainOperations
       .where('operationId')
       .equals(operationId)
       .first()
   }
 
-  static count = async (microchain?: string, states?: db.OperationState[]) => {
+  static count = async (
+    microchain?: string,
+    states?: dbModel.OperationState[]
+  ) => {
     return await dbWallet.chainOperations
       .filter(
         (op) =>
@@ -33,9 +36,9 @@ export class ChainOperation {
     offset: number,
     limit: number,
     microchain?: string,
-    states?: db.OperationState[],
+    states?: dbModel.OperationState[],
     certificateHash?: string
-  ): Promise<db.ChainOperation[]> => {
+  ): Promise<dbModel.ChainOperation[]> => {
     return await dbWallet.chainOperations
       .filter(
         (op) =>
@@ -50,7 +53,7 @@ export class ChainOperation {
       .toArray()
   }
 
-  static update = async (chainOperation: db.ChainOperation) => {
+  static update = async (chainOperation: dbModel.ChainOperation) => {
     await dbWallet.chainOperations.update(chainOperation.id, chainOperation)
   }
 
@@ -60,9 +63,9 @@ export class ChainOperation {
 
   static exists = async (
     microchain: string,
-    operationType: db.OperationType,
+    operationType: dbModel.OperationType,
     applicationId?: string,
-    states?: db.OperationState[],
+    states?: dbModel.OperationState[],
     createdBefore?: number,
     createdAfter?: number
   ) => {

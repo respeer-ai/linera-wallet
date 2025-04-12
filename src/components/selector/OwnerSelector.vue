@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { ref, toRef } from 'vue'
 
 import AccountsView from '../account/AccountsView.vue'
@@ -46,10 +46,10 @@ const persistent = toRef(props, 'persistent')
 
 const step = ref(1)
 
-const owner = defineModel<db.Owner>()
-const emit = defineEmits<{(ev: 'selected', value?: db.Owner): void}>()
+const owner = defineModel<dbModel.Owner>()
+const emit = defineEmits<{(ev: 'selected', value?: dbModel.Owner): void}>()
 
-const onOwnerSelected = (_owner: db.Owner) => {
+const onOwnerSelected = (_owner: dbModel.Owner) => {
   owner.value = _owner
   emit('selected', _owner)
 }

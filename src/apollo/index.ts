@@ -5,7 +5,7 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { dbBase } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export enum EndpointType {
   Faucet,
@@ -31,12 +31,14 @@ export async function getClientOptionsWithEndpointType(
   if (endpointType === EndpointType.Faucet && network) {
     const url = new URL(network.faucetUrl)
     const protocol = url.protocol.replace(':', '')
-    schema = protocol as db.HTTPSchema
+    schema = protocol as dbModel.HTTPSchema
     wsSchema =
-      protocol === db.HTTPSchema.HTTP ? db.WSSchema.WS : db.WSSchema.WSS
+      protocol === dbModel.HTTPSchema.HTTP
+        ? dbModel.WSSchema.WS
+        : dbModel.WSSchema.WSS
     host = url.hostname
     port = parseInt(
-      url.port ? url.port : protocol === db.HTTPSchema.HTTP ? '80' : '443'
+      url.port ? url.port : protocol === dbModel.HTTPSchema.HTTP ? '80' : '443'
     )
     path = url.pathname
     useAppHost = false
@@ -55,8 +57,8 @@ export async function getClientOptionsWithEndpointType(
 }
 
 export /* async */ function getClientOptions(
-  schema: db.HTTPSchema,
-  wsSchema: db.WSSchema,
+  schema: dbModel.HTTPSchema,
+  wsSchema: dbModel.WSSchema,
   host: string,
   port: number,
   path?: string,

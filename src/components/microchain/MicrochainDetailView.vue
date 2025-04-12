@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { useRouter } from 'vue-router'
@@ -84,7 +84,7 @@ import MicrochainDetailInnerView from './MicrochainDetailInnerView.vue'
 import { dbBridge } from 'src/bridge'
 
 interface Props {
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
@@ -94,7 +94,7 @@ const chainUsdBalance = ref(0)
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const emit = defineEmits<{(ev: 'back'): void,
   (ev: 'close'): void

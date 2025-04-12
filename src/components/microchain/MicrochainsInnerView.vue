@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { computed, ref, toRef } from 'vue'
 
 import MicrochainCardView from '../microchain/MicrochainCardView.vue'
@@ -54,14 +54,14 @@ const xPadding = toRef(props, 'xPadding')
 const showSelected = toRef(props, 'showSelected')
 const owner = toRef(props, 'owner')
 
-const microchains = ref([] as db.Microchain[])
+const microchains = ref([] as dbModel.Microchain[])
 const searchText = ref('')
 const displayMicrochains = computed(() => microchains.value.filter((el) => !searchText.value.length || el.name.includes(searchText.value) || el.microchain.includes(searchText.value)))
 
-const microchain = defineModel<db.Microchain>()
-const emit = defineEmits<{(ev: 'selected', value: db.Microchain): void}>()
+const microchain = defineModel<dbModel.Microchain>()
+const emit = defineEmits<{(ev: 'selected', value: dbModel.Microchain): void}>()
 
-const onMicrochainSelected = (_microchain: db.Microchain) => {
+const onMicrochainSelected = (_microchain: dbModel.Microchain) => {
   microchain.value = _microchain
   emit('selected', _microchain)
 }

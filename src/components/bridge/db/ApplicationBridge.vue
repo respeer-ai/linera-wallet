@@ -4,7 +4,7 @@
 
 <script setup lang='ts'>
 import { computed, ref, toRef, watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -18,14 +18,14 @@ interface Props {
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
 
-const applications = defineModel<db.Application[]>('applications')
+const applications = defineModel<dbModel.Application[]>('applications')
 
-const microchainOwners = ref([] as db.MicrochainOwner[])
+const microchainOwners = ref([] as dbModel.MicrochainOwner[])
 const microchainOwnerBridge = ref<InstanceType<typeof MicrochainOwnerBridge>>()
 
 const microchains = computed(() => microchainOwners.value.reduce((ids: string[], a): string[] => { ids.push(a.microchain); return ids }, []))
 
-const _applications = useObservable<db.Application[]>(
+const _applications = useObservable<dbModel.Application[]>(
   liveQuery(async () => {
     return owner.value
       ? await dbWallet.applications.where('microchain').anyOf(microchains.value).toArray()

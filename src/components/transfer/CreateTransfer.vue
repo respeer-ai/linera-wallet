@@ -64,12 +64,13 @@
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
+import { dbBridge, rpcBridge } from 'src/bridge'
+import { blockWorker } from 'src/worker'
 
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
 import ConfirmTransfer from './ConfirmTransfer.vue'
-import { dbBridge, rpcBridge } from 'src/bridge'
 
 interface Query {
   fromMicrochainId: string
@@ -82,11 +83,11 @@ const applicationId = ref((route.query as unknown as Query).applicationId)
 
 const step = ref(1)
 
-const selectedToken = ref(undefined as unknown as db.Token)
-const selectedFromOwner = ref(undefined as unknown as db.Owner)
-const selectedFromMicrochain = ref(undefined as unknown as db.Microchain)
-const selectedToOwner = ref(undefined as unknown as db.Owner)
-const selectedToMicrochain = ref(undefined as unknown as db.Microchain)
+const selectedToken = ref(undefined as unknown as dbModel.Token)
+const selectedFromOwner = ref(undefined as unknown as dbModel.Owner)
+const selectedFromMicrochain = ref(undefined as unknown as dbModel.Microchain)
+const selectedToOwner = ref(undefined as unknown as dbModel.Owner)
+const selectedToMicrochain = ref(undefined as unknown as dbModel.Microchain)
 const toAddress = ref('')
 const toMicrochain = ref('')
 const fromChainBalance = ref(false)
@@ -112,26 +113,36 @@ const onBackClick = () => {
 const onTransferConfirmed = async () => {
   transferring.value = true
   try {
+    let operationId = undefined as unknown as string
+
     if (!selectedToken.value.native) {
       const chainAccountOwner = {
         chainId: selectedToMicrochain.value?.microchain || toMicrochain.value,
-        owner: rpcBridge.Account.accountOwner(selectedToOwner.value?.owner || await db.ownerFromPublicKey(toAddress.value))
-      } as rpc.Account
-      const operationId = await rpcBridge.MemeApplicationOperation.transfer(
+        owner: rpcBridge.Account.accountOwner(selectedToOwner.value?.owner || await dbModel.ownerFromPublicKey(toAddress.value))
+      } as rpcModel.Account
+      operationId = await rpcBridge.MemeApplicationOperation.transfer(
         selectedFromMicrochain.value?.microchain,
         selectedToken.value.applicationId as string,
         chainAccountOwner, amount.value)
-      await rpcBridge.Operation.waitOperation(operationId)
     } else {
-      const operationId = await rpcBridge.Operation.transfer(
+      operationId = await rpcBridge.Operation.transfer(
         fromChainBalance.value ? undefined : selectedFromOwner.value?.address,
         selectedFromMicrochain.value?.microchain,
         toChainBalance.value ? undefined : selectedToOwner.value?.address || toAddress.value,
         selectedToMicrochain.value?.microchain || toMicrochain.value,
         amount.value
       )
-      await rpcBridge.Operation.waitOperation(operationId)
     }
+
+    if (window.location.origin.startsWith('http')) {
+      // Notify new operation
+      blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_OPERATION, {
+        microchain: selectedFromMicrochain.value?.microchain,
+        operationId
+      })
+    }
+
+    await rpcBridge.Operation.waitOperation(operationId)
   } catch (e) {
     console.log('Failed transfer', e)
   }
@@ -141,13 +152,13 @@ const onTransferConfirmed = async () => {
 
 onMounted(async () => {
   if (fromMicrochainId.value) {
-    selectedFromMicrochain.value = await dbBridge.Microchain.microchain(fromMicrochainId.value) as db.Microchain
+    selectedFromMicrochain.value = await dbBridge.Microchain.microchain(fromMicrochainId.value) as dbModel.Microchain
   }
   if (applicationId.value) {
-    selectedToken.value = await dbBridge.Token.token(applicationId.value) as db.Token
+    selectedToken.value = await dbBridge.Token.token(applicationId.value) as dbModel.Token
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    selectedToken.value = await dbBridge.Token.native() as db.Token
+    selectedToken.value = await dbBridge.Token.native() as dbModel.Token
   }
 })
 

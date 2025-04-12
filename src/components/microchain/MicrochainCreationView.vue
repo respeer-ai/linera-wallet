@@ -32,13 +32,13 @@
 <script setup lang='ts'>
 import { copyToClipboard } from 'quasar'
 import { localStore } from 'src/localstores'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { _copyToClipboard } from 'src/utils/copycontent'
 import { toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface Props {
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')

@@ -41,7 +41,7 @@
         <q-space />
         <q-img :src='microchainLogo' width='16px' height='16px' />
         <q-avatar size='16px' class='page-item-x-margin-left'>
-          <q-img v-if='sourceMicrochain' :src='db.microchainAvatar(sourceMicrochain)' width='16px' height='16px' />
+          <q-img v-if='sourceMicrochain' :src='dbModel.microchainAvatar(sourceMicrochain)' width='16px' height='16px' />
         </q-avatar>
       </div>
     </div>
@@ -52,7 +52,7 @@
       <div class='row vertical-items-margin' :style='{marginTop: "-24px"}'>
         <q-space />
         <q-avatar size='16px'>
-          <q-img v-if='sourceOwner' :src='db.ownerAvatar(sourceOwner)' width='16px' height='16px' />
+          <q-img v-if='sourceOwner' :src='dbModel.ownerAvatar(sourceOwner)' width='16px' height='16px' />
         </q-avatar>
       </div>
     </div>
@@ -67,7 +67,7 @@
         <q-space />
         <q-img :src='microchainLogo' width='16px' height='16px' />
         <q-avatar size='16px' class='page-item-x-margin-left'>
-          <q-img v-if='targetMicrochain' :src='db.microchainAvatar(targetMicrochain)' width='16px' height='16px' />
+          <q-img v-if='targetMicrochain' :src='dbModel.microchainAvatar(targetMicrochain)' width='16px' height='16px' />
         </q-avatar>
       </div>
     </div>
@@ -78,7 +78,7 @@
       <div class='row vertical-items-margin' :style='{marginTop: "-24px"}'>
         <q-space />
         <q-avatar size='16px'>
-          <q-img v-if='targetOwner' :src='db.ownerAvatar(targetOwner)' width='16px' height='16px' />
+          <q-img v-if='targetOwner' :src='dbModel.ownerAvatar(targetOwner)' width='16px' height='16px' />
         </q-avatar>
       </div>
     </div>
@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { date } from 'quasar'
@@ -138,18 +138,18 @@ import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
 import { microchainLogo } from 'src/assets'
 
 interface Props {
-  activity: db.Activity
+  activity: dbModel.Activity
 }
 const props = defineProps<Props>()
 const activity = toRef(props, 'activity')
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
-const microchainOwners = ref([] as db.MicrochainOwner[])
-const sourceOwner = ref(undefined as unknown as db.Owner)
-const sourceMicrochain = ref(undefined as unknown as db.Microchain)
-const targetOwner = ref(undefined as unknown as db.Owner)
-const targetMicrochain = ref(undefined as unknown as db.Microchain)
-const token = ref(undefined as unknown as db.Token)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
+const microchainOwners = ref([] as dbModel.MicrochainOwner[])
+const sourceOwner = ref(undefined as unknown as dbModel.Owner)
+const sourceMicrochain = ref(undefined as unknown as dbModel.Microchain)
+const targetOwner = ref(undefined as unknown as dbModel.Owner)
+const targetMicrochain = ref(undefined as unknown as dbModel.Microchain)
+const token = ref(undefined as unknown as dbModel.Token)
 
 const action = computed(() => {
   if (activity.value.sourceAddress === activity.value.targetAddress) {
@@ -211,15 +211,15 @@ const timestamp = computed(() => {
 onMounted(async () => {
   if (activity.value.sourceAddress?.length) {
     const address = activity.value.sourceAddress.includes(':') ? activity.value.sourceAddress.split(':')[1] : activity.value.sourceAddress
-    sourceOwner.value = await dbBridge.Owner.owner(address) as db.Owner
+    sourceOwner.value = await dbBridge.Owner.owner(address) as dbModel.Owner
   }
-  sourceMicrochain.value = await dbBridge.Microchain.microchain(activity.value.sourceChain) as db.Microchain
+  sourceMicrochain.value = await dbBridge.Microchain.microchain(activity.value.sourceChain) as dbModel.Microchain
   if (activity.value.targetAddress?.length) {
     const address = activity.value.targetAddress.includes(':') ? activity.value.targetAddress.split(':')[1] : activity.value.targetAddress
-    targetOwner.value = await dbBridge.Owner.owner(address) as db.Owner
+    targetOwner.value = await dbBridge.Owner.owner(address) as dbModel.Owner
   }
-  targetMicrochain.value = await dbBridge.Microchain.microchain(activity.value.targetChain) as db.Microchain
-  token.value = await dbBridge.Token.tokenWithId(activity.value.tokenId || 1) as db.Token
+  targetMicrochain.value = await dbBridge.Microchain.microchain(activity.value.targetChain) as dbModel.Microchain
+  token.value = await dbBridge.Token.tokenWithId(activity.value.tokenId || 1) as dbModel.Token
 })
 
 </script>

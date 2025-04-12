@@ -1,12 +1,12 @@
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { MicrochainOwner } from './microchain_owner'
 
 export class Activity {
   static addressActivities = async (
     publicKey: string
-  ): Promise<db.Activity[]> => {
-    const acts = [] as db.Activity[]
+  ): Promise<dbModel.Activity[]> => {
+    const acts = [] as dbModel.Activity[]
     acts.push(
       ...(await dbWallet.activities
         .where('targetAddress')
@@ -25,15 +25,15 @@ export class Activity {
   static ownerActivities = async (
     offset: number,
     limit: number,
-    owner: db.Owner
-  ): Promise<db.Activity[]> => {
+    owner: dbModel.Owner
+  ): Promise<dbModel.Activity[]> => {
     const microchainOwners =
       (await MicrochainOwner.ownerMicrochainOwners(owner.owner)) ||
-      ([] as db.MicrochainOwner[])
+      ([] as dbModel.MicrochainOwner[])
     if (!microchainOwners) return []
     const microchains =
       microchainOwners.reduce(
-        (ids: string[], a: db.MicrochainOwner): string[] => {
+        (ids: string[], a: dbModel.MicrochainOwner): string[] => {
           ids.push(a.microchain)
           return ids
         },
@@ -66,7 +66,7 @@ export class Activity {
     timestamp: number,
     certificateHash: string,
     grant: string
-  ): Promise<db.Activity> => {
+  ): Promise<dbModel.Activity> => {
     const activities = (await dbWallet.activities.toArray()).filter(
       (activity) => {
         return (
@@ -94,7 +94,7 @@ export class Activity {
       timestamp,
       certificateHash,
       grant
-    } as db.Activity
+    } as dbModel.Activity
     await dbWallet.activities.add(activity)
 
     return activity

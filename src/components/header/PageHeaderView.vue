@@ -24,7 +24,7 @@
       <div class='header-text text-center text-bold row cursor-pointer' @click='onAccountClick'>
         <q-space />
         <div class='account-icon'>
-          <q-img v-if='selectedOwner' :src='db.ownerAvatar(selectedOwner)' height='14px' width='14px' />
+          <q-img v-if='selectedOwner' :src='dbModel.ownerAvatar(selectedOwner)' height='14px' width='14px' />
         </div>
         <div class='header-items-margin-x-left'>
           {{ selectedOwner?.name }}
@@ -123,7 +123,7 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { shortid } from 'src/utils'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
@@ -136,10 +136,10 @@ import OwnerSelector from '../selector/OwnerSelector.vue'
 import AccountDetailView from '../account/AccountDetailView.vue'
 import MicrochainsImporter from '../microchain/MicrochainsImporter.vue'
 
-const networks = ref([] as db.Network[])
-const selectedNetwork = ref(undefined as unknown as db.Network)
-const owners = ref([] as db.Owner[])
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const networks = ref([] as dbModel.Network[])
+const selectedNetwork = ref(undefined as unknown as dbModel.Network)
+const owners = ref([] as dbModel.Owner[])
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const selectingNetwork = ref(false)
 const selectingOwner = ref(false)
@@ -155,7 +155,7 @@ const onAccountClick = () => {
   selectingOwner.value = true
 }
 
-const onNetworkSelected = (network: db.Network) => {
+const onNetworkSelected = (network: dbModel.Network) => {
   selectingNetwork.value = false
   selectedNetwork.value = network
   // TODO: initialize all microchains
@@ -167,7 +167,7 @@ const onAddNetwork = () => {
   selectingNetwork.value = false
 }
 
-const onOwnerSelected = (owner?: db.Owner) => {
+const onOwnerSelected = (owner?: dbModel.Owner) => {
   selectingOwner.value = false
   if (owner) {
     selectedOwner.value = owner

@@ -4,7 +4,7 @@
 
 <script setup lang='ts'>
 import { ref, toRef, watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -18,13 +18,13 @@ interface Props {
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
 
-const selectedNetwork = ref(undefined as unknown as db.Network)
+const selectedNetwork = ref(undefined as unknown as dbModel.Network)
 
-const microchains = defineModel<db.Microchain[]>('microchains')
-const defaultMicrochain = defineModel<db.Microchain>('defaultMicrochain')
+const microchains = defineModel<dbModel.Microchain[]>('microchains')
+const defaultMicrochain = defineModel<dbModel.Microchain>('defaultMicrochain')
 const count = defineModel<number>('count')
 
-const _microchains = useObservable<db.Microchain[]>(
+const _microchains = useObservable<dbModel.Microchain[]>(
   liveQuery(async () => {
     if (owner.value !== undefined) {
       return await dbBridge.Microchain.ownerMicrochains(0, 1000, owner.value)
@@ -42,7 +42,7 @@ const _count = useObservable<number>(
   }) as never
 )
 
-const updateMicrochains = (__microchains: db.Microchain[]) => {
+const updateMicrochains = (__microchains: dbModel.Microchain[]) => {
   // TODO: there is some bug here to update defaultMicrochain
   microchains.value = [...__microchains || []]
   defaultMicrochain.value = microchains.value.find((el) => el.default)

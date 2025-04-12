@@ -58,7 +58,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, toRef, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import MicrochainOwnerBalanceBridge from '../bridge/db/MicrochainOwnerBalanceBridge.vue'
 import MicrochainBalanceBridge from '../bridge/db/MicrochainBalanceBridge.vue'
@@ -66,9 +66,9 @@ import TokenBridge from '../bridge/db/TokenBridge.vue'
 import { dbBridge } from 'src/bridge'
 
 interface Props {
-  fromOwner: db.Owner
-  fromMicrochain: db.Microchain
-  token: db.Token
+  fromOwner: dbModel.Owner
+  fromMicrochain: dbModel.Microchain
+  token: dbModel.Token
 }
 const props = defineProps<Props>()
 const fromOwner = toRef(props, 'fromOwner')

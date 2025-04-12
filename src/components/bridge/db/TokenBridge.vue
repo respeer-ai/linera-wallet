@@ -1,15 +1,15 @@
 <script setup lang='ts'>
 import { watch } from 'vue'
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbBase } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
 import { dbBridge } from 'src/bridge'
 
-const tokens = defineModel<db.Token[]>('tokens')
+const tokens = defineModel<dbModel.Token[]>('tokens')
 const count = defineModel<number>('count')
 
-const _tokens = useObservable<db.Token[]>(
+const _tokens = useObservable<dbModel.Token[]>(
   liveQuery(async () => {
     return await dbBase.tokens.toArray()
   }) as never

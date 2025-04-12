@@ -7,14 +7,14 @@ import {
 import { parse, stringify } from 'lossless-json'
 import axios from 'axios'
 import * as dbBridge from '../db'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class BlockMaterial {
   static getBlockMaterial = async (
     chainId: string,
     maxPendingMessages: number
   ): Promise<CandidateBlockMaterial> => {
-    const network = (await dbBridge.Network.selected()) as db.Network
+    const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
     const rpcUrl = process.env.DEV

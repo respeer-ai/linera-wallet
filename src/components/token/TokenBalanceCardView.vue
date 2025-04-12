@@ -6,7 +6,7 @@
           <div class='row'>
             <q-img :src='microchainLogo' width='20px' height='20px' />
             <q-avatar size='20px' class='page-item-x-margin-left'>
-              <q-img :src='db.microchainAvatar(_microchain)' width='20px' height='20px' />
+              <q-img :src='dbModel.microchainAvatar(_microchain)' width='20px' height='20px' />
             </q-avatar>
           </div>
           <div class='word-break-all page-item-x-margin-left' :style='{width: "calc(100% - 52px)"}'>
@@ -16,7 +16,7 @@
         <div v-if='owner && selectedOwner' class='vertical-items-margin row decorate-underline-dashed'>
           <div class='row'>
             <q-avatar size='20px'>
-              <q-img v-if='owner && selectedOwner' :src='db.ownerAvatar(selectedOwner)' width='20px' height='20px' />
+              <q-img v-if='owner && selectedOwner' :src='dbModel.ownerAvatar(selectedOwner)' width='20px' height='20px' />
             </q-avatar>
             <div :style='{marginLeft: "20px"}' />
           </div>
@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { dbBridge } from 'src/bridge'
 
@@ -53,9 +53,9 @@ import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import { microchainLogo } from 'src/assets'
 
 interface Props {
-  token: db.Token
-  chainBalance?: db.MicrochainFungibleTokenBalance
-  ownerBalance?: db.MicrochainOwnerFungibleTokenBalance
+  token: dbModel.Token
+  chainBalance?: dbModel.MicrochainFungibleTokenBalance
+  ownerBalance?: dbModel.MicrochainOwnerFungibleTokenBalance
   xPadding?: string
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -73,11 +73,11 @@ const usdBalance = computed(() => tokenBalance.value * token.value.usdCurrency |
 const microchain = computed(() => chainBalance.value?.microchain || ownerBalance.value?.microchain)
 const owner = computed(() => ownerBalance.value?.owner)
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
-const _microchain = ref(undefined as unknown as db.Microchain)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
+const _microchain = ref(undefined as unknown as dbModel.Microchain)
 
 onMounted(async () => {
-  _microchain.value = await dbBridge.Microchain.microchain(microchain.value as string) as db.Microchain
+  _microchain.value = await dbBridge.Microchain.microchain(microchain.value as string) as dbModel.Microchain
 })
 
 </script>

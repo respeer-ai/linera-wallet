@@ -1,4 +1,9 @@
-import { BlockEventType, NewBlockPayload } from './runner'
+import {
+  BlockEventType,
+  NewBlockPayload,
+  NewIncomingBundlePayload,
+  NewOperationPayload
+} from './runner'
 
 export class BlockWorker {
   // eslint-disable-next-line no-use-before-define
@@ -18,7 +23,10 @@ export class BlockWorker {
     return BlockWorker._instance
   }
 
-  public static send = (type: BlockEventType, payload?: NewBlockPayload) => {
+  public static send = (
+    type: BlockEventType,
+    payload?: NewBlockPayload | NewIncomingBundlePayload | NewOperationPayload
+  ) => {
     BlockWorker.getBlockWorker()._worker?.postMessage({
       type,
       payload

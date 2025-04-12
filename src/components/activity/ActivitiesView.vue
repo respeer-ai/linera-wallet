@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, toRef, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 
 import DbActivityBridge from '../bridge/db/ActivityBridge.vue'
@@ -41,18 +41,18 @@ interface Props {
 const props = defineProps<Props>()
 const xPadding = toRef(props, 'xPadding')
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const dbActivityBridge = ref<InstanceType<typeof DbActivityBridge>>()
 
-const activities = ref([] as db.Activity[])
+const activities = ref([] as dbModel.Activity[])
 const displayCount = ref(5)
 
 const displayActivities = computed(() => {
   return [...activities.value].sort((a, b) => b.timestamp - a.timestamp).slice(0, displayCount.value)
 })
 
-const loadActivitiesRecursive = async (total: number, offset: number, limit: number, _activities: db.Activity[]) => {
+const loadActivitiesRecursive = async (total: number, offset: number, limit: number, _activities: dbModel.Activity[]) => {
   if (offset >= total) {
     activities.value = _activities
     return
@@ -76,7 +76,7 @@ watch(selectedOwner, () => {
   void loadActivities()
 })
 
-const onActivityClick = (activity: db.Activity) => {
+const onActivityClick = (activity: dbModel.Activity) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_ACTIVITY
   localStore.setting.HomeActionParams = activity
 }

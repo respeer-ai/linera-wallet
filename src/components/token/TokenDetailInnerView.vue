@@ -192,7 +192,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef, watch } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
@@ -205,14 +205,14 @@ import TokenBalanceCardView from './TokenBalanceCardView.vue'
 import { discordLogo, githubLogo, telegramLogo, twitterLogo } from 'src/assets'
 
 interface Props {
-  token: db.Token
+  token: dbModel.Token
 }
 const props = defineProps<Props>()
 const token = toRef(props, 'token')
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
-const ownerBalances = ref([] as db.MicrochainOwnerFungibleTokenBalance[])
-const chainBalances = ref([] as db.MicrochainFungibleTokenBalance[])
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
+const ownerBalances = ref([] as dbModel.MicrochainOwnerFungibleTokenBalance[])
+const chainBalances = ref([] as dbModel.MicrochainFungibleTokenBalance[])
 const tokenBalance = ref(0)
 
 const tokenLogo = ref('')

@@ -2,7 +2,7 @@
   <q-item class='row full-width tab-panel-item' :clickable='clickable' :style='{ paddingLeft: xPadding, paddingRight: xPadding }'>
     <div v-if='showIndicator' :class='[ "selector-indicator", (showSelected ? selected : microchain.default) ? "selector-indicator-selected" : "" ]' />
     <q-avatar :class='[ showIndicator ? "selector-margin-x-left" : "" ]'>
-      <q-img :src='db.microchainAvatar(microchain)' />
+      <q-img :src='dbModel.microchainAvatar(microchain)' />
       <q-badge color='transparent' rounded transparent floating>
         <q-img :src='lineraLogo' width='14px' height='14px' />
       </q-badge>
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { _copyToClipboard } from 'src/utils/copycontent'
@@ -76,7 +76,7 @@ import { lineraLogo } from 'src/assets'
 import { dbBridge } from 'src/bridge'
 
 interface Props {
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
   showAccountBalance?: boolean
   integratedMode?: boolean
   showIndicator?: boolean
@@ -108,7 +108,7 @@ const chainTokenBalance = ref(0)
 const chainUsdBalance = ref(0)
 const ownerTokenBalance = ref(0)
 const ownerUsdBalance = ref(0)
-const owner = ref(undefined as unknown as db.Owner)
+const owner = ref(undefined as unknown as dbModel.Owner)
 
 const nativeTokenId = ref(undefined as unknown as number)
 

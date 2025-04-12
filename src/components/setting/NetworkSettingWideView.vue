@@ -49,13 +49,13 @@
 
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 import NetworkEditorView from './NetworkEditorView.vue'
 
-const networks = ref([] as db.Network[])
-const selectedNetwork = ref({} as db.Network)
+const networks = ref([] as dbModel.Network[])
+const selectedNetwork = ref({} as dbModel.Network)
 
 const displayNetwork = ref(selectedNetwork.value)
 
@@ -64,7 +64,7 @@ watch(selectedNetwork, () => {
 })
 
 const addingNetwork = ref(false)
-const addedNetwork = ref({} as db.Network)
+const addedNetwork = ref({} as dbModel.Network)
 
 const onAddNetworkClick = () => {
   addingNetwork.value = !addingNetwork.value
@@ -78,7 +78,7 @@ const onNetworkDeleted = () => {
   addingNetwork.value = false
 }
 
-const onNetworkSelected = (network: db.Network) => {
+const onNetworkSelected = (network: dbModel.Network) => {
   displayNetwork.value = network
 }
 

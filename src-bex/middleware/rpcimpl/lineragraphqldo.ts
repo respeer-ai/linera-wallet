@@ -12,7 +12,7 @@ import { basebridge } from '../../../src-bex/event'
 import { subscription } from '../../subscription'
 import type { Json } from '@metamask/utils'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
-import { db, rpc } from '../../../src/model'
+import { dbModel, rpcModel } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
 import { graphqlResult } from '../../../src/utils'
 import { parse, stringify } from 'lossless-json'
@@ -98,7 +98,7 @@ const queryApplicationMutation = async (
       applicationId: query.applicationId,
       bytes: queryBytes
     }
-  } as rpc.Operation
+  } as rpcModel.Operation
   const operationId = uuidv4()
 
   // Normally we don't publish blob with application operation
@@ -106,14 +106,14 @@ const queryApplicationMutation = async (
   await sharedStore.createChainOperation({
     operationId,
     microchain,
-    operationType: db.OperationType.ANONYMOUS,
+    operationType: dbModel.OperationType.ANONYMOUS,
     applicationId: query.applicationId,
-    applicationType: db.ApplicationType.ANONYMOUS,
+    applicationType: dbModel.ApplicationType.ANONYMOUS,
     operation: stringify(operation),
     graphqlQuery: query.query.query,
     graphqlVariables: stringify(query.query.variables),
-    state: db.OperationState.CREATED
-  } as db.ChainOperation)
+    state: dbModel.OperationState.CREATED
+  } as dbModel.ChainOperation)
 
   return { operationId }
 }
@@ -139,14 +139,14 @@ const parseSystemMutation = async (
   await sharedStore.createChainOperation({
     operationId,
     microchain,
-    operationType: db.OperationType.ANONYMOUS,
+    operationType: dbModel.OperationType.ANONYMOUS,
     applicationId: query.applicationId,
-    applicationType: db.ApplicationType.ANONYMOUS,
+    applicationType: dbModel.ApplicationType.ANONYMOUS,
     operation,
     graphqlQuery: query.query.query,
     graphqlVariables: stringify(query.query.variables),
-    state: db.OperationState.CREATED
-  } as db.ChainOperation)
+    state: dbModel.OperationState.CREATED
+  } as dbModel.ChainOperation)
 
   return { operationId, operation }
 }

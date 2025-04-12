@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { toRef } from 'vue'
 
 import MicrochainsInnerView from '../../microchain/MicrochainsInnerView.vue'
@@ -17,6 +17,6 @@ interface Props {
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
 
-const microchain = defineModel<db.Microchain>()
+const microchain = defineModel<dbModel.Microchain>()
 
 </script>

@@ -2,7 +2,7 @@
   <div class='row'>
     <q-space />
     <q-avatar>
-      <q-img :src='db.ownerAvatar(owner)' />
+      <q-img :src='dbModel.ownerAvatar(owner)' />
     </q-avatar>
     <div class='selector-margin-x-left account-avatar'>
       <div v-if='editing' class='row'>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
@@ -41,7 +41,7 @@ import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import { dbBridge } from 'src/bridge'
 
 interface Props {
-  owner: db.Owner
+  owner: dbModel.Owner
   editable?: boolean
 }
 const props = defineProps<Props>()

@@ -1,17 +1,19 @@
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class MicrochainOwner {
   static ownerMicrochainOwners = async (
     owner: string
-  ): Promise<db.MicrochainOwner[]> => {
+  ): Promise<dbModel.MicrochainOwner[]> => {
     return await dbWallet.microchainOwners
       .where('owner')
       .equals(owner)
       .toArray()
   }
 
-  static microchainOwners = async (microchain: string): Promise<db.Owner[]> => {
+  static microchainOwners = async (
+    microchain: string
+  ): Promise<dbModel.Owner[]> => {
     const _microchainOwners = await dbWallet.microchainOwners
       .where('microchain')
       .equals(microchain)
@@ -29,6 +31,6 @@ export class MicrochainOwner {
       microchain,
       owner,
       balance: 0
-    } as db.MicrochainOwner)
+    } as dbModel.MicrochainOwner)
   }
 }

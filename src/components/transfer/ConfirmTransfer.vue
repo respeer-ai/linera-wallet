@@ -30,7 +30,7 @@
         <template #label>
           <div class='row full-width'>
             <q-avatar>
-              <q-img v-if='fromOwner' :src='db.ownerAvatar(fromOwner)' width='36px' height='36px' />
+              <q-img v-if='fromOwner' :src='dbModel.ownerAvatar(fromOwner)' width='36px' height='36px' />
             </q-avatar>
             <div v-if='fromOwner' class='header-items-margin-x-left text-left'>
               <div>
@@ -53,7 +53,7 @@
         <template #label>
           <div class='row full-width'>
             <q-avatar>
-              <q-img v-if='fromMicrochain' :src='db.microchainAvatar(fromMicrochain)' width='36px' height='36px' />
+              <q-img v-if='fromMicrochain' :src='dbModel.microchainAvatar(fromMicrochain)' width='36px' height='36px' />
             </q-avatar>
             <div v-if='fromMicrochain' class='header-items-margin-x-left text-left'>
               <div>
@@ -80,7 +80,7 @@
         <template #label>
           <div class='row full-width'>
             <q-avatar>
-              <q-img v-if='toOwner' :src='db.ownerAvatar(toOwner)' width='36px' height='36px' />
+              <q-img v-if='toOwner' :src='dbModel.ownerAvatar(toOwner)' width='36px' height='36px' />
             </q-avatar>
             <div v-if='toOwner' class='header-items-margin-x-left text-left'>
               <div>
@@ -107,7 +107,7 @@
         <template #label>
           <div class='row full-width'>
             <q-avatar>
-              <q-img v-if='toMicrochain' :src='db.microchainAvatar(toMicrochain)' width='36px' height='36px' />
+              <q-img v-if='toMicrochain' :src='dbModel.microchainAvatar(toMicrochain)' width='36px' height='36px' />
             </q-avatar>
             <div v-if='toMicrochain' class='header-items-margin-x-left text-left'>
               <div>
@@ -145,17 +145,17 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { dbBridge } from 'src/bridge'
 
 interface Props {
-  token: db.Token
-  fromOwner: db.Owner
-  fromMicrochain: db.Microchain
-  toOwner?: db.Owner
-  toMicrochain?: db.Microchain
+  token: dbModel.Token
+  fromOwner: dbModel.Owner
+  fromMicrochain: dbModel.Microchain
+  toOwner?: dbModel.Owner
+  toMicrochain?: dbModel.Microchain
   toAddress?: string
   toMicrochainId?: string
   fromChainBalance: boolean

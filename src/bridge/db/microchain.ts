@@ -1,5 +1,5 @@
 import { dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { Network } from './network'
 import { MicrochainOwner } from './microchain_owner'
 
@@ -7,23 +7,32 @@ export class Microchain {
   static microchains = async (
     offset: number,
     limit: number,
-    imported?: boolean
-  ): Promise<db.Microchain[]> => {
-    return (
-      await dbWallet.microchains.offset(offset).limit(limit).toArray()
-    ).filter((el) => !imported || el.imported)
+    imported?: boolean,
+    states?: dbModel.MicrochainState[]
+  ): Promise<dbModel.Microchain[]> => {
+    return await dbWallet.microchains
+      .filter(
+        (op) =>
+          (imported === undefined || op.imported === imported) &&
+          (states === undefined ||
+            states.length === 0 ||
+            states.includes(op.state))
+      )
+      .offset(offset)
+      .limit(limit || 9999)
+      .toArray()
   }
 
   static microchain = async (
     microchain: string
-  ): Promise<db.Microchain | undefined> => {
+  ): Promise<dbModel.Microchain | undefined> => {
     return await dbWallet.microchains
       .where('microchain')
       .equals(microchain)
       .first()
   }
 
-  static anyMicrochain = async (): Promise<db.Microchain | undefined> => {
+  static anyMicrochain = async (): Promise<dbModel.Microchain | undefined> => {
     return await dbWallet.microchains.offset(0).first()
   }
 
@@ -36,7 +45,7 @@ export class Microchain {
     limit: number,
     owner: string,
     imported?: boolean
-  ): Promise<db.Microchain[]> => {
+  ): Promise<dbModel.Microchain[]> => {
     const microchainOwners = await dbWallet.microchainOwners
       .where('owner')
       .equals(owner)
@@ -55,7 +64,7 @@ export class Microchain {
 
   static microchainOwner = async (
     microchain: string
-  ): Promise<db.Owner | undefined> => {
+  ): Promise<dbModel.Owner | undefined> => {
     const microchainOwners = (await dbWallet.microchainOwners.toArray()).filter(
       (el) => el.microchain === microchain
     )
@@ -72,7 +81,7 @@ export class Microchain {
     certificateHash?: string,
     name?: string,
     _default?: boolean
-  ): Promise<db.Microchain> => {
+  ): Promise<dbModel.Microchain> => {
     let microchain = await dbWallet.microchains
       .where('microchain')
       .equals(microchainId)
@@ -89,14 +98,14 @@ export class Microchain {
       name,
       default: _default,
       imported: true,
-      state: db.MicrochainState.CLAIMING
-    } as db.Microchain
+      state: dbModel.MicrochainState.CLAIMING
+    } as dbModel.Microchain
     await MicrochainOwner.create(owner, microchainId)
     await dbWallet.microchains.add(microchain)
     return microchain
   }
 
-  static update = async (microchain: db.Microchain) => {
+  static update = async (microchain: dbModel.Microchain) => {
     await dbWallet.microchains.update(microchain.id, microchain)
   }
 }

@@ -26,20 +26,20 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { computed, ref } from 'vue'
 
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
 import TokenCardView from '../token/TokenCardView.vue'
 
-const token = defineModel<db.Token>()
-const emit = defineEmits<{(ev: 'selected', value?: db.Token): void}>()
+const token = defineModel<dbModel.Token>()
+const emit = defineEmits<{(ev: 'selected', value?: dbModel.Token): void}>()
 
-const tokens = ref([] as db.Token[])
+const tokens = ref([] as dbModel.Token[])
 const searchText = ref('')
 const displayTokens = computed(() => tokens.value.filter((el) => el.name.toLowerCase().includes(searchText.value.toLowerCase())))
 
-const onTokenClick = (_token: db.Token) => {
+const onTokenClick = (_token: dbModel.Token) => {
   token.value = _token
   emit('selected', _token)
 }

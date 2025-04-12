@@ -1,4 +1,8 @@
-import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
+import {
+  EndpointType,
+  getClientOptionsWithBaseUrl,
+  getClientOptionsWithEndpointType
+} from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
 import {
   provideApolloClient,
@@ -7,7 +11,7 @@ import {
 } from '@vue/apollo-composable'
 import { graphqlResult, _hex } from 'src/utils'
 import { Ed25519SigningKey, Memory } from '@hazae41/berith'
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
 import { dbBase } from 'src/controller'
 import {
   NOTIFICATIONS,
@@ -25,18 +29,19 @@ import * as dbBridge from '../db'
 import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import * as constant from 'src/const'
 
 export class Block {
   static submitBlockAndSignature = async (
     chainId: string,
     height: number,
     block: _Block,
-    round: rpc.Round,
+    round: rpcModel.Round,
     signature: string,
     validatedBlockCertificate: unknown | undefined,
     blobBytes: Array<Uint8Array>
   ): Promise<string> => {
-    const network = (await dbBridge.Network.selected()) as db.Network
+    const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
     const applicationUrl = process.env.DEV
@@ -102,15 +107,15 @@ export class Block {
   }
 
   static signPayload = async (
-    owner: db.Owner,
+    owner: dbModel.Owner,
     payload: Uint8Array
   ): Promise<string> => {
     const password = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!password) return Promise.reject('Invalid password')
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid fingerprint')
-    const _password = db.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = db.privateKey(owner, _password)
+    const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
+    const privateKey = dbModel.privateKey(owner, _password)
     const keyPair = Ed25519SigningKey.from_bytes(
       new Memory(_hex.toBytes(privateKey))
     )
@@ -119,10 +124,19 @@ export class Block {
 
   static subscribe = async (
     chainId: string,
+    memeChain: boolean,
     onNewBlock?: (hash: string) => void,
     onNewIncomingBundle?: () => void
   ): Promise<(() => void) | undefined> => {
-    const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
+    const options = memeChain
+      ? getClientOptionsWithBaseUrl(
+          constant.APPLICATION_URLS.PROXY_BASE,
+          undefined as unknown as string,
+          undefined,
+          undefined,
+          undefined
+        )
+      : await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
@@ -148,12 +162,14 @@ export class Block {
       if (newBlock) {
         onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)
       }
-      const newIncomingBundle = graphqlResult.keyValue(
-        reason,
-        'NewIncomingBundle'
-      )
-      if (newIncomingBundle) {
-        onNewIncomingBundle?.()
+      if (!memeChain) {
+        const newIncomingBundle = graphqlResult.keyValue(
+          reason,
+          'NewIncomingBundle'
+        )
+        if (newIncomingBundle) {
+          onNewIncomingBundle?.()
+        }
       }
     })
 

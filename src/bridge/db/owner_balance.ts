@@ -1,8 +1,8 @@
 import { dbBase, dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class OwnerBalance {
-  static getTokenBalance = async (owner?: db.Owner, tokenId?: number) => {
+  static getTokenBalance = async (owner?: dbModel.Owner, tokenId?: number) => {
     owner = owner || (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return
 
@@ -65,7 +65,7 @@ export class OwnerBalance {
     )
   }
 
-  static getUsdBalance = async (owner?: db.Owner, tokenId?: number) => {
+  static getUsdBalance = async (owner?: dbModel.Owner, tokenId?: number) => {
     owner = owner || (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return
 

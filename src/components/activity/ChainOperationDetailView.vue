@@ -13,7 +13,7 @@
         <strong>{{ $t('MSG_STATUS') }}</strong>
       </div>
       <q-space />
-      <div :class='operation.state === db.OperationState.FAILED ? "text-red-6" : "text-green-8"'>
+      <div :class='operation.state === dbModel.OperationState.FAILED ? "text-red-6" : "text-green-8"'>
         <strong>{{ operationState }}</strong>
       </div>
     </div>
@@ -41,7 +41,7 @@
         <q-space />
         <q-img :src='microchainLogo' width='16px' height='16px' />
         <q-avatar size='16px' class='page-item-x-margin-left'>
-          <q-img v-if='operationChain' :src='db.microchainAvatar(operationChain)' width='16px' height='16px' />
+          <q-img v-if='operationChain' :src='dbModel.microchainAvatar(operationChain)' width='16px' height='16px' />
         </q-avatar>
       </div>
     </div>
@@ -96,7 +96,7 @@
     <div v-if='operation.applicationType' class='row vertical-items-margin decorate-underline-dashed items-x-margin'>
       <div>{{ $t('MSG_APPLICATION_TYPE') }}</div>
       <q-space />
-      <div>{{ db.ApplicationType[operation.applicationType] }}</div>
+      <div>{{ dbModel.ApplicationType[operation.applicationType] }}</div>
     </div>
     <div class='vertical-menus-margin decorate-underline text-bold items-x-margin'>
       {{ $t('MSG_CODE') }}
@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
 import { computed, onMounted, ref, toRef } from 'vue'
 import { shortid } from 'src/utils'
 import { date } from 'quasar'
@@ -123,21 +123,21 @@ import MicrochainOwnerBridge from '../bridge/db/MicrochainOwnerBridge.vue'
 import { microchainLogo } from 'src/assets'
 
 interface Props {
-  operation: db.ChainOperation
+  operation: dbModel.ChainOperation
 }
 const props = defineProps<Props>()
 const operation = toRef(props, 'operation')
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
-const microchainOwners = ref([] as db.MicrochainOwner[])
-const token = ref(undefined as unknown as db.Token)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
+const microchainOwners = ref([] as dbModel.MicrochainOwner[])
+const token = ref(undefined as unknown as dbModel.Token)
 const transferAmount = ref(0)
 
 const operationType = computed(() => {
-  if (operation.value.operationType && operation.value.operationType !== db.OperationType.ANONYMOUS) {
+  if (operation.value.operationType && operation.value.operationType !== dbModel.OperationType.ANONYMOUS) {
     return operation.value.operationType[0].toUpperCase() + operation.value.operationType.slice(1)
   }
-  const _operation = JSON.parse(operation.value.operation) as rpc.Operation
+  const _operation = JSON.parse(operation.value.operation) as rpcModel.Operation
   if (_operation.System) {
     return 'System:' + Object.keys(_operation.System)[0]
   }
@@ -150,9 +150,9 @@ const operationType = computed(() => {
   return 'Unknown'
 })
 
-const operationChain = ref(undefined as unknown as db.Microchain)
+const operationChain = ref(undefined as unknown as dbModel.Microchain)
 
-const operationState = computed(() => db.OperationState[operation.value.state])
+const operationState = computed(() => dbModel.OperationState[operation.value.state])
 const operationStr = computed(() => JSON.stringify(JSON.parse(operation.value.operation), null, 2))
 
 const emit = defineEmits<{(ev: 'back'): void,
@@ -170,10 +170,10 @@ const onCloseClick = () => {
 // TODO: parse application operation
 
 onMounted(async () => {
-  operationChain.value = await dbBridge.Microchain.microchain(operation.value.microchain) as db.Microchain
-  if (operation.value.operationType === db.OperationType.TRANSFER) {
-    token.value = await dbBridge.Token.native() as db.Token
-    const _operation = JSON.parse(operation.value.operation) as rpc.Operation
+  operationChain.value = await dbBridge.Microchain.microchain(operation.value.microchain) as dbModel.Microchain
+  if (operation.value.operationType === dbModel.OperationType.TRANSFER) {
+    token.value = await dbBridge.Token.native() as dbModel.Token
+    const _operation = JSON.parse(operation.value.operation) as rpcModel.Operation
     transferAmount.value = Number(_operation.System?.Transfer?.amount)
   }
 })

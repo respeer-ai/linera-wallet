@@ -9,7 +9,7 @@
 
 <script setup lang='ts'>
 import { toRef } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import AccountsInnerView from './AccountsInnerView.vue'
 
@@ -21,10 +21,10 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const persistent = toRef(props, 'persistent')
 
-const owner = defineModel<db.Owner>()
-const emit = defineEmits<{(ev: 'selected', value: db.Owner): void}>()
+const owner = defineModel<dbModel.Owner>()
+const emit = defineEmits<{(ev: 'selected', value: dbModel.Owner): void}>()
 
-const onOwnerSelected = (_owner: db.Owner) => {
+const onOwnerSelected = (_owner: dbModel.Owner) => {
   owner.value = _owner
   emit('selected', _owner)
 }

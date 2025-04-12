@@ -1,15 +1,15 @@
 import { dbBase } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import * as constant from '../../const'
 
 export class Token {
   static initialize = async (nativeLogo: string) => {
     if (await Token.native()) return
-    db.lineraToken.logo = nativeLogo
-    await dbBase.tokens.add(db.lineraToken)
+    dbModel.lineraToken.logo = nativeLogo
+    await dbBase.tokens.add(dbModel.lineraToken)
   }
 
-  static create = async (token: db.Token) => {
+  static create = async (token: dbModel.Token) => {
     if (
       (await dbBase.tokens.toArray()).findIndex(
         (el) => el.applicationId === token.applicationId
@@ -19,7 +19,7 @@ export class Token {
     await dbBase.tokens.add(token)
   }
 
-  static update = async (token: db.Token) => {
+  static update = async (token: dbModel.Token) => {
     await dbBase.tokens.update(token.id, token)
   }
 
@@ -33,7 +33,7 @@ export class Token {
 
   static fungibles = async () => {
     return (await dbBase.tokens.toArray()).filter(
-      (el) => el.tokenType === db.TokenType.Fungible
+      (el) => el.tokenType === dbModel.TokenType.Fungible
     )
   }
 
@@ -46,17 +46,21 @@ export class Token {
   static tokens = async (
     offset: number,
     limit: number,
-    applicationIds?: string[]
-  ): Promise<db.Token[]> => {
-    if (applicationIds && applicationIds.length) {
-      return await dbBase.tokens
-        .where('applicationId')
-        .anyOf(applicationIds)
-        .offset(offset)
-        .limit(limit)
-        .toArray()
-    }
-    return await dbBase.tokens.offset(offset).limit(limit).toArray()
+    applicationIds?: string[],
+    creatorChainId?: string
+  ): Promise<dbModel.Token[]> => {
+    return await dbBase.tokens
+      .filter(
+        (op) =>
+          (creatorChainId === undefined ||
+            op.creatorChainId === creatorChainId) &&
+          (applicationIds === undefined ||
+            applicationIds.length === 0 ||
+            applicationIds.includes(op.applicationId as string))
+      )
+      .offset(offset)
+      .limit(limit || 9999)
+      .toArray()
   }
 
   static count = async () => {

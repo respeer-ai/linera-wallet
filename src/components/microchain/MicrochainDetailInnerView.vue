@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { _copyToClipboard } from 'src/utils/copycontent'
@@ -96,7 +96,7 @@ import ActivitiesView from '../activity/ActivitiesView.vue'
 import ChainOperationsView from '../activity/ChainOperationsView.vue'
 
 interface Props {
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
@@ -105,9 +105,9 @@ const chainTokenBalance = ref(0)
 const chainUsdBalance = ref(0)
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
-const activities = ref([] as db.Activity[])
+const activities = ref([] as dbModel.Activity[])
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 const nativeTokenId = ref(undefined as unknown as number)
 
 onMounted(async () => {

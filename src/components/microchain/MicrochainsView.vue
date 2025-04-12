@@ -68,7 +68,7 @@
 
 <script setup lang='ts'>
 import { computed, onMounted, ref, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 import { type Chains } from 'src/__generated__/graphql/service/graphql'
 import { useI18n } from 'vue-i18n'
@@ -83,9 +83,9 @@ import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
-const microchainOwners = ref([] as db.MicrochainOwner[])
-const microchains = ref([] as db.Microchain[])
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const microchainOwners = ref([] as dbModel.MicrochainOwner[])
+const microchains = ref([] as dbModel.Microchain[])
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 const count = ref(0)
 
 const displayCount = ref(4)
@@ -155,7 +155,7 @@ const onSynchronizeMicrochainsClick = () => {
   })
 }
 
-const loadMicrochainsRecursive = async (total: number, offset: number, limit: number, _microchains: db.Microchain[]) => {
+const loadMicrochainsRecursive = async (total: number, offset: number, limit: number, _microchains: dbModel.Microchain[]) => {
   if (offset >= total) {
     microchains.value = _microchains
     return
@@ -178,7 +178,7 @@ onMounted(async () => {
   await loadMicrochains()
 })
 
-const onMicrochainClick = (microchain: db.Microchain) => {
+const onMicrochainClick = (microchain: dbModel.Microchain) => {
   localStore.setting.HomeAction = localStore.settingDef.HomeAction.SHOW_MICROCHAIN
   localStore.setting.HomeActionParams = microchain
 }

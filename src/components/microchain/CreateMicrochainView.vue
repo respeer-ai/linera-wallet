@@ -28,7 +28,7 @@
 
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 import { useI18n } from 'vue-i18n'
 import { rpcBridge } from 'src/bridge'
@@ -38,17 +38,17 @@ import ValidateMicrochainView from './ValidateMicrochainView.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
-const createdMicrochain = ref(undefined as unknown as db.Microchain)
+const createdMicrochain = ref(undefined as unknown as dbModel.Microchain)
 const step = ref(1)
 
-const emit = defineEmits<{(ev: 'created', value: db.Microchain): void,
+const emit = defineEmits<{(ev: 'created', value: dbModel.Microchain): void,
   (ev: 'error'): void
 }>()
 
-const createMicrochain = async (): Promise<db.Microchain> => {
+const createMicrochain = async (): Promise<dbModel.Microchain> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    rpcBridge.Microchain.openMicrochain().then((microchain: db.Microchain) => {
+    rpcBridge.Microchain.openMicrochain().then((microchain: dbModel.Microchain) => {
       localStore.notification.pushNotification({
         Title: t('MSG_OPEN_CHAIN'),
         Message: t('MSG_SUCCESS_OPEN_MICROCHAIN'),

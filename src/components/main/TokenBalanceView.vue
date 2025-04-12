@@ -63,14 +63,14 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { localStore } from 'src/localstores'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 
 const tokenBalance = ref(0)
 const usdBalance = ref(0)
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 const microchainCount = ref(0)
 
 const router = useRouter()

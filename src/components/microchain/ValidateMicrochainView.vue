@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { computed, ref, toRef } from 'vue'
 
 interface Props {
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')

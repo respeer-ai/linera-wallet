@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
 import { dbBridge } from '..'
 import { stringify } from 'lossless-json'
 import { Account } from './account'
@@ -14,11 +14,11 @@ export class Operation {
   ): Promise<string> => {
     const fromOwner =
       fromPublicKey !== undefined
-        ? await db.ownerFromPublicKey(fromPublicKey)
+        ? await dbModel.ownerFromPublicKey(fromPublicKey)
         : undefined
     const toOwner =
       toPublicKey !== undefined
-        ? Account.accountOwner(await db.ownerFromPublicKey(toPublicKey))
+        ? Account.accountOwner(await dbModel.ownerFromPublicKey(toPublicKey))
         : undefined
     let amountStr = stringify(amount) || '0'
     if (Number(amountStr) === 0) return Promise.reject('Invalid amount')
@@ -33,7 +33,7 @@ export class Operation {
     const _toOwner = toOwner ? Account.accountOwner(toOwner) : Account.CHAIN
 
     const operation = {
-      operationType: db.OperationType.TRANSFER,
+      operationType: dbModel.OperationType.TRANSFER,
       operationId,
       microchain: fromChainId,
       operation: stringify({
@@ -49,8 +49,8 @@ export class Operation {
             amount: amountStr
           }
         }
-      } as rpc.Operation)
-    } as db.ChainOperation
+      } as rpcModel.Operation)
+    } as dbModel.ChainOperation
     await dbBridge.ChainOperation.create({ ...operation })
     return operationId
   }
@@ -58,12 +58,12 @@ export class Operation {
   static async waitOperation(operationId: string): Promise<boolean> {
     const operation = (await dbBridge.ChainOperation.get(
       operationId
-    )) as db.ChainOperation
+    )) as dbModel.ChainOperation
     if (!operation) return Promise.reject('Invalid operation')
 
     // TODO: will the operation never confirmed ?
-    if (operation?.state >= db.OperationState.CONFIRMED)
-      return operation?.state !== db.OperationState.FAILED
+    if (operation?.state >= dbModel.OperationState.CONFIRMED)
+      return operation?.state !== dbModel.OperationState.FAILED
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {

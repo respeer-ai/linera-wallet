@@ -39,24 +39,24 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 import { dbBridge, rpcBridge } from 'src/bridge'
 
 import DbNetworkBridge from '../bridge/db/NetworkBridge.vue'
 
-const networks = ref([] as db.Network[])
+const networks = ref([] as dbModel.Network[])
 
-const network = defineModel<db.Network>()
-const emit = defineEmits<{(ev: 'selected', value: db.Network): void,
+const network = defineModel<dbModel.Network>()
+const emit = defineEmits<{(ev: 'selected', value: dbModel.Network): void,
   (ev: 'add'): void
 }>()
 
-const onDeleteNetworkClick = async (network: db.Network) => {
+const onDeleteNetworkClick = async (network: dbModel.Network) => {
   await dbBridge.Network.delete(network.id as number)
 }
 
-const onNetworkSelected = async (_network: db.Network) => {
+const onNetworkSelected = async (_network: dbModel.Network) => {
   _network.selected = true
   network.value = _network
   await dbBridge.Network.update(_network)

@@ -1,4 +1,4 @@
-import { db, rpc } from 'src/model'
+import { dbModel, rpcModel } from 'src/model'
 import { ApolloClient } from '@apollo/client/core'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { getClientOptionsWithBaseUrl } from 'src/apollo'
@@ -49,13 +49,13 @@ export class MemeApplicationOperation {
 
     return new Promise((resolve, reject) => {
       onResult((res) => {
-        const token = graphqlResult.data(res, 'meme') as rpc.MemeToken
+        const token = graphqlResult.data(res, 'meme') as rpcModel.MemeToken
         void dbBridge.Token.create({
           name: token.name,
           description: token.metadata.description,
           totalSupply: Number(token.totalSupply),
           ticker: token.ticker,
-          tokenType: db.TokenType.Fungible,
+          tokenType: dbModel.TokenType.Fungible,
           logoStoreType: token.metadata.logoStoreType,
           logo: token.metadata.logo,
           applicationId,
@@ -88,7 +88,7 @@ export class MemeApplicationOperation {
     const chainAccountOwner = {
       chainId,
       owner: Account.accountOwner(owner)
-    } as rpc.Account
+    } as rpcModel.Account
     const token = await dbBridge.Token.token(applicationId)
     if (!token) return 0
     const options = getClientOptionsWithBaseUrl(
@@ -130,7 +130,7 @@ export class MemeApplicationOperation {
   static transfer = async (
     chainId: string,
     applicationId: string,
-    to: rpc.Account | undefined,
+    to: rpcModel.Account | undefined,
     amount: number
   ): Promise<string> => {
     try {
@@ -147,8 +147,8 @@ export class MemeApplicationOperation {
       const operationId = uuidv4()
 
       const operation = {
-        operationType: db.OperationType.TRANSFER,
-        applicationType: db.ApplicationType.MEME,
+        operationType: dbModel.OperationType.TRANSFER,
+        applicationType: dbModel.ApplicationType.MEME,
         operationId,
         microchain: chainId,
         operation: JSON.stringify({
@@ -157,10 +157,10 @@ export class MemeApplicationOperation {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             bytes: queryBytes
           }
-        } as rpc.Operation),
+        } as rpcModel.Operation),
         graphqlQuery: TRANSFER_MEME.loc?.source?.body,
         graphqlVariables: JSON.stringify(variables)
-      } as db.ChainOperation
+      } as dbModel.ChainOperation
       await dbBridge.ChainOperation.create({ ...operation })
       return operationId
     } catch (e) {

@@ -2,7 +2,7 @@
   <div>
     <div :class='[ "row vertical-sections-margin", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <q-avatar>
-        <q-img :src='db.microchainAvatar(microchain)' />
+        <q-img :src='dbModel.microchainAvatar(microchain)' />
       </q-avatar>
       <div class='selector-margin-x-left account-avatar'>
         <span class='text-bold text-grey-9'>{{ microchain.name || 'Microchain' }}</span>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { onMounted, ref, toRef } from 'vue'
 import { localStore } from 'src/localstores'
 import { dbBridge } from 'src/bridge'
@@ -37,7 +37,7 @@ import ActivityBridge from '../bridge/db/ActivityBridge.vue'
 import MicrochainDetailInnerView from '../microchain/MicrochainDetailInnerView.vue'
 
 interface Props {
-  microchain: db.Microchain
+  microchain: dbModel.Microchain
 }
 const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
@@ -46,9 +46,9 @@ const chainTokenBalance = ref(0)
 const chainUsdBalance = ref(0)
 const accountTokenBalance = ref(0)
 const accountUsdBalance = ref(0)
-const activities = ref([] as db.Activity[])
+const activities = ref([] as dbModel.Activity[])
 
-const selectedOwner = ref(undefined as unknown as db.Owner)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const nativeTokenId = ref(undefined as unknown as number)
 

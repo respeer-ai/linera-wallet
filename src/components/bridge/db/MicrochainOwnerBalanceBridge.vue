@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from '../../../model'
+import { dbModel } from '../../../model'
 import { dbWallet } from '../../../controller'
 import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
@@ -21,12 +21,12 @@ const tokenId = toRef(props, 'tokenId')
 const microchainId = toRef(props, 'microchainId')
 const owner = toRef(props, 'owner')
 
-const tokens = ref([] as db.Token[])
+const tokens = ref([] as dbModel.Token[])
 
 const tokenBalance = defineModel<number>('tokenBalance')
 const usdBalance = defineModel<number>('usdBalance')
 
-const _balances = useObservable<db.MicrochainOwnerFungibleTokenBalance[]>(
+const _balances = useObservable<dbModel.MicrochainOwnerFungibleTokenBalance[]>(
   liveQuery(async () => {
     return tokenId.value !== undefined
       ? (await dbWallet.microchainOwnerFungibleTokenBalances.toArray()).filter((el) => el.tokenId === tokenId.value && el.microchain === microchainId.value && (!owner.value || el.owner.includes(owner.value) || owner.value?.includes(el.owner)))

@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { ref, toRef } from 'vue'
 
 import AccountDetailInnerView from './AccountDetailInnerView.vue'
@@ -28,7 +28,7 @@ import ShowPrivateKeySecurityConfirmView from './ShowPrivateKeySecurityConfirmVi
 import ShowPrivateKeyView from './ShowPrivateKeyView.vue'
 
 interface Props {
-  owner: db.Owner
+  owner: dbModel.Owner
 }
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')

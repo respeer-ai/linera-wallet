@@ -1,5 +1,5 @@
 import { dbBase } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class OriginRpcMicrochain {
   static formalize = async (origin: string) => {
@@ -26,7 +26,7 @@ export class OriginRpcMicrochain {
         origin,
         publicKey,
         microchain
-      } as db.OriginRpcMicrochain)
+      } as dbModel.OriginRpcMicrochain)
     _microchain.microchain = microchain
     _microchain.id === undefined
       ? await dbBase.rpcMicrochains.add(_microchain)

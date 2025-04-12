@@ -18,11 +18,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 import ApplicationCardView from './ApplicationCardView.vue'
 
-const applications = ref([] as db.Application[])
+const applications = ref([] as dbModel.Application[])
 
 // TODO: get applications from ams
 

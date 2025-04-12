@@ -3,11 +3,11 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { toRef } from 'vue'
 
 interface Props {
-  application: db.Application
+  application: dbModel.Application
 }
 const props = defineProps<Props>()
 const application = toRef(props, 'application')

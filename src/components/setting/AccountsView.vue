@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { ref } from 'vue'
 import { shortid } from 'src/utils'
 
@@ -60,10 +60,10 @@ import MicrochainDetailView from './MicrochainDetailView.vue'
 import { localStore } from 'src/localstores'
 
 const step = ref(1)
-const selectedOwner = ref(undefined as unknown as db.Owner)
-const selectedMicrochain = ref(undefined as unknown as db.Microchain)
+const selectedOwner = ref(undefined as unknown as dbModel.Owner)
+const selectedMicrochain = ref(undefined as unknown as dbModel.Microchain)
 
-const onAccountClick = (owner: db.Owner) => {
+const onAccountClick = (owner: dbModel.Owner) => {
   step.value++
   selectedOwner.value = owner
 }

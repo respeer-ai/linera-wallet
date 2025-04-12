@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { toRef } from 'vue'
 
 import MicrochainsInnerView from '../microchain/MicrochainsInnerView.vue'
@@ -20,10 +20,10 @@ interface Props {
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
 
-const microchain = defineModel<db.Microchain>()
-const emit = defineEmits<{(ev: 'selected', value?: db.Microchain): void}>()
+const microchain = defineModel<dbModel.Microchain>()
+const emit = defineEmits<{(ev: 'selected', value?: dbModel.Microchain): void}>()
 
-const onMicrochainSelected = (_microchain: db.Microchain) => {
+const onMicrochainSelected = (_microchain: dbModel.Microchain) => {
   microchain.value = _microchain
   emit('selected', _microchain)
 }

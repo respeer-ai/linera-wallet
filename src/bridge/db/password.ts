@@ -1,5 +1,5 @@
 import { dbBase } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class Password {
   static resetActive = async () => {
@@ -15,7 +15,7 @@ export class Password {
     if (!passwd) return undefined
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return undefined
-    return db.decryptPassword(passwd, fingerPrint.fingerPrint)
+    return dbModel.decryptPassword(passwd, fingerPrint.fingerPrint)
   }
 
   static save = async (passwd?: string) => {
@@ -26,7 +26,7 @@ export class Password {
     await Password.resetActive()
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid finterprint')
-    const _passwd = db.buildPassword(
+    const _passwd = dbModel.buildPassword(
       passwd || password || '',
       fingerPrint.fingerPrint
     )
@@ -40,6 +40,6 @@ export class Password {
     if (!pwd) return false
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid finterprint')
-    return db.decryptPassword(pwd, fingerPrint.fingerPrint) === passwd
+    return dbModel.decryptPassword(pwd, fingerPrint.fingerPrint) === passwd
   }
 }

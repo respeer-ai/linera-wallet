@@ -30,9 +30,9 @@
         <div v-else>
           <div class='page-actions-padding'>
             <q-icon
-              :name='operationState === db.OperationState.FAILED ? "bi-x-circle-fill" : "bi-check-circle-fill"'
+              :name='operationState === dbModel.OperationState.FAILED ? "bi-x-circle-fill" : "bi-check-circle-fill"'
               size='36px'
-              :color='operationState === db.OperationState.FAILED ? "red" : "green"'
+              :color='operationState === dbModel.OperationState.FAILED ? "red" : "green"'
             />
           </div>
           <MutationInfoView
@@ -75,7 +75,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { shortid } from 'src/utils'
 import { commontypes } from 'src/types'
 import { lineraGraphqlMutationOperation, lineraGraphqlQuery, lineraGraphqlQueryApplicationId, lineraGraphqlQueryPublicKey, LineraOperation } from '../../../../src-bex/middleware/types'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { dbBridge } from 'src/bridge'
 
 import CheckboxView from '../CheckboxView.vue'
@@ -98,7 +98,7 @@ const graphqlVariables = computed(() => lineraGraphqlQuery(request.value?.reques
 const publicKey = ref(lineraGraphqlQueryPublicKey(request.value?.request))
 const popupOperation = computed(() => localStore.popup._popupPrivData as LineraOperation)
 const popupUpdated = computed(() => localStore.popup._popupUpdated)
-const operationState = ref(db.OperationState.FAILED)
+const operationState = ref(dbModel.OperationState.FAILED)
 const microchain = ref(undefined as unknown as string)
 const processing = ref(false)
 const shouldPersist = computed(() => !['Approve', 'Transfer', 'Swap'].includes(operation.value))
@@ -127,14 +127,14 @@ const createRpcAuth = async () => {
   }
 }
 
-const checkOperationState = async (): Promise<{ operation: db.ChainOperation | undefined, executed: boolean }> => {
+const checkOperationState = async (): Promise<{ operation: dbModel.ChainOperation | undefined, executed: boolean }> => {
   return new Promise((resolve, reject) => {
     if (!popupOperation.value) return reject('Invalid operation')
-    dbBridge.ChainOperation.get(popupOperation.value.operationId).then((operation: db.ChainOperation | undefined) => {
+    dbBridge.ChainOperation.get(popupOperation.value.operationId).then((operation: dbModel.ChainOperation | undefined) => {
       if (!operation) {
         return resolve({ operation, executed: false })
       }
-      if (operation?.state > db.OperationState.EXECUTED) {
+      if (operation?.state > dbModel.OperationState.EXECUTED) {
         operationState.value = operation?.state
         return resolve({ operation, executed: true })
       }
@@ -165,7 +165,7 @@ const respondOperation = () => {
   const _respond = respond.value
   checkOperationState().then(({ operation }) => {
     localStore.popup.removeRequest(localStore.popup.popupRequestId)
-    if (operation?.state === db.OperationState.FAILED) {
+    if (operation?.state === dbModel.OperationState.FAILED) {
       void _respond?.({
         code: -1,
         message: operation.failReason
@@ -235,7 +235,7 @@ const onActionResize = (size: Size) => {
 onMounted(async () => {
   title.value = 'Permissions'
   publicKey.value = lineraGraphqlQueryPublicKey(request.value.request)
-  const rpcMicrochain = await dbBridge.OriginRpcMicrochain.getOriginRpcMicrochain(origin.value) as db.OriginRpcMicrochain
+  const rpcMicrochain = await dbBridge.OriginRpcMicrochain.getOriginRpcMicrochain(origin.value) as dbModel.OriginRpcMicrochain
   microchain.value = rpcMicrochain?.microchain
   // TODO: here the public key should be the same as rpcMicrochain
   if (!publicKey.value?.length) {

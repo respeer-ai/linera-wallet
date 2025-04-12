@@ -1,10 +1,10 @@
 import { dbBase } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 
 export class Network {
   static initialize = async () => {
     if (await Network.selected()) return
-    await dbBase.networks.add(db.defaultNetwork)
+    await dbBase.networks.add(dbModel.defaultNetwork)
   }
 
   static resetSelected = async () => {
@@ -16,14 +16,14 @@ export class Network {
     }
   }
 
-  static create = async (network: db.Network) => {
+  static create = async (network: dbModel.Network) => {
     if (await Network.exists(network.name))
       return Promise.reject('Already exists')
     if (network.selected) await Network.resetSelected()
     await dbBase.networks.add(network)
   }
 
-  static update = async (network: db.Network) => {
+  static update = async (network: dbModel.Network) => {
     if (
       (await Network.exists(network.name)) &&
       !(await Network.exists(network.name, network.id))

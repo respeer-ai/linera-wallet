@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang='ts'>
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { toRef } from 'vue'
 
 import AccountDetailAvatarView from '../account/AccountDetailAvatarView.vue'
@@ -36,16 +36,16 @@ import MicrochainsInnerView from '../microchain/MicrochainsInnerView.vue'
 import { localStore } from 'src/localstores'
 
 interface Props {
-  owner: db.Owner
+  owner: dbModel.Owner
 }
 const props = defineProps<Props>()
 const owner = toRef(props, 'owner')
 
-const selectedMicrochain = defineModel<db.Microchain>()
+const selectedMicrochain = defineModel<dbModel.Microchain>()
 
-const emit = defineEmits<{(ev: 'selected', microchain: db.Microchain): void}>()
+const emit = defineEmits<{(ev: 'selected', microchain: dbModel.Microchain): void}>()
 
-const onMicrochainSelected = (microchain: db.Microchain) => {
+const onMicrochainSelected = (microchain: dbModel.Microchain) => {
   selectedMicrochain.value = microchain
   emit('selected', microchain)
 }

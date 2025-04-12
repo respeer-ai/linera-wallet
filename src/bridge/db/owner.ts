@@ -1,5 +1,5 @@
 import { dbBase, dbWallet } from 'src/controller'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { Microchain } from './microchain'
 import { MicrochainFungibleTokenBalance } from './microchain_fungible_token_balance'
 import { MicrochainOwnerFungibleTokenBalance } from './microchain_owner_fungible_token_balance'
@@ -26,9 +26,9 @@ export class Owner {
       if (!fingerPrint) return Promise.reject('Invalid fingerprint')
       const passwd = (await dbBase.passwords.toArray()).find(
         (el) => el.active
-      ) as db.Password
+      ) as dbModel.Password
       if (passwd)
-        _password = db.decryptPassword(passwd, fingerPrint.fingerPrint)
+        _password = dbModel.decryptPassword(passwd, fingerPrint.fingerPrint)
     }
     if (!publicKey.length || !privateKey.length || !_password?.length) {
       throw Error('Invalid owner materials')
@@ -36,7 +36,7 @@ export class Owner {
     if (!name) {
       // TODO: add field to store account number
       name =
-        db.DEFAULT_ACCOUNT_NAME +
+        dbModel.DEFAULT_ACCOUNT_NAME +
         ' ' +
         (await dbWallet.owners.count()).toString()
     }
@@ -45,12 +45,17 @@ export class Owner {
       undefined
     )
       return
-    const owner = await db.buildOwner(publicKey, privateKey, _password, name)
+    const owner = await dbModel.buildOwner(
+      publicKey,
+      privateKey,
+      _password,
+      name
+    )
     await Owner.resetSelected()
     await dbWallet.owners.add(owner)
   }
 
-  static update = async (owner: db.Owner) => {
+  static update = async (owner: dbModel.Owner) => {
     if (
       (await Owner.exists(owner.name)) &&
       !(await Owner.exists(owner.name, owner.id))
@@ -66,7 +71,7 @@ export class Owner {
   }
 
   static ownerBalance = async (
-    owner: db.Owner,
+    owner: dbModel.Owner,
     tokenId: number,
     microchain?: string
   ): Promise<{ tokenBalance: number; usdBalance: number }> => {

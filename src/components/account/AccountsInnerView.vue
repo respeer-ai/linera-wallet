@@ -20,7 +20,7 @@
       >
         <div :class='[ "selector-indicator", (owner ? _owner.id === owner?.id : _owner.selected) ? "selector-indicator-selected" : "" ]' />
         <q-avatar color='red-1 selector-margin-x-left'>
-          <q-img :src='db.ownerAvatar(_owner)' width='48px' height='48px' />
+          <q-img :src='dbModel.ownerAvatar(_owner)' width='48px' height='48px' />
         </q-avatar>
         <div class='selector-margin-x-left text-left'>
           <div class='text-bold text-grey-9'>
@@ -55,7 +55,7 @@
 
 <script setup lang='ts'>
 import { computed, ref, toRef, watch } from 'vue'
-import { db } from 'src/model'
+import { dbModel } from 'src/model'
 import { shortid } from 'src/utils'
 
 import OwnerBridge from '../bridge/db/OwnerBridge.vue'
@@ -77,11 +77,11 @@ const persistent = toRef(props, 'persistent')
 const searchable = toRef(props, 'searchable')
 const showAction = toRef(props, 'showAction')
 
-const owners = ref([] as db.Owner[])
+const owners = ref([] as dbModel.Owner[])
 const searchText = ref('')
 
-const owner = defineModel<db.Owner>()
-const emit = defineEmits<{(ev: 'selected', value: db.Owner): void}>()
+const owner = defineModel<dbModel.Owner>()
+const emit = defineEmits<{(ev: 'selected', value: dbModel.Owner): void}>()
 
 const displayOwners = computed(() => owners.value.filter((el) => {
   return el.name.includes(searchText.value) || el.address.includes(searchText.value)
@@ -90,12 +90,12 @@ const displayOwners = computed(() => owners.value.filter((el) => {
 const ownerBalances = ref(new Map<string, number>())
 const ownerUsdBalances = ref(new Map<string, number>())
 
-const onActionClick = (owner: db.Owner) => {
+const onActionClick = (owner: dbModel.Owner) => {
   // TODO
   console.log(owner)
 }
 
-const onOwnerSelected = async (_owner: db.Owner) => {
+const onOwnerSelected = async (_owner: dbModel.Owner) => {
   owner.value = _owner
   if (persistent.value) {
     _owner.selected = true
@@ -106,7 +106,7 @@ const onOwnerSelected = async (_owner: db.Owner) => {
 
 watch(owners, async () => {
   for (const _owner of owners.value) {
-    const token = await dbBridge.Token.native() as db.Token
+    const token = await dbBridge.Token.native() as dbModel.Token
     const balance = await dbBridge.Owner.ownerBalance(_owner, token?.id || 0)
     ownerBalances.value.set(_owner.address, balance?.tokenBalance || 0)
     ownerUsdBalances.value.set(_owner.address, balance?.usdBalance || 0)

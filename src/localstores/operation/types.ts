@@ -1,4 +1,4 @@
-import { db, rpc } from '../../model'
+import { dbModel, rpcModel } from '../../model'
 
 export enum OperationType {
   TRANSFER = 'transfer'
@@ -6,8 +6,8 @@ export enum OperationType {
 
 export interface ChainOperation {
   operationType?: OperationType
-  applicationType?: db.ApplicationType
+  applicationType?: dbModel.ApplicationType
   operationId: string
   microchain: string
-  operation: rpc.Operation
+  operation: rpcModel.Operation
 }
