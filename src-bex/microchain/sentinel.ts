@@ -5,19 +5,18 @@ import { Berith } from '@hazae41/berith'
 export class Sentinel {
   static running = false
 
-  public static run() {
+  public static async run() {
     if (Sentinel.running) return
     Sentinel.running = true
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    fetch(wasmModuleUrl)
-      .then((buffer) => {
-        void initWasm(buffer)
-      })
-      .catch(() => {
-        // TODO
-      })
+    try {
+      const buffer = await fetch(wasmModuleUrl)
+      await initWasm(buffer)
 
-    void Berith.initBundledOnce()
+      await Berith.initBundledOnce()
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`Failed load wasm ${e}`)
+    }
   }
 }

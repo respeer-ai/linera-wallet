@@ -49,13 +49,14 @@ export default bexBackground(
       }
     }
   ) => {
+    keepalive(bridge, allActiveConnections)
+
     engine.DataHandler.run(bridge)
     block.BlockSigner.run(bridge)
-    keepalive(bridge, allActiveConnections)
   }
 )
 
 installationManager.initializeOnInstalledListener()
 
-sentinel.Sentinel.run()
+void sentinel.Sentinel.run()
 void setupLineraSubscription()

@@ -19,7 +19,18 @@ self.onmessage = async (message: MessageEvent) => {
     await mutex.runExclusive(async () => {
       if (wasmInitialized) return
       void BlockRunner.handleTicker()
-      await initWasm(await fetch(wasmModuleUrl))
+      let _wasmModuleUrl = wasmModuleUrl.startsWith('/')
+        ? wasmModuleUrl
+        : `/www/${wasmModuleUrl}`
+      try {
+        await initWasm(await fetch(_wasmModuleUrl))
+      } catch (e) {
+        // TODO: workaround for chrome load path
+        _wasmModuleUrl = _wasmModuleUrl.includes('/www')
+          ? _wasmModuleUrl
+          : `/www${_wasmModuleUrl}`
+        await initWasm(await fetch(_wasmModuleUrl))
+      }
       await Berith.initBundledOnce()
       wasmInitialized = true
     })
