@@ -119,7 +119,6 @@ export class Block {
 
   static subscribe = async (
     chainId: string,
-    onNewRawBlock?: (height: number) => void,
     onNewBlock?: (hash: string) => void,
     onNewIncomingBundle?: () => void
   ): Promise<(() => void) | undefined> => {
@@ -145,10 +144,6 @@ export class Block {
         graphqlResult.rootData(res) as NotificationsSubscription
       ).notifications as unknown
       const reason = graphqlResult.keyValue(notifications, 'reason')
-      const newRawBlock = graphqlResult.keyValue(reason, 'NewRawBlock')
-      if (newRawBlock) {
-        onNewRawBlock?.(graphqlResult.keyValue(newRawBlock, 'height') as number)
-      }
       const newBlock = graphqlResult.keyValue(reason, 'NewBlock')
       if (newBlock) {
         onNewBlock?.(graphqlResult.keyValue(newBlock, 'hash') as string)

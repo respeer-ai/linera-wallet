@@ -16,7 +16,8 @@
     ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "lib": ["es2020", "dom", "WebWorker", "ES6"]
   },
   "esModuleInterop": true,
   "exclude": [

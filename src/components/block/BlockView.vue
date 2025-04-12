@@ -16,6 +16,7 @@ import { useI18n } from 'vue-i18n'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { Round } from 'src/model/rpc/model'
 import { parse, stringify } from 'lossless-json'
+import { blockWorker } from 'src/worker'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import ConstructBlock from './ConstructBlock.vue'
@@ -390,10 +391,12 @@ const subscribeMicrochain = async (microchain: db.Microchain) => {
   }
 
   const unsubscribe = await rpcBridge.Block.subscribe(
-    microchain.microchain,
-    () => {
-      // DO NOTHING
-    }, (hash: string) => {
+    microchain.microchain, (hash: string) => {
+      blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
+        microchain: microchain.microchain,
+        hash
+      })
+
       processNewBlock(microchain, hash).then(() => {
         // DO NOTHING
       }).catch((e) => {
