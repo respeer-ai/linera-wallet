@@ -157,25 +157,33 @@ export class Engine {
 }
 
 export class DataHandler {
+  static engine: Engine = undefined as unknown as Engine
+
+  static handleData = (payload: BexPayload<RpcRequest, unknown>) => {
+    const res = {} as PendingJsonRpcResponse<Json>
+    DataHandler.engine
+      .rpcExec(payload.data)
+      .then((rc) => {
+        res.result = rc as Json
+        void payload.respond(res)
+      })
+      .catch((e: Error) => {
+        res.error = {
+          code: -1,
+          message: e.message || JSON.stringify(e)
+        }
+        void payload.respond(res)
+      })
+  }
+
   public static run(bridge: BexBridge) {
     basebridge.EventBus.instance.setBridge(bridge)
 
-    const _engine = new Engine()
-    bridge.on('data', (payload: BexPayload<RpcRequest, unknown>) => {
-      const res = {} as PendingJsonRpcResponse<Json>
-      _engine
-        .rpcExec(payload.data)
-        .then((rc) => {
-          res.result = rc as Json
-          void payload.respond(res)
-        })
-        .catch((e: Error) => {
-          res.error = {
-            code: -1,
-            message: e.message || JSON.stringify(e)
-          }
-          void payload.respond(res)
-        })
-    })
+    if (!DataHandler.engine) {
+      DataHandler.engine = new Engine()
+    }
+
+    bridge.off('data', DataHandler.handleData)
+    bridge.on('data', DataHandler.handleData)
   }
 }

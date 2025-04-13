@@ -99,24 +99,25 @@ export class BlockSigner {
     )
   }
 
+  static handleNewOperation = (payload: BexPayload<blockWorker.NewOperationPayload, unknown>) => {
+    blockWorker.BlockRunner.handleOperation(payload.data)
+      .then(() => {
+        void payload.respond({})
+      })
+      .catch((e) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`Failed process operation ${e}`)
+      })
+  }
+
   public static run(bridge: BexBridge) {
+    bridge.off('new-operation', BlockSigner.handleNewOperation)
+    bridge.on('new-operation', BlockSigner.handleNewOperation)
+
     if (BlockSigner.running) return
     BlockSigner.running = true
 
     void blockWorker.BlockRunner.handleTicker()
-    bridge.on(
-      'new-operation',
-      (payload: BexPayload<blockWorker.NewOperationPayload, unknown>) => {
-        blockWorker.BlockRunner.handleOperation(payload.data)
-          .then(() => {
-            void payload.respond({})
-          })
-          .catch((e) => {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            console.log(`Failed process operation ${e}`)
-          })
-      }
-    )
 
     // Subscribe message and block
     subscription.Subscription.subscribe(
