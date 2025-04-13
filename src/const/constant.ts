@@ -19,10 +19,10 @@ export const toUrl = (
 }
 
 const URLS = [
-  'http://api.blobgateway.com/api/blobs/chains/93ccfbf1de6b0bd3074bce9238f18d7e03f512310459052f3946b94427e75dd0/applications/08256ae7a5f33432a4a250a613fb2566570e1929c802c988c0d7c3b91977372f',
-  'http://api.ams.respeer.ai/api/ams/chains/e4e3ac0a7ec88cb91235d97b215442d1cdb673be06f1aec4a1d994b9b18c8762/applications/a881fd10e3d52637697841322e5248bc878080daeda8de5a1c911ba88fcbffe7',
-  'http://api.linerameme.fun/api/proxy/chains/7fd6d38952f2cc45c6d8bc5adbc45f1a38f63103bff078edb3cc70744d025a13/applications/5e5892dd50f322561546041535a0c1b16e2aee84d6d3cc6bb35263204d49ff42',
-  'http://api.lineraswap.fun/api/swap/chains/4506bfce9ef838bcc72fa44475f8e2e98da5c0fe3c41d04c411e5c0d6bbe5988/applications/52b540873853cfa4b10ec60b0341bb0b8b9e25f30f44e1ecd2f9d8ba9df17f7a',
+  'http://api.blobgateway.com/api/blobs/chains/5a23f69aed0af87da37e566efbd074af4ab0b95505a810b7362b888af4278da5/applications/f6ab6bc2ffea6ec7a88c34b3a2e285e9c39cfab299bf253e9e3b4947c3b4a56e',
+  'http://api.ams.respeer.ai/api/ams/chains/84c470088d0e267ddfe250576fb01ca422b6dbcbea770ec39e9c52da1d763a26/applications/61036a73aa0293a2e8aa1347a25a99fa712b19c2920d5edae54b647099f4b065',
+  'http://api.linerameme.fun/api/proxy/chains/3b4bb4a4fc839a2f602a59169f573ca95cb88ab42b75ae66044a01de90716ea9/applications/72f135fa19ef0283695978e41217be62e98bfb4c9317a65c4730d873c3d4248a',
+  'http://api.lineraswap.fun/api/swap/chains/b5feaf9812353a4f27e26003421e6b64a721a159489d173ce0ae5774dac1d7a1/applications/fb35347084fa4f79ad4df9947b207e02aa8a73945848cc1a0ac4d4b46b11696b',
   'http://api.linerameme.fun/api/proxy',
   'ws://api.linerameme.fun/api/proxy/ws',
   'http://api.lineraswap.fun/api/swap',

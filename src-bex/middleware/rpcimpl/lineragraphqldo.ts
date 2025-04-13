@@ -242,7 +242,7 @@ export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
         string,
         Record<string, Record<string, string>>
       >
-      if (microchain !== _data.data.notifications.chain_id) {
+      if (microchain !== _data?.data?.notifications?.chain_id) {
         return
       }
       void basebridge.EventBus.bridge?.send('linera_subscription', {
