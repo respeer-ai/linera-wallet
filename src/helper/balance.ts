@@ -19,11 +19,15 @@ export class BalanceHelper {
       } as dbModel.MicrochainFungibleTokenBalance)
     microchainBalance.balance = Number(balance)
     if (microchainBalance.id === undefined) {
-      await dbBridge.MicrochainFungibleTokenBalance.create(
-        microchain,
-        microchainBalance.tokenId,
-        microchainBalance.balance
-      )
+      try {
+        await dbBridge.MicrochainFungibleTokenBalance.create(
+          microchain,
+          microchainBalance.tokenId,
+          microchainBalance.balance
+        )
+      } catch {
+        await BalanceHelper.updateChainBalance(microchain, tokenId, balance)
+      }
     } else {
       await dbBridge.MicrochainFungibleTokenBalance.update(microchainBalance)
     }
@@ -49,12 +53,16 @@ export class BalanceHelper {
       } as dbModel.MicrochainOwnerFungibleTokenBalance)
     microchainOwnerBalance.balance = balance
     if (microchainOwnerBalance.id === undefined) {
-      await dbBridge.MicrochainOwnerFungibleTokenBalance.create(
-        microchain,
-        owner,
-        tokenId,
-        microchainOwnerBalance.balance
-      )
+      try {
+        await dbBridge.MicrochainOwnerFungibleTokenBalance.create(
+          microchain,
+          owner,
+          tokenId,
+          microchainOwnerBalance.balance
+        )
+      } catch {
+        await BalanceHelper.updateAccountBalance(microchain, tokenId, owner, balance)
+      }
     } else {
       await dbBridge.MicrochainOwnerFungibleTokenBalance.update(
         microchainOwnerBalance
