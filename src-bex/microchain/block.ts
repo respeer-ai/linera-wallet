@@ -106,7 +106,7 @@ export class BlockSigner {
       })
       .catch((e) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Failed process operation ${e}`)
+        console.log(`Failed process operation: ${e}`)
       })
   }
 
