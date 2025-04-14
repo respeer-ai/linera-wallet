@@ -13,6 +13,7 @@ export enum BlockEventType {
   NEW_OPERATION = 'NewOperation',
   NEW_INCOMING_BUNDLE = 'NewIncomingBundle',
   NEW_BLOCK = 'NewBlock',
+  BLOCK_PROCESSED = 'BlockProcessed',
   RUN_TICKER = 'RunTicker'
 }
 
@@ -29,6 +30,10 @@ export type NewIncomingBundlePayload = BasePayload
 
 export interface NewOperationPayload extends BasePayload {
   operationId: string
+}
+
+export interface BlockProcessedPayload {
+  microchain: string
 }
 
 export interface BlockEvent {
@@ -132,6 +137,13 @@ export class BlockRunner {
     if (!block) return
 
     await BlockRunner.handleConfirmedBlock(microchain, block, memeChain)
+
+    self.postMessage({
+      type: BlockEventType.BLOCK_PROCESSED,
+      payload: {
+        microchain
+      }
+    })
   }
 
   static handleIncomingBundle = async (payload: NewIncomingBundlePayload) => {

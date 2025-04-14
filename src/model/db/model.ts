@@ -129,17 +129,14 @@ export const defaultNetwork = {
   preset: true
 } as Network
 
-export const rpcUrl = (network: Network, ignoreEnv?: boolean) => {
+export const rpcUrl = (network: Network) => {
   if (
     !network.rpcSchema?.length ||
     !network.host?.length ||
     network.port === undefined
   )
     return ''
-  const httpBaseUrl =
-    process.env.DEV && !ignoreEnv
-      ? ''
-      : `${network.rpcSchema}://${network.host}:${network.port}`
+  const httpBaseUrl = `${network.rpcSchema}://${network.host}:${network.port}`
   return `${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`
 }
 

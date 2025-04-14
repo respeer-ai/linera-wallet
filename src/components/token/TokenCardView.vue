@@ -32,8 +32,9 @@
 
 <script setup lang='ts'>
 import { dbModel } from 'src/model'
-import { onMounted, ref, toRef, watch } from 'vue'
+import { onMounted, ref, toRef, watch, onBeforeUnmount } from 'vue'
 import { dbBridge } from 'src/bridge'
+import { blockWorker } from 'src/worker'
 
 import DbOwnerBalanceBridge from '../bridge/db/OwnerBalanceBridge.vue'
 import DbOwnerBridge from '../bridge/db/OwnerBridge.vue'
@@ -62,6 +63,13 @@ const tokenLogo = ref('')
 
 const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
+const onBlockProcessed = async (payload: blockWorker.BlockProcessedPayload) => {
+  const { microchain } = payload
+  console.log('Block processed', microchain)
+  if (microchain !== token.value.creatorChainId) return
+  await getBalance()
+}
+
 const getBalance = async () => {
   if (!selectedOwner.value) return
   const balance = await dbBridge.Owner.ownerBalance(selectedOwner.value, token.value.id as number)
@@ -76,6 +84,11 @@ watch(selectedOwner, async () => {
 onMounted(async () => {
   await getBalance()
   tokenLogo.value = await dbBridge.Token.logo(token.value.id as number) as string
+  blockWorker.BlockWorker.on(blockWorker.BlockEventType.BLOCK_PROCESSED, onBlockProcessed)
+})
+
+onBeforeUnmount(() => {
+  blockWorker.BlockWorker.off(blockWorker.BlockEventType.BLOCK_PROCESSED, onBlockProcessed)
 })
 
 </script>

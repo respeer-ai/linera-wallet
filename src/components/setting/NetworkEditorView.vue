@@ -68,7 +68,7 @@ import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 const network = defineModel<dbModel.Network>({ default: {} as dbModel.Network })
 
 const rpcUrl = computed({
-  get: () => network.value ? dbModel.rpcUrl(network.value, true) : '',
+  get: () => network.value ? dbModel.rpcUrl(network.value) : '',
   set: (val: string) => {
     const v = new URL(val)
     const protocol = v.protocol.replace(':', '')

@@ -20,11 +20,9 @@ export class SimulatedBlock {
     const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
-    const applicationUrl = process.env.DEV
-      ? network?.path
-      : `${network?.rpcSchema}://${network?.host}:${network?.port}${
-          network.path?.length ? network.path : ''
-        }`
+    const applicationUrl = `${network?.rpcSchema}://${network?.host}:${network?.port}${
+      network.path?.length ? network.path : ''
+    }`
     const blockMaterial = {
       operations,
       blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes))),

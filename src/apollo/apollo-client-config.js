@@ -3,13 +3,7 @@ export default /* async */ function (/* { app, router, store, ssrContext, urlPat
     default: {
       // 'apollo-link-http' config
       // https://www.apollographql.com/docs/link/links/http/#options
-      httpLinkConfig: {
-        // you can define the 'uri' here or using an env variable when
-        // running quasar commands, for example:
-        // `GRAPHQL_URI=https://prod.example.com/graphql quasar build`
-        // `GRAPHQL_URI=https://dev.example.com/graphql quasar dev`
-        uri: process.env.GRAPHQL_URI || 'http://localhost:8080'
-      },
+      httpLinkConfig: {},
 
       // 'apollo-cache-inmemory' config
       // https://www.apollographql.com/docs/react/caching/cache-configuration/#configuring-the-cache

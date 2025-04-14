@@ -26,7 +26,6 @@ export async function getClientOptionsWithEndpointType(
   let host = network.host
   let port = network.port
   let path = network.path?.length ? network?.path : undefined
-  let useAppHost = true
 
   if (endpointType === EndpointType.Faucet && network) {
     const url = new URL(network.faucetUrl)
@@ -41,7 +40,6 @@ export async function getClientOptionsWithEndpointType(
       url.port ? url.port : protocol === dbModel.HTTPSchema.HTTP ? '80' : '443'
     )
     path = url.pathname
-    useAppHost = false
   }
 
   return getClientOptions(
@@ -51,8 +49,7 @@ export async function getClientOptionsWithEndpointType(
     port,
     path,
     chainId,
-    applicationId,
-    useAppHost
+    applicationId
   )
 }
 
@@ -63,8 +60,7 @@ export /* async */ function getClientOptions(
   port: number,
   path?: string,
   chainId?: string,
-  applicationId?: string,
-  useAppHost?: boolean
+  applicationId?: string
 ) {
   const httpBaseUrl = schema + '://' + host + ':' + `${port}`
   const wsBaseUrl = wsSchema + '://' + host + ':' + `${port}` + '/ws'
@@ -74,8 +70,7 @@ export /* async */ function getClientOptions(
     wsBaseUrl,
     chainId,
     applicationId,
-    path,
-    useAppHost
+    path
   )
 }
 
@@ -84,14 +79,13 @@ export function getClientOptionsWithBaseUrl(
   wsBaseUrl: string,
   chainId?: string,
   applicationId?: string,
-  path?: string,
-  useAppHost?: boolean
+  path?: string
 ) {
   const httpBaseUrl = baseUrl
   const path1 = path || ''
 
   const httpApiBaseUrl =
-    (!useAppHost ? httpBaseUrl : process.env.DEV ? '' : httpBaseUrl) +
+    httpBaseUrl +
     path1 +
     (chainId ? `/chains/${chainId}` : '') +
     (applicationId ? `/applications/${applicationId}` : '')
