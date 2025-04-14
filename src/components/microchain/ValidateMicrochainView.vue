@@ -1,6 +1,6 @@
 <template>
   <div class='full-width'>
-    <div v-html='$t("MSG_CHECKO_NEED_MICROCHAIN_CREATION_MATERIALS_TO_REBUILD_MICROCHAIN_STORE")' />
+    <div v-html='$t("MSG_CHECKO_NEEDS_TO_KNOW_MICROCHAIN_CREATION_MATERIAL_FOR_RECOVERY")' />
     <div class='vertical-sections-margin tip info'>
       <q-icon name='bi-check-circle' color='green-6' :style='{marginBottom: "4px"}' /> {{ $t('MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_VERIFY') }}
     </div>

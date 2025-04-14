@@ -95,9 +95,8 @@ export default {
   MSG_BRIDGE: 'Bridge',
   MSG_STAKE: 'Stake',
   MSG_CHECKO_NEEDS_TO_KNOW_MICROCHAIN_CREATION_MATERIAL_FOR_RECOVERY:
-    'CheCko needs to know the microchain ID, the message used to create ' +
-    'microchain and the certificate hash in which the creation message is ' +
-    'packed to rebuild microchain store on MaaS cluster.',
+    'CheCko needs to know the microchain ID and the message used to create ' +
+    'microchain to rebuild microchain store on MaaS cluster.',
   MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_INPUT_BOX:
     'Paste microchain creation information to input box.',
   MSG_MICROCHAIN_ID: 'Microchain ID',
@@ -124,10 +123,6 @@ export default {
   MSG_CREATE_MICROCHAIN: 'Create microchain',
   MSG_IMPORT_MICROCHAIN: 'Import microchain',
   MSG_SYNCHRONIZE_MICROCHAINS: 'Synchronize microchains',
-  MSG_CHECKO_NEED_MICROCHAIN_CREATION_MATERIALS_TO_REBUILD_MICROCHAIN_STORE:
-    'CheCko needs to know the microchain ID, the message used ' +
-    'to create microchain and the certificate hash in which the ' +
-    'creation message is packed to rebuild microchain store on MaaS cluster.',
   MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_VERIFY:
     'Paste microchain creation information to input box to verify.',
   MSG_LETS_GO: "Let's go",
