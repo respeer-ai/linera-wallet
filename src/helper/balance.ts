@@ -61,7 +61,12 @@ export class BalanceHelper {
           microchainOwnerBalance.balance
         )
       } catch {
-        await BalanceHelper.updateAccountBalance(microchain, tokenId, owner, balance)
+        await BalanceHelper.updateAccountBalance(
+          microchain,
+          tokenId,
+          owner,
+          balance
+        )
       }
     } else {
       await dbBridge.MicrochainOwnerFungibleTokenBalance.update(

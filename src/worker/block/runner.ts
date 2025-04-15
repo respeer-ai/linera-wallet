@@ -109,10 +109,7 @@ export class BlockRunner {
 
     let needRetry = false
     if (!memeChain) {
-      needRetry = await ChainOperationHelper.executedInBlock(
-        microchain,
-        block
-      )
+      needRetry = await ChainOperationHelper.executedInBlock(microchain, block)
       needRetry ||= !(await MicrochainHelper.openedInBlock(microchain, block))
     }
 
@@ -133,7 +130,11 @@ export class BlockRunner {
       await BalanceHelper.updateNativeBalances(microchain)
     }
 
-    const block = await rpcBridge.Block.getBlockWithHash(microchain, hash, memeChain)
+    const block = await rpcBridge.Block.getBlockWithHash(
+      microchain,
+      hash,
+      memeChain
+    )
     if (!block) return
 
     await BlockRunner.handleConfirmedBlock(microchain, block, memeChain)

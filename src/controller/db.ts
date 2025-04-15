@@ -48,7 +48,8 @@ dbWallet.version(1).stores({
   microchains:
     '++id, microchain, messageId, certificateHash, name, default, imported, state, openChainCertificateHash',
   owners: '++id, address, owner, privateKey, salt, name, selected',
-  microchainFungibleTokenBalances: '++id, &[microchain+tokenId], microchain, balance',
+  microchainFungibleTokenBalances:
+    '++id, &[microchain+tokenId], microchain, balance',
   microchainOwnerFungibleTokenBalances:
     '++id, &[microchain+owner+tokenId], microchain, owner, balance',
   nfts: '++id, collectionId, tokenId, uri, microchain, owner',

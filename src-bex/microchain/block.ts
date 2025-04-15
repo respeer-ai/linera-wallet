@@ -99,7 +99,9 @@ export class BlockSigner {
     )
   }
 
-  static handleNewOperation = (payload: BexPayload<blockWorker.NewOperationPayload, unknown>) => {
+  static handleNewOperation = (
+    payload: BexPayload<blockWorker.NewOperationPayload, unknown>
+  ) => {
     blockWorker.BlockRunner.handleOperation(payload.data)
       .then(() => {
         void payload.respond({})
