@@ -109,7 +109,7 @@ const savePassword = async () => {
 }
 
 const saveAccount = async () => {
-  await dbBridge.Owner.create(privateKeyHex.value)
+  await dbBridge.Owner.create(privateKeyHex.value, undefined, password.value)
   void router.push({ path: localStore.setting.formalizePath('/home') })
 }
 
