@@ -22,7 +22,7 @@
       >
         <InitializeAccount
           :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic'
-          v-model:private-key='privateKeyHex'
+          v-model:private-key-hex='privateKeyHex'
         />
       </q-step>
       <q-step
