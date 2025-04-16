@@ -29,6 +29,8 @@ export class ChainOperationHelper {
     const operation = await dbBridge.ChainOperation.get(operationId)
     if (!operation) return
     operation.state = dbModel.OperationState.EXECUTING
+    operation.lastErrorAt = operation.errorAt
+    operation.errorAt = 0
     await dbBridge.ChainOperation.update(operation)
   }
 
@@ -43,7 +45,7 @@ export class ChainOperationHelper {
     await dbBridge.ChainOperation.update(operation)
   }
 
-  static firstProcessOperation = async (operationId: string) => {
+  static tryFirstProcessOperation = async (operationId: string) => {
     const operation = await dbBridge.ChainOperation.get(operationId)
     if (!operation) return
     if (!operation.firstProcessedAt) {
@@ -54,45 +56,69 @@ export class ChainOperationHelper {
 
   static inflightOperations = async () => {
     return await ChainOperationHelper.statedOperations([
-      dbModel.OperationState.CREATED,
-      dbModel.OperationState.EXECUTING,
       dbModel.OperationState.EXECUTED
     ])
   }
 
-  static statedOperations = async (states: dbModel.OperationState[]) => {
+  static initialOperations = async () => {
+    return await ChainOperationHelper.statedOperations([
+      dbModel.OperationState.CREATED
+    ])
+  }
+
+  static errorOperations = async () => {
+    return await ChainOperationHelper.statedOperations(
+      [dbModel.OperationState.EXECUTING],
+      true
+    )
+  }
+
+  static statedOperations = async (
+    states: dbModel.OperationState[],
+    error?: boolean
+  ) => {
     return await dbBridge.ChainOperation.chainOperations(
       0,
       0,
       undefined,
-      states
+      states,
+      undefined,
+      error
     )
   }
 
-  static timeoutOperation = async (operationId: string, e: string) => {
-    if (JSON.stringify(e)?.includes('Was expecting block height')) {
-      return false
-    }
-    if (
-      JSON.stringify(e)?.includes(
-        'is out of order compared to previous messages from'
-      )
-    ) {
-      return false
-    }
-
+  static failOperation = async (operationId: string, e: string) => {
     const operation = await dbBridge.ChainOperation.get(operationId)
+    if (!operation) return
+    operation.state = dbModel.OperationState.FAILED
+    operation.failedAt = Date.now()
+    operation.failReason = e
+    await dbBridge.ChainOperation.update(operation)
+  }
 
-    if (!operation?.firstProcessedAt) return false
+  static errorOperation = async (operationId: string, e: string) => {
+    const operation = await dbBridge.ChainOperation.get(operationId)
+    if (!operation) return
+    operation.errorAt = Date.now()
+    operation.failReason = e
+    await dbBridge.ChainOperation.update(operation)
+  }
+
+  static tryTimeoutOperation = async (operationId: string, e: string) => {
+    const operation = await dbBridge.ChainOperation.get(operationId)
+    if (!operation) return true
+
+    if (!operation.firstProcessedAt) {
+      if (operation.createdAt + 60 * 1000 < Date.now()) {
+        await ChainOperationHelper.failOperation(operationId, e)
+        return
+      }
+      await ChainOperationHelper.errorOperation(operationId, e)
+      return
+    }
 
     if (operation.firstProcessedAt + 10 * 1000 < Date.now()) {
-      operation.state = dbModel.OperationState.FAILED
-      operation.failedAt = Date.now()
-      operation.failReason = e
-      await dbBridge.ChainOperation.update(operation)
-      return true
+      await ChainOperationHelper.failOperation(operationId, e)
     }
-
-    return false
   }
 }

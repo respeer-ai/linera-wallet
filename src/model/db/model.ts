@@ -324,8 +324,10 @@ export interface ChainOperation {
   graphqlVariables?: string
   certificateHash?: string
   state: OperationState
-  createdAt?: number
+  createdAt: number
   firstProcessedAt?: number
+  errorAt?: number
+  lastErrorAt?: number
   failedAt?: number
   failReason?: string
 }

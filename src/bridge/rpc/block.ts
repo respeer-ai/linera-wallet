@@ -113,8 +113,8 @@ export class Block {
     const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
     if (!fingerPrint) return Promise.reject('Invalid fingerprint')
     const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = dbModel.privateKey(owner, _password)
-    return await Ed25519.signWithKeccac256Hash(privateKey, payload)
+    const privateKeyHex = dbModel.privateKey(owner, _password)
+    return await Ed25519.signWithKeccac256Hash(privateKeyHex, payload)
   }
 
   static subscribe = async (

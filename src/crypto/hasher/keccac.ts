@@ -10,6 +10,6 @@ export class Keccac256 {
   }
 
   static hash = async (bytes: Uint8Array) => {
-    return await keccak(bytes, 256)
+    return await keccak(new Uint8Array(bytes), 256)
   }
 }

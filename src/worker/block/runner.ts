@@ -41,13 +41,13 @@ export interface BlockEvent {
   payload: NewBlockPayload | NewIncomingBundlePayload | NewOperationPayload
 }
 
+const respond = self.postMessage
+
 export class BlockRunner {
   static tickerHandle = undefined as unknown
 
   static handleInflightOperations = async () => {
-    const operations = await ChainOperationHelper.statedOperations([
-      dbModel.OperationState.EXECUTED
-    ])
+    const operations = await ChainOperationHelper.inflightOperations()
     for (const operation of operations) {
       if (!operation.certificateHash) continue
       await BlockRunner.handleBlock({
@@ -55,6 +55,17 @@ export class BlockRunner {
         hash: operation.certificateHash,
         memeChain: false
       })
+    }
+  }
+
+  static handleErrorOperations = async () => {
+    const operations = await ChainOperationHelper.errorOperations()
+    for (const operation of operations) {
+      await BlockRunner.handleOperation({
+        microchain: operation.microchain,
+        operationId: operation.operationId
+      })
+      // TODO: let user process operations which is in processing but not error
     }
   }
 
@@ -90,6 +101,7 @@ export class BlockRunner {
 
     try {
       await BlockRunner.handleInflightOperations()
+      await BlockRunner.handleErrorOperations()
       await BlockRunner.handleClaimedMicrochains()
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -139,7 +151,7 @@ export class BlockRunner {
 
     await BlockRunner.handleConfirmedBlock(microchain, block, memeChain)
 
-    self.postMessage({
+    respond?.({
       type: BlockEventType.BLOCK_PROCESSED,
       payload: {
         microchain
@@ -169,37 +181,48 @@ export class BlockRunner {
 
   static handleOperation = async (payload: NewOperationPayload) => {
     const { microchain, operationId } = payload
+    let _isRetryBlock = false
+    let _certificateHash = undefined as unknown as string
+    let _moreIncomingBundle = false
+
+    await ChainOperationHelper.executingOperation(operationId)
 
     try {
       const { certificateHash, moreIncomingBundle, isRetryBlock } =
         await BlockHelper.proposeNewBlock(microchain, operationId)
 
-      if (!isRetryBlock) {
+      _isRetryBlock = isRetryBlock || _isRetryBlock
+      _certificateHash = certificateHash || _certificateHash
+      _moreIncomingBundle = moreIncomingBundle || _moreIncomingBundle
+    } catch (e) {
+      await ChainOperationHelper.tryTimeoutOperation(
+        operationId,
+        JSON.stringify(e)
+      )
+      return
+      // It'll be retried in ticker
+      // For operations which is still CREATED, UI should post again
+    }
+
+    try {
+      if (!_isRetryBlock) {
         await ChainOperationHelper.submittedWithHash(
           operationId,
-          certificateHash as string
+          _certificateHash
         )
-        await ChainOperationHelper.firstProcessOperation(operationId)
+        await ChainOperationHelper.tryFirstProcessOperation(operationId)
       }
 
-      if (moreIncomingBundle) {
+      if (_moreIncomingBundle) {
         setTimeout(() => {
           void BlockRunner.handleIncomingBundle(payload)
         }, 100)
       }
     } catch (e) {
-      if (
-        await ChainOperationHelper.timeoutOperation(
-          operationId,
-          JSON.stringify(e)
-        )
+      await ChainOperationHelper.tryTimeoutOperation(
+        operationId,
+        JSON.stringify(e)
       )
-        return
-
-      console.log(`Failed handle operation: ${JSON.stringify(e)}`)
-      setTimeout(() => {
-        void BlockRunner.handleOperation(payload)
-      }, 100)
     }
   }
 }

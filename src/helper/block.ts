@@ -167,7 +167,7 @@ export class BlockHelper {
     )
     const signature = await BlockHelper.signPayload(
       microchain,
-      parse(blockPayload) as Uint8Array
+      JSON.parse(blockPayload) as Uint8Array
     )
     const certificateHash = await BlockHelper.submitBlockWithSignature(
       microchain,

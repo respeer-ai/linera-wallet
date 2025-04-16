@@ -3,7 +3,7 @@ import { type NotificationsSubscription } from '../../src/__generated__/graphql/
 import { graphqlResult } from '../../src/utils'
 import { blockWorker } from '../../src/worker'
 import { dbBridge } from '../../src/bridge'
-import { BexBridge, BexPayload } from '@quasar/app-vite'
+import { BexPayload } from '@quasar/app-vite'
 
 export class BlockSigner {
   static running = false
@@ -112,10 +112,7 @@ export class BlockSigner {
       })
   }
 
-  public static run(bridge: BexBridge) {
-    bridge.off('new-operation', BlockSigner.handleNewOperation)
-    bridge.on('new-operation', BlockSigner.handleNewOperation)
-
+  public static run() {
     if (BlockSigner.running) return
     BlockSigner.running = true
 

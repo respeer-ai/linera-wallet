@@ -14,6 +14,7 @@ import { rpcBridge } from 'src/bridge'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
+import { ChainOperationHelper } from 'src/helper'
 
 const microchains = ref([] as dbModel.Microchain[])
 const tokens = ref([] as dbModel.Token[])
@@ -104,12 +105,24 @@ watch(tokensImportState, () => {
   }
 })
 
+const handleInitialOperations = async () => {
+  const operations = await ChainOperationHelper.initialOperations()
+  for (const operation of operations) {
+    blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_OPERATION, {
+      microchain: operation.microchain,
+      operationId: operation.operationId
+    })
+  }
+}
+
 onMounted(async () => {
   await subscribeMicrochains()
+  await handleInitialOperations()
 })
 
 onUnmounted(() => {
   unsubscribeMicrochains()
+  blockWorker.BlockWorker.terminate()
 })
 
 </script>

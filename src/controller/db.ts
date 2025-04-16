@@ -58,6 +58,6 @@ dbWallet.version(1).stores({
   activities:
     '++id, sourceChain, sourceAddress, targetChain, targetAddress, amount, blockHeight, timestamp, certificateHash, grant, tokenId, microchain',
   chainOperations:
-    '++id, operationType, applicationType, operationId, microchain, operation, state, certificateHash, createdAt, failedAt, failReason, graphqlQuery, graphqlVariables',
+    '++id, operationType, applicationType, operationId, microchain, operation, state, certificateHash, createdAt, errorAt, lastErrorAt, failedAt, failReason, graphqlQuery, graphqlVariables',
   operationBlobs: '++id, operationId, blob'
 })
