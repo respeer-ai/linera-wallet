@@ -216,23 +216,26 @@ export const lineraGraphqlQueryHandler = async (request?: RpcRequest) => {
 
 export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
   if (!request) {
-    return await Promise.reject('Invalid request')
+    return Promise.reject('Invalid request')
   }
   const query = request.request.params as unknown as RpcGraphqlQuery
   if (!query) {
-    return await Promise.reject('Invalid query')
+    return Promise.reject('Invalid query')
   }
   const publicKey = query.publicKey
+  if (!publicKey) {
+    return Promise.reject('Invalid public key')
+  }
   const subscriptionId = subscription.Subscription.subscribe(
     query.topics as string[],
     async (subscriptionId: string, data: unknown) => {
       const microchain = await dbBridge.RpcAuth.rpcMicrochain(
         request.origin,
-        publicKey as string
+        publicKey
       )
       if (!microchain) {
         console.log(
-          `RPC microchain for public key ${publicKey as string} of origin ${
+          `RPC microchain for public key ${publicKey} of origin ${
             request.origin
           } is not available`
         )
