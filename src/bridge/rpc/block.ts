@@ -9,8 +9,7 @@ import {
   useQuery,
   useSubscription
 } from '@vue/apollo-composable'
-import { graphqlResult, _hex } from 'src/utils'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { graphqlResult } from 'src/utils'
 import { dbModel, rpcModel } from 'src/model'
 import { dbBase } from 'src/controller'
 import {
@@ -30,6 +29,7 @@ import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import * as constant from 'src/const'
+import { _Web3, Ed25519 } from 'src/crypto'
 
 export class Block {
   static submitBlockAndSignature = async (
@@ -62,7 +62,7 @@ export class Block {
       stringify(signedBlock) as string
     )
     const bcsBytes = Array.from(parse(bcsStr) as number[])
-    const bcsHex = _hex.toHex(new Uint8Array(bcsBytes))
+    const bcsHex = _Web3.bytesToHexTrim0x(new Uint8Array(bcsBytes))
 
     return new Promise((resolve, reject) => {
       axios
@@ -114,10 +114,7 @@ export class Block {
     if (!fingerPrint) return Promise.reject('Invalid fingerprint')
     const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
     const privateKey = dbModel.privateKey(owner, _password)
-    const keyPair = Ed25519SigningKey.from_bytes(
-      new Memory(_hex.toBytes(privateKey))
-    )
-    return _hex.toHex(keyPair.sign(new Memory(payload)).to_bytes().bytes)
+    return await Ed25519.signWithKeccac256Hash(privateKey, payload)
   }
 
   static subscribe = async (

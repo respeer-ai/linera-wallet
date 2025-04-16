@@ -5,8 +5,6 @@
 <script setup lang='ts'>
 import { ref, computed, watch } from 'vue'
 import { dbModel } from 'src/model'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
-import { _hex } from 'src/utils'
 import { localStore } from 'src/localstores'
 
 import DbNetworkBridge from '../bridge/db/NetworkBridge.vue'
@@ -26,10 +24,9 @@ watch(networkId, async (newValue) => {
   for (const microchain of microchains) {
     const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
     for (const owner of owners) {
-      const privateKey = dbModel.privateKey(owner, password)
-      const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
+      const privateKeyHex = dbModel.privateKey(owner, password)
       try {
-        await rpcBridge.Microchain.initMicrochainStore(owner.owner, keyPair, microchain.microchain, microchain.messageId)
+        await rpcBridge.Microchain.initMicrochainStore(owner.owner, privateKeyHex, microchain.microchain, microchain.messageId)
         microchain.imported = true
       } catch {
         microchain.imported = false

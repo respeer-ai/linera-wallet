@@ -45,17 +45,16 @@
 <script setup lang='ts'>
 import { localStore } from 'src/localstores'
 import { computed, onMounted, ref, watch } from 'vue'
-import { _hex } from 'src/utils'
 import { commontypes } from 'src/types'
 import type { Json } from '@metamask/utils'
 import { Web3 } from 'web3'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { dbModel } from 'src/model'
 
 import VerifyPassword from '../..//password/VerifyPassword.vue'
 import SignInfoView from '../SignInfoView.vue'
 import ProcessingView from '../../processing/ProcessingView.vue'
 import { dbBridge } from 'src/bridge'
+import { _Web3, Ed25519 } from 'src/crypto'
 
 const step = ref(1)
 const origin = computed(() => localStore.popup.popupOrigin)
@@ -81,11 +80,9 @@ const signResponse = async () => {
   if (!_account) {
     return onCancelClick()
   }
-  const privateKey = dbModel.privateKey(_account, password.value)
-  console.log(_account, password.value, privateKey)
-  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  const bytes = Web3.utils.hexToBytes(hexContent.value as string)
-  const signature = Web3.utils.bytesToHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+  const privateKeyHex = dbModel.privateKey(_account, password.value)
+  const bytes = _Web3.hexToBytes(hexContent.value as string)
+  const signature = await Ed25519.signWithKeccac256Hash(privateKeyHex, bytes)
   setTimeout(() => {
     processing.value = false
     void respond.value?.({

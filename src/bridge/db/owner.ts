@@ -3,6 +3,7 @@ import { dbModel } from 'src/model'
 import { Microchain } from './microchain'
 import { MicrochainFungibleTokenBalance } from './microchain_fungible_token_balance'
 import { MicrochainOwnerFungibleTokenBalance } from './microchain_owner_fungible_token_balance'
+import { Ed25519 } from 'src/crypto'
 
 export class Owner {
   static resetSelected = async () => {
@@ -13,8 +14,7 @@ export class Owner {
   }
 
   static create = async (
-    publicKey: string,
-    privateKey: string,
+    privateKeyHex: string,
     name?: string,
     _password?: string
   ) => {
@@ -30,9 +30,10 @@ export class Owner {
       if (passwd)
         _password = dbModel.decryptPassword(passwd, fingerPrint.fingerPrint)
     }
-    if (!publicKey.length || !privateKey.length || !_password?.length) {
+    if (!privateKeyHex.length || !_password?.length) {
       throw Error('Invalid owner materials')
     }
+    const publicKeyHex = Ed25519.publicHex(privateKeyHex)
     if (!name) {
       // TODO: add field to store account number
       name =
@@ -41,16 +42,11 @@ export class Owner {
         (await dbWallet.owners.count()).toString()
     }
     if (
-      (await dbWallet.owners.where('address').equals(publicKey).first()) !==
+      (await dbWallet.owners.where('address').equals(publicKeyHex).first()) !==
       undefined
     )
       return
-    const owner = await dbModel.buildOwner(
-      publicKey,
-      privateKey,
-      _password,
-      name
-    )
+    const owner = await dbModel.buildOwner(privateKeyHex, _password, name)
     await Owner.resetSelected()
     await dbWallet.owners.add(owner)
   }

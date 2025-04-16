@@ -21,9 +21,7 @@
 </template>
 
 <script setup lang='ts'>
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import { onMounted, ref } from 'vue'
-import { _hex } from 'src/utils'
 import { dbBridge } from 'src/bridge'
 
 import GenerateKey from './GenerateKey.vue'
@@ -38,10 +36,8 @@ const generateKey = ref<InstanceType<typeof GenerateKey>>()
 
 const onCreateClick = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const privateKey = generateKey.value?.generateKey() as string
-  const keyPair = Ed25519SigningKey.from_bytes(new Memory(_hex.toBytes(privateKey)))
-  const publicKey = _hex.toHex(keyPair.public().to_bytes().bytes)
-  await dbBridge.Owner.create(publicKey, privateKey, accountName.value)
+  const privateKeyHex = generateKey.value?.generateKey() as string
+  await dbBridge.Owner.create(privateKeyHex, accountName.value)
   emit('created')
 }
 

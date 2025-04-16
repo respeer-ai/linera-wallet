@@ -22,7 +22,7 @@
       >
         <InitializeAccount
           :password='password' v-model:show-inner-action-btn='showInnerActionBtn' v-model:mnemonic='mnemonic'
-          v-model:public-key='publicKey' v-model:private-key='privateKey'
+          v-model:private-key='privateKeyHex'
         />
       </q-step>
       <q-step
@@ -70,8 +70,7 @@ const { t } = useI18n({ useScope: 'global' })
 const step = ref(1)
 const password = ref(undefined as unknown as string)
 const passwordError = ref(false)
-const publicKey = ref('')
-const privateKey = ref('')
+const privateKeyHex = ref('')
 const mnemonic = ref('')
 const mnemonicValid = ref(false)
 const showInnerActionBtn = ref(false)
@@ -110,7 +109,7 @@ const savePassword = async () => {
 }
 
 const saveAccount = async () => {
-  await dbBridge.Owner.create(publicKey.value, privateKey.value)
+  await dbBridge.Owner.create(privateKeyHex.value)
   void router.push({ path: localStore.setting.formalizePath('/home') })
 }
 

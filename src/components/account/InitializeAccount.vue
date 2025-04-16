@@ -44,8 +44,7 @@
     <GenerateKey
       :password='password'
       v-model:mnemonic='mnemonic'
-      v-model:private-key='privateKey'
-      v-model:public-key='publicKey'
+      v-model:private-key='privateKeyHex'
     />
   </div>
 </template>
@@ -64,8 +63,7 @@ const password = toRef(props, 'password')
 
 const showInnerActionBtn = defineModel<boolean>('showInnerActionBtn')
 const mnemonic = defineModel<string>('mnemonic')
-const publicKey = defineModel<string>('publicKey')
-const privateKey = defineModel<string>('privateKey')
+const privateKeyHex = defineModel<string>('privateKey')
 
 const mnemonicWords = computed(() => mnemonic.value?.split(' '))
 const showMnemonic = ref(false)

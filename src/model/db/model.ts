@@ -1,9 +1,7 @@
 import CryptoJS, { AES, enc } from 'crypto-js'
-import { keccak } from 'hash-wasm'
-// TODO: replace with web3.js utils
-import { _hex } from '../../utils'
 import Identicon from 'identicon.js'
 import { OriginRpcAuth } from '../../../src-bex/middleware/types'
+import { Ed25519, Keccac256 } from 'src/crypto'
 
 export interface MicrochainOwner {
   id?: number
@@ -44,10 +42,7 @@ export interface Application {
 }
 
 export const ownerFromPublicKey = async (publicKey: string) => {
-  const publicKeyBytes = _hex.toBytes(publicKey)
-  const typeNameBytes = new TextEncoder().encode('Ed25519PublicKey::')
-  const bytes = new Uint8Array([...typeNameBytes, ...publicKeyBytes])
-  return await keccak(bytes, 256)
+  return Keccac256.hashWithTypename('Ed25519PublicKey', publicKey)
 }
 
 export interface Owner {
@@ -63,18 +58,18 @@ export interface Owner {
 export const DEFAULT_ACCOUNT_NAME = 'Account'
 
 export const buildOwner = async (
-  publicKey: string,
-  privateKey: string,
+  privateKeyHex: string,
   password: string,
   name: string
 ) => {
-  const owner = await ownerFromPublicKey(publicKey)
+  const publicKeyHex = Ed25519.publicHex(privateKeyHex)
+  const owner = await ownerFromPublicKey(publicKeyHex)
   const salt = CryptoJS.lib.WordArray.random(16).toString(enc.Base64)
   const key = CryptoJS.SHA256(salt + password + salt).toString()
-  const _privateKey = AES.encrypt(privateKey, key).toString()
+  const _privateKey = AES.encrypt(privateKeyHex, key).toString()
 
   return {
-    address: publicKey,
+    address: publicKeyHex,
     owner,
     privateKey: _privateKey,
     salt,

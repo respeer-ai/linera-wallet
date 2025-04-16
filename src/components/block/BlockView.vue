@@ -2,7 +2,6 @@
   <div>
     <DbMicrochainBridge v-model:microchains='microchains' />
     <DbTokenBridge v-model:tokens='tokens' />
-    <ConstructBlock ref='constructBlock' />
   </div>
 </template>
 
@@ -15,9 +14,6 @@ import { rpcBridge } from 'src/bridge'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
-import ConstructBlock from './ConstructBlock.vue'
-
-const constructBlock = ref<InstanceType<typeof ConstructBlock>>()
 
 const microchains = ref([] as dbModel.Microchain[])
 const tokens = ref([] as dbModel.Token[])

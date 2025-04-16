@@ -5,9 +5,8 @@ import {
   useMutation,
   useQuery
 } from '@vue/apollo-composable'
-import { _hex, graphqlResult } from 'src/utils'
+import { graphqlResult } from 'src/utils'
 import { dbBase, dbWallet } from 'src/controller'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
 import {
   OWNER_CHAINS,
   WALLET_INIT_WITHOUT_SECRET_KEY,
@@ -24,6 +23,7 @@ import {
 import { dbModel } from 'src/model'
 import * as dbBridge from '../db'
 import { Account } from './account'
+import { _Web3, Ed25519 } from 'src/crypto'
 
 export class Microchain {
   static openChain = async (
@@ -46,7 +46,7 @@ export class Microchain {
 
   static initMicrochainStore = async (
     owner: string,
-    keyPair: Ed25519SigningKey,
+    secretKeyHex: string,
     chainId: string,
     messageId: string
   ) => {
@@ -59,9 +59,12 @@ export class Microchain {
     )?.faucetUrl
 
     const typeNameBytes = new TextEncoder().encode('Nonce::')
-    const bytes = new Uint8Array([...typeNameBytes, ..._hex.toBytes(messageId)])
+    const bytes = new Uint8Array([
+      ...typeNameBytes,
+      ..._Web3.hexToBytes(messageId)
+    ])
     const signature = {
-      Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+      Ed25519: await Ed25519.signWithKeccac256Hash(secretKeyHex, bytes)
     }
 
     owner = Account.accountOwner(owner)
@@ -125,20 +128,17 @@ export class Microchain {
     const password = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!password) return Promise.reject(new Error('Invalid password'))
     const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = dbModel.privateKey(owner, _password)
-    const keyPair = Ed25519SigningKey.from_bytes(
-      new Memory(_hex.toBytes(privateKey))
-    )
+    const privateKeyHex = dbModel.privateKey(owner, _password)
 
     // Initialize public key to RPC wallet firstly
-    await Account.initPublicKey(keyPair)
+    await Account.initPublicKey(privateKeyHex)
 
     const resp = await Microchain.openChain(owner?.owner)
     if (!resp) return Promise.reject(new Error('Invalid open chain'))
 
     await Microchain.initMicrochainStore(
       owner.owner,
-      keyPair,
+      privateKeyHex,
       resp.chainId as string,
       resp.messageId as string
     )
@@ -168,17 +168,14 @@ export class Microchain {
     const password = (await dbBase.passwords.toArray()).find((el) => el.active)
     if (!password) return Promise.reject(new Error('Invalid password'))
     const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKey = dbModel.privateKey(owner, _password)
-    const keyPair = Ed25519SigningKey.from_bytes(
-      new Memory(_hex.toBytes(privateKey))
-    )
+    const privateKeyHex = dbModel.privateKey(owner, _password)
 
     // Initialize public key to RPC wallet firstly
-    await Account.initPublicKey(keyPair)
+    await Account.initPublicKey(privateKeyHex)
 
     await Microchain.initMicrochainStore(
       owner.owner,
-      keyPair,
+      privateKeyHex,
       chainId,
       messageId
     )

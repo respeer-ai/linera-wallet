@@ -9,24 +9,22 @@ connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
 use bip39::Mnemonic;
-use std::str::FromStr;
 
 use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
-    crypto::{AccountPublicKey, AccountSecretKey, CryptoHash},
-    data_types::{BlockHeight, Round, Timestamp, Blob as _Blob},
-    identifiers::ChainId,
+    crypto::{AccountSecretKey, Hashable},
+    data_types::Round,
 };
 use linera_chain::{data_types::{
-    BlockExecutionOutcome, IncomingBundle, ProposalContent,
+    BlockExecutionOutcome, ProposalContent,
 }, types::Block};
 use linera_execution::Operation;
-use linera_views::crypto::Hashable;
+use linera_client::client_options::ClientContextOptions;
 
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
-use web_sys::*;
+use web_sys::wasm_bindgen;
 
 mod fake_service;
 use fake_service::{MutationRoot as ServiceMutationRoot, QueryRoot as ServiceQueryRoot};
@@ -37,37 +35,11 @@ use fake_meme::{MutationRoot as MemeMutationRoot, QueryRoot as MemeQueryRoot};
 mod signed_block;
 use signed_block::SignedBlockBcs;
 
-use linera_client::fake_wallet::FakeWallet;
-use linera_client::{chain_listener::ClientContext as _, client_options::ClientOptions};
-
-// TODO convert to IndexedDbStore once we refactor Context
-type WebStorage =
-    linera_storage::DbStorage<linera_views::memory::MemoryStore, linera_storage::WallClock>;
-
-pub async fn get_storage() -> Result<WebStorage, JsError> {
-    Ok(linera_storage::DbStorage::initialize(
-        linera_views::memory::MemoryStoreConfig::new(1),
-        "linera",
-        None,
-    )
-    .await?)
-}
-
-type MemoryFakeWallet = linera_client::persistent::Memory<FakeWallet>;
-type SignClientContext = linera_client::client_context::ClientContext<WebStorage, MemoryFakeWallet>;
-
-// TODO get from config
-pub const OPTIONS: ClientOptions = ClientOptions {
+pub const OPTIONS: ClientContextOptions = ClientContextOptions {
     send_timeout: std::time::Duration::from_millis(4000),
     recv_timeout: std::time::Duration::from_millis(4000),
     max_pending_message_bundles: 10,
-    wasm_runtime: Some(linera_execution::WasmRuntime::Wasmer),
-    max_concurrent_queries: None,
     max_loaded_chains: nonzero_lit::usize!(40),
-    max_stream_queries: 10,
-    max_cache_size: 1000,
-    max_entry_size: 1000,
-    max_cache_entries: 1000,
     retry_delay: std::time::Duration::from_millis(1000),
     max_retries: 10,
     wait_for_outgoing_messages: false,
@@ -80,18 +52,9 @@ pub const OPTIONS: ClientOptions = ClientOptions {
     // TODO(linera-protocol#2944): separate these out from the
     // `ClientOptions` struct, since they apply only to the CLI/native
     // client
-    tokio_threads: Some(1),
-    command: linera_client::client_options::ClientCommand::Keygen,
     wallet_state_path: None,
-    storage_config: None,
     with_wallet: None,
 };
-
-pub async fn get_fake_client_context() -> Result<SignClientContext, JsError> {
-    let wallet = linera_client::config::WalletState::new(FakeWallet::new());
-    let storage = get_storage().await?;
-    Ok(SignClientContext::new(storage, OPTIONS, wallet))
-}
 
 #[wasm_bindgen]
 pub async fn bcs_serialize_signed_block(bytes_str: &str) -> Result<String, JsError> {
@@ -126,52 +89,6 @@ pub async fn block_payload(
     Ok(serde_json::to_string(&message)?)
 }
 
-// Execute operation to get
-#[wasm_bindgen]
-pub async fn construct_block(
-    chain_id: &str,
-    public_key: &str,
-    admin_id: &str,
-    block_hash: &str,
-    incoming_bundles: &str,
-    operations: &str,
-    blob_bytes: &str,
-    local_time: u64,
-    next_block_height: u64,
-) -> Result<Option<String>, JsError> {
-    let chain_id: ChainId = ChainId::from_str(chain_id)?;
-    let operations: Vec<Operation> = serde_json::from_str(operations)?;
-    let incoming_bundles: Vec<IncomingBundle> = serde_json::from_str(incoming_bundles)?;
-    let blob_bytes: Vec<Vec<u8>> = serde_json::from_str(blob_bytes)?;
-    let client_context: SignClientContext = get_fake_client_context().await?;
-    let secret_key = AccountSecretKey::from_public_key(AccountPublicKey::from_str(public_key)?);
-    let admin_id: ChainId = ChainId::from_str(admin_id)?;
-    let block_hash: Option<CryptoHash> = Some(CryptoHash::from_str(block_hash)?);
-
-    let chain_client = client_context.make_chain_client_ext(
-        chain_id,
-        secret_key,
-        admin_id,
-        block_hash,
-        Timestamp::from(local_time),
-        BlockHeight::from(next_block_height),
-    )?;
-
-    let blobs = blob_bytes.into_iter().map(_Blob::new_data).collect();
-
-    let executed_block = chain_client
-        .simulate_execute_block(
-            operations.clone(),
-            incoming_bundles,
-            blobs,
-            Timestamp::from(local_time),
-        )
-        .await?;
-
-    let json = serde_json::to_string(&executed_block)?;
-    Ok(Some(String::from(json)))
-}
-
 #[derive(Serialize)]
 struct MnemonicKeyPair {
     mnemonic: Mnemonic,
@@ -203,6 +120,9 @@ pub async fn generate_secret_key_from_mnemonic(
     _seed.copy_from_slice(&seed[0..32]);
     let mut rng = rand_chacha::ChaCha20Rng::from_seed(_seed);
     let secret_key = AccountSecretKey::generate_from(&mut rng);
+    let AccountSecretKey::Ed25519(secret_key) = secret_key else {
+        panic!("Invalid secret key");
+    };
     let key_str = format!("{}", serde_json::to_string(&secret_key)?);
     let key_str = key_str.replace("\"", "");
     Ok(key_str[..64].to_string())

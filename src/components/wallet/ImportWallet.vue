@@ -125,9 +125,8 @@ const savePassword = () => {
 
 const validateAccount = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  generateKey.value?.createAccountWithMnemonic(mnemonic.value, password.value).then(async (val: unknown) => {
-    const v = val as Record<string, string>
-    await dbBridge.Owner.create(v.publicKey, v.privateKey, undefined, password.value)
+  generateKey.value?.createAccountWithMnemonic(mnemonic.value, password.value).then(async (privateKeyHex: string) => {
+    await dbBridge.Owner.create(privateKeyHex, undefined, password.value)
     void router.push({ path: localStore.setting.formalizePath('/home') })
   }).catch((error) => {
     localStore.notification.pushNotification({

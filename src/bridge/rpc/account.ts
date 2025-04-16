@@ -5,7 +5,7 @@ import {
   useMutation,
   useQuery
 } from '@vue/apollo-composable'
-import { _hex, graphqlResult } from 'src/utils'
+import { graphqlResult } from 'src/utils'
 import { rpcModel } from 'src/model'
 import { BALANCE, BALANCES, WALLET_INIT_PUBLIC_KEY } from 'src/graphql'
 import {
@@ -13,7 +13,7 @@ import {
   type BalanceQuery,
   type BalancesQuery
 } from 'src/__generated__/graphql/service/graphql'
-import { Ed25519SigningKey, Memory } from '@hazae41/berith'
+import { _Web3, Ed25519 } from 'src/crypto'
 
 export class Account {
   static CHAIN = '0x00'
@@ -98,13 +98,15 @@ export class Account {
     })
   }
 
-  static initPublicKey = async (keyPair: Ed25519SigningKey) => {
+  static initPublicKey = async (secretKeyHex: string) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
     const typeNameBytes = new TextEncoder().encode('Nonce::')
-    const publicKeyBytes = keyPair.public().to_bytes().bytes
+    const publicKeyBytes = Ed25519.publicBytes(secretKeyHex)
+    const publicKeyHex = _Web3.bytesToHexTrim0x(publicKeyBytes)
+
     // Prefix '00' is for enum in public system
     const bytes = new Uint8Array([
       ...typeNameBytes,
@@ -113,10 +115,10 @@ export class Account {
       ...publicKeyBytes
     ])
     const signature = {
-      Ed25519: _hex.toHex(keyPair.sign(new Memory(bytes)).to_bytes().bytes)
+      Ed25519: await Ed25519.signWithKeccac256Hash(secretKeyHex, bytes)
     }
     const publicKey = {
-      Ed25519: _hex.toHex(keyPair.public().to_bytes().bytes)
+      Ed25519: publicKeyHex
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
