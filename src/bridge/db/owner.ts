@@ -34,7 +34,7 @@ export class Owner {
       throw Error('Invalid owner materials')
     }
     const publicKeyHex = Ed25519.publicHex(privateKeyHex)
-    if (!name) {
+    if (!name?.length) {
       // TODO: add field to store account number
       name =
         dbModel.DEFAULT_ACCOUNT_NAME +

@@ -56,7 +56,7 @@ const emit = defineEmits<{(ev: 'imported'): void,
 
 const onImportClick = async () => {
   try {
-    await dbBridge.Owner.create(privateKeyHex.value)
+    await dbBridge.Owner.create(privateKeyHex.value, accountName.value, password.value)
   } catch (error) {
     localStore.notification.pushNotification({
       Title: 'Import account',
