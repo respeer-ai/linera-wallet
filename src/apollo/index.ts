@@ -1,3 +1,4 @@
+import * as constant from '../const'
 import type { ApolloClientOptions } from '@apollo/client/core'
 import { createHttpLink, InMemoryCache, split } from '@apollo/client/core'
 // import type { BootFileParams } from '@quasar/app'
@@ -62,8 +63,8 @@ export /* async */ function getClientOptions(
   chainId?: string,
   applicationId?: string
 ) {
-  const httpBaseUrl = schema + '://' + host + ':' + `${port}`
-  const wsBaseUrl = wsSchema + '://' + host + ':' + `${port}` + '/ws'
+  const httpBaseUrl = constant.formalizeSchema(`${schema}://${host}:${port}`)
+  const wsBaseUrl = constant.formalizeSchema(`${wsSchema}://${host}:${port}/ws`)
 
   return getClientOptionsWithBaseUrl(
     httpBaseUrl,
