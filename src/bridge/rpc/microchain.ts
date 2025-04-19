@@ -24,6 +24,7 @@ import { dbModel } from 'src/model'
 import * as dbBridge from '../db'
 import { Account } from './account'
 import { _Web3, Ed25519 } from 'src/crypto'
+import * as constant from 'src/const'
 
 export class Microchain {
   static openChain = async (
@@ -54,9 +55,10 @@ export class Microchain {
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
-    const faucetUrl = (await dbBase.networks.toArray()).find(
-      (el) => el.selected
-    )?.faucetUrl
+    const faucetUrl = constant.formalizeSchema(
+      (await dbBase.networks.toArray()).find((el) => el.selected)
+        ?.faucetUrl as string
+    )
 
     const typeNameBytes = new TextEncoder().encode('Nonce::')
     const bytes = new Uint8Array([

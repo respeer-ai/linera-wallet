@@ -133,7 +133,9 @@ export const rpcUrl = (network: Network) => {
   )
     return ''
   const httpBaseUrl = `${network.rpcSchema}://${network.host}:${network.port}`
-  return constant.formalizeSchema(`${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`)
+  return constant.formalizeSchema(
+    `${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`
+  )
 }
 
 export const wsUrl = (network: Network) => {
@@ -143,7 +145,9 @@ export const wsUrl = (network: Network) => {
     network.port === undefined
   )
     return ''
-  return constant.formalizeSchema(`${network.wsSchema}://${network.host}:${network.port}/ws`)
+  return constant.formalizeSchema(
+    `${network.wsSchema}://${network.host}:${network.port}/ws`
+  )
 }
 
 export interface DeviceFingerPrint {

@@ -55,12 +55,18 @@ export class Network {
   static rpcEndpoint = async () => {
     const network = await Network.selected()
     if (!network) return ''
-    return constant.formalizeSchema(`${network.rpcSchema}://${network.host}:${network.port.toString()}(${network.path.length} ? ${network.path} : '')`)
+    return constant.formalizeSchema(
+      `${network.rpcSchema}://${network.host}:${network.port.toString()}(${
+        network.path.length
+      } ? ${network.path} : '')`
+    )
   }
 
   static subscriptionEndpoint = async () => {
     const network = await Network.selected()
     if (!network) return ''
-    return constant.formalizeSchema(`${network.wsSchema}://${network.host}:${network.port.toString()}/ws`)
+    return constant.formalizeSchema(
+      `${network.wsSchema}://${network.host}:${network.port.toString()}/ws`
+    )
   }
 }

@@ -29,7 +29,7 @@ export async function getClientOptionsWithEndpointType(
   let path = network.path?.length ? network?.path : undefined
 
   if (endpointType === EndpointType.Faucet && network) {
-    const url = new URL(network.faucetUrl)
+    const url = new URL(constant.formalizeSchema(network.faucetUrl))
     const protocol = url.protocol.replace(':', '')
     schema = protocol as dbModel.HTTPSchema
     wsSchema =

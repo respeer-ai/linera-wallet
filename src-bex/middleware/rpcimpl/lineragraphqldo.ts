@@ -235,9 +235,7 @@ export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {
       )
       if (!microchain) {
         console.log(
-          `RPC microchain for public key ${publicKey} of origin ${
-            request.origin
-          } is not available`
+          `RPC microchain for public key ${publicKey} of origin ${request.origin} is not available`
         )
         return Promise.reject(new Error('Invalid microchain'))
       }
