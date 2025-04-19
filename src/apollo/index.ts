@@ -1,3 +1,4 @@
+import * as constant from '../const'
 import type { ApolloClientOptions } from '@apollo/client/core'
 import { createHttpLink, InMemoryCache, split } from '@apollo/client/core'
 // import type { BootFileParams } from '@quasar/app'
@@ -28,7 +29,7 @@ export async function getClientOptionsWithEndpointType(
   let path = network.path?.length ? network?.path : undefined
 
   if (endpointType === EndpointType.Faucet && network) {
-    const url = new URL(network.faucetUrl)
+    const url = new URL(constant.formalizeSchema(network.faucetUrl))
     const protocol = url.protocol.replace(':', '')
     schema = protocol as dbModel.HTTPSchema
     wsSchema =
@@ -62,8 +63,8 @@ export /* async */ function getClientOptions(
   chainId?: string,
   applicationId?: string
 ) {
-  const httpBaseUrl = schema + '://' + host + ':' + `${port}`
-  const wsBaseUrl = wsSchema + '://' + host + ':' + `${port}` + '/ws'
+  const httpBaseUrl = constant.formalizeSchema(`${schema}://${host}:${port}`)
+  const wsBaseUrl = constant.formalizeSchema(`${wsSchema}://${host}:${port}/ws`)
 
   return getClientOptionsWithBaseUrl(
     httpBaseUrl,

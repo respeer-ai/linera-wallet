@@ -2,6 +2,7 @@ import CryptoJS, { AES, enc } from 'crypto-js'
 import Identicon from 'identicon.js'
 import { OriginRpcAuth } from '../../../src-bex/middleware/types'
 import { Ed25519, Keccac256 } from 'src/crypto'
+import * as constant from '../../const'
 
 export interface MicrochainOwner {
   id?: number
@@ -114,10 +115,10 @@ export interface Network {
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
   name: 'Linera ResPeer Local Net RPC',
-  faucetUrl: 'http://api.faucet.respeer.ai/api/faucet',
+  faucetUrl: constant.APPLICATION_URLS.FAUCET_URL,
   rpcSchema: HTTPSchema.HTTP,
   wsSchema: WSSchema.WS,
-  host: 'api.rpc.respeer.ai',
+  host: constant.APPLICATION_URLS.RPC_HOST,
   port: 80,
   path: '/api/rpc',
   selected: true,
@@ -132,7 +133,9 @@ export const rpcUrl = (network: Network) => {
   )
     return ''
   const httpBaseUrl = `${network.rpcSchema}://${network.host}:${network.port}`
-  return `${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`
+  return constant.formalizeSchema(
+    `${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`
+  )
 }
 
 export const wsUrl = (network: Network) => {
@@ -142,7 +145,9 @@ export const wsUrl = (network: Network) => {
     network.port === undefined
   )
     return ''
-  return `${network.wsSchema}://${network.host}:${network.port}/ws`
+  return constant.formalizeSchema(
+    `${network.wsSchema}://${network.host}:${network.port}/ws`
+  )
 }
 
 export interface DeviceFingerPrint {

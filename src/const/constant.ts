@@ -18,33 +18,50 @@ export const toUrl = (
   return schema + '://' + host + ':' + port.toString()
 }
 
+export const formalizeSchema = (url: string) => {
+  url = url.replace(
+    'http://',
+    process.env.NODE_ENV === 'production' ? 'https://' : 'http://'
+  )
+  url = url.replace(
+    'ws://',
+    process.env.NODE_ENV === 'production' ? 'wss://' : 'ws://'
+  )
+  url = url.replace(
+    ':80',
+    process.env.NODE_ENV === 'production' ? ':443' : ':80'
+  )
+  return url
+}
+
 const URLS = [
-  'http://api.blobgateway.com/api/blobs/chains/f7b00619e3b022d24dd802415e75d4182027d34ad04285a819176a4af3bead54/applications/d270c2e766f96752dd882d5da69d17ca055838f6a9d15b90938b64955c2324dc',
-  'http://api.ams.respeer.ai/api/ams/chains/8e49e7d608df6d0a6852d17e12abc669f8d8d1d861bf200189785cb4e14231f3/applications/01df77a8a1e255aa0cf8f6c0119be8ec20116b01722cd2e2bc0dc8b7bd7aebee',
-  'http://api.linerameme.fun/api/proxy/chains/ad61e8897c02fc7d723436cacebfd513a0388501d9af208e5b47401770b9ed6a/applications/4cfb88422fb5d102ffe2b8328314e216adceced5c1e76fdcfa84c3649eaf7f14',
-  'http://api.lineraswap.fun/api/swap/chains/197ce4b80e33b6ea90192086e97dd536d663b3138c4504984dc9602cc4809f50/applications/fb77ce0f5a796e1a322e1215e250e1d547f966a414ec7eac522077f81cc24ed9',
+  'http://api.blobgateway.com/api/blobs/chains/66201b64d1b2b3e3bad971ea5ab08524739ce058df9996361e545de8820f53b7/applications/ae8ad6cf1446107bd996e55d6b2c3cff67376636407889d5c392d88d0348cb54',
+  'http://api.ams.respeer.ai/api/ams/chains/0f01f62e5a1d1764baa378d7c115973b364a7474ca8dec5bede43016ccb48a73/applications/d1c7e6d51a26003ed047d841462d45ac89c59e6d90aa57d7971619dbadc24701',
+  'http://api.linerameme.fun/api/proxy/chains/943a7f972e5dd64e126c8a22e69e8d1e492cd398b730db6ab46e780fe4f05c2a/applications/2926a3f53240bc99af0b4c469ce0275cd2d3c9d126e894badeaf996a9f19fb78',
+  'http://api.lineraswap.fun/api/swap/chains/b47f1b5ae482460b585fa72c41b6b1ed46a1efe9292962ace8b675f55537d40f/applications/939e7f4bff8427039ff78a90d0ac9792a136fedc7a07aa7567641242257fd9f4',
   'http://api.linerameme.fun/api/proxy',
   'ws://api.linerameme.fun/api/proxy/ws',
   'http://api.lineraswap.fun/api/swap',
-  'ws://api.lineraswap.fun/api/swap/ws'
+  'ws://api.lineraswap.fun/api/swap/ws',
+  'http://api.lineraswap.fun/api/kline',
+  'ws://api.lineraswap.fun/api/kline/ws',
+  'http://api.faucet.respeer.ai/api/faucet',
+  'http://api.rpc.respeer.ai/api/rpc'
 ]
 
 export const APPLICATION_URLS = {
-  BLOB_GATEWAY: URLS[0],
-  AMS: URLS[1],
-  PROXY: URLS[2],
-  SWAP: URLS[3],
-  PROXY_BASE: URLS[4],
-  PROXY_BASE_WS: URLS[5],
-  SWAP_BASE: URLS[6],
-  SWAP_BASE_WS: URLS[7]
-}
-
-export const formalizeSchema = (url: string) => {
-  return url.replace(
-    HTTPSchema.HTTP,
-    process.env.NODE_ENV === 'production' ? HTTPSchema.HTTP : HTTPSchema.HTTP
-  )
+  BLOB_GATEWAY: formalizeSchema(URLS[0]),
+  AMS: formalizeSchema(URLS[1]),
+  PROXY: formalizeSchema(URLS[2]),
+  SWAP: formalizeSchema(URLS[3]),
+  PROXY_BASE: formalizeSchema(URLS[4]),
+  PROXY_BASE_WS: formalizeSchema(URLS[5]),
+  SWAP_BASE: formalizeSchema(URLS[6]),
+  SWAP_BASE_WS: formalizeSchema(URLS[7]),
+  KLINE_HTTP_URL: formalizeSchema(URLS[8]),
+  KLINE_WS_URL: formalizeSchema(URLS[9]),
+  FAUCET_URL: formalizeSchema(URLS[10]),
+  RPC_HOST: URLS[11]
 }
 
 export const applicationId = (url: string) => {
@@ -59,6 +76,3 @@ export const LINERA_TICKER = 'TLINERA'
 export const LINERA_NATIVE_ID = LINERA_TICKER
 export const LINERA_LOGO =
   'https://avatars.githubusercontent.com/u/107513858?s=48&v=4'
-
-export const KLINE_WS_URL = 'ws://api.kline.lineraswap.fun/api/kline/ws'
-export const KLINE_HTTP_URL = 'http://api.kline.lineraswap.fun/api/kline'
