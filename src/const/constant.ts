@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import * as domain from './domain'
+
 export enum HTTPSchema {
   HTTP = 'http',
   HTTPS = 'https'
@@ -35,49 +36,20 @@ export const formalizeSchema = (url: string) => {
   return url
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-const SUB_DOMAIN = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_SUB_DOMAIN
-const BLOB_GATEWAY_CHAIN_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_BLOB_GATEWAY_CHAIN_ID
-const BLOB_GATEWAY_APPLICATION_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_BLOB_GATEWAY_APPLICATION_ID
-const AMS_CHAIN_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_AMS_CHAIN_ID
-const AMS_APPLICATION_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_AMS_APPLICATION_ID
-const PROXY_CHAIN_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_PROXY_CHAIN_ID
-const PROXY_APPLICATION_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_PROXY_APPLICATION_ID
-const SWAP_CHAIN_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_SWAP_CHAIN_ID
-const SWAP_APPLICATION_ID = (
-  import.meta as unknown as Record<string, Record<string, string>>
-).env.VITE_SWAP_APPLICATION_ID
-
 const URLS = [
-  `http://api.${SUB_DOMAIN}blobgateway.com/api/blobs/chains/${BLOB_GATEWAY_CHAIN_ID}/applications/${BLOB_GATEWAY_APPLICATION_ID}`,
-  `http://api.${SUB_DOMAIN}ams.respeer.ai/api/ams/chains/${AMS_CHAIN_ID}/applications/${AMS_APPLICATION_ID}`,
-  `http://api.${SUB_DOMAIN}linerameme.fun/api/proxy/chains/${PROXY_CHAIN_ID}/applications/${PROXY_APPLICATION_ID}`,
-  `http://api.${SUB_DOMAIN}lineraswap.fun/api/swap/chains/${SWAP_CHAIN_ID}/applications/${SWAP_APPLICATION_ID}`,
-  `http://api.${SUB_DOMAIN}linerameme.fun/api/proxy`,
-  `ws://api.${SUB_DOMAIN}linerameme.fun/api/proxy/ws`,
-  `http://api.${SUB_DOMAIN}lineraswap.fun/api/swap`,
-  `ws://api.${SUB_DOMAIN}lineraswap.fun/api/swap/ws`,
-  `http://api.${SUB_DOMAIN}lineraswap.fun/api/kline`,
-  `ws://api.${SUB_DOMAIN}lineraswap.fun/api/kline/ws`,
-  `http://api.${SUB_DOMAIN}faucet.respeer.ai/api/faucet`,
-  `http://api.${SUB_DOMAIN}rpc.respeer.ai/api/rpc`,
-  `ws://api.${SUB_DOMAIN}rpc.respeer.ai/api/rpc/ws`
+  `http://api.${domain.SUB_DOMAIN}blobgateway.com/api/blobs/chains/${domain.BLOB_GATEWAY_CHAIN_ID}/applications/${domain.BLOB_GATEWAY_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}ams.respeer.ai/api/ams/chains/${domain.AMS_CHAIN_ID}/applications/${domain.AMS_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}linerameme.fun/api/proxy/chains/${domain.PROXY_CHAIN_ID}/applications/${domain.PROXY_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap/chains/${domain.SWAP_CHAIN_ID}/applications/${domain.SWAP_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}linerameme.fun/api/proxy`,
+  `ws://api.${domain.SUB_DOMAIN}linerameme.fun/api/proxy/ws`,
+  `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap`,
+  `ws://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap/ws`,
+  `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/kline`,
+  `ws://api.${domain.SUB_DOMAIN}lineraswap.fun/api/kline/ws`,
+  `http://api.${domain.SUB_DOMAIN}faucet.respeer.ai/api/faucet`,
+  `http://api.${domain.SUB_DOMAIN}rpc.respeer.ai/api/rpc`,
+  `ws://api.${domain.SUB_DOMAIN}rpc.respeer.ai/api/rpc/ws`
 ]
 
 export const APPLICATION_URLS = {

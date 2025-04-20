@@ -14,12 +14,8 @@ const { configure } = require('quasar/wrappers')
 const path = require('path')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { stringify } = require('flatted')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { loadEnv } = require('vite')
 
 module.exports = configure(function (ctx) {
-  const env = loadEnv(ctx.mode, process.cwd())
-
   return {
     // https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
     supportTS: {
@@ -66,7 +62,7 @@ module.exports = configure(function (ctx) {
       // publicPath: '/',
       // analyze: true,
 
-      env,
+      // env: {},
 
       rawDefine: {
         'process.version': stringify(process.version)
