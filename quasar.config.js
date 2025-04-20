@@ -128,27 +128,8 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
-      proxy: {
-        '/rpc': {
-          target: 'http://api.rpc.respeer.ai',
-          pathRewrite: {
-            '^/rpc': '/rpc'
-          },
-          secure: false,
-          changeOrigin: true
-        },
-        '/api/blobs': {
-          target: 'http://api.blobgateway.com',
-          pathRewrite: {
-            '^/api/blobs': '/api/blobs'
-          },
-          secure: false,
-          changeOrigin: true
-        }
-      },
-      server: {
-        type: 'http'
-      },
+      proxy: {},
+      server: {},
       port: 8080,
       open: false // opens browser window automatically
     },

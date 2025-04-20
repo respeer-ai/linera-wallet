@@ -1,4 +1,3 @@
-import * as constant from '../const'
 import type { ApolloClientOptions } from '@apollo/client/core'
 import { createHttpLink, InMemoryCache, split } from '@apollo/client/core'
 // import type { BootFileParams } from '@quasar/app'
@@ -6,7 +5,6 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { dbBase } from 'src/controller'
-import { dbModel } from 'src/model'
 
 export enum EndpointType {
   Faucet,
@@ -22,57 +20,14 @@ export async function getClientOptionsWithEndpointType(
   const network = (await dbBase.networks.toArray()).find((el) => el.selected)
   if (!network) return
 
-  let schema = network.rpcSchema
-  let wsSchema = network.wsSchema
-  let host = network.host
-  let port = network.port
-  let path = network.path?.length ? network?.path : undefined
+  let rpcUrl = network.rpcUrl
+  const rpcWsUrl = network.rpcWsUrl
 
   if (endpointType === EndpointType.Faucet && network) {
-    const url = new URL(constant.formalizeSchema(network.faucetUrl))
-    const protocol = url.protocol.replace(':', '')
-    schema = protocol as dbModel.HTTPSchema
-    wsSchema =
-      protocol === dbModel.HTTPSchema.HTTP
-        ? dbModel.WSSchema.WS
-        : dbModel.WSSchema.WSS
-    host = url.hostname
-    port = parseInt(
-      url.port ? url.port : protocol === dbModel.HTTPSchema.HTTP ? '80' : '443'
-    )
-    path = url.pathname
+    rpcUrl = network.faucetUrl
   }
 
-  return getClientOptions(
-    schema,
-    wsSchema,
-    host,
-    port,
-    path,
-    chainId,
-    applicationId
-  )
-}
-
-export /* async */ function getClientOptions(
-  schema: dbModel.HTTPSchema,
-  wsSchema: dbModel.WSSchema,
-  host: string,
-  port: number,
-  path?: string,
-  chainId?: string,
-  applicationId?: string
-) {
-  const httpBaseUrl = constant.formalizeSchema(`${schema}://${host}:${port}`)
-  const wsBaseUrl = constant.formalizeSchema(`${wsSchema}://${host}:${port}/ws`)
-
-  return getClientOptionsWithBaseUrl(
-    httpBaseUrl,
-    wsBaseUrl,
-    chainId,
-    applicationId,
-    path
-  )
+  return getClientOptionsWithBaseUrl(rpcUrl, rpcWsUrl, chainId, applicationId)
 }
 
 export function getClientOptionsWithBaseUrl(

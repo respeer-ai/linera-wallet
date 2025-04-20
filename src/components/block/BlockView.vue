@@ -32,6 +32,12 @@ const subscribeMicrochain = async (microchain: string) => {
       microchain
     })
   }
+  // TODO: use balances api to get balance of all microchains
+  blockWorker.BlockWorker.send(blockWorker.BlockEventType.NEW_BLOCK, {
+    microchain,
+    hash: undefined,
+    memeChain
+  })
 
   const unsubscribe = await rpcBridge.Block.subscribe(
     microchain, memeChain, (hash: string) => {

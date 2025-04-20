@@ -1,3 +1,5 @@
+import * as domain from './domain'
+
 export enum HTTPSchema {
   HTTP = 'http',
   HTTPS = 'https'
@@ -35,18 +37,19 @@ export const formalizeSchema = (url: string) => {
 }
 
 const URLS = [
-  'http://api.blobgateway.com/api/blobs/chains/66201b64d1b2b3e3bad971ea5ab08524739ce058df9996361e545de8820f53b7/applications/ae8ad6cf1446107bd996e55d6b2c3cff67376636407889d5c392d88d0348cb54',
-  'http://api.ams.respeer.ai/api/ams/chains/0f01f62e5a1d1764baa378d7c115973b364a7474ca8dec5bede43016ccb48a73/applications/d1c7e6d51a26003ed047d841462d45ac89c59e6d90aa57d7971619dbadc24701',
-  'http://api.linerameme.fun/api/proxy/chains/943a7f972e5dd64e126c8a22e69e8d1e492cd398b730db6ab46e780fe4f05c2a/applications/2926a3f53240bc99af0b4c469ce0275cd2d3c9d126e894badeaf996a9f19fb78',
-  'http://api.lineraswap.fun/api/swap/chains/b47f1b5ae482460b585fa72c41b6b1ed46a1efe9292962ace8b675f55537d40f/applications/939e7f4bff8427039ff78a90d0ac9792a136fedc7a07aa7567641242257fd9f4',
-  'http://api.linerameme.fun/api/proxy',
-  'ws://api.linerameme.fun/api/proxy/ws',
-  'http://api.lineraswap.fun/api/swap',
-  'ws://api.lineraswap.fun/api/swap/ws',
-  'http://api.lineraswap.fun/api/kline',
-  'ws://api.lineraswap.fun/api/kline/ws',
-  'http://api.faucet.respeer.ai/api/faucet',
-  'http://api.rpc.respeer.ai/api/rpc'
+  `http://api.${domain.SUB_DOMAIN}blobgateway.com/api/blobs/chains/${domain.BLOB_GATEWAY_CHAIN_ID}/applications/${domain.BLOB_GATEWAY_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}ams.respeer.ai/api/ams/chains/${domain.AMS_CHAIN_ID}/applications/${domain.AMS_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}linerameme.fun/api/proxy/chains/${domain.PROXY_CHAIN_ID}/applications/${domain.PROXY_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap/chains/${domain.SWAP_CHAIN_ID}/applications/${domain.SWAP_APPLICATION_ID}`,
+  `http://api.${domain.SUB_DOMAIN}linerameme.fun/api/proxy`,
+  `ws://api.${domain.SUB_DOMAIN}linerameme.fun/api/proxy/ws`,
+  `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap`,
+  `ws://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap/ws`,
+  `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/kline`,
+  `ws://api.${domain.SUB_DOMAIN}lineraswap.fun/api/kline/ws`,
+  'https://faucet.testnet-babbage.linera.net',
+  `http://api.${domain.SUB_DOMAIN}rpc.respeer.ai/api/rpc`,
+  `ws://api.${domain.SUB_DOMAIN}rpc.respeer.ai/api/rpc/ws`
 ]
 
 export const APPLICATION_URLS = {
@@ -61,7 +64,8 @@ export const APPLICATION_URLS = {
   KLINE_HTTP_URL: formalizeSchema(URLS[8]),
   KLINE_WS_URL: formalizeSchema(URLS[9]),
   FAUCET_URL: formalizeSchema(URLS[10]),
-  RPC_HOST: URLS[11]
+  RPC_URL: formalizeSchema(URLS[11]),
+  RPC_WS_URL: formalizeSchema(URLS[12])
 }
 
 export const applicationId = (url: string) => {

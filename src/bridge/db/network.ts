@@ -1,6 +1,5 @@
 import { dbBase } from 'src/controller'
 import { dbModel } from 'src/model'
-import * as constant from '../../const'
 
 export class Network {
   static initialize = async () => {
@@ -55,18 +54,12 @@ export class Network {
   static rpcEndpoint = async () => {
     const network = await Network.selected()
     if (!network) return ''
-    return constant.formalizeSchema(
-      `${network.rpcSchema}://${network.host}:${network.port.toString()}(${
-        network.path.length
-      } ? ${network.path} : '')`
-    )
+    return network.rpcUrl
   }
 
   static subscriptionEndpoint = async () => {
     const network = await Network.selected()
     if (!network) return ''
-    return constant.formalizeSchema(
-      `${network.wsSchema}://${network.host}:${network.port.toString()}/ws`
-    )
+    return network.rpcWsUrl
   }
 }

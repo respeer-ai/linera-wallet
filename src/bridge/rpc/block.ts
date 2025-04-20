@@ -44,9 +44,6 @@ export class Block {
     const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
-    const applicationUrl = `${network?.rpcSchema}://${network?.host}:${
-      network?.port
-    }${network.path?.length ? network.path : ''}`
     const sig = {
       Ed25519: signature
     }
@@ -58,6 +55,7 @@ export class Block {
       blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes)))
     }
     // TODO: we have to use bcs here due to issue https://github.com/linera-io/linera-protocol/issues/3734
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const bcsStr = await lineraWasm.bcs_serialize_signed_block(
       stringify(signedBlock) as string
     )
@@ -67,7 +65,7 @@ export class Block {
     return new Promise((resolve, reject) => {
       axios
         .post(
-          applicationUrl,
+          network.rpcUrl,
           stringify({
             query: SUBMIT_BLOCK_AND_SIGNATURE_BCS.loc?.source.body,
             variables: {

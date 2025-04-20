@@ -1,6 +1,5 @@
 import { graphqlResult } from 'src/utils'
 import { BLOCK_MATERIAL } from 'src/graphql'
-import * as constant from '../../const'
 import {
   type BlockMaterialQuery,
   type CandidateBlockMaterial
@@ -18,15 +17,10 @@ export class BlockMaterial {
     const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
-    const rpcUrl = constant.formalizeSchema(
-      `${network?.rpcSchema}://${network?.host}:${network?.port}${
-        network?.path.length ? network?.path : ''
-      }`
-    )
     return new Promise((resolve, reject) => {
       axios
         .post(
-          rpcUrl,
+          network.rpcUrl,
           {
             query: BLOCK_MATERIAL.loc?.source.body,
             variables: {
