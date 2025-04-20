@@ -20,9 +20,6 @@ export class SimulatedBlock {
     const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
 
-    const applicationUrl = `${network?.rpcSchema}://${network?.host}:${
-      network?.port
-    }${network.path?.length ? network.path : ''}`
     const blockMaterial = {
       operations,
       blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes))),
@@ -32,7 +29,7 @@ export class SimulatedBlock {
     return new Promise((resolve, reject) => {
       axios
         .post(
-          applicationUrl,
+          network.rpcUrl,
           stringify({
             query: SIMULATE_EXECUTE_BLOCK.loc?.source.body,
             variables: {

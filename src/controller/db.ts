@@ -12,8 +12,7 @@ export const dbBase = new Dexie('CheCkoBaseDatabase') as Dexie & {
 }
 
 dbBase.version(1).stores({
-  networks:
-    '++id, icon, name, faucetUrl, rpcSchema, wsSchema, host, port, path, selected, preset',
+  networks: '++id, icon, name, faucetUrl, rpcUrl, rpcWsUrl, selected, preset',
   passwords: '++id, password, salt, createdAt',
   tokens:
     '++id, name, ticker, tokenType, description, applicationId, creatorChainId, native, usdCurrency, discord, telegram, twitter, website, github, totalSupply',

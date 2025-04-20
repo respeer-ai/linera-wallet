@@ -41,7 +41,7 @@
         flat class='btn full-width vertical-menus-margin' no-caps
         @click='onSaveClick'
         v-if='!network.preset && !network.selected'
-        :disable='!network.faucetUrl || !network.host || !network.name || !network.port || !network.rpcSchema || !network.wsSchema'
+        :disable='!network.faucetUrl || !network.rpcUrl || !network.name'
       >
         {{ $t('MSG_SAVE') }}
       </q-btn>
@@ -68,7 +68,7 @@ import NetworkBridge from '../bridge/db/NetworkBridge.vue'
 const network = defineModel<dbModel.Network>({ default: {} as dbModel.Network })
 
 const rpcUrl = computed({
-  get: () => network.value ? dbModel.rpcUrl(network.value) : '',
+  get: () => network.value?.rpcUrl || '',
   set: (val: string) => {
     const v = new URL(val)
     const protocol = v.protocol.replace(':', '')
@@ -85,7 +85,7 @@ const rpcUrl = computed({
 })
 
 const wsUrl = computed({
-  get: () => network.value ? dbModel.wsUrl(network.value) : '',
+  get: () => network.value?.rpcWsUrl || '',
   set: (val: string) => {
     const v = new URL(val)
     const protocol = v.protocol.replace(':', '')

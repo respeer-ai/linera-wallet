@@ -103,11 +103,8 @@ export interface Network {
   icon: string
   name: string
   faucetUrl: string
-  rpcSchema: HTTPSchema
-  wsSchema: WSSchema
-  host: string
-  port: number
-  path: string
+  rpcUrl: string
+  rpcWsUrl: string
   selected: boolean
   preset: boolean
 }
@@ -116,39 +113,11 @@ export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
   name: 'Linera ResPeer Local Net RPC',
   faucetUrl: constant.APPLICATION_URLS.FAUCET_URL,
-  rpcSchema: HTTPSchema.HTTP,
-  wsSchema: WSSchema.WS,
-  host: constant.APPLICATION_URLS.RPC_HOST,
-  port: 80,
-  path: '/api/rpc',
+  rpcUrl: constant.APPLICATION_URLS.RPC_URL,
+  rpcWsUrl: constant.APPLICATION_URLS.RPC_WS_URL,
   selected: true,
   preset: true
 } as Network
-
-export const rpcUrl = (network: Network) => {
-  if (
-    !network.rpcSchema?.length ||
-    !network.host?.length ||
-    network.port === undefined
-  )
-    return ''
-  const httpBaseUrl = `${network.rpcSchema}://${network.host}:${network.port}`
-  return constant.formalizeSchema(
-    `${httpBaseUrl}${network.path?.length > 1 ? network.path : ''}`
-  )
-}
-
-export const wsUrl = (network: Network) => {
-  if (
-    !network.wsSchema?.length ||
-    !network.host?.length ||
-    network.port === undefined
-  )
-    return ''
-  return constant.formalizeSchema(
-    `${network.wsSchema}://${network.host}:${network.port}/ws`
-  )
-}
 
 export interface DeviceFingerPrint {
   id?: number

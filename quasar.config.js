@@ -14,8 +14,12 @@ const { configure } = require('quasar/wrappers')
 const path = require('path')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { stringify } = require('flatted')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { loadEnv } = require('vite')
 
 module.exports = configure(function (ctx) {
+  const env = loadEnv(ctx.mode, process.cwd())
+
   return {
     // https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
     supportTS: {
@@ -62,7 +66,7 @@ module.exports = configure(function (ctx) {
       // publicPath: '/',
       // analyze: true,
 
-      // env: {},
+      env,
 
       rawDefine: {
         'process.version': stringify(process.version)
@@ -128,27 +132,8 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
-      proxy: {
-        '/rpc': {
-          target: 'http://api.rpc.respeer.ai',
-          pathRewrite: {
-            '^/rpc': '/rpc'
-          },
-          secure: false,
-          changeOrigin: true
-        },
-        '/api/blobs': {
-          target: 'http://api.blobgateway.com',
-          pathRewrite: {
-            '^/api/blobs': '/api/blobs'
-          },
-          secure: false,
-          changeOrigin: true
-        }
-      },
-      server: {
-        type: 'http'
-      },
+      proxy: {},
+      server: {},
       port: 8080,
       open: false // opens browser window automatically
     },
