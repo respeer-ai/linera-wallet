@@ -65,7 +65,6 @@ const selectedOwner = ref(undefined as unknown as dbModel.Owner)
 
 const onBlockProcessed = async (payload: blockWorker.BlockProcessedPayload) => {
   const { microchain } = payload
-  console.log('Block processed', microchain)
   if (microchain !== token.value.creatorChainId) return
   await getBalance()
 }
