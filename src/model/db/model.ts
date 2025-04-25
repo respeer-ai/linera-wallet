@@ -111,7 +111,7 @@ export interface Network {
 
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
-  name: 'Linera ResPeer Local Net RPC',
+  name: 'Linera Babbage ResPeer RPC',
   faucetUrl: constant.APPLICATION_URLS.FAUCET_URL,
   rpcUrl: constant.APPLICATION_URLS.RPC_URL,
   rpcWsUrl: constant.APPLICATION_URLS.RPC_WS_URL,
