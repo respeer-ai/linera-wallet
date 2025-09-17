@@ -2,11 +2,7 @@ import { gql } from '@apollo/client/core'
 
 export const OPEN_CHAIN = gql`
   mutation openChain($owner: AccountOwner!) {
-    claim(owner: $owner) {
-      messageId
-      chainId
-      certificateHash
-    }
+    claim(owner: $owner)
   }
 `
 

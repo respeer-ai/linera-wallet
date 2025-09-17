@@ -34,35 +34,30 @@ export const WALLET_INIT_WITHOUT_SECRET_KEY = gql`
   mutation walletInitWithoutSecretKey(
     $chainId: ChainId!
     $initializer: WalletInitializer!
-    $messageId: MessageId!
   ) {
     walletInitWithoutSecretKey(
       chainId: $chainId
       initializer: $initializer
-      messageId: $messageId
     )
   }
 `
 
 export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
-  mutation submitBlockAndSignature(
+  mutation submitSignedBlock(
     $chainId: ChainId!
-    $height: BlockHeight!
     $block: SignedBlock!
   ) {
-    submitBlockAndSignature(chainId: $chainId, height: $height, block: $block)
+    submitSignedBlock(chainId: $chainId, block: $block)
   }
 `
 
 export const SUBMIT_BLOCK_AND_SIGNATURE_BCS = gql`
-  mutation submitBlockAndSignatureBcs(
+  mutation submitSignedBlockBcs(
     $chainId: ChainId!
-    $height: BlockHeight!
     $block: SignedBlockBcs!
   ) {
-    submitBlockAndSignatureBcs(
+    submitSignedBlockBcs(
       chainId: $chainId
-      height: $height
       block: $block
     )
   }
@@ -88,35 +83,16 @@ export const BLOCK = gql`
           stateHash
           previousBlockHash
           authenticatedSigner
-          bundlesHash
-          operationsHash
+          transactionsHash
           messagesHash
           previousMessageBlocksHash
+          previousEventBlocksHash
           oracleResponsesHash
           eventsHash
           blobsHash
           operationResultsHash
         }
         body {
-          incomingBundles {
-            origin
-            bundle {
-              height
-              timestamp
-              certificateHash
-              transactionIndex
-              messages {
-                authenticatedSigner
-                grant
-                refundGrantTo
-                kind
-                index
-                message
-              }
-            }
-            action
-          }
-          operations
           messages {
             destination
             authenticatedSigner
@@ -126,6 +102,7 @@ export const BLOCK = gql`
             message
           }
           previousMessageBlocks
+          previousEventBlocks
           oracleResponses
           events {
             streamId {
@@ -137,6 +114,33 @@ export const BLOCK = gql`
           }
           blobs
           operationResults
+          transactionMetadata {
+            transactionType
+            incomingBundle {
+              origin
+              bundle {
+                height
+                timestamp
+                certificateHash
+                transactionIndex
+                messages {
+                  authenticatedSigner
+                  grant
+                  refundGrantTo
+                  kind
+                  index
+                  message
+                }
+              }
+              action
+            }
+            operation {
+              operationType
+              applicationId
+              userBytesHex
+              systemBytesHex
+            }
+          }
         }
       }
     }
@@ -176,91 +180,8 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
     $blockMaterial: BlockMaterial!
   ) {
     simulateExecuteBlock(chainId: $chainId, blockMaterial: $blockMaterial) {
-      block {
-        header {
-          chainId
-          epoch
-          height
-          timestamp
-          stateHash
-          previousBlockHash
-          authenticatedSigner
-          bundlesHash
-          operationsHash
-          messagesHash
-          previousMessageBlocksHash
-          oracleResponsesHash
-          eventsHash
-          blobsHash
-          operationResultsHash
-        }
-        body {
-          incomingBundles {
-            origin
-            bundle {
-              height
-              timestamp
-              certificateHash
-              transactionIndex
-              messages {
-                authenticatedSigner
-                grant
-                refundGrantTo
-                kind
-                index
-                message
-              }
-            }
-            action
-          }
-          operations
-          messages {
-            destination
-            authenticatedSigner
-            grant
-            refundGrantTo
-            kind
-            message
-          }
-          previousMessageBlocks
-          oracleResponses
-          events {
-            streamId {
-              applicationId
-              streamName
-            }
-            index
-            value
-          }
-          blobs
-          operationResults
-        }
-      }
-      outcome {
-        messages {
-          destination
-          authenticatedSigner
-          grant
-          refundGrantTo
-          kind
-          message
-        }
-        previousMessageBlocks
-        stateHash
-        oracleResponses
-        events {
-          streamId {
-            applicationId
-            streamName
-          }
-          index
-          value
-        }
-        blobs
-        operationResults
-      }
+      blockProposal
       blobBytes
-      validatedBlockCertificate
     }
   }
 `
@@ -292,7 +213,7 @@ export const TRANSFER = gql`
   mutation transfer(
     $chainId: ChainId!
     $owner: AccountOwner!
-    $recipient: Recipient!
+    $recipient: Account!
     $amount: Amount!
   ) {
     transfer(
@@ -301,14 +222,5 @@ export const TRANSFER = gql`
       recipient: $recipient
       amount: $amount
     )
-  }
-`
-
-export const WALLET_INIT_PUBLIC_KEY = gql`
-  mutation walletInitPublicKey(
-    $publicKey: AccountPublicKey!
-    $signature: AccountSignature!
-  ) {
-    walletInitPublicKey(publicKey: $publicKey, signature: $signature)
   }
 `

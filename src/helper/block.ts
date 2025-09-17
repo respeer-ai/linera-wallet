@@ -109,7 +109,7 @@ export class BlockHelper {
     material: CandidateBlockMaterial
   ) => {
     return await lineraWasm.block_payload(
-      stringify(simulatedBlock.block, null, 2) as string,
+      stringify(simulatedBlock.block) as string,
       stringify(material.round) as string,
       stringify(simulatedBlock.outcome) as string
     )
