@@ -135,7 +135,7 @@ const onSynchronizeMicrochainsClick = () => {
   if (!selectedOwner.value) return
   rpcBridge.Microchain.chains(selectedOwner.value?.owner).then(async (chains: Chains | undefined) => {
     for (const microchain of chains?.list || []) {
-      await dbBridge.Microchain.create(selectedOwner.value.owner, microchain as string, undefined, undefined, undefined, chains?.default === microchain)
+      await dbBridge.Microchain.create(selectedOwner.value.owner, microchain as string, undefined, undefined, chains?.default === microchain)
     }
     await loadMicrochains()
     localStore.notification.pushNotification({

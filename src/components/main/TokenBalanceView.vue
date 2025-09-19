@@ -80,7 +80,7 @@ const onTransferClick = () => {
 }
 
 const onSwapClick = () => {
-  window.open('http://testnet-babbage.lineraswap.fun')
+  window.open('http://testnet-conway.lineraswap.fun')
 }
 
 </script>

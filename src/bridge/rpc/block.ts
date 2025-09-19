@@ -10,19 +10,20 @@ import {
   useSubscription
 } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
-import { dbModel, rpcModel } from 'src/model'
+import { dbModel } from 'src/model'
 import { dbBase } from 'src/controller'
 import {
   NOTIFICATIONS,
   BLOCK,
-  SUBMIT_BLOCK_AND_SIGNATURE_BCS
+  SUBMIT_SIGNED_BLOCK_BCS
 } from 'src/graphql'
 import {
   type BlockQuery,
   type NotificationsSubscription,
   type ConfirmedBlock,
-  type Block as _Block,
-  type SubmitBlockAndSignatureBcsMutation
+  type SubmitSignedBlockBcsMutation,
+  type InputUnsignedBlockProposal,
+  type SignedBlock
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
 import axios from 'axios'
@@ -32,14 +33,11 @@ import * as constant from 'src/const'
 import { _Web3, Ed25519 } from 'src/crypto'
 
 export class Block {
-  static submitBlockAndSignature = async (
+  static submitSignedBlock = async (
     chainId: string,
-    height: number,
-    block: _Block,
-    round: rpcModel.Round,
+    block: InputUnsignedBlockProposal,
     signature: string,
-    validatedBlockCertificate: unknown | undefined,
-    blobBytes: Array<Uint8Array>
+    blobBytes: number[][]
   ): Promise<string> => {
     const network = (await dbBridge.Network.selected()) as dbModel.Network
     if (!network) return Promise.reject('Invalid network')
@@ -47,13 +45,13 @@ export class Block {
     const sig = {
       Ed25519: signature
     }
+
     const signedBlock = {
-      block,
-      round,
+      unsignedBlockProposal: block,
       signature: sig,
-      validatedBlockCertificate,
-      blobBytes: Array.from(blobBytes.map((bytes) => Array.from(bytes)))
-    }
+      blobBytes
+    } as SignedBlock
+
     // TODO: we have to use bcs here due to issue https://github.com/linera-io/linera-protocol/issues/3734
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const bcsStr = await lineraWasm.bcs_serialize_signed_block(
@@ -67,13 +65,12 @@ export class Block {
         .post(
           network.rpcUrl,
           stringify({
-            query: SUBMIT_BLOCK_AND_SIGNATURE_BCS.loc?.source.body,
+            query: SUBMIT_SIGNED_BLOCK_BCS.loc?.source.body,
             variables: {
               chainId,
-              height,
               block: bcsHex
             },
-            operationName: 'submitBlockAndSignatureBcs'
+            operationName: 'submitSignedBlockBcs'
           }),
           {
             responseType: 'text',
@@ -88,10 +85,10 @@ export class Block {
             return reject(stringify(errors))
           }
           const submitBlockAndSignatureBcs = (
-            data as Record<string, SubmitBlockAndSignatureBcsMutation>
+            data as Record<string, SubmitSignedBlockBcsMutation>
           ).data
           resolve(
-            submitBlockAndSignatureBcs.submitBlockAndSignatureBcs as string
+            submitBlockAndSignatureBcs.submitSignedBlockBcs as string
           )
         })
         .catch((e) => {

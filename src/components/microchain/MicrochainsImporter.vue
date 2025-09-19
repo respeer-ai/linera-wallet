@@ -26,7 +26,7 @@ watch(networkId, async (newValue) => {
     for (const owner of owners) {
       const privateKeyHex = dbModel.privateKey(owner, password)
       try {
-        await rpcBridge.Microchain.initMicrochainStore(owner.owner, privateKeyHex, microchain.microchain, microchain.messageId)
+        await rpcBridge.Microchain.initMicrochainStore(owner.owner, privateKeyHex, microchain.microchain, microchain.creatorChainId)
         microchain.imported = true
       } catch {
         microchain.imported = false

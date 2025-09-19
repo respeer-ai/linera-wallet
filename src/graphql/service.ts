@@ -30,19 +30,23 @@ export const OWNER_CHAINS = gql`
   }
 `
 
-export const WALLET_INIT_WITHOUT_SECRET_KEY = gql`
-  mutation walletInitWithoutSecretKey(
+export const IMPORT_CHAIN = gql`
+  mutation importChain(
+    $owner: AccountOwner!
     $chainId: ChainId!
-    $initializer: WalletInitializer!
+    $signature: AccountSignature!
+    $creatorChainId: ChainId!
   ) {
-    walletInitWithoutSecretKey(
+    importChain(
+      owner: $owner
       chainId: $chainId
-      initializer: $initializer
+      signature: $signature
+      creatorChainId: $creatorChainId
     )
   }
 `
 
-export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
+export const SUBMIT_SIGNED_BLOCK = gql`
   mutation submitSignedBlock(
     $chainId: ChainId!
     $block: SignedBlock!
@@ -51,7 +55,7 @@ export const SUBMIT_BLOCK_AND_SIGNATURE = gql`
   }
 `
 
-export const SUBMIT_BLOCK_AND_SIGNATURE_BCS = gql`
+export const SUBMIT_SIGNED_BLOCK_BCS = gql`
   mutation submitSignedBlockBcs(
     $chainId: ChainId!
     $block: SignedBlockBcs!
@@ -180,7 +184,95 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
     $blockMaterial: BlockMaterial!
   ) {
     simulateExecuteBlock(chainId: $chainId, blockMaterial: $blockMaterial) {
-      blockProposal
+      blockProposal {
+        content {
+          block {
+            chainId
+            epoch
+            transactionMetadata {
+              transactionType
+              incomingBundle {
+                origin
+                bundle {
+                  height
+                  timestamp
+                  certificateHash
+                  transactionIndex
+                  messages {
+                    authenticatedSigner
+                    grant
+                    refundGrantTo
+                    kind
+                    index
+                    message
+                  }
+                }
+                action
+              }
+              operation {
+                operationType
+                applicationId
+                userBytesHex
+                systemBytesHex
+              }
+            }
+            height
+            timestamp
+            authenticatedSigner
+            previousBlockHash
+          }
+          round
+          outcome {
+            messages {
+              destination
+              authenticatedSigner
+              grant
+              refundGrantTo
+              kind
+              message
+            }
+            previousMessageBlocks
+            previousEventBlocks
+            stateHash
+            oracleResponses
+            events {
+              streamId {
+                applicationId
+                streamName
+              }
+              index
+              value
+            }
+            blobs
+            operationResults
+          }
+        }
+        outcome {
+          messages {
+            destination
+            authenticatedSigner
+            grant
+            refundGrantTo
+            kind
+            message
+          }
+          previousMessageBlocks
+          previousEventBlocks
+          stateHash
+          oracleResponses
+          events {
+            streamId {
+              applicationId
+              streamName
+            }
+            index
+            value
+          }
+          blobs
+          operationResults
+        }
+        originalProposal
+      }
       blobBytes
     }
   }

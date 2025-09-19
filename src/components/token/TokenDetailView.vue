@@ -114,7 +114,7 @@ const onTransferClick = () => {
 }
 
 const onSwapClick = () => {
-  window.open('https://testnet-babbage.lineraswap.fun')
+  window.open('https://testnet-conway.lineraswap.fun')
 }
 
 </script>

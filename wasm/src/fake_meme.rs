@@ -24,7 +24,7 @@ impl MutationRoot {
         to: Account,
         amount: Amount,
     ) -> Result<Vec<u8>, Error> {
-        Ok(bcs::to_bytes(&MemeOperation::Transfer{
+        Ok(bcs::to_bytes(&MemeOperation::Transfer {
             to,
             amount
         })?)

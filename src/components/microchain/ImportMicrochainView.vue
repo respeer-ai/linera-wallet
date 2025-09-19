@@ -12,7 +12,7 @@
       autogrow hide-bottom-space class='vertical-items-margin'
     />
     <div class='text-bold vertical-menus-margin'>
-      {{ $t('MSG_CREATION_MESSAGE') }}
+      {{ $t('MSG_CREATOR_CHAIN_ID') }}
     </div>
     <q-input
       outlined v-model='messageId' type='textarea' :error='messageIdError'

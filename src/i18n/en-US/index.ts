@@ -100,7 +100,7 @@ export default {
   MSG_PASTE_MICROCHAIN_CREATION_INFORMATION_TO_INPUT_BOX:
     'Paste microchain creation information to input box.',
   MSG_MICROCHAIN_ID: 'Microchain ID',
-  MSG_CREATION_MESSAGE: 'Creation message',
+  MSG_CREATOR_CHAIN_ID: 'Creator chain ID',
   MSG_CREATION_CERTIFICATE: 'Creation certificate',
   MSG_PLEASE_BACKUP_MICROCHAIN_CREATION_MATERIALS:
     'Please backup microchain ID, the message used to create microchain ' +
@@ -113,8 +113,6 @@ export default {
   MSG_CHAIN_BALANCE: 'Chain balance',
   MSG_ACCOUNT_BALANCE: 'Account balance',
   MSG_CHAIN_DETAILS: 'Chain details',
-  MSG_CREATION_MESSAGE_ID: 'Creation message ID',
-  MSG_CREATION_CERTIFICATE_HASH: 'Creation certificate hash',
   MSG_DEFAULT_CHAIN: 'Default chain',
   MSG_CHAIN_ACTIVITIES: 'Chain activities',
   MSG_VIEW_MORE_THREE_DOTS: 'View more ...',

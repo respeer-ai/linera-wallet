@@ -2,9 +2,9 @@ use async_graphql::{Error, Object};
 use linera_base::{
     crypto::CryptoHash,
     data_types::Amount,
-    identifiers::{ChainId, ModuleId, AccountOwner, ApplicationId},
+    identifiers::{ChainId, ModuleId, AccountOwner, ApplicationId, Account},
 };
-use linera_execution::{system::Recipient, Operation, SystemOperation};
+use linera_execution::{Operation, SystemOperation};
 
 pub struct QueryRoot;
 
@@ -23,7 +23,7 @@ impl MutationRoot {
         &self,
         _chain_id: ChainId,
         owner: AccountOwner,
-        recipient: Recipient,
+        recipient: Account,
         amount: Amount,
     ) -> Result<Operation, Error> {
         Ok(Operation::system(SystemOperation::Transfer {

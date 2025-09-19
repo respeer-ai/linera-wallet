@@ -1,5 +1,5 @@
 import {
-  type Block,
+  type UnsignedBlockProposal,
   type ConfirmedBlock
 } from 'src/__generated__/graphql/service/graphql'
 import { stringify } from 'lossless-json'
@@ -9,7 +9,7 @@ import { dbModel } from 'src/model'
 export class MicrochainHelper {
   static claimedInBlock = async (
     microchain: string,
-    block: Block,
+    block: UnsignedBlockProposal,
     certificateHash: string
   ) => {
     const isOpenChain = stringify(block)?.includes('OpenChain')

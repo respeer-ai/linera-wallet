@@ -63,6 +63,8 @@ export type Destination = {
   Subscribers: Uint8Array
 }
 
+export type ChainDescription = unknown
+
 export type MemeToken = {
   initialSupply: string
   totalSupply: string

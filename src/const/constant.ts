@@ -47,7 +47,7 @@ const URLS = [
   `ws://api.${domain.SUB_DOMAIN}lineraswap.fun/api/swap/ws`,
   `http://api.${domain.SUB_DOMAIN}lineraswap.fun/api/kline`,
   `ws://api.${domain.SUB_DOMAIN}lineraswap.fun/api/kline/ws`,
-  'https://faucet.testnet-babbage.linera.net',
+  'https://faucet.testnet-conway.linera.net',
   `http://api.${domain.SUB_DOMAIN}rpc.respeer.ai/api/rpc`,
   `ws://api.${domain.SUB_DOMAIN}rpc.respeer.ai/api/rpc/ws`
 ]

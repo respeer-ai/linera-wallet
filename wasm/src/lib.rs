@@ -14,11 +14,9 @@ use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
     crypto::{AccountSecretKey, Hashable},
-    data_types::Round,
+    data_types::ChainDescription,
 };
-use linera_chain::{data_types::{
-    BlockExecutionOutcome, ProposalContent,
-}, types::Block};
+use linera_chain::data_types::{OperationMetadata, ProposalContent};
 use linera_execution::Operation;
 use linera_client::client_options::ClientContextOptions;
 
@@ -39,7 +37,6 @@ pub const OPTIONS: ClientContextOptions = ClientContextOptions {
     send_timeout: std::time::Duration::from_millis(4000),
     recv_timeout: std::time::Duration::from_millis(4000),
     max_pending_message_bundles: 10,
-    max_loaded_chains: nonzero_lit::usize!(40),
     retry_delay: std::time::Duration::from_millis(1000),
     max_retries: 10,
     wait_for_outgoing_messages: false,
@@ -49,11 +46,12 @@ pub const OPTIONS: ClientContextOptions = ClientContextOptions {
     blob_download_timeout: std::time::Duration::from_millis(1000),
     grace_period: linera_core::DEFAULT_GRACE_PERIOD,
 
-    // TODO(linera-protocol#2944): separate these out from the
-    // `ClientOptions` struct, since they apply only to the CLI/native
-    // client
     wallet_state_path: None,
     with_wallet: None,
+
+    keystore_path: None,
+
+    chain_worker_ttl: std::time::Duration::from_millis(1000),
 };
 
 #[wasm_bindgen]
@@ -66,27 +64,23 @@ pub async fn bcs_serialize_signed_block(bytes_str: &str) -> Result<String, JsErr
 
 #[wasm_bindgen]
 pub async fn block_payload(
-    block: &str,
-    round: &str,
-    outcome: &str,
+    content: &str,
 ) -> Result<String, JsError> {
-    let deserializer = &mut serde_json::Deserializer::from_str(block);
-    let block: Block = serde_path_to_error::deserialize(deserializer)?;
-    let (proposed_block, _) = block.into_proposal();
+    let deserializer = &mut serde_json::Deserializer::from_str(content);
+    let content: ProposalContent = serde_path_to_error::deserialize(deserializer)?;
 
-    let round: Round = serde_json::from_str(round)?;
-    let outcome: Option<BlockExecutionOutcome> = match serde_json::from_str(outcome) {
-        Ok(outcome) => Some(outcome),
-        Err(_) => None,
-    };
-    let content = ProposalContent {
-        block: proposed_block,
-        round,
-        outcome,
-    };
     let mut message = Vec::new();
     content.write(&mut message);
     Ok(serde_json::to_string(&message)?)
+}
+
+#[wasm_bindgen]
+pub async fn chain_description_id(chain_description: &str) -> Result<String, JsError> {
+    let deserializer = &mut serde_json::Deserializer::from_str(chain_description);
+    let chain_description: ChainDescription =
+        serde_path_to_error::deserialize(deserializer)?;
+    let id = chain_description.id();
+    Ok(serde_json::to_string(&id)?.replace("\"", ""))
 }
 
 #[derive(Serialize)]
@@ -153,11 +147,11 @@ pub async fn graphql_deserialize_meme_operation(
     let schema = Schema::new(MemeQueryRoot, MemeMutationRoot, EmptySubscription);
     let value = schema.execute(request).await.into_result().unwrap().data;
     let async_graphql::Value::Object(object) = value else {
-        todo!()
+        return Err(JsError::new("Invalid query"));
     };
     let values = object.values().collect::<Vec<&async_graphql::Value>>();
     if values.len() == 0 {
-        todo!()
+        return Err(JsError::new("Invalid query"));
     }
     Ok(serde_json::to_string(&values[0])?)
 }
@@ -171,15 +165,23 @@ pub async fn graphql_deserialize_operation(
     let schema = Schema::new(ServiceQueryRoot, ServiceMutationRoot, EmptySubscription);
     let value = schema.execute(request).await.into_result().unwrap().data;
     let async_graphql::Value::Object(object) = value else {
-        todo!()
+        return Err(JsError::new("Invalid query"));
     };
     let values = object.values().collect::<Vec<&async_graphql::Value>>();
     if values.len() == 0 {
-        todo!()
+        return Err(JsError::new("Invalid query"));
     }
     let operation: Operation = async_graphql::from_value(values[0].clone())?;
     let operation_str = serde_json::to_string(&operation)?;
     Ok(operation_str)
+}
+
+#[wasm_bindgen]
+pub async fn operation_metadata(operation: &str) -> Result<String, JsError> {
+    let deserializer = &mut serde_json::Deserializer::from_str(operation);
+    let operation: Operation = serde_path_to_error::deserialize(deserializer)?;
+    let metadata = OperationMetadata::from(&operation);
+    Ok(serde_json::to_string(&metadata)?)
 }
 
 #[wasm_bindgen(start)]

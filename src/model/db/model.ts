@@ -19,7 +19,7 @@ export enum MicrochainState {
 export interface Microchain {
   id?: number
   microchain: string
-  messageId: string
+  creatorChainId: string
   name: string
   default: boolean
   imported: boolean // If it's imported in selected network
@@ -111,7 +111,7 @@ export interface Network {
 
 export const defaultNetwork = {
   icon: 'https://github.com/respeer-ai/linera-wallet/blob/master/src/assets/LineraLogo.png?raw=true',
-  name: 'Linera Babbage ResPeer RPC',
+  name: 'Linera Conway ResPeer RPC',
   faucetUrl: constant.APPLICATION_URLS.FAUCET_URL,
   rpcUrl: constant.APPLICATION_URLS.RPC_URL,
   rpcWsUrl: constant.APPLICATION_URLS.RPC_WS_URL,

@@ -11,13 +11,6 @@
       outlined v-model='microchainId' type='textarea' :error='microchainIdError'
       autogrow hide-bottom-space class='vertical-items-margin'
     />
-    <div class='text-bold vertical-menus-margin'>
-      {{ $t('MSG_CREATION_MESSAGE') }}
-    </div>
-    <q-input
-      outlined v-model='messageId' type='textarea' :error='messageIdError'
-      autogrow hide-bottom-space class='vertical-items-margin'
-    />
     <q-btn
       class='btn vertical-sections-margin extra-margin-bottom full-width' flat no-caps
       @click='onValidateClick' :disabled='!canValidate'
@@ -38,22 +31,18 @@ const props = defineProps<Props>()
 const microchain = toRef(props, 'microchain')
 
 const microchainId = ref('')
-const messageId = ref('')
 
 const microchainIdError = ref(false)
-const messageIdError = ref(false)
 
 const emit = defineEmits<{(ev: 'validated'): void}>()
 
 const canValidate = computed(() => {
-  return microchainId.value === microchain.value.microchain ||
-         messageId.value === microchain.value.messageId
+  return microchainId.value === microchain.value.microchain
 })
 
 const onValidateClick = () => {
   microchainIdError.value = microchainId.value !== microchain.value.microchain
-  messageIdError.value = messageId.value !== microchain.value.messageId
-  if (microchainIdError.value || messageIdError.value) return
+  if (microchainIdError.value) return
   emit('validated')
 }
 

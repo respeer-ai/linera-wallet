@@ -8,10 +8,10 @@
       {{ microchain.microchain }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(microchain.microchain, evt)' /></span>
     </div>
     <div class='text-bold vertical-sections-margin  decorate-underline'>
-      {{ $t('MSG_CREATION_MESSAGE') }}
+      {{ $t('MSG_CREATOR_CHAIN_ID') }}
     </div>
     <div class='word-break-all vertical-items-margin cursor-pointer'>
-      {{ microchain.messageId }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(microchain.messageId, evt)' /></span>
+      {{ microchain.creatorChainId }} <span class='cursor-pointer'><q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(microchain.creatorChainId, evt)' /></span>
     </div>
     <div class='row vertical-sections-margin tip warn'>
       <q-icon name='bi-exclamation-circle' color='red-6' :style='{marginTop: "4px"}' />

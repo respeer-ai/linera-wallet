@@ -9,12 +9,11 @@ import { graphqlResult } from 'src/utils'
 import { dbBase, dbWallet } from 'src/controller'
 import {
   OWNER_CHAINS,
-  WALLET_INIT_WITHOUT_SECRET_KEY,
-  OPEN_CHAIN
+  OPEN_CHAIN,
+  IMPORT_CHAIN
 } from 'src/graphql'
 import {
-  type OpenChainMutation,
-  type ClaimOutcome
+  type OpenChainMutation
 } from 'src/__generated__/graphql/faucet/graphql'
 import {
   type Chains,
@@ -24,12 +23,14 @@ import { dbModel } from 'src/model'
 import * as dbBridge from '../db'
 import { Account } from './account'
 import { _Web3, Ed25519 } from 'src/crypto'
-import * as constant from 'src/const'
+import { ChainDescription } from 'src/model/rpc/model'
+import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
+import { stringify } from 'lossless-json'
 
 export class Microchain {
   static openChain = async (
     owner: string
-  ): Promise<ClaimOutcome | undefined> => {
+  ): Promise<ChainDescription | undefined> => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Faucet)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
@@ -42,48 +43,42 @@ export class Microchain {
     const res = await mutate({
       owner
     })
-    return (graphqlResult.rootData(res) as OpenChainMutation).claim
+    return (graphqlResult.rootData(res) as OpenChainMutation).claim as unknown
   }
 
   static initMicrochainStore = async (
     owner: string,
     secretKeyHex: string,
     chainId: string,
-    messageId: string
+    creatorChainId: string
   ) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
 
-    const faucetUrl = constant.formalizeSchema(
-      (await dbBase.networks.toArray()).find((el) => el.selected)
-        ?.faucetUrl as string
-    )
-
     const typeNameBytes = new TextEncoder().encode('Nonce::')
     const bytes = new Uint8Array([
       ...typeNameBytes,
-      ..._Web3.hexToBytes(messageId)
+      ..._Web3.hexToBytes(chainId)
     ])
     const signature = {
-      Ed25519: await Ed25519.signWithKeccac256Hash(secretKeyHex, bytes)
+      Ed25519: {
+        signature: await Ed25519.signWithKeccac256Hash(secretKeyHex, bytes),
+        public_key: Ed25519.publicHex(secretKeyHex)
+      }
     }
 
     owner = Account.accountOwner(owner)
-    const initializer = {
-      owner,
-      signature,
-      faucetUrl
-    }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const { mutate } = provideApolloClient(apolloClient)(() =>
-      useMutation(WALLET_INIT_WITHOUT_SECRET_KEY)
+      useMutation(IMPORT_CHAIN)
     )
     return await mutate({
+      owner,
       chainId,
-      initializer,
-      messageId
+      signature,
+      creatorChainId
     })
   }
 
@@ -132,25 +127,34 @@ export class Microchain {
     const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
     const privateKeyHex = dbModel.privateKey(owner, _password)
 
-    // Initialize public key to RPC wallet firstly
-    await Account.initPublicKey(privateKeyHex)
+    const chainDescription = await Microchain.openChain(owner?.owner)
+    if (!chainDescription) return Promise.reject(new Error('Failed open chain'))
 
-    const resp = await Microchain.openChain(owner?.owner)
-    if (!resp) return Promise.reject(new Error('Invalid open chain'))
+    // TODO: workaround for u64 overflow
+    const chainId = await lineraWasm.chain_description_id((stringify(chainDescription) as string).replace('18446744073709552000', '18446744073709551615'))
+    interface Resp {
+      origin: {
+        Child: {
+          parent: string
+        }
+      }
+    }
+    const creatorChainId = (chainDescription as Resp).origin.Child.parent
+
+    console.log('Open microchain', chainId, creatorChainId)
 
     await Microchain.initMicrochainStore(
       owner.owner,
       privateKeyHex,
-      resp.chainId as string,
-      resp.messageId as string
+      chainId,
+      creatorChainId
     )
     // The first block will be signed in BlockView
 
     const microchain = await dbBridge.Microchain.create(
       owner.owner,
-      resp.chainId as string,
-      resp.messageId as string,
-      resp.certificateHash as string
+      chainId,
+      creatorChainId
     )
 
     return microchain
@@ -171,9 +175,6 @@ export class Microchain {
     if (!password) return Promise.reject(new Error('Invalid password'))
     const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
     const privateKeyHex = dbModel.privateKey(owner, _password)
-
-    // Initialize public key to RPC wallet firstly
-    await Account.initPublicKey(privateKeyHex)
 
     await Microchain.initMicrochainStore(
       owner.owner,

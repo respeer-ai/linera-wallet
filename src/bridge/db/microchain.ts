@@ -67,8 +67,7 @@ export class Microchain {
   static create = async (
     owner: string,
     microchainId: string,
-    messageId?: string,
-    certificateHash?: string,
+    creatorChainId?: string,
     name?: string,
     _default?: boolean
   ): Promise<dbModel.Microchain> => {
@@ -82,8 +81,7 @@ export class Microchain {
     microchain = {
       microchain: microchainId,
       balance: 0,
-      messageId,
-      certificateHash,
+      creatorChainId,
       networkId: selectedNetwork.id,
       name,
       default: _default,

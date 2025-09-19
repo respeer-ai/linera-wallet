@@ -1,12 +1,12 @@
 import {
-  type Block,
+  type Operation,
+  type UnsignedBlockProposal,
   type CandidateBlockMaterial,
   type SimulatedBlockMaterial
 } from 'src/__generated__/graphql/service/graphql'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { dbModel, rpcModel } from 'src/model'
 import { parse, stringify } from 'lossless-json'
-import { sha3 } from 'hash-wasm'
 import * as lineraWasm from '../../src-bex/wasm/linera_wasm'
 import { MicrochainHelper } from './microchain'
 
@@ -48,24 +48,20 @@ export class BlockHelper {
   }
 
   static validateOperation = async (
-    block: Block,
+    block: UnsignedBlockProposal,
     operation: rpcModel.Operation
   ) => {
-    const executedOperation = block.body.operations[0] as rpcModel.Operation
-    const operationHash = await sha3(
-      stringify(BlockHelper.sortedObject(operation), (key, value) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        if (value !== null) return value
-      }) as string
+    const executedOperation = block.content.block.transactionMetadata.find((tx) => tx.operation)?.operation
+
+    const _operationStr = await lineraWasm.operation_metadata(
+      stringify(operation) as string
     )
-    const executedOperationHash = await sha3(
-      stringify(BlockHelper.sortedObject(executedOperation), (key, value) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        if (value !== null) return value
-      }) as string
-    )
-    if (operationHash !== executedOperationHash) {
-      throw Error('Invalid operation payload')
+    const metadata = parse(_operationStr) as Operation
+    if (metadata.applicationId !== executedOperation?.applicationId ||
+      metadata.operationType !== executedOperation?.operationType ||
+      metadata.systemBytesHex !== executedOperation.systemBytesHex ||
+      metadata.userBytesHex !== executedOperation.userBytesHex) {
+      throw Error('Operation metadata mismatch')
     }
   }
 
@@ -87,12 +83,12 @@ export class BlockHelper {
       candidate
     )
 
-    const _block = simulatedBlock?.block
+    const _block = simulatedBlock?.blockProposal
     if (!_block) throw Error('Invalid block')
 
-    const validatedBlockCertificate =
-      simulatedBlock?.validatedBlockCertificate as unknown
-    const isRetryBlock = !!validatedBlockCertificate
+    const originalProposal =
+      simulatedBlock?.blockProposal?.originalProposal as unknown
+    const isRetryBlock = !!originalProposal
 
     if (_operation && !isRetryBlock) {
       await BlockHelper.validateOperation(_block, _operation)
@@ -105,13 +101,10 @@ export class BlockHelper {
   }
 
   static blockPayload = async (
-    simulatedBlock: SimulatedBlockMaterial,
-    material: CandidateBlockMaterial
+    simulatedBlock: SimulatedBlockMaterial
   ) => {
     return await lineraWasm.block_payload(
-      stringify(simulatedBlock.block) as string,
-      stringify(material.round) as string,
-      stringify(simulatedBlock.outcome) as string
+      stringify(simulatedBlock.blockProposal.content) as string
     )
   }
 
@@ -125,23 +118,16 @@ export class BlockHelper {
     return signature
   }
 
-  static submitBlockWithSignature = async (
+  static submitSignedBlock = async (
     microchain: string,
     simulatedBlock: SimulatedBlockMaterial,
-    material: CandidateBlockMaterial,
-    operation: dbModel.ChainOperation | undefined,
     signature: string
   ) => {
-    return await rpcBridge.Block.submitBlockAndSignature(
+    return await rpcBridge.Block.submitSignedBlock(
       microchain,
-      simulatedBlock.block.header.height as number,
-      simulatedBlock.block,
-      material.round as rpcModel.Round,
+      simulatedBlock.blockProposal,
       signature,
-      simulatedBlock.validatedBlockCertificate,
-      operation
-        ? await dbBridge.ChainOperation.operationBlobs(operation.operationId)
-        : []
+      simulatedBlock.blobBytes
     )
   }
 
@@ -162,24 +148,21 @@ export class BlockHelper {
       material
     )
     const blockPayload = await BlockHelper.blockPayload(
-      simulatedBlock,
-      material
+      simulatedBlock
     )
     const signature = await BlockHelper.signPayload(
       microchain,
       JSON.parse(blockPayload) as Uint8Array
     )
-    const certificateHash = await BlockHelper.submitBlockWithSignature(
+    const certificateHash = await BlockHelper.submitSignedBlock(
       microchain,
       simulatedBlock,
-      material,
-      operation,
       signature
     )
 
     await MicrochainHelper.claimedInBlock(
       microchain,
-      simulatedBlock.block,
+      simulatedBlock.blockProposal,
       certificateHash
     )
 

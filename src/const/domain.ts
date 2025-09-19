@@ -1,4 +1,4 @@
-export const SUB_DOMAIN = 'testnet-babbage.'
+export const SUB_DOMAIN = 'testnet-conway.'
 export const BLOB_GATEWAY_CHAIN_ID =
   '674cd8dac1db6b6536ec895aa4b3dd1f12c11a78d7bffe0c557b1aae137538f7'
 export const BLOB_GATEWAY_APPLICATION_ID =

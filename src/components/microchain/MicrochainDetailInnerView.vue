@@ -36,15 +36,15 @@
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>
       <div class='microchain-detail-label text-grey-8 flex items-center'>
-        {{ $t('MSG_CREATION_MESSAGE_ID') }}
+        {{ $t('MSG_CREATOR_CHAIN_ID') }}
       </div>
       <q-space />
       <div class='word-break-all row microchain-detail-value flex items-center justify-center row'>
         <q-space />
         <div class='microchain-detail-value-text  text-right'>
-          {{ microchain.messageId }}
+          {{ microchain.creatorChainId }}
         </div>
-        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(microchain.messageId, evt)' />
+        <q-icon name='bi-copy' size='12px' class='microchain-detail-copy-icon page-item-x-margin-left' @click.stop='(evt) => _copyToClipboard(microchain.creatorChainId, evt)' />
       </div>
     </div>
     <div :class='[ "row decorate-underline-dashed vertical-menus-margin cursor-pointer microchain-detail-line", localStore.setting.extensionMode ? "setting-item-inner-padding" : "" ]'>

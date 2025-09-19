@@ -11,10 +11,10 @@ import { dbModel } from 'src/model'
 import { localStore } from 'src/localstores'
 import { blockWorker } from 'src/worker'
 import { rpcBridge } from 'src/bridge'
+import { ChainOperationHelper } from 'src/helper'
 
 import DbMicrochainBridge from '../bridge/db/MicrochainBridge.vue'
 import DbTokenBridge from '../bridge/db/TokenBridge.vue'
-import { ChainOperationHelper } from 'src/helper'
 
 const microchains = ref([] as dbModel.Microchain[])
 const tokens = ref([] as dbModel.Token[])
