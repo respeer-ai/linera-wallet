@@ -12,11 +12,7 @@ import {
 import { graphqlResult } from 'src/utils'
 import { dbModel } from 'src/model'
 import { dbBase } from 'src/controller'
-import {
-  NOTIFICATIONS,
-  BLOCK,
-  SUBMIT_SIGNED_BLOCK_BCS
-} from 'src/graphql'
+import { NOTIFICATIONS, BLOCK, SUBMIT_SIGNED_BLOCK_BCS } from 'src/graphql'
 import {
   type BlockQuery,
   type NotificationsSubscription,
@@ -87,9 +83,7 @@ export class Block {
           const submitBlockAndSignatureBcs = (
             data as Record<string, SubmitSignedBlockBcsMutation>
           ).data
-          resolve(
-            submitBlockAndSignatureBcs.submitSignedBlockBcs as string
-          )
+          resolve(submitBlockAndSignatureBcs.submitSignedBlockBcs as string)
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

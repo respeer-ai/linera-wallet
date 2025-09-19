@@ -7,14 +7,8 @@ import {
 } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { dbBase, dbWallet } from 'src/controller'
-import {
-  OWNER_CHAINS,
-  OPEN_CHAIN,
-  IMPORT_CHAIN
-} from 'src/graphql'
-import {
-  type OpenChainMutation
-} from 'src/__generated__/graphql/faucet/graphql'
+import { OWNER_CHAINS, OPEN_CHAIN, IMPORT_CHAIN } from 'src/graphql'
+import { type OpenChainMutation } from 'src/__generated__/graphql/faucet/graphql'
 import {
   type Chains,
   type OwnerChainsQuery
@@ -131,7 +125,12 @@ export class Microchain {
     if (!chainDescription) return Promise.reject(new Error('Failed open chain'))
 
     // TODO: workaround for u64 overflow
-    const chainId = await lineraWasm.chain_description_id((stringify(chainDescription) as string).replace('18446744073709552000', '18446744073709551615'))
+    const chainId = await lineraWasm.chain_description_id(
+      (stringify(chainDescription) as string).replace(
+        '18446744073709552000',
+        '18446744073709551615'
+      )
+    )
     interface Resp {
       origin: {
         Child: {

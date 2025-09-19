@@ -51,16 +51,20 @@ export class BlockHelper {
     block: UnsignedBlockProposal,
     operation: rpcModel.Operation
   ) => {
-    const executedOperation = block.content.block.transactionMetadata.find((tx) => tx.operation)?.operation
+    const executedOperation = block.content.block.transactionMetadata.find(
+      (tx) => tx.operation
+    )?.operation
 
     const _operationStr = await lineraWasm.operation_metadata(
       stringify(operation) as string
     )
     const metadata = parse(_operationStr) as Operation
-    if (metadata.applicationId !== executedOperation?.applicationId ||
+    if (
+      metadata.applicationId !== executedOperation?.applicationId ||
       metadata.operationType !== executedOperation?.operationType ||
       metadata.systemBytesHex !== executedOperation.systemBytesHex ||
-      metadata.userBytesHex !== executedOperation.userBytesHex) {
+      metadata.userBytesHex !== executedOperation.userBytesHex
+    ) {
       throw Error('Operation metadata mismatch')
     }
   }
@@ -86,8 +90,8 @@ export class BlockHelper {
     const _block = simulatedBlock?.blockProposal
     if (!_block) throw Error('Invalid block')
 
-    const originalProposal =
-      simulatedBlock?.blockProposal?.originalProposal as unknown
+    const originalProposal = simulatedBlock?.blockProposal
+      ?.originalProposal as unknown
     const isRetryBlock = !!originalProposal
 
     if (_operation && !isRetryBlock) {
@@ -100,9 +104,7 @@ export class BlockHelper {
     }
   }
 
-  static blockPayload = async (
-    simulatedBlock: SimulatedBlockMaterial
-  ) => {
+  static blockPayload = async (simulatedBlock: SimulatedBlockMaterial) => {
     return await lineraWasm.block_payload(
       stringify(simulatedBlock.blockProposal.content) as string
     )
@@ -147,9 +149,7 @@ export class BlockHelper {
       operation,
       material
     )
-    const blockPayload = await BlockHelper.blockPayload(
-      simulatedBlock
-    )
+    const blockPayload = await BlockHelper.blockPayload(simulatedBlock)
     const signature = await BlockHelper.signPayload(
       microchain,
       JSON.parse(blockPayload) as Uint8Array

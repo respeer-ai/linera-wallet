@@ -1,9 +1,6 @@
 import { EndpointType, getClientOptionsWithEndpointType } from 'src/apollo'
 import { ApolloClient } from '@apollo/client/core'
-import {
-  provideApolloClient,
-  useQuery
-} from '@vue/apollo-composable'
+import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
 import { rpcModel } from 'src/model'
 import { BALANCE, BALANCES } from 'src/graphql'

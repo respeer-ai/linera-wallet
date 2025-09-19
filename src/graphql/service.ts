@@ -47,23 +47,14 @@ export const IMPORT_CHAIN = gql`
 `
 
 export const SUBMIT_SIGNED_BLOCK = gql`
-  mutation submitSignedBlock(
-    $chainId: ChainId!
-    $block: SignedBlock!
-  ) {
+  mutation submitSignedBlock($chainId: ChainId!, $block: SignedBlock!) {
     submitSignedBlock(chainId: $chainId, block: $block)
   }
 `
 
 export const SUBMIT_SIGNED_BLOCK_BCS = gql`
-  mutation submitSignedBlockBcs(
-    $chainId: ChainId!
-    $block: SignedBlockBcs!
-  ) {
-    submitSignedBlockBcs(
-      chainId: $chainId
-      block: $block
-    )
+  mutation submitSignedBlockBcs($chainId: ChainId!, $block: SignedBlockBcs!) {
+    submitSignedBlockBcs(chainId: $chainId, block: $block)
   }
 `
 
