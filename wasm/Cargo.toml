@@ -4,7 +4,7 @@ description = "The Linera Web client"
 version = "0.1.0"
 authors = ["Linera <contact@linera.io>"]
 edition = "2021"
-repository = "https://github.com/linera-io/linera-wallet.git"
+repository = "https://github.com/respeer-ai/linera-wallet.git"
 license = "Apache-2.0"
 
 [lib]
@@ -42,57 +42,57 @@ version = "2.1.0"
 features = [ "rand" ]
 
 [dependencies.linera-base]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web"]
 
 [dependencies.linera-chain]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web"]
 
 [dependencies.linera-client]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
-default-features = false
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web"]
+default-features = false
 
 [dependencies.linera-core]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web", "wasmer"]
 
 [dependencies.linera-execution]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web", "wasmer"]
 
 [dependencies.linera-faucet-client]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 
 [dependencies.linera-rpc]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web"]
 
 [dependencies.linera-storage]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web", "wasmer"]
 
 [dependencies.linera-views]
-# git = "https://github.com/linera-io/linera-protocol.git"
-# rev = "62c28004"
-version = "0.15.3"
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+# version = "0.15.3"
 features = ["web", "indexeddb"]
 
 [dependencies.abi]
@@ -125,3 +125,11 @@ branch = "post-message"
 version = "0.4.1"
 git = "https://github.com/Twey/rust-indexed-db"
 branch = "no-uuid-wasm-bindgen"
+
+[patch.crates-io.linera-sdk]
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"
+
+[patch.crates-io.linera-views]
+git = "https://github.com/respeer-ai/linera-protocol.git"
+rev = "b910849ccc"

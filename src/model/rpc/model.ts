@@ -24,11 +24,6 @@ export type Origin = {
   medium: string
 }
 
-export type Recipient = {
-  Account?: Account
-  Burn?: unknown
-}
-
 export type Message = {
   System: {
     Credit: {
@@ -47,7 +42,7 @@ export type Operation = {
   System?: {
     Transfer?: {
       owner?: string
-      recipient: Recipient
+      recipient: Account
       amount: string
     }
   }

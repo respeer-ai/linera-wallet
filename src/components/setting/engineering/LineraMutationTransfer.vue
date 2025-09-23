@@ -10,7 +10,7 @@
 <script setup lang='ts'>
 import { TRANSFER } from 'src/graphql'
 import Web3 from 'web3'
-import { dbModel, rpcModel } from 'src/model'
+import { dbModel } from 'src/model'
 import { toRef } from 'vue'
 
 interface Props {
@@ -41,11 +41,9 @@ const onRun = async () => {
           variables: {
             chainId: state.chainId.replace('0x', ''),
             recipient: {
-              Account: {
-                chainId: state.chainId.replace('0x', ''),
-                owner
-              }
-            } as rpcModel.Recipient,
+              chainId: state.chainId.replace('0x', ''),
+              owner
+            },
             amount: '0.01'
           }
         },

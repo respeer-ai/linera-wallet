@@ -195,6 +195,7 @@ export class BlockRunner {
       _certificateHash = certificateHash || _certificateHash
       _moreIncomingBundle = moreIncomingBundle || _moreIncomingBundle
     } catch (e) {
+      console.log('Failed handle operation:', e)
       await ChainOperationHelper.tryTimeoutOperation(
         operationId,
         JSON.stringify(e)

@@ -13,14 +13,14 @@ use bip39::Mnemonic;
 use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
-    crypto::{AccountSecretKey, Hashable},
-    data_types::ChainDescription,
+    crypto::{AccountSecretKey, CryptoHash, Hashable},
+    data_types::{BlockHeight, ChainDescription, Epoch, Round, Timestamp}, identifiers::{AccountOwner, ChainId},
 };
-use linera_chain::data_types::{OperationMetadata, ProposalContent};
+use linera_chain::data_types::{BlockExecutionOutcome, OperationMetadata, ProposalContent, Transaction, deserialize_transactions};
 use linera_execution::Operation;
 use linera_client::client_options::ClientContextOptions;
 
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use wasm_bindgen::prelude::*;
 use web_sys::wasm_bindgen;
 
@@ -72,6 +72,57 @@ pub async fn block_payload(
     let mut message = Vec::new();
     content.write(&mut message);
     Ok(serde_json::to_string(&message)?)
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct WrapperProposedBlock {
+    /// The chain to which this block belongs.
+    pub chain_id: ChainId,
+    /// The number identifying the current configuration.
+    pub epoch: Epoch,
+    /// The transactions to execute in this block. Each transaction can be either
+    /// incoming messages or an operation.
+    #[serde(
+        alias = "transaction_metadata",
+        alias = "transactionMetadata",
+        deserialize_with = "deserialize_transactions"
+    )]
+    pub transactions: Vec<Transaction>,
+    /// The block height.
+    pub height: BlockHeight,
+    /// The timestamp when this block was created. This must be later than all messages received
+    /// in this block, but no later than the current time.
+    pub timestamp: Timestamp,
+    /// The user signing for the operations in the block and paying for their execution
+    /// fees. If set, this must be the `owner` in the block proposal. `None` means that
+    /// the default account of the chain is used. This value is also used as recipient of
+    /// potential refunds for the message grants created by the operations.
+    pub authenticated_signer: Option<AccountOwner>,
+    /// Certified hash (see `Certificate` below) of the previous block in the
+    /// chain, if any.
+    pub previous_block_hash: Option<CryptoHash>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct WrapperProposalContent {
+    /// The proposed block.
+    pub block: WrapperProposedBlock,
+    /// The consensus round in which this proposal is made.
+    pub round: Round,
+    /// If this is a retry from an earlier round, the execution outcome.
+    pub outcome: Option<BlockExecutionOutcome>,
+}
+
+#[wasm_bindgen]
+pub async fn deserialize_proposal_content(
+    content: &str,
+) -> Result<String, JsError> {
+    let deserializer = &mut serde_json::Deserializer::from_str(content);
+    let content: WrapperProposalContent = serde_path_to_error::deserialize(deserializer)?;
+
+    Ok(serde_json::to_string(&content)?)
 }
 
 #[wasm_bindgen]

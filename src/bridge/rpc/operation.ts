@@ -41,10 +41,8 @@ export class Operation {
           Transfer: {
             owner: _fromOwner,
             recipient: {
-              Account: {
-                chainId: toChainId,
-                owner: _toOwner
-              }
+              chainId: toChainId,
+              owner: _toOwner
             },
             amount: amountStr
           }

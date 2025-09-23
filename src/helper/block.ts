@@ -2,7 +2,9 @@ import {
   type Operation,
   type UnsignedBlockProposal,
   type CandidateBlockMaterial,
-  type SimulatedBlockMaterial
+  type SimulatedBlockMaterial,
+  type InputUnsignedBlockProposal,
+  InputProposalContent
 } from 'src/__generated__/graphql/service/graphql'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { dbModel, rpcModel } from 'src/model'
@@ -110,6 +112,19 @@ export class BlockHelper {
     )
   }
 
+  static deserializeProposalContent = async (
+    simulatedBlock: SimulatedBlockMaterial
+  ): Promise<InputUnsignedBlockProposal> => {
+    const contentStr = await lineraWasm.deserialize_proposal_content(
+      stringify(simulatedBlock.blockProposal.content) as string
+    )
+    const content = parse(contentStr) as InputProposalContent
+    return {
+      ...simulatedBlock.blockProposal,
+      content
+    }
+  }
+
   static signPayload = async (microchain: string, payload: Uint8Array) => {
     const owner = (await dbBridge.Microchain.microchainOwner(
       microchain
@@ -117,19 +132,26 @@ export class BlockHelper {
     if (!owner) throw Error('Invalid owner')
     const signature = await rpcBridge.Block.signPayload(owner, payload)
     if (!signature) throw Error('Failed generate signature')
-    return signature
+    const publicKeyHex = await rpcBridge.Block.publicKeyHex(owner)
+    if (!publicKeyHex) throw Error('Failed get public key')
+    return { signature, publicKeyHex }
   }
 
   static submitSignedBlock = async (
     microchain: string,
     simulatedBlock: SimulatedBlockMaterial,
-    signature: string
+    signature: string,
+    publicKeyHex: string
   ) => {
+    const inputBlock = await BlockHelper.deserializeProposalContent(
+      simulatedBlock
+    )
     return await rpcBridge.Block.submitSignedBlock(
       microchain,
-      simulatedBlock.blockProposal,
+      inputBlock,
       signature,
-      simulatedBlock.blobBytes
+      simulatedBlock.blobBytes,
+      publicKeyHex
     )
   }
 
@@ -150,14 +172,15 @@ export class BlockHelper {
       material
     )
     const blockPayload = await BlockHelper.blockPayload(simulatedBlock)
-    const signature = await BlockHelper.signPayload(
+    const { signature, publicKeyHex } = await BlockHelper.signPayload(
       microchain,
       JSON.parse(blockPayload) as Uint8Array
     )
     const certificateHash = await BlockHelper.submitSignedBlock(
       microchain,
       simulatedBlock,
-      signature
+      signature,
+      publicKeyHex
     )
 
     await MicrochainHelper.claimedInBlock(
