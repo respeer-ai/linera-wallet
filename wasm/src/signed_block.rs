@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
+use linera_base::{bcs_scalar, crypto::AccountSignature, data_types::Round};
 use linera_chain::types::{Block, ValidatedBlockCertificate};
-use linera_base::{crypto::AccountSignature, bcs_scalar, data_types::Round};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -17,4 +17,3 @@ bcs_scalar!(
     SignedBlockBcs,
     "A signed block which will be submitted to blockchain with its signature."
 );
-

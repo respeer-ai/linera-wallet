@@ -2,7 +2,7 @@ use async_graphql::{Error, Object};
 use linera_base::{
     crypto::CryptoHash,
     data_types::Amount,
-    identifiers::{ChainId, ModuleId, AccountOwner, ApplicationId, Account},
+    identifiers::{Account, AccountOwner, ApplicationId, ChainId, ModuleId},
 };
 use linera_execution::{Operation, SystemOperation};
 

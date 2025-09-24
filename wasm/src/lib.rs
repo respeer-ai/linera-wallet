@@ -14,13 +14,17 @@ use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
     crypto::{AccountSecretKey, CryptoHash, Hashable},
-    data_types::{BlockHeight, ChainDescription, Epoch, Round, Timestamp}, identifiers::{AccountOwner, ChainId},
+    data_types::{BlockHeight, ChainDescription, Epoch, Round, Timestamp},
+    identifiers::{AccountOwner, ChainId},
 };
-use linera_chain::data_types::{BlockExecutionOutcome, OperationMetadata, ProposalContent, Transaction, deserialize_transactions};
-use linera_execution::Operation;
+use linera_chain::data_types::{
+    deserialize_transactions, BlockExecutionOutcome, OperationMetadata, ProposalContent,
+    Transaction,
+};
 use linera_client::client_options::ClientContextOptions;
+use linera_execution::Operation;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use web_sys::wasm_bindgen;
 
@@ -31,7 +35,6 @@ mod fake_meme;
 use fake_meme::{MutationRoot as MemeMutationRoot, QueryRoot as MemeQueryRoot};
 
 mod signed_block;
-use signed_block::SignedBlockBcs;
 
 pub const OPTIONS: ClientContextOptions = ClientContextOptions {
     send_timeout: std::time::Duration::from_millis(4000),
@@ -55,17 +58,7 @@ pub const OPTIONS: ClientContextOptions = ClientContextOptions {
 };
 
 #[wasm_bindgen]
-pub async fn bcs_serialize_signed_block(bytes_str: &str) -> Result<String, JsError> {
-    let block: SignedBlockBcs = serde_json::from_str(bytes_str)?;
-    let block_bytes = bcs::to_bytes(&block)?;
-    let block_str = serde_json::to_string(&block_bytes)?;
-    Ok(block_str)
-}
-
-#[wasm_bindgen]
-pub async fn block_payload(
-    content: &str,
-) -> Result<String, JsError> {
+pub async fn block_payload(content: &str) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(content);
     let content: ProposalContent = serde_path_to_error::deserialize(deserializer)?;
 
@@ -116,9 +109,7 @@ struct WrapperProposalContent {
 }
 
 #[wasm_bindgen]
-pub async fn deserialize_proposal_content(
-    content: &str,
-) -> Result<String, JsError> {
+pub async fn deserialize_proposal_content(content: &str) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(content);
     let content: WrapperProposalContent = serde_path_to_error::deserialize(deserializer)?;
 
@@ -128,8 +119,7 @@ pub async fn deserialize_proposal_content(
 #[wasm_bindgen]
 pub async fn chain_description_id(chain_description: &str) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(chain_description);
-    let chain_description: ChainDescription =
-        serde_path_to_error::deserialize(deserializer)?;
+    let chain_description: ChainDescription = serde_path_to_error::deserialize(deserializer)?;
     let id = chain_description.id();
     Ok(serde_json::to_string(&id)?.replace("\"", ""))
 }

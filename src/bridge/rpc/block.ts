@@ -17,16 +17,15 @@ import {
   type BlockQuery,
   type NotificationsSubscription,
   type ConfirmedBlock,
-  type SubmitSignedBlockBcsMutation,
   type InputUnsignedBlockProposal,
-  type SignedBlock
+  type SignedBlock,
+  type SubmitSignedBlockMutation
 } from 'src/__generated__/graphql/service/graphql'
 import * as dbBridge from '../db'
 import axios from 'axios'
 import { parse, stringify } from 'lossless-json'
-// import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import * as constant from 'src/const'
-import { /* _Web3, */ Ed25519 } from 'src/crypto'
+import { Ed25519 } from 'src/crypto'
 
 export class Block {
   static submitSignedBlock = async (
@@ -52,16 +51,6 @@ export class Block {
       blobBytes
     } as SignedBlock
 
-    // TODO: we have to use bcs here due to issue https://github.com/linera-io/linera-protocol/issues/3734
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    // const bcsStr = await lineraWasm.bcs_serialize_signed_block(
-    //   stringify(signedBlock) as string
-    // )
-    // const bcsBytes = Array.from(parse(bcsStr) as number[])
-    // const bcsHex = _Web3.bytesToHexTrim0x(new Uint8Array(bcsBytes))
-
-    console.log('Submitting signed block', signedBlock, chainId)
-
     return new Promise((resolve, reject) => {
       axios
         .post(
@@ -86,10 +75,10 @@ export class Block {
           if (errors && errors.length > 0) {
             return reject(stringify(errors))
           }
-          const submitBlockAndSignatureBcs = (
-            data as Record<string, SubmitSignedBlockBcsMutation>
+          const submitSignedBlock = (
+            data as Record<string, SubmitSignedBlockMutation>
           ).data
-          resolve(submitBlockAndSignatureBcs.submitSignedBlockBcs as string)
+          resolve(submitSignedBlock.submitSignedBlock as string)
         })
         .catch((e) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
