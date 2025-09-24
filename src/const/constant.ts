@@ -20,15 +20,19 @@ export const toUrl = (
   return schema + '://' + host + ':' + port.toString()
 }
 
+const RUN_IN_PROD = false
+
 export const formalizeSchema = (url: string) => {
-  url = url.replace(
-    'http://',
-    process.env.NODE_ENV === 'production' ? 'https://' : 'http://'
-  )
-  url = url.replace(
-    'ws://',
-    process.env.NODE_ENV === 'production' ? 'wss://' : 'ws://'
-  )
+  if (RUN_IN_PROD) {
+    url = url.replace(
+      'http://',
+      process.env.NODE_ENV === 'production' ? 'https://' : 'http://'
+    )
+    url = url.replace(
+      'ws://',
+      process.env.NODE_ENV === 'production' ? 'wss://' : 'ws://'
+    )
+  }
   url = url.replace(
     ':80',
     process.env.NODE_ENV === 'production' ? ':443' : ':80'
