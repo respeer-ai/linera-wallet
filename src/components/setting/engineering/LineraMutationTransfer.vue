@@ -12,6 +12,7 @@ import { TRANSFER } from 'src/graphql'
 import Web3 from 'web3'
 import { dbModel } from 'src/model'
 import { toRef } from 'vue'
+import { Account } from 'src/bridge/rpc'
 
 interface Props {
   purpose?: string
@@ -30,7 +31,7 @@ const onRun = async () => {
       method: 'metamask_getProviderState'
     }) as Record<string, string>
 
-    const owner = await dbModel.ownerFromPublicKey(accounts[0])
+    const owner = Account.accountOwner(await dbModel.ownerFromPublicKey(accounts[0]))
     console.log(accounts, state, owner)
 
     const result = await window.linera.request({
@@ -40,6 +41,7 @@ const onRun = async () => {
           query: TRANSFER.loc?.source?.body,
           variables: {
             chainId: state.chainId.replace('0x', ''),
+            owner: '0x00',
             recipient: {
               chainId: state.chainId.replace('0x', ''),
               owner

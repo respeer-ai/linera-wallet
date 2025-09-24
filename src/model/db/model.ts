@@ -43,7 +43,7 @@ export interface Application {
 }
 
 export const ownerFromPublicKey = async (publicKey: string) => {
-  return Keccac256.hashWithTypename('Ed25519PublicKey', publicKey)
+  return await Keccac256.hashWithTypename('Ed25519PublicKey', publicKey)
 }
 
 export interface Owner {
