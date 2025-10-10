@@ -4,7 +4,8 @@ import {
   type CandidateBlockMaterial,
   type SimulatedBlockMaterial,
   type InputUnsignedBlockProposal,
-  InputProposalContent
+  type TransactionMetadata,
+  type InputWrapperProposalContent
 } from 'src/__generated__/graphql/service/graphql'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { dbModel, rpcModel } from 'src/model'
@@ -53,9 +54,17 @@ export class BlockHelper {
     block: UnsignedBlockProposal,
     operation: rpcModel.Operation
   ) => {
-    const executedOperation = block.content.block.transactionMetadata.find(
-      (tx) => tx.operation
-    )?.operation
+    let executedOperation: Operation | undefined
+    for (const tx of block.content.block.transactions) {
+      const txMetadataStr = await lineraWasm.transaction_metadata(
+        stringify(tx) as string
+      )
+      const txMetadata = parse(txMetadataStr) as TransactionMetadata
+      if (txMetadata.operation) {
+        executedOperation = txMetadata.operation
+        break
+      }
+    }
 
     const _operationStr = await lineraWasm.operation_metadata(
       stringify(operation) as string
@@ -118,7 +127,7 @@ export class BlockHelper {
     const contentStr = await lineraWasm.deserialize_proposal_content(
       stringify(simulatedBlock.blockProposal.content) as string
     )
-    const content = parse(contentStr) as InputProposalContent
+    const content = parse(contentStr) as InputWrapperProposalContent
     return {
       ...simulatedBlock.blockProposal,
       content

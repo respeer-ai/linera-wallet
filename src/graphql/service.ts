@@ -180,33 +180,7 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
           block {
             chainId
             epoch
-            transactionMetadata {
-              transactionType
-              incomingBundle {
-                origin
-                bundle {
-                  height
-                  timestamp
-                  certificateHash
-                  transactionIndex
-                  messages {
-                    authenticatedSigner
-                    grant
-                    refundGrantTo
-                    kind
-                    index
-                    message
-                  }
-                }
-                action
-              }
-              operation {
-                operationType
-                applicationId
-                userBytesHex
-                systemBytesHex
-              }
-            }
+            transactions
             height
             timestamp
             authenticatedSigner

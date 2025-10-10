@@ -15,18 +15,19 @@ use bip39::Mnemonic;
 use abi::meme::{MemeMessage, MemeOperation};
 use async_graphql::{http::parse_query_string, EmptySubscription, Schema};
 use linera_base::{
-    crypto::{AccountSecretKey, CryptoHash, Hashable},
-    data_types::{BlockHeight, ChainDescription, Epoch, Round, Timestamp},
-    identifiers::{AccountOwner, ChainId},
+    crypto::{AccountSecretKey, Hashable},
+    data_types::ChainDescription,
 };
-use linera_chain::data_types::{
-    BlockExecutionOutcome, OperationMetadata, ProposalContent,
-    Transaction,
+use linera_chain::{
+    data_types::{
+        OperationMetadata, ProposalContent, ProposedBlock, Transaction, TransactionMetadata,
+    },
+    wrapper_block::{WrapperProposalContent, WrapperProposedBlock},
 };
 use linera_client::client_options::ClientContextOptions;
 use linera_execution::Operation;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
 use web_sys::wasm_bindgen;
 
@@ -66,47 +67,40 @@ pub const OPTIONS: ClientContextOptions = ClientContextOptions {
 #[wasm_bindgen]
 pub async fn block_payload(content: &str) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(content);
-    let content: ProposalContent = serde_path_to_error::deserialize(deserializer)?;
+    let content: WrapperProposalContent = serde_path_to_error::deserialize(deserializer)?;
+
+    let WrapperProposalContent {
+        block,
+        round,
+        outcome,
+    } = content;
+    let WrapperProposedBlock {
+        chain_id,
+        epoch,
+        transactions,
+        height,
+        timestamp,
+        authenticated_signer,
+        previous_block_hash,
+    } = block;
+
+    let content = ProposalContent {
+        block: ProposedBlock {
+            chain_id,
+            epoch,
+            transactions,
+            height,
+            timestamp,
+            authenticated_signer,
+            previous_block_hash,
+        },
+        round,
+        outcome,
+    };
 
     let mut message = Vec::new();
     content.write(&mut message);
     Ok(serde_json::to_string(&message)?)
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct WrapperProposedBlock {
-    /// The chain to which this block belongs.
-    pub chain_id: ChainId,
-    /// The number identifying the current configuration.
-    pub epoch: Epoch,
-    /// The transactions to execute in this block. Each transaction can be either
-    /// incoming messages or an operation.
-    pub transactions: Vec<Transaction>,
-    /// The block height.
-    pub height: BlockHeight,
-    /// The timestamp when this block was created. This must be later than all messages received
-    /// in this block, but no later than the current time.
-    pub timestamp: Timestamp,
-    /// The user signing for the operations in the block and paying for their execution
-    /// fees. If set, this must be the `owner` in the block proposal. `None` means that
-    /// the default account of the chain is used. This value is also used as recipient of
-    /// potential refunds for the message grants created by the operations.
-    pub authenticated_signer: Option<AccountOwner>,
-    /// Certified hash (see `Certificate` below) of the previous block in the
-    /// chain, if any.
-    pub previous_block_hash: Option<CryptoHash>,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct WrapperProposalContent {
-    /// The proposed block.
-    pub block: WrapperProposedBlock,
-    /// The consensus round in which this proposal is made.
-    pub round: Round,
-    /// If this is a retry from an earlier round, the execution outcome.
-    pub outcome: Option<BlockExecutionOutcome>,
 }
 
 #[wasm_bindgen]
@@ -223,6 +217,14 @@ pub async fn operation_metadata(operation: &str) -> Result<String, JsError> {
     let deserializer = &mut serde_json::Deserializer::from_str(operation);
     let operation: Operation = serde_path_to_error::deserialize(deserializer)?;
     let metadata = OperationMetadata::from(&operation);
+    Ok(serde_json::to_string(&metadata)?)
+}
+
+#[wasm_bindgen]
+pub async fn transaction_metadata(transaction: &str) -> Result<String, JsError> {
+    let deserializer = &mut serde_json::Deserializer::from_str(transaction);
+    let transaction: Transaction = serde_path_to_error::deserialize(deserializer)?;
+    let metadata = TransactionMetadata::from_transaction(&transaction);
     Ok(serde_json::to_string(&metadata)?)
 }
 
