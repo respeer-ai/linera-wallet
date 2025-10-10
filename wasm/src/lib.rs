@@ -8,6 +8,8 @@ callable from all Web pages to which the Web client has been
 connected_.  Outside of their type, which is checked at call time,
 arguments to these functions cannot be trusted and _must_ be verified!
 */
+use std::time::Duration;
+
 use bip39::Mnemonic;
 
 use abi::meme::{MemeMessage, MemeOperation};
@@ -18,7 +20,7 @@ use linera_base::{
     identifiers::{AccountOwner, ChainId},
 };
 use linera_chain::data_types::{
-    deserialize_transactions, BlockExecutionOutcome, OperationMetadata, ProposalContent,
+    BlockExecutionOutcome, OperationMetadata, ProposalContent,
     Transaction,
 };
 use linera_client::client_options::ClientContextOptions;
@@ -37,24 +39,28 @@ use fake_meme::{MutationRoot as MemeMutationRoot, QueryRoot as MemeQueryRoot};
 mod signed_block;
 
 pub const OPTIONS: ClientContextOptions = ClientContextOptions {
-    send_timeout: std::time::Duration::from_millis(4000),
-    recv_timeout: std::time::Duration::from_millis(4000),
+    send_timeout: linera_base::time::Duration::from_millis(4000),
+    recv_timeout: linera_base::time::Duration::from_millis(4000),
     max_pending_message_bundles: 10,
-    retry_delay: std::time::Duration::from_millis(1000),
+    retry_delay: linera_base::time::Duration::from_millis(1000),
     max_retries: 10,
     wait_for_outgoing_messages: false,
     blanket_message_policy: linera_core::client::BlanketMessagePolicy::Accept,
     restrict_chain_ids_to: None,
     long_lived_services: false,
-    blob_download_timeout: std::time::Duration::from_millis(1000),
+    blob_download_timeout: linera_base::time::Duration::from_millis(1000),
+    certificate_download_batch_size: linera_core::client::DEFAULT_CERTIFICATE_DOWNLOAD_BATCH_SIZE,
+    chain_worker_ttl: Duration::from_secs(30),
+    sender_chain_worker_ttl: Duration::from_millis(200),
     grace_period: linera_core::DEFAULT_GRACE_PERIOD,
+    max_joined_tasks: 100,
 
+    // TODO(linera-protocol#2944): separate these out from the
+    // `ClientOptions` struct, since they apply only to the CLI/native
+    // client
     wallet_state_path: None,
-    with_wallet: None,
-
     keystore_path: None,
-
-    chain_worker_ttl: std::time::Duration::from_millis(1000),
+    with_wallet: None,
 };
 
 #[wasm_bindgen]
@@ -76,11 +82,6 @@ struct WrapperProposedBlock {
     pub epoch: Epoch,
     /// The transactions to execute in this block. Each transaction can be either
     /// incoming messages or an operation.
-    #[serde(
-        alias = "transaction_metadata",
-        alias = "transactionMetadata",
-        deserialize_with = "deserialize_transactions"
-    )]
     pub transactions: Vec<Transaction>,
     /// The block height.
     pub height: BlockHeight,
