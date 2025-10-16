@@ -43,61 +43,61 @@ features = [ "rand" ]
 
 [dependencies.linera-base]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web"]
 
 [dependencies.linera-chain]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web"]
 
 [dependencies.linera-client]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web"]
 default-features = false
 
 [dependencies.linera-core]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web", "wasmer"]
 
 [dependencies.linera-execution]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web", "wasmer"]
 
 [dependencies.linera-faucet-client]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 
 [dependencies.linera-rpc]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web"]
 
 [dependencies.linera-storage]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web", "wasmer"]
 
 [dependencies.linera-views]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 # version = "0.15.4"
 features = ["web", "indexeddb"]
 
 [dependencies.abi]
 git = "https://github.com/respeer-ai/linera-meme.git"
-rev = "c105159f"
+rev = "259d359"
 
 [dependencies.web-sys]
 version = "0.3"
@@ -128,8 +128,8 @@ branch = "no-uuid-wasm-bindgen"
 
 [patch.crates-io.linera-sdk]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
 
 [patch.crates-io.linera-views]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "82221d2c16"
+rev = "5827858f87"
