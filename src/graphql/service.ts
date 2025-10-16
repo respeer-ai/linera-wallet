@@ -125,6 +125,24 @@ export const BLOCK = gql`
                   kind
                   index
                   message
+                  messageMetadata {
+                    messageType
+                    applicationId
+                    userBytesHex
+                    systemMessage {
+                      systemMessageType
+                      credit {
+                        target
+                        amount
+                        source
+                      }
+                      withdraw {
+                        owner
+                        amount
+                        recipient
+                      }
+                    }
+                  }
                 }
               }
               action
@@ -227,6 +245,24 @@ export const BLOCK_MATERIAL = gql`
             kind
             index
             message
+            messageMetadata {
+              messageType
+              applicationId
+              userBytesHex
+              systemMessage {
+                systemMessageType
+                credit {
+                  target
+                  amount
+                  source
+                }
+                withdraw {
+                  owner
+                  amount
+                  recipient
+                }
+              }
+            }
           }
         }
         origin
@@ -327,6 +363,24 @@ export const PENDING_MESSAGES = gql`
           kind
           index
           message
+          messageMetadata {
+            messageType
+            applicationId
+            userBytesHex
+            systemMessage {
+              systemMessageType
+              credit {
+                target
+                amount
+                source
+              }
+              withdraw {
+                owner
+                amount
+                recipient
+              }
+            }
+          }
         }
       }
       origin

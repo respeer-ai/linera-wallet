@@ -73,7 +73,8 @@ export class BlockHelper {
     if (
       metadata.applicationId !== executedOperation?.applicationId ||
       metadata.operationType !== executedOperation?.operationType ||
-      metadata.systemBytesHex !== executedOperation.systemBytesHex ||
+      // TODO: compare system operation
+      metadata.systemOperation !== executedOperation.systemOperation ||
       metadata.userBytesHex !== executedOperation.userBytesHex
     ) {
       throw Error('Operation metadata mismatch')
