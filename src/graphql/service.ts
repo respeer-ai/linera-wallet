@@ -133,7 +133,75 @@ export const BLOCK = gql`
               operationType
               applicationId
               userBytesHex
-              systemBytesHex
+              systemOperation {
+                systemOperationType
+                transfer {
+                  owner
+                  recipient
+                  amount
+                }
+                claim {
+                  owner
+                  targetId
+                  recipient
+                  amount
+                }
+                openChain {
+                  balance
+                  ownership {
+                    ownershipJson
+                  }
+                  applicationPermissions {
+                    permissionsJson
+                  }
+                }
+                changeOwnership {
+                  superOwners
+                  owners {
+                    owner
+                    weight
+                  }
+                  multiLeaderRounds
+                  openMultiLeaderRounds
+                  timeoutConfig {
+                    fastRoundMs
+                    baseTimeoutMs
+                    timeoutIncrementMs
+                    fallbackDurationMs
+                  }
+                }
+                changeApplicationPermissions {
+                  permissions {
+                    permissionsJson
+                  }
+                }
+                admin {
+                  adminOperationType
+                  epoch
+                  blobHash
+                }
+                createApplication {
+                  moduleId
+                  parametersHex
+                  instantiationArgumentHex
+                  requiredApplicationIds
+                }
+                publishDataBlob {
+                  blobHash
+                }
+                verifyBlob {
+                  blobId
+                }
+                publishModule {
+                  moduleId
+                }
+                epoch
+                updateStreams {
+                  chainId
+                  streamId
+                  nextIndex
+                }
+              }
             }
           }
         }
