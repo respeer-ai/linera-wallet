@@ -202,7 +202,7 @@ export const lineraToken = {
   logo: '',
   native: true,
   discord: 'https://discord.com/invite/linera',
-  telegram: 'http://t.me/linera_official',
+  telegram: 'https://t.me/linera_official',
   twitter: 'https://x.com/linera_io',
   website: 'https://linera.io',
   github: 'https://github.com/linera-io/linera-protocol'
