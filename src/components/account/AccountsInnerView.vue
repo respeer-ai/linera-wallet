@@ -35,7 +35,7 @@
           <div class='row'>
             <q-space />
             <span>$</span>
-            <strong class='text-grey-9'>{{ ownerUsdBalances.get(_owner.address)?.toFixed(2) }}</strong>
+            <strong class='text-grey-9'>{{ ownerUsdBalances.get(_owner.address)?.toFixed(4) }}</strong>
             <span class='text-grey-6 header-items-margin-x-left'>USD</span>
           </div>
           <div class='row'>

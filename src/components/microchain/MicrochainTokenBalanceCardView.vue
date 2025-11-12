@@ -24,7 +24,7 @@
         {{ parseFloat(ownerTokenBalance.toFixed(4)) }} <span class='selector-item-currency-sub'>{{ token.ticker }}</span>
       </div>
       <div class='text-right'>
-        $ {{ parseFloat(ownerUsdBalance.toFixed(2)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
+        $ {{ parseFloat(ownerUsdBalance.toFixed(4)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
       </div>
     </div>
     <div v-if='showIndicator' class='selector-indicator selector-margin-x-left' />

@@ -34,7 +34,7 @@
           ≈
         </div>
         <div class='page-item-x-margin-left'>
-          $ {{ parseFloat(usdBalance.toFixed(2)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
+          $ {{ parseFloat(usdBalance.toFixed(4)) }} <span class='text-grey-6 selector-item-currency-sub'>{{ $t('MSG_USD') }}</span>
         </div>
       </div>
       <DbOwnerBridge v-model:selected-owner='selectedOwner' />
