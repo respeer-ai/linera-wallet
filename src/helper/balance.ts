@@ -99,7 +99,7 @@ export class BalanceHelper {
     await BalanceHelper.updateChainBalance(
       microchain,
       nativeToken.id as number,
-      Number(balances[microchain].chainBalance)
+      Number(balances[microchain].chain_balance)
     )
     for (const owner of _owners) {
       await BalanceHelper.updateAccountBalance(

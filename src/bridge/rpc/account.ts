@@ -50,7 +50,7 @@ export class Account {
     chainId: string,
     owner: string
   ) => {
-    return balances[chainId].ownerBalances[Account.accountOwner(owner)] || 0
+    return balances[chainId].owner_balances[Account.accountOwner(owner)] || 0
   }
 
   static accountOwner = (owner: string) => {

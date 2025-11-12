@@ -20,7 +20,7 @@ export const toUrl = (
   return schema + '://' + host + ':' + port.toString()
 }
 
-const RUN_IN_PROD = true
+const RUN_IN_PROD = false
 
 export const formalizeSchema = (url: string) => {
   if (RUN_IN_PROD) {

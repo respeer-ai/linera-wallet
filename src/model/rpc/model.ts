@@ -3,8 +3,9 @@ import { StoreType } from '../db/model'
 export type Balances = Record<
   string,
   {
-    chainBalance: number
-    ownerBalances: Record<string, number>
+    // We should use snake style for RPC response
+    chain_balance: number
+    owner_balances: Record<string, number>
   }
 >
 
