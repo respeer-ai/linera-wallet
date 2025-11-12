@@ -50,11 +50,20 @@ pub const OPTIONS: ClientContextOptions = ClientContextOptions {
     restrict_chain_ids_to: None,
     long_lived_services: false,
     blob_download_timeout: linera_base::time::Duration::from_millis(1000),
+    certificate_batch_download_timeout: linera_base::time::Duration::from_millis(1000),
     certificate_download_batch_size: linera_core::client::DEFAULT_CERTIFICATE_DOWNLOAD_BATCH_SIZE,
+    sender_certificate_download_batch_size:
+        linera_core::client::DEFAULT_SENDER_CERTIFICATE_DOWNLOAD_BATCH_SIZE,
     chain_worker_ttl: Duration::from_secs(30),
     sender_chain_worker_ttl: Duration::from_millis(200),
     grace_period: linera_core::DEFAULT_GRACE_PERIOD,
     max_joined_tasks: 100,
+    max_accepted_latency_ms: linera_core::client::requests_scheduler::MAX_ACCEPTED_LATENCY_MS,
+    cache_ttl_ms: linera_core::client::requests_scheduler::CACHE_TTL_MS,
+    cache_max_size: linera_core::client::requests_scheduler::CACHE_MAX_SIZE,
+    max_request_ttl_ms: linera_core::client::requests_scheduler::MAX_REQUEST_TTL_MS,
+    alpha: linera_core::client::requests_scheduler::ALPHA_SMOOTHING_FACTOR,
+    alternative_peers_retry_delay_ms: linera_core::client::requests_scheduler::STAGGERED_DELAY_MS,
 
     // TODO(linera-protocol#2944): separate these out from the
     // `ClientOptions` struct, since they apply only to the CLI/native
@@ -62,6 +71,9 @@ pub const OPTIONS: ClientContextOptions = ClientContextOptions {
     wallet_state_path: None,
     keystore_path: None,
     with_wallet: None,
+    chrome_trace_exporter: false,
+    chrome_trace_file: None,
+    otlp_exporter_endpoint: None,
 };
 
 #[wasm_bindgen]
