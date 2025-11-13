@@ -50,7 +50,7 @@ export class Account {
     chainId: string,
     owner: string
   ) => {
-    return balances[chainId].owner_balances[Account.accountOwner(owner)] || 0
+    return balances[chainId].ownerBalances[Account.accountOwner(owner)] || 0
   }
 
   static accountOwner = (owner: string) => {
@@ -94,6 +94,6 @@ export class Account {
   }
 
   static accountDescription = (account: rpcModel.Account) => {
-    return `${account.chainId}:${Account.accountOwner(account.owner)}`
+    return `${account.chain_id}:${Account.accountOwner(account.owner)}`
   }
 }

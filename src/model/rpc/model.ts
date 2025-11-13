@@ -4,13 +4,13 @@ export type Balances = Record<
   string,
   {
     // We should use snake style for RPC response
-    chain_balance: number
-    owner_balances: Record<string, number>
+    chainBalance: number
+    ownerBalances: Record<string, number>
   }
 >
 
 export type Account = {
-  chainId: string
+  chain_id: string
   owner: string
 }
 
@@ -34,7 +34,7 @@ export type Message = {
     }
   }
   User: {
-    applicationId: string
+    application_id: string
     bytes: Uint8Array
   }
 }
@@ -48,7 +48,7 @@ export type Operation = {
     }
   }
   User?: {
-    applicationId: string
+    application_id: string
     // Bytes in the operation will be stored into database with stringify. Uint8Array will be serialized to map so we just use number array
     bytes: number[]
   }
