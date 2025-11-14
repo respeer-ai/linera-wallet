@@ -209,6 +209,8 @@ pub async fn graphql_deserialize_operation(
     query: &str,
     variables: &str,
 ) -> Result<String, JsError> {
+    log::info!("query: {}, variables: {}", query, variables);
+
     let request = parse_query_string(&format!("query={}&variables={}", query, variables))?;
     let schema = Schema::new(ServiceQueryRoot, ServiceMutationRoot, EmptySubscription);
     let value = schema.execute(request).await.into_result().unwrap().data;

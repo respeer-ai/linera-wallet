@@ -3,6 +3,7 @@ import { StoreType } from '../db/model'
 export type Balances = Record<
   string,
   {
+    // We should use snake style for RPC response
     chainBalance: number
     ownerBalances: Record<string, number>
   }

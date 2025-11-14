@@ -18,6 +18,8 @@ export type Scalars = {
   AccountOwner: { input: any; output: any; }
   /** Initial chain configuration and chain origin. */
   ChainDescription: { input: any; output: any; }
+  /** The unique identifier (UID) of a chain. This is currently computed as the hash value of a ChainDescription. */
+  ChainId: { input: any; output: any; }
   /** A scalar that can represent any JSON value. */
   JSON: { input: any; output: any; }
   /** A scalar that can represent any JSON Object value. */
@@ -51,6 +53,8 @@ export type MutationRootClaimArgs = {
 
 export type QueryRoot = {
   __typename?: 'QueryRoot';
+  /** Find the existing a chain with the given authentication key, if any. */
+  chainId: Scalars['ChainId']['output'];
   /** Returns the current committee, including weights and resource policy. */
   currentCommittee: Committee;
   /** Returns the current committee's validators. */
@@ -59,6 +63,11 @@ export type QueryRoot = {
   genesisConfig: Scalars['JSON']['output'];
   /** Returns the version information on this faucet service. */
   version: Scalars['VersionInfo']['output'];
+};
+
+
+export type QueryRootChainIdArgs = {
+  owner: Scalars['AccountOwner']['input'];
 };
 
 export type Validator = {
