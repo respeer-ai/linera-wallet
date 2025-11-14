@@ -10,7 +10,7 @@ export type Balances = Record<
 >
 
 export type Account = {
-  chain_id: string
+  chainId: string
   owner: string
 }
 
@@ -34,7 +34,7 @@ export type Message = {
     }
   }
   User: {
-    application_id: string
+    applicationId: string
     bytes: Uint8Array
   }
 }
@@ -48,7 +48,7 @@ export type Operation = {
     }
   }
   User?: {
-    application_id: string
+    applicationId: string
     // Bytes in the operation will be stored into database with stringify. Uint8Array will be serialized to map so we just use number array
     bytes: number[]
   }

@@ -94,6 +94,6 @@ export class Account {
   }
 
   static accountDescription = (account: rpcModel.Account) => {
-    return `${account.chain_id}:${Account.accountOwner(account.owner)}`
+    return `${account.chainId}:${Account.accountOwner(account.owner)}`
   }
 }
