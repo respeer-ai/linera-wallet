@@ -103,6 +103,7 @@ export class BlockRunner {
       await BlockRunner.handleInflightOperations()
       await BlockRunner.handleErrorOperations()
       await BlockRunner.handleClaimedMicrochains()
+      await BlockRunner.handleMirochainsIncomingMessages()
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Failed process ticker ${e}`)
@@ -157,6 +158,15 @@ export class BlockRunner {
         microchain
       }
     })
+  }
+
+  static handleMirochainsIncomingMessages = async () => {
+    const microchains = await dbBridge.Microchain.microchains(0, 0)
+    for (const microchain of microchains) {
+      await BlockRunner.handleIncomingBundle({
+        microchain: microchain.microchain
+      })
+    }
   }
 
   static handleIncomingBundle = async (payload: NewIncomingBundlePayload) => {

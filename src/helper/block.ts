@@ -173,6 +173,7 @@ export class BlockHelper {
     const { material, moreIncomingBundle } = await BlockHelper.blockMaterial(
       microchain
     )
+
     if (!material.incomingBundles.length && !operationId)
       return { certificateHash: undefined, moreIncomingBundle: false }
 
