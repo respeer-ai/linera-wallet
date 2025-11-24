@@ -28,10 +28,10 @@
           v-model='password'
           @blur='onPasswordBlur'
           @focus='onPasswordFocus'
-          :error='passwordError'
           hide-bottom-space
           :type='display ? "text" : "password"'
         />
+        <password-meter @score='onScore' :password='password' />
         <div :style='{margin: "4px 0", lineHeight: "32px"}' class='text-bold'>
           {{ $t('MSG_CONFIRM_PASSWORD') }}
         </div>
@@ -41,7 +41,6 @@
           v-model='confirmPassword'
           @blur='onConfirmPasswordBlur'
           @focus='onConfirmPasswordFocus'
-          :error='confirmPasswordError'
           hide-bottom-space
           :type='display ? "text" : "password"'
         />
@@ -54,6 +53,7 @@
 <script setup lang="ts">
 import { verify } from 'src/utils'
 import { ref, watch } from 'vue'
+import PasswordMeter from 'vue-simple-password-meter'
 
 const password = defineModel<string>('password', { default: '' })
 const confirmPassword = ref('')
@@ -62,6 +62,7 @@ const displayHideText = ref('Display')
 const error = defineModel<boolean>('error', { default: false })
 const passwordError = ref(false)
 const confirmPasswordError = ref(false)
+const passwordScore = ref(0)
 
 watch(display, () => {
   displayHideText.value = display.value ? 'Hide' : 'Display'
@@ -100,5 +101,9 @@ watch([password, confirmPassword], () => {
   confirmPasswordError.value = confirmPassword.value === undefined || !verify.validatePassword(confirmPassword.value)
   error.value = password.value !== confirmPassword.value || passwordError.value || confirmPasswordError.value
 })
+
+const onScore = (payload: { score: number }) => {
+  passwordScore.value = payload.score
+}
 
 </script>

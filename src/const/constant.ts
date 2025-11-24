@@ -32,11 +32,11 @@ export const formalizeSchema = (url: string) => {
       'ws://',
       process.env.NODE_ENV === 'production' ? 'wss://' : 'ws://'
     )
+    url = url.replace(
+      ':80',
+      process.env.NODE_ENV === 'production' ? ':443' : ':80'
+    )
   }
-  url = url.replace(
-    ':80',
-    process.env.NODE_ENV === 'production' ? ':443' : ':80'
-  )
   return url
 }
 
