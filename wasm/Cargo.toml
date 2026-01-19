@@ -43,47 +43,47 @@ features = [ "rand" ]
 
 [dependencies.linera-base]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web"]
 
 [dependencies.linera-chain]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web"]
 
 [dependencies.linera-client]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web"]
 default-features = false
 
 [dependencies.linera-core]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web", "wasmer"]
 
 [dependencies.linera-execution]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web", "wasmer"]
 
 [dependencies.linera-faucet-client]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 
 [dependencies.linera-rpc]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web"]
 
 [dependencies.linera-storage]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web", "wasmer"]
 
 [dependencies.linera-views]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 features = ["web", "indexeddb"]
 
 [dependencies.abi]
@@ -119,8 +119,8 @@ branch = "no-uuid-wasm-bindgen"
 
 [patch.crates-io.linera-sdk]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
 
 [patch.crates-io.linera-views]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "8ef28c97"
+rev = "5e88f6ed"
