@@ -18,7 +18,10 @@
     "skipDefaultLibCheck": true,
     "noImplicitAny": false,
     "lib": ["es2020", "dom", "WebWorker", "ES6"],
-    "module": "ES2022"
+    "module": "ES2022",
+    "paths": {
+        "web-thread:wasm-shim": ["./src-bex/wasm/linera_wasm.js"]
+    }
   },
   "esModuleInterop": true,
   "exclude": [

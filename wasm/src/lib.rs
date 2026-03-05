@@ -52,7 +52,7 @@ pub async fn block_payload(content: &str) -> Result<String, JsError> {
         transactions,
         height,
         timestamp,
-        authenticated_signer,
+        authenticated_owner,
         previous_block_hash,
     } = block;
 
@@ -63,7 +63,7 @@ pub async fn block_payload(content: &str) -> Result<String, JsError> {
             transactions,
             height,
             timestamp,
-            authenticated_signer,
+            authenticated_owner,
             previous_block_hash,
         },
         round,
@@ -205,7 +205,6 @@ pub async fn transaction_metadata(transaction: &str) -> Result<String, JsError> 
 #[wasm_bindgen(start)]
 pub fn main() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-    linera_base::tracing::init();
     console_log::init_with_level(log::Level::Debug).unwrap();
     log::info!("Hello Linera!");
 }

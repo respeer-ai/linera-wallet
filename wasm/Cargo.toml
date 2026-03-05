@@ -11,7 +11,7 @@ license = "Apache-2.0"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wasm-bindgen = "0.2.95"
+wasm-bindgen = "0.2.100"
 js-sys = "0.3"
 wasm-bindgen-futures = "=0.4.50"
 console_error_panic_hook = "0.1.6"
@@ -35,7 +35,10 @@ async-graphql = "=7.0.17"
 async-graphql-value = "=7.0.17"
 wasmtimer = "0.4.1"
 web-time = "1.1.0"
-tracing = "0.1.40"
+tracing = { version = "0.1.40", features = ["release_max_level_trace"] }
+tracing-web = "0.1.3"
+time = "=0.3.41"
+time-core = "=0.1.4"
 
 [dependencies.bip39]
 git = "https://github.com/rust-bitcoin/rust-bip39.git"
@@ -44,57 +47,62 @@ features = [ "rand" ]
 
 [dependencies.linera-base]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 features = ["web"]
 
 [dependencies.linera-chain]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 features = ["web"]
 
 [dependencies.linera-client]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
-features = ["web"]
+rev = "be6840d3"
 default-features = false
+features = ["web"]
 
 [dependencies.linera-core]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 features = ["web", "wasmer"]
 
 [dependencies.linera-execution]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
+default-features = false
 features = ["web", "wasmer"]
 
 [dependencies.linera-faucet-client]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 
 [dependencies.linera-rpc]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 features = ["web"]
 
 [dependencies.linera-storage]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 features = ["web", "wasmer"]
 
 [dependencies.linera-views]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 features = ["web", "indexeddb"]
 
 [dependencies.abi]
 git = "https://github.com/respeer-ai/linera-meme.git"
-rev = "d38f06f"
+rev = "41af8e59"
 
 [dependencies.web-sys]
-version = "0.3"
+version = "0.3.69"
 features = [
   "console",
+  "Lock",
+  "LockManager",
+  "LockOptions",
+  "Navigator",
   "Window",
 ]
 
@@ -109,19 +117,11 @@ schemars = "*"
 [features]
 default = []
 
-[patch.crates-io.wasm_thread]
-git = "https://github.com/Twey/wasm_thread"
-branch = "post-message"
-
-[patch.crates-io.indexed_db_futures]
-version = "0.4.1"
-git = "https://github.com/Twey/rust-indexed-db"
-branch = "no-uuid-wasm-bindgen"
-
 [patch.crates-io.linera-sdk]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
 
 [patch.crates-io.linera-views]
 git = "https://github.com/respeer-ai/linera-protocol.git"
-rev = "5e88f6ed"
+rev = "be6840d3"
+
