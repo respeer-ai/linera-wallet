@@ -11,7 +11,7 @@ const config: CodegenConfig = {
       plugins: []
     },
     './src/__generated__/graphql/faucet/': {
-      schema: 'https://faucet.testnet-conway.linera.net',
+      schema: 'http://api.testnet-conway.faucet.respeer.ai/api/faucet',
       documents: ['src/graphql/faucet.ts'],
       preset: 'client',
       plugins: []

@@ -16,6 +16,8 @@ export type Scalars = {
   Float: { input: number; output: number; }
   /** A unique identifier for a user or an application. */
   AccountOwner: { input: any; output: any; }
+  /** A non-negative amount of tokens. */
+  Amount: { input: any; output: any; }
   /** Initial chain configuration and chain origin. */
   ChainDescription: { input: any; output: any; }
   /** The unique identifier (UID) of a chain. This is currently computed as the hash value of a ChainDescription. */
@@ -53,6 +55,8 @@ export type MutationRootClaimArgs = {
 
 export type QueryRoot = {
   __typename?: 'QueryRoot';
+  /** Returns the balance of faucet */
+  balance: Scalars['Amount']['output'];
   /** Find the existing a chain with the given authentication key, if any. */
   chainId: Scalars['ChainId']['output'];
   /** Returns the current committee, including weights and resource policy. */

@@ -77,7 +77,7 @@ export const BLOCK = gql`
           timestamp
           stateHash
           previousBlockHash
-          authenticatedSigner
+          authenticatedOwner
           transactionsHash
           messagesHash
           previousMessageBlocksHash
@@ -90,9 +90,12 @@ export const BLOCK = gql`
         body {
           messages {
             destination
-            authenticatedSigner
+            authenticatedOwner
             grant
-            refundGrantTo
+            refundGrantTo {
+              chainId
+              owner
+            }
             kind
             message
           }
@@ -119,9 +122,12 @@ export const BLOCK = gql`
                 certificateHash
                 transactionIndex
                 messages {
-                  authenticatedSigner
+                  authenticatedOwner
                   grant
-                  refundGrantTo
+                  refundGrantTo {
+                    chainId
+                    owner
+                  }
                   kind
                   index
                   message
@@ -139,7 +145,10 @@ export const BLOCK = gql`
                       withdraw {
                         owner
                         amount
-                        recipient
+                        recipient {
+                          chainId
+                          owner
+                        }
                       }
                     }
                   }
@@ -155,13 +164,19 @@ export const BLOCK = gql`
                 systemOperationType
                 transfer {
                   owner
-                  recipient
+                  recipient {
+                    chainId
+                    owner
+                  }
                   amount
                 }
                 claim {
                   owner
                   targetId
-                  recipient
+                  recipient {
+                    chainId
+                    owner
+                  }
                   amount
                 }
                 openChain {
@@ -239,9 +254,12 @@ export const BLOCK_MATERIAL = gql`
           certificateHash
           transactionIndex
           messages {
-            authenticatedSigner
+            authenticatedOwner
             grant
-            refundGrantTo
+            refundGrantTo {
+              chainId
+              owner
+            }
             kind
             index
             message
@@ -259,7 +277,10 @@ export const BLOCK_MATERIAL = gql`
                 withdraw {
                   owner
                   amount
-                  recipient
+                  recipient {
+                    chainId
+                    owner
+                  }
                 }
               }
             }
@@ -287,16 +308,19 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
             transactions
             height
             timestamp
-            authenticatedSigner
+            authenticatedOwner
             previousBlockHash
           }
           round
           outcome {
             messages {
               destination
-              authenticatedSigner
+              authenticatedOwner
               grant
-              refundGrantTo
+              refundGrantTo {
+                chainId
+                owner
+              }
               kind
               message
             }
@@ -319,9 +343,12 @@ export const SIMULATE_EXECUTE_BLOCK = gql`
         outcome {
           messages {
             destination
-            authenticatedSigner
+            authenticatedOwner
             grant
-            refundGrantTo
+            refundGrantTo {
+              chainId
+              owner
+            }
             kind
             message
           }
@@ -357,9 +384,12 @@ export const PENDING_MESSAGES = gql`
         certificateHash
         transactionIndex
         messages {
-          authenticatedSigner
+          authenticatedOwner
           grant
-          refundGrantTo
+          refundGrantTo {
+            chainId
+            owner
+          }
           kind
           index
           message
@@ -377,7 +407,10 @@ export const PENDING_MESSAGES = gql`
               withdraw {
                 owner
                 amount
-                recipient
+                recipient {
+                  chainId
+                  owner
+                }
               }
             }
           }
