@@ -11,6 +11,7 @@ import { ApplicationCreatorChain } from './application_creator_chain'
 import * as constant from '../../const'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { stringify } from 'lossless-json'
+import { type Account as _Account } from 'src/__generated__/graphql/service/graphql'
 
 export class MemeApplicationOperation {
   static persistApplication = async (applicationId: string) => {
@@ -88,7 +89,7 @@ export class MemeApplicationOperation {
     const chainAccountOwner = {
       chainId,
       owner: Account.accountOwner(owner)
-    } as rpcModel.Account
+    } as _Account
     const token = await dbBridge.Token.token(applicationId)
     if (!token) return 0
     const options = getClientOptionsWithBaseUrl(
@@ -130,7 +131,7 @@ export class MemeApplicationOperation {
   static transfer = async (
     chainId: string,
     applicationId: string,
-    to: rpcModel.Account | undefined,
+    to: _Account | undefined,
     amount: number
   ): Promise<string> => {
     try {

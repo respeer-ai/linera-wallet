@@ -64,9 +64,10 @@
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { dbModel, rpcModel } from 'src/model'
+import { dbModel } from 'src/model'
 import { dbBridge, rpcBridge } from 'src/bridge'
 import { blockWorker } from 'src/worker'
+import { Account } from 'src/__generated__/graphql/service/graphql'
 
 import SelectTransferAccount from './SelectTransferAccount.vue'
 import SetTranserAmount from './SetTranserAmount.vue'
@@ -119,7 +120,7 @@ const onTransferConfirmed = async () => {
       const chainAccountOwner = {
         chainId: selectedToMicrochain.value?.microchain || toMicrochain.value,
         owner: rpcBridge.Account.accountOwner(selectedToOwner.value?.owner || await dbModel.ownerFromPublicKey(toAddress.value))
-      } as rpcModel.Account
+      } as Account
       operationId = await rpcBridge.MemeApplicationOperation.transfer(
         selectedFromMicrochain.value?.microchain,
         selectedToken.value.applicationId as string,

@@ -7,7 +7,8 @@ import { BALANCE, BALANCES } from 'src/graphql'
 import {
   type ChainOwners,
   type BalanceQuery,
-  type BalancesQuery
+  type BalancesQuery,
+  type Account as _Account
 } from 'src/__generated__/graphql/service/graphql'
 
 export class Account {
@@ -93,7 +94,7 @@ export class Account {
     })
   }
 
-  static accountDescription = (account: rpcModel.Account) => {
+  static accountDescription = (account: _Account) => {
     return `${account.chainId}:${Account.accountOwner(account.owner)}`
   }
 }
