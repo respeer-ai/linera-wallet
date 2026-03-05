@@ -1,3 +1,4 @@
+import { type Account } from 'src/__generated__/graphql/service/graphql'
 import { StoreType } from '../db/model'
 
 export type Balances = Record<
@@ -8,11 +9,6 @@ export type Balances = Record<
     ownerBalances: Record<string, number>
   }
 >
-
-export type Account = {
-  chainId: string
-  owner: string
-}
 
 export type Round =
   | 'Fast'
