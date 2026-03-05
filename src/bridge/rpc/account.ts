@@ -95,6 +95,6 @@ export class Account {
   }
 
   static accountDescription = (account: _Account) => {
-    return `${account.chainId}:${Account.accountOwner(account.owner)}`
+    return `${account.chainId as string}:${Account.accountOwner(account.owner as string)}`
   }
 }
