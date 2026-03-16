@@ -48,6 +48,8 @@ export type Scalars = {
   Epoch: { input: any; output: any; }
   /** A unique identifier for a user application or for the system application */
   GenericApplicationId: { input: any; output: any; }
+  /** A scalar that can represent any JSON value. */
+  JSON: { input: any; output: any; }
   /** A scalar that can represent any JSON Object value. */
   JSONObject: { input: any; output: any; }
   /** A message to be sent and possibly executed in the receiver's block. */
@@ -328,6 +330,11 @@ export type ChainStateExtendedView = {
   inboxes: ReentrantCollectionView_ChainId_InboxStateView_1a7dccb2;
   /** Consensus state. */
   manager: ChainManager;
+  /**
+   * The indices of next events we expect to see per stream (could be ahead of the last
+   * executed block in sparse chains).
+   */
+  nextExpectedEvents: MapView_StreamId_Int_3d7f5335;
   /** Outboxes with at least one pending message. This allows us to avoid loading all outboxes. */
   nonemptyOutboxes: Array<Scalars['ChainId']['output']>;
   /**
@@ -418,7 +425,10 @@ export type Committee = {
   totalVotes: Scalars['Int']['input'];
   /** The validators in the committee. */
   validators: Scalars['JSONObject']['input'];
-  /** The threshold to prove the validity of a statement. */
+  /**
+   * The threshold to prove the validity of a statement. I.e. the assumption is that strictly
+   * less than `validity_threshold` are faulty.
+   */
   validityThreshold: Scalars['Int']['input'];
 };
 
@@ -513,6 +523,13 @@ export type Entry_StreamId_BlockHeight_50cd702e = {
   __typename?: 'Entry_StreamId_BlockHeight_50cd702e';
   key: StreamId;
   value?: Maybe<Scalars['BlockHeight']['output']>;
+};
+
+/** A GraphQL-visible map item, complete with key. */
+export type Entry_StreamId_Int_459c4ec3 = {
+  __typename?: 'Entry_StreamId_Int_459c4ec3';
+  key: StreamId;
+  value?: Maybe<Scalars['Int']['output']>;
 };
 
 /** An event recorded in a block. */
@@ -874,6 +891,29 @@ export type MapView_StreamId_BlockHeight_E6657ad9KeysArgs = {
   count?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type MapView_StreamId_Int_3d7f5335 = {
+  __typename?: 'MapView_StreamId_Int_3d7f5335';
+  count: Scalars['Int']['output'];
+  entries: Array<Entry_StreamId_Int_459c4ec3>;
+  entry: Entry_StreamId_Int_459c4ec3;
+  keys: Array<StreamId>;
+};
+
+
+export type MapView_StreamId_Int_3d7f5335EntriesArgs = {
+  input?: InputMaybe<MapInput_StreamIdInput_B7c3909d>;
+};
+
+
+export type MapView_StreamId_Int_3d7f5335EntryArgs = {
+  key: StreamIdInput;
+};
+
+
+export type MapView_StreamId_Int_3d7f5335KeysArgs = {
+  count?: InputMaybe<Scalars['Int']['input']>;
+};
+
 /** A set of messages from a single block, for a single destination. */
 export type MessageBundle = {
   __typename?: 'MessageBundle';
@@ -926,16 +966,18 @@ export type MutationRoot = {
    * notification as an "incoming message" in a next block).
    */
   createCommittee: Scalars['CryptoHash']['output'];
+  /** Forget chain in some special case (e.g. let proxy cluster forget meme chain after meme mining started otherwise mine will fail) */
+  forgetChain?: Maybe<Scalars['ChainId']['output']>;
   /** ResPeer::CheCko::Initialize offline wallet */
   importChain: Scalars['ChainId']['output'];
   /**
    * Creates (or activates) a new chain with the given owner.
-   * This will automatically subscribe to the future committees created by `admin_id`.
+   * This will automatically subscribe to the future committees created by `admin_chain_id`.
    */
   openChain: Scalars['ChainId']['output'];
   /**
    * Creates (or activates) a new chain by installing the given authentication keys.
-   * This will automatically subscribe to the future committees created by `admin_id`.
+   * This will automatically subscribe to the future committees created by `admin_chain_id`.
    */
   openMultiOwnerChain: Scalars['ChainId']['output'];
   /** Processes the inbox and returns the lists of certificate hashes that were created, if any. */
@@ -1030,6 +1072,11 @@ export type MutationRootCreateApplicationArgs = {
 export type MutationRootCreateCommitteeArgs = {
   chainId: Scalars['ChainId']['input'];
   committee: Committee;
+};
+
+
+export type MutationRootForgetChainArgs = {
+  chainId: Scalars['ChainId']['input'];
 };
 
 
@@ -1428,6 +1475,11 @@ export type SubscriptionRoot = {
   __typename?: 'SubscriptionRoot';
   /** Subscribes to notifications from the specified chain. */
   notifications: Scalars['Notification']['output'];
+  /**
+   * Subscribes to the result of a pre-registered GraphQL query.
+   * Re-executes the query on every new block and pushes changed results.
+   */
+  queryResult: Scalars['JSON']['output'];
 };
 
 
@@ -1435,9 +1487,16 @@ export type SubscriptionRootNotificationsArgs = {
   chainId: Scalars['ChainId']['input'];
 };
 
+
+export type SubscriptionRootQueryResultArgs = {
+  applicationId: Scalars['ApplicationId']['input'];
+  chainId: Scalars['ChainId']['input'];
+  name: Scalars['String']['input'];
+};
+
 export type SystemExecutionStateView = {
   __typename?: 'SystemExecutionStateView';
-  adminId?: Maybe<Scalars['ChainId']['output']>;
+  adminChainId?: Maybe<Scalars['ChainId']['output']>;
   balance: Scalars['Amount']['output'];
   balances: MapView_AccountOwner_Amount_11ef1379;
   committees: Scalars['JSONObject']['output'];

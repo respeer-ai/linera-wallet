@@ -45,7 +45,7 @@ import { computed, onMounted, ref, toRef } from 'vue'
 import { date } from 'quasar'
 import { _copyToClipboard } from 'src/utils/copycontent'
 import { shortid } from 'src/utils'
-import { lineraGraphqlMutationQueryWithQuery } from 'app/src-bex/middleware/types'
+import { lineraGraphqlMutationQueryWithQuery } from '../../../src-bex/middleware/types'
 
 import { lineraLogo } from 'src/assets'
 import { dbBridge } from 'src/bridge'

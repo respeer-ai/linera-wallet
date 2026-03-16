@@ -26,11 +26,11 @@ export const formalizeSchema = (url: string) => {
   if (RUN_IN_PROD) {
     url = url.replace(
       'http://',
-      process.env.NODE_ENV === 'production' ? 'https://' : 'http://'
+      process.env.NODE_ENV === 'production' ? 'http://' : 'http://'
     )
     url = url.replace(
       'ws://',
-      process.env.NODE_ENV === 'production' ? 'wss://' : 'ws://'
+      process.env.NODE_ENV === 'production' ? 'ws://' : 'ws://'
     )
     url = url.replace(
       ':80',

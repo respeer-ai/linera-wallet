@@ -20,6 +20,8 @@ export type Scalars = {
   ChainDescription: { input: any; output: any; }
   /** The unique identifier (UID) of a chain. This is currently computed as the hash value of a ChainDescription. */
   ChainId: { input: any; output: any; }
+  /** A number identifying the configuration of the chain (aka the committee) */
+  Epoch: { input: any; output: any; }
   /** A scalar that can represent any JSON value. */
   JSON: { input: any; output: any; }
   /** A scalar that can represent any JSON Object value. */
@@ -57,6 +59,8 @@ export type QueryRoot = {
   chainId: Scalars['ChainId']['output'];
   /** Returns the current committee, including weights and resource policy. */
   currentCommittee: Committee;
+  /** Returns the current epoch of the faucet's chain. */
+  currentEpoch: Scalars['Epoch']['output'];
   /** Returns the current committee's validators. */
   currentValidators: Array<Validator>;
   /** Returns the genesis config. */
