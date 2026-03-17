@@ -966,6 +966,8 @@ export type MutationRoot = {
    * notification as an "incoming message" in a next block).
    */
   createCommittee: Scalars['CryptoHash']['output'];
+  /** Calculate block execution state hash */
+  estimateGas: Scalars['Amount']['output'];
   /** Forget chain in some special case (e.g. let proxy cluster forget meme chain after meme mining started otherwise mine will fail) */
   forgetChain?: Maybe<Scalars['ChainId']['output']>;
   /** ResPeer::CheCko::Initialize offline wallet */
@@ -1072,6 +1074,12 @@ export type MutationRootCreateApplicationArgs = {
 export type MutationRootCreateCommitteeArgs = {
   chainId: Scalars['ChainId']['input'];
   committee: Committee;
+};
+
+
+export type MutationRootEstimateGasArgs = {
+  blockMaterial: Scalars['BlockMaterial']['input'];
+  chainId: Scalars['ChainId']['input'];
 };
 
 
