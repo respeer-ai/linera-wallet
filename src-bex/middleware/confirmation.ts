@@ -24,7 +24,8 @@ const confirmations = new Map<RpcMethod, boolean>([
   [RpcMethod.ETH_GET_BALANCE, false],
   [RpcMethod.ETH_SIGN, true],
 
-  [RpcMethod.SEND_METADATA, false]
+  [RpcMethod.SEND_METADATA, false],
+  [RpcMethod.ETH_ESTIMATE_GAS, false]
 ])
 
 export const needConfirm = async (req: RpcRequest) => {

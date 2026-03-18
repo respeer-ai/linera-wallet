@@ -9,7 +9,6 @@ import {
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import { basebridge } from '../../../src-bex/event'
 import { subscription } from '../../subscription'
-import type { Json } from '@metamask/utils'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { dbModel, rpcModel } from '../../../src/model'
 import { v4 as uuidv4 } from 'uuid'
@@ -18,7 +17,7 @@ import { parse, stringify } from 'lossless-json'
 import { dbBridge } from '../../../src/bridge'
 import { BlockHelper } from '../../../src/helper'
 import { ESTIMATE_GAS } from '../../../src/graphql'
-import type { JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
+import type { Json, JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
@@ -219,9 +218,7 @@ export const lineraGraphqlQueryHandler = async (request?: RpcRequest) => {
 
 // Readonly APIs to construct mutation
 // TODO: process duplicate code
-const constructQueryApplicationMutation = async (
-  query: RpcGraphqlQuery
-) => {
+const constructQueryApplicationMutation = async (query: RpcGraphqlQuery) => {
   const queryBytes = applicationQueryBytes(query)
   if (!queryBytes) return Promise.reject('Invalid application operation')
 
@@ -233,14 +230,12 @@ const constructQueryApplicationMutation = async (
   } as rpcModel.Operation
 }
 
-const constructSystemMutation = async (
-  query: RpcGraphqlQuery
-) => {
+const constructSystemMutation = async (query: RpcGraphqlQuery) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-type-assertion
-  const operationStr = await lineraWasm.graphql_deserialize_operation(
+  const operationStr = (await lineraWasm.graphql_deserialize_operation(
     query.query.query,
     stringify(query.query.variables) as string
-  ) as string
+  )) as string
 
   return JSON.parse(operationStr) as rpcModel.Operation
 }
@@ -250,8 +245,7 @@ const constructMutation = async (query: RpcGraphqlQuery) => {
   // If it's application operation, construct bytes
   // TODO: for application operation, we need to get its wasm code blob, then load into wrap, get it service type definition, then feed to async graphql. This will be done in rust
   // Then, add operation to database, wait for block signer process it
-  if (query.applicationId)
-    return await constructQueryApplicationMutation(query)
+  if (query.applicationId) return await constructQueryApplicationMutation(query)
   return await constructSystemMutation(query)
 }
 
@@ -274,16 +268,16 @@ export const lineraEstimateGasHandler = async (request?: RpcRequest) => {
   }
 
   // Get material
-  const { material, moreIncomingBundle: _ } = await BlockHelper.blockMaterial(
-    microchain
-  )
+  const { material } = await BlockHelper.blockMaterial(microchain)
   // Parse operation and blob from request
   const operation = await constructMutation(query)
   // Construct block material
   const blockMaterial = {
     operations: [operation],
-    blobBytes: query.query.blobBytes ? Array.from(query.query.blobBytes.map((bytes) => Array.from(bytes))) : [],
-    material
+    blobBytes: query.query.blobBytes
+      ? Array.from(query.query.blobBytes.map((bytes) => Array.from(bytes)))
+      : [],
+    candidate: material
   }
   // TODO: query estimate gas
   return await lineraGraphqlQueryHandler({
@@ -297,11 +291,11 @@ export const lineraEstimateGasHandler = async (request?: RpcRequest) => {
           query: ESTIMATE_GAS.loc?.source?.body,
           variables: {
             chainId: microchain,
-            blockMaterial,
+            blockMaterial
           },
-          publicKey,
-          operationName: 'EstimateGas'
-        }
+          operationName: 'estimateGas'
+        },
+        publicKey
       } as JsonRpcParams
     } as JsonRpcRequest<JsonRpcParams>
   })

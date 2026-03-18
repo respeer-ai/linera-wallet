@@ -67,6 +67,7 @@ export class Engine {
     switch (req.request.method) {
       case RpcMethod.ETH_ESTIMATE_GAS:
         req.silent = true
+      // falls through
       case RpcMethod.LINERA_SUBSCRIBE:
       case RpcMethod.LINERA_GRAPHQL_MUTATION: {
         const query = req.request.params as unknown as RpcGraphqlQuery

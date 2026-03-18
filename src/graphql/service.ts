@@ -31,14 +31,8 @@ export const OWNER_CHAINS = gql`
 `
 
 export const ESTIMATE_GAS = gql`
-  query estimateGas(
-    $chainId: ChainId!
-    $blockMaterial: BlockMaterial!
-  ) {
-    estimateGas(
-      chainId: $chainId
-      blockMaterial: $blockMaterial
-    )
+  query estimateGas($chainId: ChainId!, $blockMaterial: BlockMaterial!) {
+    estimateGas(chainId: $chainId, blockMaterial: $blockMaterial)
   }
 `
 

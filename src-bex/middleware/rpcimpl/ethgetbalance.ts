@@ -41,9 +41,9 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
           query: {
             query: BALANCES.loc?.source?.body,
             variables: {
-              chainOwners: microchains.map(chainId => ({
+              chainOwners: microchains.map((chainId) => ({
                 chainId,
-                owner: [owner.address],
+                owner: [owner.address]
               }))
             },
             operationName: 'Balances'
