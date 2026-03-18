@@ -17,6 +17,7 @@ const documents = {
     "\n  query balances($chainOwners: [ChainOwners!]!) {\n    balances(chainOwners: $chainOwners)\n  }\n": types.BalancesDocument,
     "\n  query applications($chainId: ChainId!) {\n    applications(chainId: $chainId) {\n      id\n      link\n    }\n  }\n": types.ApplicationsDocument,
     "\n  query ownerChains($owner: AccountOwner!) {\n    ownerChains(owner: $owner) {\n      list\n      default\n    }\n  }\n": types.OwnerChainsDocument,
+    "\n  query estimateGas(\n    $chainId: ChainId!\n    $blockMaterial: BlockMaterial!\n  ) {\n    estimateGas(\n      chainId: $chainId\n      blockMaterial: $blockMaterial\n    )\n  }\n": types.EstimateGasDocument,
     "\n  mutation importChain(\n    $owner: AccountOwner!\n    $chainId: ChainId!\n    $signature: AccountSignature!\n    $creatorChainId: ChainId!\n  ) {\n    importChain(\n      owner: $owner\n      chainId: $chainId\n      signature: $signature\n      creatorChainId: $creatorChainId\n    )\n  }\n": types.ImportChainDocument,
     "\n  mutation submitSignedBlock($chainId: ChainId!, $block: SignedBlock!) {\n    submitSignedBlock(chainId: $chainId, block: $block)\n  }\n": types.SubmitSignedBlockDocument,
     "\n  mutation submitSignedBlockBcs($chainId: ChainId!, $block: SignedBlockBcs!) {\n    submitSignedBlockBcs(chainId: $chainId, block: $block)\n  }\n": types.SubmitSignedBlockBcsDocument,
@@ -58,6 +59,10 @@ export function graphql(source: "\n  query applications($chainId: ChainId!) {\n 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query ownerChains($owner: AccountOwner!) {\n    ownerChains(owner: $owner) {\n      list\n      default\n    }\n  }\n"): (typeof documents)["\n  query ownerChains($owner: AccountOwner!) {\n    ownerChains(owner: $owner) {\n      list\n      default\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query estimateGas(\n    $chainId: ChainId!\n    $blockMaterial: BlockMaterial!\n  ) {\n    estimateGas(\n      chainId: $chainId\n      blockMaterial: $blockMaterial\n    )\n  }\n"): (typeof documents)["\n  query estimateGas(\n    $chainId: ChainId!\n    $blockMaterial: BlockMaterial!\n  ) {\n    estimateGas(\n      chainId: $chainId\n      blockMaterial: $blockMaterial\n    )\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

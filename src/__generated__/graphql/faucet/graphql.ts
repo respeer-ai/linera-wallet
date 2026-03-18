@@ -16,10 +16,14 @@ export type Scalars = {
   Float: { input: number; output: number; }
   /** A unique identifier for a user or an application. */
   AccountOwner: { input: any; output: any; }
+  /** A non-negative amount of tokens. */
+  Amount: { input: any; output: any; }
   /** Initial chain configuration and chain origin. */
   ChainDescription: { input: any; output: any; }
   /** The unique identifier (UID) of a chain. This is currently computed as the hash value of a ChainDescription. */
   ChainId: { input: any; output: any; }
+  /** A Keccak256 value */
+  CryptoHash: { input: any; output: any; }
   /** A number identifying the configuration of the chain (aka the committee) */
   Epoch: { input: any; output: any; }
   /** A scalar that can represent any JSON value. */
@@ -30,7 +34,20 @@ export type Scalars = {
   ResourceControlPolicyScalar: { input: any; output: any; }
   /** A secp256k1 public key value */
   Secp256k1PublicKey: { input: any; output: any; }
+  /** A timestamp, in microseconds since the Unix epoch */
+  Timestamp: { input: any; output: any; }
   VersionInfo: { input: any; output: any; }
+};
+
+/** The result of a successful `claim` or `dailyClaim` mutation. */
+export type ClaimOutcome = {
+  __typename?: 'ClaimOutcome';
+  /** The amount of tokens transferred. */
+  amount: Scalars['Amount']['output'];
+  /** The hash of the certificate containing the operation. */
+  certificateHash: Scalars['CryptoHash']['output'];
+  /** The ID of the chain. */
+  chainId: Scalars['ChainId']['output'];
 };
 
 export type Committee = {
@@ -42,10 +59,25 @@ export type Committee = {
   validityThreshold: Scalars['Int']['output'];
 };
 
+/** Information about the initial chain claim. */
+export type InitialClaim = {
+  __typename?: 'InitialClaim';
+  /** The chain ID that was created. */
+  chainId: Scalars['ChainId']['output'];
+  /** The block timestamp when the chain was created. */
+  timestamp: Scalars['Timestamp']['output'];
+};
+
 export type MutationRoot = {
   __typename?: 'MutationRoot';
   /** Creates a new chain with the given authentication key, and transfers tokens to it. */
   claim: Scalars['ChainDescription']['output'];
+  /**
+   * Transfers a daily amount of tokens to the user's existing chain.
+   * The user must have already claimed a chain. Each user can claim once per 24-hour
+   * period, measured from their initial claim time.
+   */
+  dailyClaim: ClaimOutcome;
 };
 
 
@@ -53,9 +85,14 @@ export type MutationRootClaimArgs = {
   owner: Scalars['AccountOwner']['input'];
 };
 
+
+export type MutationRootDailyClaimArgs = {
+  owner: Scalars['AccountOwner']['input'];
+};
+
 export type QueryRoot = {
   __typename?: 'QueryRoot';
-  /** Find the existing a chain with the given authentication key, if any. */
+  /** Finds the existing chain with the given authentication key, if any. */
   chainId: Scalars['ChainId']['output'];
   /** Returns the current committee, including weights and resource policy. */
   currentCommittee: Committee;
@@ -65,12 +102,30 @@ export type QueryRoot = {
   currentValidators: Array<Validator>;
   /** Returns the genesis config. */
   genesisConfig: Scalars['JSON']['output'];
+  /** Returns the initial claim for the given owner, if any. */
+  initialClaim?: Maybe<InitialClaim>;
+  /**
+   * Returns the earliest time at which the owner can make a daily claim.
+   * If the returned timestamp is in the past (or now), the user can claim immediately.
+   * Returns `None` if the user has not yet completed the initial claim.
+   */
+  nextDailyClaim?: Maybe<Scalars['Timestamp']['output']>;
   /** Returns the version information on this faucet service. */
   version: Scalars['VersionInfo']['output'];
 };
 
 
 export type QueryRootChainIdArgs = {
+  owner: Scalars['AccountOwner']['input'];
+};
+
+
+export type QueryRootInitialClaimArgs = {
+  owner: Scalars['AccountOwner']['input'];
+};
+
+
+export type QueryRootNextDailyClaimArgs = {
   owner: Scalars['AccountOwner']['input'];
 };
 
