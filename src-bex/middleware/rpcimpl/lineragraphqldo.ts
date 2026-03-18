@@ -16,6 +16,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { graphqlResult } from '../../../src/utils'
 import { parse, stringify } from 'lossless-json'
 import { dbBridge } from '../../../src/bridge'
+import { BlockHelper } from '../../../src/helper'
+import { ESTIMATE_GAS } from '../../../src/graphql'
+import type { JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
 
 const queryUrl = async (microchain: string, query: RpcGraphqlQuery) => {
   let graphqlUrl: string
@@ -200,18 +203,105 @@ const lineraGraphqlDoHandler = async (request?: RpcRequest) => {
   const graphqlOperation = lineraGraphqlOperation(request)
   switch (graphqlOperation) {
     case GraphqlOperation.MUTATION:
-      return mutationDo(microchain, query)
+      return await mutationDo(microchain, query)
     case GraphqlOperation.QUERY:
-      return queryDo(microchain, query)
+      return await queryDo(microchain, query)
   }
 }
 
 export const lineraGraphqlMutationHandler = async (request?: RpcRequest) => {
-  return lineraGraphqlDoHandler(request)
+  return await lineraGraphqlDoHandler(request)
 }
 
 export const lineraGraphqlQueryHandler = async (request?: RpcRequest) => {
-  return lineraGraphqlDoHandler(request)
+  return await lineraGraphqlDoHandler(request)
+}
+
+// Readonly APIs to construct mutation
+// TODO: process duplicate code
+const constructQueryApplicationMutation = async (
+  query: RpcGraphqlQuery
+) => {
+  const queryBytes = applicationQueryBytes(query)
+  if (!queryBytes) return Promise.reject('Invalid application operation')
+
+  return {
+    User: {
+      applicationId: query.applicationId,
+      bytes: queryBytes
+    }
+  } as rpcModel.Operation
+}
+
+const constructSystemMutation = async (
+  query: RpcGraphqlQuery
+) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-type-assertion
+  return (await lineraWasm.graphql_deserialize_operation(
+    query.query.query,
+    stringify(query.query.variables) as string
+  )) as string
+}
+
+const constructMutation = async (query: RpcGraphqlQuery) => {
+  // If it's system operation, parse it
+  // If it's application operation, construct bytes
+  // TODO: for application operation, we need to get its wasm code blob, then load into wrap, get it service type definition, then feed to async graphql. This will be done in rust
+  // Then, add operation to database, wait for block signer process it
+  if (query.applicationId)
+    return await constructQueryApplicationMutation(query)
+  return await constructSystemMutation(query)
+}
+
+export const lineraEstimateGasHandler = async (request?: RpcRequest) => {
+  // TODO： optimize duplicate code
+  if (!request) {
+    return await Promise.reject('Invalid request')
+  }
+  const query = request.request.params as unknown as RpcGraphqlQuery
+  if (!query || !query.query) {
+    return await Promise.reject('Invalid query')
+  }
+  const publicKey = query.publicKey
+  const microchain = await dbBridge.RpcAuth.rpcMicrochain(
+    request.origin,
+    publicKey as string
+  )
+  if (!microchain) {
+    return Promise.reject(new Error('Invalid microchain'))
+  }
+
+  // Get material
+  const { material, moreIncomingBundle: _ } = await BlockHelper.blockMaterial(
+    microchain
+  )
+  // Parse operation and blob from request
+  const operation = await constructMutation(query)
+  // Construct block material
+  const blockMaterial = {
+    operations: [operation],
+    blobBytes: query.query.blobBytes ? Array.from(query.query.blobBytes.map((bytes) => Array.from(bytes))) : [],
+    material
+  }
+  // TODO: query estimate gas
+  return await lineraGraphqlQueryHandler({
+    origin: request.origin,
+    name: request.name,
+    favicon: request.favicon,
+    request: {
+      method: 'linera_graphqlQuery',
+      params: {
+        query: {
+          query: ESTIMATE_GAS.loc?.source?.body,
+          variables: {
+            chainId: microchain,
+            blockMaterial,
+          },
+          operationName: 'EstimateGas'
+        }
+      } as JsonRpcParams
+    } as JsonRpcRequest<JsonRpcParams>
+  })
 }
 
 export const lineraGraphqlSubscribeHandler = async (request?: RpcRequest) => {

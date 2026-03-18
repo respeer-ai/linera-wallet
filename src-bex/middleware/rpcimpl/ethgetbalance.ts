@@ -1,8 +1,8 @@
 import { RpcRequest } from '../types'
-import gql from 'graphql-tag'
 import { lineraGraphqlQueryHandler } from './lineragraphqldo'
 import type { JsonRpcParams, JsonRpcRequest } from '@metamask/utils'
 import { dbBridge } from '../../../src/bridge'
+import { BALANCES } from '../../../src/graphql'
 
 export const ethGetBalanceHandler = async (request?: RpcRequest) => {
   if (!request) {
@@ -30,14 +30,6 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
     return Promise.reject(new Error('Invalid microchains'))
   }
 
-  const query = gql`
-    query getChainAccountBalances(
-      $chainIds: [String!]!
-      $publicKeys: [String!]!
-    ) {
-      balances(chainIds: $chainIds, publicKeys: $publicKeys)
-    }
-  `
   return new Promise((resolve, reject) => {
     lineraGraphqlQueryHandler({
       origin: request.origin,
@@ -47,10 +39,12 @@ export const ethGetBalanceHandler = async (request?: RpcRequest) => {
         method: 'linera_graphqlQuery',
         params: {
           query: {
-            query: query.loc?.source?.body,
+            query: BALANCES.loc?.source?.body,
             variables: {
-              chainIds: microchains,
-              publicKeys: [owner.address]
+              chainOwners: microchains.map(chainId => ({
+                chainId,
+                owner: [owner.address],
+              }))
             },
             operationName: 'Balances'
           }

@@ -34,7 +34,7 @@ const onRun = async () => {
     const owner = Account.accountOwner(await dbModel.ownerFromPublicKey(accounts[0]))
     console.log(accounts, state, owner)
 
-    const result = await window.linera.request({
+    let result = await window.linera.request({
       method: 'linera_graphqlMutation',
       params: {
         query: {
@@ -52,7 +52,27 @@ const onRun = async () => {
         operationName: 'transfer'
       }
     })
-    console.log(result)
+    console.log('Transferred: ', result)
+
+    result = await window.linera.request({
+      method: 'eth_estimateGas',
+      params: {
+        query: {
+          query: TRANSFER.loc?.source?.body,
+          variables: {
+            chainId: state.chainId.replace('0x', ''),
+            owner: '0x00',
+            recipient: {
+              chainId: state.chainId.replace('0x', ''),
+              owner
+            },
+            amount: '0.01'
+          }
+        },
+        operationName: 'estimateGas'
+      }
+    })
+    console.log('Estimate gas: ', result)
   } catch (e) {
     console.log('Fail run mutation', e)
   }

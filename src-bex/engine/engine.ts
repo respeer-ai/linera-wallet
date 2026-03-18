@@ -76,6 +76,9 @@ export class Engine {
         }
         break
       }
+      case RpcMethod.ETH_ESTIMATE_GAS:
+        req.silent = true
+        break
     }
     return new Promise((resolve, reject) => {
       this.rpcPreInterceptorExec(

@@ -31,7 +31,12 @@ const handlers = new Map<RpcMethod, RpcImplHandler>([
   ],
   [RpcMethod.ETH_GET_BALANCE, ethGetBalance.ethGetBalanceHandler],
 
-  [RpcMethod.SEND_METADATA, dummyHandler]
+  [RpcMethod.SEND_METADATA, dummyHandler],
+
+  [
+    RpcMethod.ETH_ESTIMATE_GAS,
+    lineraGraphqlDo.lineraEstimateGasHandler
+  ],
 ])
 
 /* eslint-disable @typescript-eslint/no-unused-vars */

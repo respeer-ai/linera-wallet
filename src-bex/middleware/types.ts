@@ -30,7 +30,8 @@ export enum RpcMethod {
   LINERA_GRAPHQL_QUERY = 'linera_graphqlQuery',
   // We don't need publish data blob any more, it's a mutation
 
-  ETH_GET_BALANCE = 'eth_getBalance'
+  ETH_GET_BALANCE = 'eth_getBalance',
+  ETH_ESTIMATE_GAS = 'eth_estimateGas'
 }
 
 export const RpcMethods = Object.values(RpcMethod)
