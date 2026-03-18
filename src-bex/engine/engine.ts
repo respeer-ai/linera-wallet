@@ -65,6 +65,8 @@ export class Engine {
     if (!req.request.params) req.request.params = {}
 
     switch (req.request.method) {
+      case RpcMethod.ETH_ESTIMATE_GAS:
+        req.silent = true
       case RpcMethod.LINERA_SUBSCRIBE:
       case RpcMethod.LINERA_GRAPHQL_MUTATION: {
         const query = req.request.params as unknown as RpcGraphqlQuery
@@ -76,9 +78,6 @@ export class Engine {
         }
         break
       }
-      case RpcMethod.ETH_ESTIMATE_GAS:
-        req.silent = true
-        break
     }
     return new Promise((resolve, reject) => {
       this.rpcPreInterceptorExec(
