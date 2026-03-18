@@ -297,6 +297,7 @@ export const lineraEstimateGasHandler = async (request?: RpcRequest) => {
             chainId: microchain,
             blockMaterial,
           },
+          publicKey,
           operationName: 'EstimateGas'
         }
       } as JsonRpcParams
