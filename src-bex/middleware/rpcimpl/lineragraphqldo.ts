@@ -237,10 +237,12 @@ const constructSystemMutation = async (
   query: RpcGraphqlQuery
 ) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-type-assertion
-  return (await lineraWasm.graphql_deserialize_operation(
+  const operationStr = await lineraWasm.graphql_deserialize_operation(
     query.query.query,
     stringify(query.query.variables) as string
-  )) as string
+  ) as string
+
+  return JSON.parse(operationStr) as rpcModel.Operation
 }
 
 const constructMutation = async (query: RpcGraphqlQuery) => {
