@@ -1354,7 +1354,7 @@ export type QueryRootChainArgs = {
 
 export type QueryRootEstimateGasArgs = {
   blockMaterial: Scalars['BlockMaterial']['input'];
-  chainId: Scalars['ChainId']['input'];
+  chainId?: InputMaybe<Scalars['ChainId']['input']>;
 };
 
 
