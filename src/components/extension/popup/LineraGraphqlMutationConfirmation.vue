@@ -88,6 +88,7 @@ const persistAuthentication = ref(false)
 const respond = computed(() => localStore.popup._popupRespond)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
+const currentRequestId = computed(() => localStore.popup.popupRequestId)
 const request = computed(() => localStore.popup._popupPayload?.data)
 const applicationId = computed(() => lineraGraphqlQueryApplicationId(request.value?.request) as string)
 const operation = computed(() => lineraGraphqlMutationOperation(request.value?.request) as string)
@@ -164,7 +165,7 @@ const checkOperation = () => {
 const respondOperation = () => {
   const _respond = respond.value
   checkOperationState().then(({ operation }) => {
-    localStore.popup.removeRequest(localStore.popup.popupRequestId)
+    localStore.popup.removeRequest(currentRequestId.value)
     if (operation?.state === dbModel.OperationState.FAILED) {
       void _respond?.({
         code: -1,
@@ -176,7 +177,7 @@ const respondOperation = () => {
       code: 0
     } as commontypes.PopupResponse)
   }).catch((e) => {
-    localStore.popup.removeRequest(localStore.popup.popupRequestId)
+    localStore.popup.removeRequest(currentRequestId.value)
     void _respond?.({
       code: -1,
       message: (e as Error).message
@@ -208,7 +209,7 @@ const onCancelClick = () => {
     code: -1,
     message: 'Canceled by user'
   } as commontypes.PopupResponse)
-  localStore.popup.removeRequest(localStore.popup.popupRequestId)
+  localStore.popup.removeRequest(currentRequestId.value)
 }
 
 const forwardable = () => {

@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class='full-width page-x-padding'>
+  <q-card flat class='full-width page-x-padding card-soft login-card'>
     <h5 class='onboarding-page-title'>
       {{ $t('MSG_WELCOME_BACK') }}
     </h5>
@@ -27,7 +27,7 @@
           flat
           dense
           rounded
-          class='text-blue-6 full-width'
+          class='text-action full-width'
           :label='$t("MSG_FORGET_PASSWORD")'
           @click='onForgetPasswordClick'
           no-caps
@@ -81,3 +81,9 @@ const onForgetPasswordClick = () => {
 }
 
 </script>
+
+<style scoped lang='sass'>
+.login-card
+  padding-top: 20px
+  padding-bottom: 28px
+</style>

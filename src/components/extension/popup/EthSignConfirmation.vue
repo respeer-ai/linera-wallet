@@ -60,6 +60,7 @@ const step = ref(1)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
 const respond = computed(() => localStore.popup._popupRespond)
+const currentRequestId = computed(() => localStore.popup.popupRequestId)
 const request = computed(() => localStore.popup._popupPayload?.data?.request?.request)
 const account = computed(() => (request.value?.params as Json[])?.[0]?.toString())
 const publicKey = ref(account.value || '')
@@ -90,7 +91,7 @@ const signResponse = async () => {
       message: signature
     } as commontypes.PopupResponse)
     void dbBridge.RpcAuth.create(origin.value, publicKey.value, method.value)
-    localStore.popup.removeRequest(localStore.popup.popupRequestId)
+    localStore.popup.removeRequest(currentRequestId.value)
   }, 100)
 }
 
@@ -110,7 +111,7 @@ const onCancelClick = () => {
     code: -1,
     message: 'Canceled by user'
   } as commontypes.PopupResponse)
-  localStore.popup.removeRequest(localStore.popup.popupRequestId)
+  localStore.popup.removeRequest(currentRequestId.value)
 }
 
 const forwardable = () => {

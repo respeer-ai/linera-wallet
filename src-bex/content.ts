@@ -29,6 +29,55 @@ import { subscription as bgSubscription } from './subscription'
 window.Buffer = BufferPolyfill
 window.process = process
 
+const normalizeUrl = (value?: string | null) => {
+  if (!value) return undefined
+  try {
+    return new URL(value, window.location.href).href
+  } catch {
+    return undefined
+  }
+}
+
+const normalizedOrigin = () => {
+  if (window.location.origin && window.location.origin !== 'null') {
+    return window.location.origin
+  }
+  return `${window.location.protocol}//${window.location.host}`
+}
+
+const pageTitle = () => {
+  const title = window.document.title?.trim()
+  if (title?.length) return title
+  return window.location.hostname || normalizedOrigin()
+}
+
+const pageFavicon = () => {
+  const iconSelectors = [
+    'link[rel="icon"]',
+    'link[rel="shortcut icon"]',
+    'link[rel="Shortcut Icon"]',
+    'link[rel="apple-touch-icon"]',
+    'link[rel="apple-touch-icon-precomposed"]',
+    'link[rel*="icon"]',
+    'meta[property="og:image"]'
+  ]
+
+  for (const selector of iconSelectors) {
+    const elements = Array.from(window.document.querySelectorAll(selector))
+    for (const element of elements) {
+      const href =
+        'href' in element
+          ? normalizeUrl(element.href)
+          : normalizeUrl(element.getAttribute('content'))
+      if (href) {
+        return href
+      }
+    }
+  }
+
+  return normalizeUrl('/favicon.ico') || ''
+}
+
 const setupPageStream = () => {
   // the transport-specific streams for communication between inpage and background
   const pageStream = new WindowPostMessageStream({
@@ -49,13 +98,10 @@ const setupPageStream = () => {
 }
 
 const req2RpcRequest = (req: JsonRpcRequest<JsonRpcParams>) => {
-  const favicon =
-    window.document.querySelector('link[rel=icon]') ||
-    window.document.querySelector('link[rel="shortcut icon"]')
   return {
-    origin: window.location.origin,
-    name: window.document.title,
-    favicon: (favicon as HTMLLinkElement)?.href || 'favicon.ico',
+    origin: normalizedOrigin(),
+    name: pageTitle(),
+    favicon: pageFavicon(),
     request: req
   } as RpcRequest
 }

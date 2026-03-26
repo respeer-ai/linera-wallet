@@ -7,9 +7,9 @@
         flat
         dense
         size='0.8rem'
+        class='text-action'
         :label='displayHideText'
         @click='display = !display'
-        color='blue-6'
         no-caps
       />
     </div>

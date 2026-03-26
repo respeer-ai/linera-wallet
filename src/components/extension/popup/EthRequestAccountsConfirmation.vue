@@ -63,6 +63,7 @@ const allowCheckAccount = ref(false)
 const origin = computed(() => localStore.popup.popupOrigin)
 const method = computed(() => localStore.popup._popupRequest)
 const respond = computed(() => localStore.popup._popupRespond)
+const currentRequestId = computed(() => localStore.popup.popupRequestId)
 const processing = ref(false)
 
 const title = defineModel<string>('title')
@@ -87,7 +88,7 @@ const onNextStepClick = async () => {
         code: 0
       } as commontypes.PopupResponse)
       void dbBridge.RpcAuth.create(origin.value, owner.value?.address, method.value, undefined, undefined, true)
-      localStore.popup.removeRequest(localStore.popup.popupRequestId)
+      localStore.popup.removeRequest(currentRequestId.value)
     }, 100)
   }
 }
@@ -97,7 +98,7 @@ const onCancelClick = () => {
     code: -1,
     message: 'Canceled by user'
   } as commontypes.PopupResponse)
-  localStore.popup.removeRequest(localStore.popup.popupRequestId)
+  localStore.popup.removeRequest(currentRequestId.value)
 }
 
 const forwardable = () => {

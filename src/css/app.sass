@@ -1,13 +1,23 @@
+html
+  --ck-color-primary: #0376c9
+  --ck-color-primary-strong: #005ea6
+  --ck-color-primary-soft: #edf5ff
+  --ck-color-border: rgba(3, 118, 201, 0.22)
+  --ck-color-text-muted: #445a75
+  --ck-color-link: #0376c9
+  --ck-shadow-primary: 0 10px 24px rgba(3, 118, 201, 0.18)
+
 @font-face
   font-family: 'Noto Sans'
   src: url('https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap')
 
 // app global css in SCSS form
 .popup-container
-  background: white
+  background: transparent
   width: 378px
   max-width: 378px
   height: 600px
+  border-radius: 24px
 
 .page-container
   background: white
@@ -159,12 +169,27 @@ body
 
 .btn
   padding: 0 16px
-  border-radius: 16px
-  background: $red-2
+  min-height: 44px
+  border-radius: 14px
+  color: #ffffff
+  background: linear-gradient(135deg, var(--ck-color-primary) 0%, #1294f2 100%)
+  box-shadow: var(--ck-shadow-primary)
 
 .btn-alt
-  border: 1px solid $red-2
-  background: transparent
+  color: var(--ck-color-text-muted)
+  border: 1px solid var(--ck-color-border)
+  background: rgba(255, 255, 255, 0.92)
+  box-shadow: none
+
+.text-action
+  color: var(--ck-color-link)
+  font-weight: 600
+
+.card-soft
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 255, 0.94) 100%)
+  border: 1px solid rgba(3, 118, 201, 0.12)
+  border-radius: 20px
+  box-shadow: 0 16px 36px rgba(31, 59, 91, 0.08)
 
 .btn-radius
   border-radius: 8px
@@ -173,7 +198,7 @@ body
   border: 1px solid $grey-4
 
 .vertical-items-margin
-  margin-top: 8px
+  margin-top: 10px
 
 .vertical-menus-margin
   margin-top: 16px

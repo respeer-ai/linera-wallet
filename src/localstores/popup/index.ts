@@ -56,29 +56,74 @@ export const usePopupStore = defineStore('popups', {
     }
   },
   actions: {
-    insertRequest(payload: BexPayload<commontypes.PopupRequest, unknown>) {
-      this.popupType = payload.data.type
-      this.popupRequest = payload.data.request.request
+    activateRequest(requestId?: number) {
+      const _requestId = requestId ?? this.requestIds[0]
+      if (_requestId === undefined) {
+        this.popupType = middlewaretypes.PopupRequestType.CONFIRMATION
+        this.popupRequest = middlewaretypes.RpcMethod.ETH_REQUEST_ACCOUNTS
+        this.popupRequestId = 0
+        this.popupOrigin = ''
+        this.popupPrivData = undefined
+        this.popupUpdated = false
+        return
+      }
+      const popup = this.popups.get(_requestId) as BexPayload<
+        commontypes.PopupRequest,
+        unknown
+      >
+      if (!popup) {
+        this.activateRequest()
+        return
+      }
+      this.popupType = popup.data.type
+      this.popupRequest = popup.data.request.request
         .method as middlewaretypes.RpcMethod
-      this.popupRequestId = Number(payload.data.request.request.id)
-      this.popups.set(Number(payload.data.request.request.id), payload)
-      this.popupUpdated = false
+      this.popupRequestId = _requestId
+      this.popupOrigin = popup.data.request.origin
+      this.popupPrivData = popup.data.privData
+      this.popupUpdated = popup.data.privData !== undefined
+    },
+    insertRequest(payload: BexPayload<commontypes.PopupRequest, unknown>) {
+      const requestId = Number(payload.data.request.request.id)
+      this.popups.set(requestId, payload)
+      if (!this.popupRequestId || !this.popups.has(this.popupRequestId)) {
+        this.activateRequest(requestId)
+      }
     },
     updateRequest(payload: BexPayload<commontypes.PopupRequest, unknown>) {
-      if (this.popupRequestId !== Number(payload.data.request.request.id)) {
+      const requestId = Number(payload.data.request.request.id)
+      if (!this.popups.has(requestId)) {
         return false
       }
+      this.popups.set(requestId, payload)
+      if (this.popupRequestId !== requestId) {
+        return true
+      }
       this.popupPrivData = payload.data.privData
-      this.popups.set(Number(payload.data.request.request.id), payload)
       this.popupUpdated = true
       return true
     },
     removeRequest(requestId: number) {
       this.popups.delete(requestId)
+      if (this.popupRequestId === requestId) {
+        this.activateRequest()
+      }
     },
     addConnection(connection: ConnectionInfo) {
-      this.popupOrigin = connection.origin
       this.connections.set(connection.origin, connection)
+    },
+    async rejectAllRequests(message = 'Canceled by user') {
+      const popups = Array.from(this.popups.values()) as Array<
+        BexPayload<commontypes.PopupRequest, unknown>
+      >
+      for (const popup of popups) {
+        await popup.respond({
+          code: -1,
+          message
+        } as commontypes.PopupResponse)
+      }
+      this.popups.clear()
+      this.activateRequest()
     }
   }
 })
