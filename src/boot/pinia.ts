@@ -2,9 +2,9 @@ import { boot } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
 import localforage from 'localforage'
 
-export default boot(({ app }) => {
-  const pinia = createPinia()
+export const pinia = createPinia()
 
+export default boot(({ app }) => {
   localforage.config({
     driver: localforage.INDEXEDDB,
     name: 'checko.respeer.ai-data',

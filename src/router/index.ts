@@ -5,6 +5,7 @@ import {
   createWebHashHistory,
   createWebHistory
 } from 'vue-router'
+import { pinia } from 'src/boot/pinia'
 import routes from './routes'
 import { useSettingStore } from 'src/localstores/setting'
 
@@ -24,6 +25,13 @@ export default route(function (/* { store, ssrContext } */) {
       ? createWebHistory
       : createWebHashHistory
 
+  const historyBase =
+    !process.env.SERVER &&
+    process.env.MODE === 'bex' &&
+    process.env.VUE_ROUTER_MODE !== 'history'
+      ? `${window.location.pathname}#/`
+      : process.env.VUE_ROUTER_BASE
+
   const router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
@@ -31,11 +39,20 @@ export default route(function (/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createHistory(process.env.VUE_ROUTER_BASE)
+    history: createHistory(historyBase)
   })
 
+  if (
+    !process.env.SERVER &&
+    process.env.MODE === 'bex' &&
+    process.env.VUE_ROUTER_MODE !== 'history' &&
+    window.location.hash.startsWith('#/')
+  ) {
+    void router.replace(window.location.hash.slice(1))
+  }
+
   router.beforeEach((to) => {
-    const _setting = useSettingStore()
+    const _setting = useSettingStore(pinia)
     if (to.meta?.ShowHeaderMenu !== undefined) {
       _setting.ShowHeaderMenu = to.meta.ShowHeaderMenu
     } else {

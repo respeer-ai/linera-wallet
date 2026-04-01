@@ -19,7 +19,7 @@
   ],
 
   "action": {
-    "default_popup": "www/index.html#extension"
+    "default_popup": "www/index.html#/extension"
   },
 
   "background": {
