@@ -29,6 +29,24 @@ import { subscription as bgSubscription } from './subscription'
 window.Buffer = BufferPolyfill
 window.process = process
 
+interface PageMetadata {
+  origin: string
+  name: string
+  favicon: string
+}
+
+interface TabMetadataResponse {
+  url?: string
+  title?: string
+  favicon?: string
+}
+
+const pageMetadata: PageMetadata = {
+  origin: '',
+  name: '',
+  favicon: ''
+}
+
 const normalizeUrl = (value?: string | null) => {
   if (!value) return undefined
   try {
@@ -78,6 +96,77 @@ const pageFavicon = () => {
   return normalizeUrl('/favicon.ico') || ''
 }
 
+const requestTabMetadata = async () => {
+  try {
+    const response: TabMetadataResponse = await chrome.runtime.sendMessage({
+      type: 'checko:get-tab-metadata'
+    })
+
+    if (response?.url) {
+      try {
+        const url = new URL(response.url)
+        pageMetadata.origin =
+          url.origin !== 'null' ? url.origin : `${url.protocol}//${url.host}`
+      } catch {
+        // Ignore malformed tab URL and keep DOM-derived origin.
+      }
+    }
+
+    if (response?.title?.trim()) {
+      pageMetadata.name = response.title.trim()
+    }
+
+    const favicon = normalizeUrl(response?.favicon)
+    if (favicon) {
+      pageMetadata.favicon = favicon
+    }
+  } catch {
+    // Ignore runtime metadata failures and keep DOM-derived metadata.
+  }
+}
+
+const refreshPageMetadata = () => {
+  const origin = normalizedOrigin()
+  const name = pageTitle()
+  const favicon = pageFavicon()
+
+  if (origin) {
+    pageMetadata.origin = origin
+  }
+  if (name) {
+    pageMetadata.name = name
+  }
+  if (favicon) {
+    pageMetadata.favicon = favicon
+  }
+}
+
+const setupMetadataTracking = () => {
+  refreshPageMetadata()
+  void requestTabMetadata()
+
+  window.addEventListener('load', () => {
+    refreshPageMetadata()
+    void requestTabMetadata()
+  })
+
+  document.addEventListener('readystatechange', () => {
+    refreshPageMetadata()
+    void requestTabMetadata()
+  })
+
+  const observer = new MutationObserver(() => {
+    refreshPageMetadata()
+  })
+
+  observer.observe(document.documentElement, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['href', 'content', 'rel']
+  })
+}
+
 const setupPageStream = () => {
   // the transport-specific streams for communication between inpage and background
   const pageStream = new WindowPostMessageStream({
@@ -98,10 +187,11 @@ const setupPageStream = () => {
 }
 
 const req2RpcRequest = (req: JsonRpcRequest<JsonRpcParams>) => {
+  refreshPageMetadata()
   return {
-    origin: normalizedOrigin(),
-    name: pageTitle(),
-    favicon: pageFavicon(),
+    origin: pageMetadata.origin || normalizedOrigin(),
+    name: pageMetadata.name || pageTitle(),
+    favicon: pageMetadata.favicon || pageFavicon(),
     request: req
   } as RpcRequest
 }
@@ -248,5 +338,6 @@ const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
 }
 
 export default bexContent((bridge: BexBridge) => {
+  setupMetadataTracking()
   setupRpcEngine(bridge, setupPageStream())
 })

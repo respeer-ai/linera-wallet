@@ -6,12 +6,24 @@ import { BexBridge, BexConnection } from '@quasar/app-vite'
 import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 import { sentinel, block } from './microchain'
 import InstallationManager from './manager/installationmanager'
+import browser from 'webextension-polyfill'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
 
 const installationManager = new InstallationManager()
 let keepaliveInterval
+
+const isTabMetadataMessage = (
+  value: unknown
+): value is { type: 'checko:get-tab-metadata' } => {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  const candidate = value as { type?: unknown }
+  return candidate.type === 'checko:get-tab-metadata'
+}
 
 const keepalive = (
   bridge: BexBridge,
@@ -56,6 +68,19 @@ export default bexBackground(
 )
 
 installationManager.initializeOnInstalledListener()
+
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (!isTabMetadataMessage(message)) {
+    return undefined
+  }
+
+  const tab = sender.tab
+  return Promise.resolve({
+    url: tab?.url || '',
+    title: tab?.title || '',
+    favicon: tab?.favIconUrl || ''
+  })
+})
 
 void sentinel.Sentinel.run()
 void setupLineraSubscription()
