@@ -40,14 +40,10 @@ export const IMPORT_CHAIN = gql`
   mutation importChain(
     $owner: AccountOwner!
     $chainId: ChainId!
-    $signature: AccountSignature!
-    $creatorChainId: ChainId!
   ) {
     importChain(
       owner: $owner
       chainId: $chainId
-      signature: $signature
-      creatorChainId: $creatorChainId
     )
   }
 `

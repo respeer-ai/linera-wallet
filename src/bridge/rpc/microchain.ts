@@ -6,7 +6,7 @@ import {
   useQuery
 } from '@vue/apollo-composable'
 import { graphqlResult } from 'src/utils'
-import { dbBase, dbWallet } from 'src/controller'
+import { dbWallet } from 'src/controller'
 import { OWNER_CHAINS, OPEN_CHAIN, IMPORT_CHAIN } from 'src/graphql'
 import { type OpenChainMutation } from 'src/__generated__/graphql/faucet/graphql'
 import {
@@ -16,7 +16,6 @@ import {
 import { dbModel } from 'src/model'
 import * as dbBridge from '../db'
 import { Account } from './account'
-import { _Web3, Ed25519 } from 'src/crypto'
 import { ChainDescription } from 'src/model/rpc/model'
 import * as lineraWasm from '../../../src-bex/wasm/linera_wasm'
 import { stringify } from 'lossless-json'
@@ -42,25 +41,11 @@ export class Microchain {
 
   static initMicrochainStore = async (
     owner: string,
-    secretKeyHex: string,
-    chainId: string,
-    creatorChainId: string
+    chainId: string
   ) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)
-
-    const typeNameBytes = new TextEncoder().encode('Nonce::')
-    const bytes = new Uint8Array([
-      ...typeNameBytes,
-      ..._Web3.hexToBytes(chainId)
-    ])
-    const signature = {
-      Ed25519: {
-        signature: await Ed25519.signWithKeccac256Hash(secretKeyHex, bytes),
-        public_key: Ed25519.publicHex(secretKeyHex)
-      }
-    }
 
     owner = Account.accountOwner(owner)
 
@@ -70,9 +55,7 @@ export class Microchain {
     )
     return await mutate({
       owner,
-      chainId,
-      signature,
-      creatorChainId
+      chainId
     })
   }
 
@@ -113,14 +96,6 @@ export class Microchain {
     const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return Promise.reject(new Error('Invalid owner'))
 
-    const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
-    if (!fingerPrint) return Promise.reject(new Error('Invalid fingerprint'))
-
-    const password = (await dbBase.passwords.toArray()).find((el) => el.active)
-    if (!password) return Promise.reject(new Error('Invalid password'))
-    const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKeyHex = dbModel.privateKey(owner, _password)
-
     const chainDescription = await Microchain.openChain(owner?.owner)
     if (!chainDescription) return Promise.reject(new Error('Failed open chain'))
 
@@ -142,12 +117,7 @@ export class Microchain {
 
     console.log('Open microchain', chainId, creatorChainId)
 
-    await Microchain.initMicrochainStore(
-      owner.owner,
-      privateKeyHex,
-      chainId,
-      creatorChainId
-    )
+    await Microchain.initMicrochainStore(owner.owner, chainId)
     // The first block will be signed in BlockView
 
     const microchain = await dbBridge.Microchain.create(
@@ -167,20 +137,7 @@ export class Microchain {
     const owner = (await dbWallet.owners.toArray()).find((el) => el.selected)
     if (!owner) return Promise.reject(new Error('Invalid owner'))
 
-    const fingerPrint = (await dbBase.deviceFingerPrint.toArray())[0]
-    if (!fingerPrint) return Promise.reject(new Error('Invalid fingerprint'))
-
-    const password = (await dbBase.passwords.toArray()).find((el) => el.active)
-    if (!password) return Promise.reject(new Error('Invalid password'))
-    const _password = dbModel.decryptPassword(password, fingerPrint.fingerPrint)
-    const privateKeyHex = dbModel.privateKey(owner, _password)
-
-    await Microchain.initMicrochainStore(
-      owner.owner,
-      privateKeyHex,
-      chainId,
-      messageId
-    )
+    await Microchain.initMicrochainStore(owner.owner, chainId)
     // The first block will be signed in BlockView
 
     const microchain = await dbBridge.Microchain.create(

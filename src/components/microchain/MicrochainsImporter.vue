@@ -18,15 +18,12 @@ watch(networkId, async (newValue) => {
 
   localStore.setting.MicrochainsImportState = localStore.settingDef.MicrochainsImportState.MicrochainsImporting
 
-  const password = await dbBridge.Password.password()
-  if (!password) return Promise.reject(new Error('Invalid password'))
   const microchains = await dbBridge.Microchain.microchains(0, 1000, false)
   for (const microchain of microchains) {
     const owners = await dbBridge.MicrochainOwner.microchainOwners(microchain.microchain)
     for (const owner of owners) {
-      const privateKeyHex = dbModel.privateKey(owner, password)
       try {
-        await rpcBridge.Microchain.initMicrochainStore(owner.owner, privateKeyHex, microchain.microchain, microchain.creatorChainId)
+        await rpcBridge.Microchain.initMicrochainStore(owner.owner, microchain.microchain)
         microchain.imported = true
       } catch {
         microchain.imported = false
