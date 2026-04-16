@@ -39,6 +39,12 @@ groups:
         depends_on: [AGT-002]
         title: 将后续稳定调试结论持续沉淀到 primitives/context
         notes: 避免任务板长期承载语义知识
+      - id: AGT-006
+        status: Done
+        priority: P1
+        depends_on: [AGT-003]
+        title: 固化浏览器插件 release 创建流程
+        notes: 已新增 `agents/skills/release-bex-package.md` 与 `scripts/create-release.sh`，并通过 `yarn release:bex` 暴露统一入口
   - name: Product Backlog
     tasks:
       - id: WAL-001

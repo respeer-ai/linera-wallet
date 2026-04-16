@@ -134,6 +134,14 @@ navigation:
       when_to_read:
         - validating a change
         - planning regression coverage
+  skills:
+    - path: agents/skills/release-bex-package.md
+      canonical_for:
+        - bex_release_packaging
+        - github_release_asset_naming
+      when_to_read:
+        - preparing a browser extension release
+        - creating or updating a GitHub release
   tasks:
     - path: agents/tasks/board.yaml
       canonical_for:
