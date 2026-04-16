@@ -1,0 +1,113 @@
+version: 1
+type: task-board
+authority: high
+status_legend:
+  Todo: not started
+  Doing: in progress
+  Done: completed
+  Blocked: waiting on dependency or confirmation
+groups:
+  - name: Assistant Enablement
+    tasks:
+      - id: AGT-001
+        status: Done
+        priority: P0
+        depends_on: []
+        title: 建立本仓库 assistant-only `agents/` 结构
+        notes: 已创建 index/context/primitives/runbooks/tasks/generated/skills 与根级 AGENTS.md
+      - id: AGT-002
+        status: Done
+        priority: P0
+        depends_on: [AGT-001]
+        title: 定义 `linera-wallet` 的交互原语
+        notes: 已定义身份与授权、RPC 审批流、微链与区块执行、数据源与状态边界
+      - id: AGT-003
+        status: Done
+        priority: P1
+        depends_on: [AGT-001]
+        title: 定义仓库读序、规则源与决策导航
+        notes: 已在 `agents/index.yaml` 固化读序、decision_map 和 canonical 文件
+      - id: AGT-004
+        status: Todo
+        priority: P1
+        depends_on: [AGT-002]
+        title: 为关键子目录补充局部 `AGENTS.md`
+        notes: 可优先覆盖 `src-bex/`、`src/worker/`、`src/bridge/`，减少跨层误改
+      - id: AGT-005
+        status: Todo
+        priority: P1
+        depends_on: [AGT-002]
+        title: 将后续稳定调试结论持续沉淀到 primitives/context
+        notes: 避免任务板长期承载语义知识
+  - name: Product Backlog
+    tasks:
+      - id: WAL-001
+        status: Todo
+        priority: P1
+        depends_on: []
+        title: 实现 load chain 并支持更直接的 RPC 查询链状态
+        notes: 来自 `README.md` 未完成事项
+      - id: WAL-002
+        status: Todo
+        priority: P1
+        depends_on: []
+        title: 完成多个 popup 处理与更准确的 popup 关闭
+        notes: 来自 `README.md` 未完成事项
+      - id: WAL-003
+        status: Todo
+        priority: P1
+        depends_on: []
+        title: 支持动态加载应用字节码以序列化和反序列化 application operation
+        notes: 来自 `README.md` 未完成事项
+  - name: Validation Gaps
+    tasks:
+      - id: TST-001
+        status: Todo
+        priority: P1
+        depends_on: []
+        title: 为仓库建立真实 automated test 入口
+        notes: 当前 `yarn test` 仅输出占位信息
+  - name: UI Visual Polish
+    tasks:
+      - id: UI-001
+        status: Done
+        priority: P1
+        depends_on: []
+        title: 调整全局配色系统但不改 UX
+        notes: 第一阶段。仅调整全局配色系统，不改交互、不改页面流程、不改信息架构、不重做 UX。范围包括定义和统一 background/surface/text-primary/text-secondary/border/primary/success/warning/danger 等语义色，收敛按钮、卡片、输入框、标签、状态色，修正文字与背景的对比关系，优先落在全局样式变量和通用样式入口
+      - id: UI-002
+        status: Doing
+        priority: P1
+        depends_on: [UI-001]
+        title: 调整各页面页内视觉排版但不改 UX
+        notes: 第二阶段。仅调整每一页页内组件大小、区块间距、内外边距、字号层级、文案信息权重和对应字体颜色，不改页面流程、不改交互结构、不改信息架构、不重新实现 UX。当前按 Material 风格页内整治收口，重点整合 UI-003 到 UI-007 的 5 个问题：header 去卡片化、popup/page 顶层去多余圆角、多层 surface 合并、列表项按标准 list row 收敛、输入区按更明确的 field 语义收敛
+      - id: UI-003
+        status: Done
+        priority: P0
+        depends_on: [UI-002]
+        title: 去掉 popup 根容器和 page header 的多余圆角卡片化
+        notes: 对应评审项 1 和 2。header 改成真正贴边的 top bar 语义，去掉 `page-header` 的卡片式圆角和外框悬浮感；popup 根容器去掉与浏览器扩展方形外框冲突的大圆角，避免顶部和四角出现多余留白
+      - id: UI-004
+        status: Done
+        priority: P0
+        depends_on: [UI-002]
+        title: 合并页内多层 surface 与重复边框
+        notes: 对应评审项 3。减少 `page-container`、`page-header`、`panel-card`、内部卡片之间的重复 surface 嵌套，控制一页内主容器层数，避免连续多层 outlined surface 造成页面碎裂
+      - id: UI-005
+        status: Done
+        priority: P1
+        depends_on: [UI-002]
+        title: 按 Material list row 收敛账户与选择器列表
+        notes: 对应评审项 5。统一 avatar、primary text、supporting text、数值、secondary action 的排列和密度，减少同一行里多重强调，选中态只保留一种主要反馈
+      - id: UI-006
+        status: Done
+        priority: P1
+        depends_on: [UI-002]
+        title: 按更明确的 field 语义收敛输入区
+        notes: 对应评审项 4。减少仅靠 placeholder 传达字段含义的写法，统一输入框、下拉触发器、append action、说明文字的层级和边距，使其更接近 Material text field 的信息表达方式
+      - id: UI-007
+        status: Done
+        priority: P1
+        depends_on: [UI-002]
+        title: 将页头收成 Material 风格三段式 top bar
+        notes: 对应评审项 1 和 9。把页头结构收成 leading / center / trailing 三段，避免当前账户两行信息与左右操作区互相抢层级；次信息不再和主标题同层竞争

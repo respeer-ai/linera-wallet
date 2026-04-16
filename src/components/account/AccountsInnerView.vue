@@ -6,6 +6,7 @@
         outlined
         rounded
         v-model='searchText'
+        placeholder='Search account or address'
       >
         <template #prepend>
           <q-icon name='bi-search' size='16px' />
@@ -15,36 +16,36 @@
     <q-list class='selector-list'>
       <q-item
         v-for='_owner in displayOwners' :key='_owner.id' clickable
-        :class='[ "tab-panel-item selector-item-padding-right", (owner ? _owner.id === owner?.id : _owner.selected) ? "selector-item-selected" : "" ]'
+        :class='[ "tab-panel-item selector-item selector-item-padding-right material-list-row", (owner ? _owner.id === owner?.id : _owner.selected) ? "material-list-selected" : "" ]'
         @click='onOwnerSelected(_owner)'
       >
-        <div :class='[ "selector-indicator", (owner ? _owner.id === owner?.id : _owner.selected) ? "selector-indicator-selected" : "" ]' />
-        <q-avatar color='red-1 selector-margin-x-left'>
+        <div class='selector-indicator' />
+        <q-avatar color='red-1' class='selector-margin-x-left'>
           <q-img :src='dbModel.ownerAvatar(_owner)' width='48px' height='48px' />
         </q-avatar>
-        <div class='selector-margin-x-left text-left'>
-          <div class='text-bold text-grey-9'>
+        <div class='selector-margin-x-left text-left material-list-copy'>
+          <div class='material-list-title'>
             {{ _owner.name }}
           </div>
-          <div class='selector-item-endpoint'>
+          <div class='material-list-subtitle'>
             0x{{ shortid.shortId(_owner.address, 5) }}
           </div>
         </div>
         <q-space />
-        <div>
+        <div class='material-list-value'>
           <div class='row'>
             <q-space />
             <span>$</span>
-            <strong class='text-grey-9'>{{ ownerUsdBalances.get(_owner.address)?.toFixed(4) }}</strong>
+            <strong class='material-list-title'>{{ ownerUsdBalances.get(_owner.address)?.toFixed(4) }}</strong>
             <span class='text-grey-6 header-items-margin-x-left'>USD</span>
           </div>
           <div class='row'>
             <q-img :src='lineraLogo' width='18px' height='18px' />
-            <span class='text-grey-9 selector-item-currency-sub header-items-margin-x-left'>{{ ownerBalances.get(_owner.address)?.toFixed(4) }}</span>
-            <span class='text-grey-6 selector-item-currency-sub header-items-margin-x-left'>TLINERA</span>
+            <span class='material-list-subtitle header-items-margin-x-left'>{{ ownerBalances.get(_owner.address)?.toFixed(4) }}</span>
+            <span class='material-list-subtitle header-items-margin-x-left'>TLINERA</span>
           </div>
         </div>
-        <div class='selector-margin-x-left' v-if='showAction'>
+        <div class='selector-margin-x-left flex items-center' v-if='showAction'>
           <q-icon name='bi-three-dots-vertical' size='16px' @click='onActionClick(_owner)' />
         </div>
       </q-item>

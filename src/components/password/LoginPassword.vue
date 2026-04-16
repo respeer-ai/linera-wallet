@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class='full-width page-x-padding card-soft login-card'>
+  <q-card flat class='full-width page-x-padding login-card'>
     <h5 class='onboarding-page-title'>
       {{ $t('MSG_WELCOME_BACK') }}
     </h5>
@@ -86,4 +86,8 @@ const onForgetPasswordClick = () => {
 .login-card
   padding-top: 20px
   padding-bottom: 28px
+  background: transparent
+  border: 0
+  box-shadow: none
+  border-radius: 0
 </style>

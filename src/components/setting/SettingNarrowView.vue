@@ -1,5 +1,5 @@
 <template>
-  <div class='full-width  full-height'>
+  <div class='full-width full-height page-x-padding'>
     <div class='row page-actions-padding flex items-center justify-center'>
       <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer page-item-x-margin-left' @click='onBackClick' />
       <q-space />

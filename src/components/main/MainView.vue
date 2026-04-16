@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "full-width page-y-padding", localStore.setting.extensionMode ? "" : "page-x-padding" ]'>
+  <div class='full-width page-x-padding page-y-padding'>
     <div v-if='localStore.setting.homeAction === localStore.settingDef.HomeAction.SHOW_MAIN'>
       <MainInnerView />
     </div>

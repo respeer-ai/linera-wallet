@@ -37,14 +37,8 @@ export const ESTIMATE_GAS = gql`
 `
 
 export const IMPORT_CHAIN = gql`
-  mutation importChain(
-    $owner: AccountOwner!
-    $chainId: ChainId!
-  ) {
-    importChain(
-      owner: $owner
-      chainId: $chainId
-    )
+  mutation importChain($owner: AccountOwner!, $chainId: ChainId!) {
+    importChain(owner: $owner, chainId: $chainId)
   }
 `
 

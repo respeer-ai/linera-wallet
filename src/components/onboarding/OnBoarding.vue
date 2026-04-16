@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "fill-parent text-center onboarding-container shadow-1", localStore.setting.extensionMode ? "" : "onboarding-padding" ]'>
+  <div :class='[ "fill-parent text-center onboarding-container", localStore.setting.extensionMode ? "" : "onboarding-padding" ]'>
     <q-carousel
       v-model='slide'
       transition-prev='scale'

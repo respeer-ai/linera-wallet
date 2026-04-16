@@ -1,5 +1,5 @@
 <template>
-  <div :class='[ "text-center onboarding-container shadow-1", localStore.setting.extensionMode ? "" : "onboarding-padding" ]'>
+  <div :class='[ "text-center onboarding-container", localStore.setting.extensionMode ? "" : "onboarding-padding" ]'>
     <LoginPassword v-model:password='password' @unlocked='unlocked' />
   </div>
 </template>

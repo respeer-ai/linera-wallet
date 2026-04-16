@@ -1,11 +1,39 @@
 html
-  --ck-color-primary: #0376c9
-  --ck-color-primary-strong: #005ea6
-  --ck-color-primary-soft: #edf5ff
-  --ck-color-border: rgba(3, 118, 201, 0.22)
-  --ck-color-text-muted: #445a75
-  --ck-color-link: #0376c9
-  --ck-shadow-primary: 0 10px 24px rgba(3, 118, 201, 0.18)
+  --ck-color-bg: #f7f8fa
+  --ck-color-bg-elevated: #f2f4f6
+  --ck-color-surface: #ffffff
+  --ck-color-surface-soft: #fbfcfd
+  --ck-color-surface-accent: #eef8ff
+  --ck-color-border: #d6d9dc
+  --ck-color-border-strong: #bbc0c5
+  --ck-color-text-primary: #24272a
+  --ck-color-text-secondary: #535a61
+  --ck-color-text-muted: #6a737d
+  --ck-color-link: #037dd6
+  --ck-color-primary: #037dd6
+  --ck-color-primary-strong: #0260a4
+  --ck-color-primary-soft: #eaf6ff
+  --ck-color-success: #3b944a
+  --ck-color-warning: #f66a0a
+  --ck-color-danger: #d73a49
+  --ck-color-danger-soft: #fff1f1
+  --ck-shadow-primary: 0 2px 8px rgba(3, 125, 214, 0.2)
+  --ck-shadow-card: 0 1px 3px rgba(36, 39, 42, 0.08)
+  --ck-space-1: 4px
+  --ck-space-2: 8px
+  --ck-space-3: 12px
+  --ck-space-4: 16px
+  --ck-space-5: 20px
+  --ck-space-6: 24px
+  --ck-space-7: 32px
+  --ck-radius-sm: 6px
+  --ck-radius-md: 8px
+  --ck-radius-lg: 12px
+  --ck-font-xs: 12px
+  --ck-font-sm: 14px
+  --ck-font-md: 16px
+  --ck-font-lg: 18px
+  --ck-font-xl: 24px
 
 @font-face
   font-family: 'Noto Sans'
@@ -13,44 +41,54 @@ html
 
 // app global css in SCSS form
 .popup-container
-  background: transparent
+  background: var(--ck-color-surface)
   width: 378px
   max-width: 378px
   height: 600px
-  border-radius: 24px
+  border-radius: 0
+  display: flex
+  flex-direction: column
+  overflow: hidden
 
 .page-container
-  background: white
-  margin: 16px 0 0 0
+  background: var(--ck-color-surface)
+  margin: 0
   max-width: 800px
   height: 100%
+  border: 0
+  box-shadow: none
 
 .page-x-padding
-  padding-left: 16px
-  padding-right: 16px
+  padding-left: 24px
+  padding-right: 24px
+
+.popup-container .page-x-padding
+  padding-left: 4px
+  padding-right: 4px
 
 .items-x-margin
   margin-left: 10px
   margin-right: 10px
 
 .page-y-padding
-  padding-top: 24px
-  padding-bottom: 24px
+  padding-top: 28px
+  padding-bottom: 28px
 
 .page-actions-padding
-  padding-top: 16px
+  padding-top: 20px
 
 .page-item-x-margin-left
-  margin-left: 6px
+  margin-left: 8px
 
 .page-item-x-margin-right
-  margin-right: 6px
+  margin-right: 8px
 
 .page-item-y-margin-top
-  margin-top: 6px
+  margin-top: 8px
 
 .page-item-placeholder
-  margin: 48px 0
+  margin: 56px 0
+  line-height: 1.6
 
 html,
 body,
@@ -62,7 +100,138 @@ div
 
 body
   font-family: 'Noto Sans', sans-serif
-  background: $grey-2
+  background: var(--ck-color-bg)
+  color: var(--ck-color-text-primary)
+  font-size: var(--ck-font-sm)
+  line-height: 1.5
+
+a
+  color: var(--ck-color-link)
+
+.q-layout,
+.q-page-container,
+.q-page
+  background: var(--ck-color-surface)
+
+.shell-toolbar
+  color: var(--ck-color-text-primary)
+  background: rgba(255, 255, 255, 0.96)
+  border-bottom: 1px solid rgba(214, 217, 220, 0.9)
+  backdrop-filter: blur(8px)
+
+.shell-footer
+  color: var(--ck-color-text-secondary)
+  background: rgba(255, 255, 255, 0.96)
+  border-top: 1px solid rgba(214, 217, 220, 0.9)
+  backdrop-filter: blur(8px)
+
+.text-grey-9
+  color: var(--ck-color-text-primary) !important
+
+.text-grey-8,
+.text-brown-10
+  color: var(--ck-color-text-secondary) !important
+
+.text-grey-6
+  color: var(--ck-color-text-muted) !important
+
+.text-blue-8,
+.text-blue-6
+  color: var(--ck-color-primary) !important
+
+.text-red-4,
+.text-red-6,
+.text-red-8
+  color: var(--ck-color-danger) !important
+
+.text-green,
+.text-green-4,
+.text-green-6,
+.text-green-8
+  color: var(--ck-color-success) !important
+
+.bg-white,
+.bg-grey-1
+  background: var(--ck-color-surface) !important
+
+.bg-red-1
+  background: var(--ck-color-primary-soft) !important
+
+.q-card
+  background: var(--ck-color-surface)
+  color: var(--ck-color-text-primary)
+  border: 1px solid rgba(214, 217, 220, 0.9)
+  box-shadow: var(--ck-shadow-card)
+  border-radius: var(--ck-radius-lg)
+
+.q-field--outlined .q-field__control
+  background: var(--ck-color-surface)
+  border-radius: var(--ck-radius-md)
+  height: 48px
+  min-height: 48px
+  padding: 0 4px
+  align-items: center
+
+.q-field--outlined .q-field__control-container
+  height: 100%
+
+.q-field--outlined .q-field__native,
+.q-field--outlined .q-field__input
+  height: 100%
+  min-height: 46px
+  padding-top: 0
+  padding-bottom: 0
+  align-items: center
+
+.q-field--outlined .q-field__marginal
+  height: 100%
+  align-items: center
+
+.q-field--outlined .q-field__control:before
+  border: 1px solid var(--ck-color-border)
+
+.q-field--outlined .q-field__control:hover:before
+  border-color: var(--ck-color-border-strong)
+
+.q-field--outlined .q-field__control:after
+  border: 1px solid transparent
+  border-radius: inherit
+
+.q-field--outlined.q-field--focused .q-field__control:before,
+.q-field--outlined.q-field--highlighted .q-field__control:before
+  border-color: transparent
+
+.q-field--outlined.q-field--focused .q-field__control:after,
+.q-field--outlined.q-field--highlighted .q-field__control:after
+  border-color: var(--ck-color-primary)
+
+.q-field__native,
+.q-field__input,
+.q-field__label
+  color: var(--ck-color-text-primary)
+
+.q-field__native,
+.q-field__input
+  font-size: var(--ck-font-sm)
+
+.q-btn
+  min-height: 40px
+  border-radius: var(--ck-radius-md)
+  letter-spacing: 0
+
+.q-btn .q-btn__content
+  font-size: var(--ck-font-sm)
+  font-weight: 600
+
+.q-toggle__label
+  font-size: var(--ck-font-sm)
+  line-height: 1.5
+
+.q-tab__indicator
+  background: var(--ck-color-primary) !important
+
+.q-separator
+  background: rgba(214, 217, 220, 0.9)
 
 .hide
   display: none !important
@@ -85,45 +254,49 @@ body
   position: relative !important
 
 .hover:hover
-  background: rgba(#1976d2, 0.03)
+  background: rgba(11, 118, 209, 0.06)
 
 .list-expand
   margin: 0 -24px
   padding: 0 24px
 
 .header-items-margin-x-left
-  margin-left: 6px
+  margin-left: 8px
 
 .header-items-margin-x-right
-  margin-right: 6px
+  margin-right: 8px
 
 .header-item-bg
-  background: $red-1
-  border-radius: 32px
+  background: var(--ck-color-primary-soft)
+  border-radius: 999px
 
 .header-inner-padding
-  padding: 16px 12px
+  padding: 14px 16px
 
 .header-text
   line-height: 24px
-  height: 24px
+  min-height: 24px
 
 .header-dropdown
-  border: 1px solid $red-2
+  border: 1px solid var(--ck-color-border)
+  background: var(--ck-color-surface)
+  color: var(--ck-color-text-primary)
 
 .q-btn-dropdown--current
-  border-right: 0px solid $red-2
+  border-right: 0px solid var(--ck-color-border-strong)
 
 .q-btn-dropdown__arrow
   font-size: 1em !important
   margin-right: 6px
 
 .header-selected-lang
-  background: $red-1
+  background: var(--ck-color-primary-soft)
   transition: 1s
 
 .footer-inner-padding
-  padding: 6px 18px
+  padding: 10px 16px
+  font-size: var(--ck-font-sm)
+  line-height: 1.5
 
 .footer-text-margin-x-left
   margin-left: 4px
@@ -132,11 +305,11 @@ body
   margin-left: 12px
 
 .like-link
-  color: -webkit-link
-  text-decoration: underline
+  color: var(--ck-color-link)
+  text-decoration: none
 
 .link-text
-  color: -webkit-link
+  color: var(--ck-color-link)
 
 .onboarding-container
   width: 100%
@@ -155,8 +328,10 @@ body
 
 .onboarding-page-title
   width: 100%
-  font-weight: 600
-  margin: 16px 0
+  font-weight: 700
+  font-size: var(--ck-font-xl)
+  line-height: 1.25
+  margin: 20px 0 12px
   font-family: 'Noto Sans', sans-serif
 
 .page-title
@@ -165,40 +340,45 @@ body
 .onboarding-btns
   width: 100%
   max-width: 400px
-  margin: 0 0 24px 0
+  margin: 0 0 28px 0
 
 .btn
-  padding: 0 16px
+  padding: 0 18px
   min-height: 44px
-  border-radius: 14px
+  border-radius: var(--ck-radius-md)
   color: #ffffff
-  background: linear-gradient(135deg, var(--ck-color-primary) 0%, #1294f2 100%)
+  background: var(--ck-color-primary)
   box-shadow: var(--ck-shadow-primary)
+  font-size: var(--ck-font-sm)
+  font-weight: 700
 
 .btn-alt
-  color: var(--ck-color-text-muted)
+  color: var(--ck-color-text-secondary)
   border: 1px solid var(--ck-color-border)
-  background: rgba(255, 255, 255, 0.92)
+  background: var(--ck-color-surface)
   box-shadow: none
+  min-height: 44px
+  border-radius: var(--ck-radius-md)
 
 .text-action
   color: var(--ck-color-link)
   font-weight: 600
+  font-size: var(--ck-font-sm)
 
 .card-soft
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 255, 0.94) 100%)
-  border: 1px solid rgba(3, 118, 201, 0.12)
-  border-radius: 20px
-  box-shadow: 0 16px 36px rgba(31, 59, 91, 0.08)
+  background: var(--ck-color-surface)
+  border: 1px solid rgba(214, 217, 220, 0.9)
+  border-radius: var(--ck-radius-lg)
+  box-shadow: var(--ck-shadow-card)
 
 .btn-radius
-  border-radius: 8px
+  border-radius: var(--ck-radius-md)
 
 .btn-grey-border
-  border: 1px solid $grey-4
+  border: 1px solid var(--ck-color-border)
 
 .vertical-items-margin
-  margin-top: 10px
+  margin-top: 12px
 
 .vertical-menus-margin
   margin-top: 16px
@@ -210,8 +390,8 @@ body
   width: 50%
 
 .mnemonic-grid
-  border-bottom: 1px solid $red-4
-  border-right: 1px solid $red-4
+  border-bottom: 1px solid var(--ck-color-border-strong)
+  border-right: 1px solid var(--ck-color-border-strong)
   width: 20%
   height: 100%
   .q-field--dense,
@@ -222,54 +402,84 @@ body
   input
     text-align: center
   .blank-text
-    color: $red-6
+    color: var(--ck-color-danger)
     font-weight: 600
 
 .mnemonic-grid-start
-  border-left: 1px solid $red-4
+  border-left: 1px solid var(--ck-color-border-strong)
 
 .mnemonic-grid-top
-  border-top: 1px solid $red-4
+  border-top: 1px solid var(--ck-color-border-strong)
 
 .page-header
-  padding: 4px 12px
-  height: 52px
+  padding: 12px 16px
+  min-height: 56px
+  align-items: center
+  border-radius: 0
+  margin: 0 0 16px
+  border: 0
+  border-bottom: 1px solid rgba(214, 217, 220, 0.9)
+  box-shadow: none
+  background: var(--ck-color-surface)
   .q-btn-dropdown__arrow
     font-size: 1em
     margin-right: 0px
   .q-btn--dense
-    padding: 4px 8px
-    min-height: 1.25em
+    padding: 6px 10px
+    min-height: 36px
   .header-text
     line-height: 22px
-    height: 22px
+    min-height: 22px
   .header-text:hover
-    background: $red-1
-    border-radius: 8px
+    background: var(--ck-color-primary-soft)
+    border-radius: var(--ck-radius-sm)
   .header-icon
-    margin: 15px 0
+    margin: 0
   .header-account
-    width: 160px
+    width: auto
+    min-width: 180px
   .page-header-left-right
-    width: calc(50% - 80px)
+    min-width: 88px
+    width: auto
+
+.extension-page-header
+  padding: 10px 12px
+  min-height: 52px
+  margin: 0 0 12px
+  .header-account
+    min-width: 0
+    max-width: 180px
+  .page-header-left-right
+    min-width: 44px
+  .top-bar-title
+    justify-content: center
+    max-width: 180px
+  .top-bar-title-primary
+    font-size: 13px
+  .top-bar-title-secondary
+    display: none
+  .header-dropdown
+    min-width: 40px
+    padding: 0 8px
 
 .page-header-selector
   line-height: 24px
-  padding: 4px 0
+  padding: 6px 0
   .q-item
-    min-height: 40px
-    padding: 8px 16px
+    min-height: 44px
+    padding: 10px 16px
 
 .page-header-network
   font-size: 12px
-  line-height: 20px
+  line-height: 18px
+  margin-top: 2px
 
 .page-header-network-btn
-  margin: 8px 0 0 0
+  margin: 0
 
 .home-tabs
   .q-tabs
-    border-bottom: 1px solid $grey-4
+    border-bottom: 1px solid var(--ck-color-border)
   .q-tabs__content
     width: 100%
     .q-tab
@@ -279,10 +489,12 @@ body
   line-height: 20px
 
 .home-token-balance
-  font-size: 28px
-  color: $grey-9
-  padding: 24px 0 48px 0
-  border-bottom: 1px solid $grey-2
+  font-size: 32px
+  font-weight: 700
+  line-height: 1.2
+  color: var(--ck-color-text-primary)
+  padding: 24px 0 32px 0
+  border-bottom: 1px solid rgba(214, 217, 220, 0.8)
 
 .home-token-action
   font-size: 12px
@@ -291,25 +503,31 @@ body
   width: 60px
 
 .home-create-account
-  border-bottom: 1px solid $grey-2
+  border-bottom: 1px solid rgba(214, 217, 220, 0.8)
 
 .selector-title
-  font-size: 18px
+  font-size: 20px
+  line-height: 1.35
+  font-weight: 700
+  margin: 0 0 8px
 
 .selector-card
   width: 360px
   max-width: 100%
   max-height: 100%
-  padding: 24px 0
+  padding: 20px 0
+  border-radius: var(--ck-radius-lg)
+  box-shadow: none
   .selector-list
     max-height: 560px
     overflow: scroll
   .selector-action
-    margin-top: 16px
+    margin-top: 20px
     padding: 4px 24px
   .selector-item-endpoint
     font-size: 12px
-    color: $grey-6
+    color: var(--ck-color-text-muted)
+    line-height: 1.4
 
 .selector-margin-x-left
   margin-left: 12px
@@ -318,24 +536,26 @@ body
   margin-right: 12px
 
 .selector-item
+  border-radius: 0
   .selector-delete-btn
     visibility: hidden
 
 .selector-item:hover
+  background: var(--ck-color-bg-elevated)
   .selector-delete-btn
     visibility: visible
 
 .selector-item-selected
-  background: $red-1
+  background: transparent
 
 .selector-item-padding-right
-  padding-right: 8px !important
+  padding-right: 12px !important
 
 .selector-indicator
-  width: 4px
+  width: 0
 
 .selector-indicator-selected
-  background: $red-6
+  background: transparent
 
 .item-currency-sub
   font-size: 16px
@@ -360,16 +580,20 @@ body
   padding: 00
 
 .tab-panel-item
-  padding: 16px 0
+  padding: 14px 0
+  border-bottom: 1px solid rgba(214, 217, 220, 0.7)
+
+.q-list > .q-item:last-child.tab-panel-item
+  border-bottom: 0
 
 .loading-card
   min-height: 160px
   min-width: 128px
   max-width: 95%
-  padding: 24px
+  padding: 28px
 
 .extra-margin-bottom
-  margin-bottom: 24px
+  margin-bottom: 28px
 
 .extra-large-margin-bottom
   margin-bottom: 64px
@@ -388,8 +612,9 @@ pre
   white-space: pre-wrap
 
 .tip
-  border-radius: 4px
-  padding: 8px
+  border-radius: var(--ck-radius-sm)
+  padding: 12px 14px
+  line-height: 1.5
 
 .label-radius
   border-radius: 16px
@@ -398,24 +623,24 @@ pre
   width: calc(100% - 30px)
 
 .warn
-  border: 1px solid $red-2
-  border-left: 4px solid $red-4
+  border: 1px solid rgba(196, 69, 54, 0.2)
+  border-left: 4px solid var(--ck-color-danger)
 
 .warn-bg
-  background: $red-1
+  background: var(--ck-color-danger-soft)
 
 .info
-  border: 1px solid $blue-2
-  border-left: 4px solid $blue-4
+  border: 1px solid rgba(11, 118, 209, 0.16)
+  border-left: 4px solid var(--ck-color-primary)
 
 .info-bg
-  background: $grey-2
+  background: var(--ck-color-primary-soft)
 
 .decorate-underline
-  border-bottom: 2px solid $grey-2
+  border-bottom: 1px solid rgba(214, 217, 220, 0.8)
 
 .decorate-underline-dashed
-  border-bottom: 1px dashed $grey-4
+  border-bottom: 1px dashed var(--ck-color-border)
 
 .dialog
   width: 600px
@@ -426,26 +651,27 @@ pre
   width: 180px
 
 .setting-label
-  font-size: 20px
-  padding: 16px
+  font-size: 22px
+  line-height: 1.3
+  padding: 20px 16px 16px
 
 .setting-label-dense
-  padding: 0 16px
+  padding: 0 16px 4px
 
 .setting-header
-  line-height: 28px
+  line-height: 30px
 
 .setting-item
-  line-height: 28px
+  line-height: 30px
 
 .setting-action
   line-height: 24px
 
 .setting-item-container
-  padding: 8px 0 8px 8px
+  padding: 12px 0 12px 10px
 
 .setting-item-container:hover
-  background: $red-1
+  background: var(--ck-color-primary-soft)
   transition: 1s
 
 .setting-item-no-x-padding
@@ -454,11 +680,14 @@ pre
 .setting-item-inner-padding
   padding: 0 8px
 
+.transfer-step-inset
+  padding: 0 8px
+
 .setting-icon
   width: 28px
 
 .right-border
-  border-right: 1px $grey-4 solid
+  border-right: 1px var(--ck-color-border) solid
 
 .network-list-left
   width: 60%
@@ -473,10 +702,10 @@ pre
     height: 32px
 
 .private-key-warn
-  background: $red-1
-  border-left: 3px solid $red-8
-  padding: 8px
-  border-radius: 4px
+  background: var(--ck-color-danger-soft)
+  border-left: 3px solid var(--ck-color-danger)
+  padding: 12px
+  border-radius: var(--ck-radius-sm)
 
 .microchain-token-balance
   padding: 24px 0 0 0
@@ -499,24 +728,191 @@ pre
   margin-top: 4px
 
 .label-text-extra-large
-  font-size: 28px
+  font-size: 30px
+  line-height: 1.2
 
 .label-text-large
-  font-size: 18px
+  font-size: 20px
+  line-height: 1.35
 
 .label-text-medium
   font-size: 16px
+  line-height: 1.5
 
 .label-text-small
-  font-size: 12px
+  font-size: 13px
+  line-height: 1.45
 
 .transfer-card
-  width: 368px
+  width: 380px
+  max-width: 100%
 
 .transfer-tip
-  padding: 16px
-  border: 1px solid $grey-4 !important
-  border-radius: 8px !important
+  padding: 14px 16px
+  border: 1px solid var(--ck-color-border) !important
+  border-radius: var(--ck-radius-md) !important
+
+.section-label
+  font-size: var(--ck-font-xs)
+  line-height: 1.4
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: var(--ck-color-text-muted)
+  font-weight: 700
+
+.content-title
+  font-size: var(--ck-font-lg)
+  line-height: 1.35
+  font-weight: 700
+  color: var(--ck-color-text-primary)
+
+.content-subtitle
+  font-size: var(--ck-font-sm)
+  line-height: 1.5
+  color: var(--ck-color-text-secondary)
+
+.panel-card
+  padding: 0 16px 16px
+  border: 0
+  border-radius: 0
+  background: transparent
+  box-shadow: none
+
+.popup-container .panel-card
+  padding: 0 0 16px
+
+.stack-sm > * + *
+  margin-top: 12px
+
+.stack-md > * + *
+  margin-top: 18px
+
+.stack-lg > * + *
+  margin-top: 24px
+
+.selector-search
+  padding: 0px 16px 10px 16px
+
+.selector-item-endpoint
+  font-size: 12px
+  color: var(--ck-color-text-muted)
+
+.q-avatar
+  border-radius: 999px
+
+.q-avatar[color='red-1']
+  background: var(--ck-color-surface-accent)
+
+.top-bar-title
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 8px
+  min-width: 0
+
+.top-bar-title-copy
+  min-width: 0
+
+.top-bar-title-primary
+  font-size: 14px
+  font-weight: 600
+  line-height: 20px
+  color: var(--ck-color-text-primary)
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.top-bar-title-secondary
+  font-size: 12px
+  line-height: 16px
+  color: var(--ck-color-text-muted)
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.material-field-label
+  font-size: 12px
+  line-height: 16px
+  font-weight: 600
+  color: var(--ck-color-text-muted)
+  margin-bottom: 8px
+  text-transform: uppercase
+  letter-spacing: 0.04em
+
+.material-field-stack
+  margin-top: 16px
+
+.material-field-shell
+  border: 1px solid var(--ck-color-border)
+  border-radius: var(--ck-radius-md)
+  background: var(--ck-color-surface)
+  padding: 12px 14px
+
+.material-field-shell:hover
+  border-color: var(--ck-color-border-strong)
+
+.material-field-row
+  display: flex
+  align-items: center
+  gap: 12px
+  min-height: 44px
+
+.material-field-copy
+  min-width: 0
+  flex: 1
+
+.material-field-title
+  font-size: 14px
+  line-height: 20px
+  font-weight: 600
+  color: var(--ck-color-text-primary)
+
+.material-field-subtitle
+  font-size: 12px
+  line-height: 16px
+  color: var(--ck-color-text-muted)
+  margin-top: 2px
+
+.material-inline-action
+  font-size: 13px
+  line-height: 18px
+  font-weight: 600
+  color: var(--ck-color-link)
+
+.material-list-row
+  align-items: center
+
+.material-list-copy
+  min-width: 0
+  flex: 1
+
+.material-list-title
+  font-size: 14px
+  line-height: 20px
+  font-weight: 600
+  color: var(--ck-color-text-primary)
+
+.material-list-subtitle
+  font-size: 12px
+  line-height: 16px
+  color: var(--ck-color-text-muted)
+  margin-top: 2px
+
+.material-list-value
+  text-align: right
+
+.material-list-selected
+  position: relative
+
+.material-list-selected::before
+  content: ''
+  position: absolute
+  left: 0
+  top: 10px
+  bottom: 10px
+  width: 3px
+  border-radius: 999px
+  background: var(--ck-color-primary)
 
 .transfer-amount-space
   height: 100px

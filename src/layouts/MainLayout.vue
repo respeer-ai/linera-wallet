@@ -1,7 +1,7 @@
 <template>
   <q-layout view='hHh Lpr fFf'>
     <q-header v-if='showHeaderMenu'>
-      <q-toolbar class='text-white bg-white'>
+      <q-toolbar class='shell-toolbar'>
         <MainHeaderView :style='{ width: "100%" }' />
       </q-toolbar>
       <q-resize-observer @resize='onHeaderResize' />
@@ -17,16 +17,16 @@
               :is='Component'
               :class='[ extensionMode ? "popup-container" : "page-container shadow-1", alignPageCenter ? "flex justify-center items-center" : "" ]'
               :style='{
-                height: `${bodyHeight} !important`,
+                height: `${extensionMode ? "100%" : bodyHeight} !important`,
                 width: `${viewWidth} !important`,
-                overflow: "scroll"
+                overflow: extensionMode ? "auto" : "scroll"
               }'
             />
           </transition>
         </router-view>
       </q-page>
     </q-page-container>
-    <q-footer v-if='showFooterMenu' class='text-grey-8 bg-grey-1'>
+    <q-footer v-if='showFooterMenu' class='shell-footer'>
       <FooterMenu />
       <q-resize-observer @resize='onFooterResize' />
     </q-footer>

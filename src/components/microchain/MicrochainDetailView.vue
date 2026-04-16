@@ -126,7 +126,7 @@ const onTransferClick = () => {
 }
 
 const onSwapClick = () => {
-  window.open('http://testnet-conway.lineraswap.fun')
+  window.open('https://testnet-conway.linerameme.fun')
 }
 
 </script>

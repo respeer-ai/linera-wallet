@@ -1,5 +1,5 @@
 <template>
-  <div class='text-center onboarding-container shadow-1'>
+  <div class='text-center onboarding-container'>
     <div class='onboarding-content full-width full-height page-x-padding extra-margin-bottom'>
       <div class='row vertical-menus-margin'>
         <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />

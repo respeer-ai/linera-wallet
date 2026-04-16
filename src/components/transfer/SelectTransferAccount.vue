@@ -1,221 +1,229 @@
 <template>
-  <div class='vertical-menus-margin decorate-underline'>
-    {{ $t('MSG_TOKEN') }}
-  </div>
-  <q-btn-dropdown
-    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-menus-margin'
-    no-caps dense
-    dropdown-icon='bi-chevron-down'
-    menu-anchor='bottom left'
-    menu-self='top left'
-    @click='onTokenClick'
-  >
-    <template #label>
-      <div class='row full-width'>
-        <q-avatar>
-          <q-img
-            v-if='selectedToken' :src='selectedTokenLogo' width='36px' height='36px'
-            fit='contain'
-          />
-        </q-avatar>
-        <div v-if='selectedToken' class='header-items-margin-x-left text-left' :style='{width: "calc(100% - 36px - 12px - 20px)"}'>
-          <div>
-            {{ selectedToken.ticker }}
-          </div>
-          <div v-if='selectedToken.native' class='text-grey-6 page-header-network'>
-            {{ selectedToken.name }}
-          </div>
-          <div v-else class='text-grey-6 page-header-network'>
-            0x{{ shortid.shortId(selectedToken.applicationId as string, 10) }}
-          </div>
-        </div>
+  <div class='full-width transfer-step-inset'>
+    <div class='material-field-stack'>
+      <div class='material-field-label'>
+        {{ $t('MSG_TOKEN') }}
       </div>
-    </template>
-  </q-btn-dropdown>
-  <div class='vertical-menus-margin decorate-underline'>
-    {{ $t('MSG_FROM') }}
-  </div>
-  <q-btn-dropdown
-    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-menus-margin'
-    no-caps dense
-    dropdown-icon='bi-chevron-down'
-    menu-anchor='bottom left'
-    menu-self='top left'
-    @click='onFromAccountClick'
-  >
-    <template #label>
-      <div class='row full-width'>
-        <q-avatar>
-          <q-img v-if='selectedFromOwner' :src='dbModel.ownerAvatar(selectedFromOwner)' width='36px' height='36px' />
-        </q-avatar>
-        <div v-if='selectedFromOwner' class='header-items-margin-x-left text-left'>
-          <div>
-            {{ selectedFromOwner.name }}
+      <q-btn-dropdown
+        flat filled class='btn-alt full-width btn-radius btn-grey-border'
+        no-caps dense
+        dropdown-icon='bi-chevron-down'
+        menu-anchor='bottom left'
+        menu-self='top left'
+        @click='onTokenClick'
+      >
+        <template #label>
+          <div class='material-field-row full-width'>
+            <q-avatar>
+              <q-img
+                v-if='selectedToken' :src='selectedTokenLogo' width='36px' height='36px'
+                fit='contain'
+              />
+            </q-avatar>
+            <div v-if='selectedToken' class='material-field-copy text-left' :style='{width: "calc(100% - 36px - 12px - 20px)"}'>
+              <div class='material-field-title'>
+                {{ selectedToken.ticker }}
+              </div>
+              <div v-if='selectedToken.native' class='material-field-subtitle'>
+                {{ selectedToken.name }}
+              </div>
+              <div v-else class='material-field-subtitle'>
+                0x{{ shortid.shortId(selectedToken.applicationId as string, 10) }}
+              </div>
+            </div>
           </div>
-          <div class='text-grey-6 page-header-network'>
-            0x{{ shortid.shortId(selectedFromOwner.owner, 6) }}
-          </div>
-        </div>
+        </template>
+      </q-btn-dropdown>
+    </div>
+    <div class='material-field-stack'>
+      <div class='material-field-label'>
+        {{ $t('MSG_FROM') }}
       </div>
-    </template>
-  </q-btn-dropdown>
-  <q-btn-dropdown
-    flat filled class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin'
-    no-caps dense
-    dropdown-icon='bi-chevron-down'
-    menu-anchor='bottom left'
-    menu-self='top left'
-    @click='onFromMicrochainClick'
-    v-if='fromMicrochains.length > 0'
-  >
-    <template #label>
-      <div class='row full-width'>
-        <q-avatar>
-          <q-img v-if='selectedFromMicrochain' :src='dbModel.microchainAvatar(selectedFromMicrochain)' width='36px' height='36px' />
-        </q-avatar>
-        <div v-if='selectedFromMicrochain' class='header-items-margin-x-left text-left'>
-          <div>
-            {{ selectedFromMicrochain.name || 'Microchain' }}
+      <q-btn-dropdown
+        flat filled class='btn-alt full-width btn-radius btn-grey-border'
+        no-caps dense
+        dropdown-icon='bi-chevron-down'
+        menu-anchor='bottom left'
+        menu-self='top left'
+        @click='onFromAccountClick'
+      >
+        <template #label>
+          <div class='material-field-row full-width'>
+            <q-avatar>
+              <q-img v-if='selectedFromOwner' :src='dbModel.ownerAvatar(selectedFromOwner)' width='36px' height='36px' />
+            </q-avatar>
+            <div v-if='selectedFromOwner' class='material-field-copy text-left'>
+              <div class='material-field-title'>
+                {{ selectedFromOwner.name }}
+              </div>
+              <div class='material-field-subtitle'>
+                0x{{ shortid.shortId(selectedFromOwner.owner, 6) }}
+              </div>
+            </div>
           </div>
-          <div class='text-grey-6 page-header-network'>
-            0x{{ shortid.shortId(selectedFromMicrochain.microchain, 6) }}
-          </div>
-        </div>
-      </div>
-    </template>
-  </q-btn-dropdown>
-  <div v-else class='btn-alt full-width btn-radius btn-grey-border vertical-items-margin transfer-tip text-grey-6 cursor-pointer'>
-    {{ $t('MSG_NO_USABLE_MICROCHAIN') }} <span class='like-link'>{{ $t('MSG_CREATE') }}</span>
-  </div>
-  <div class='vertical-items-margin' v-if='fromMicrochains.length > 0 && selectedToken?.native'>
-    <q-toggle
-      dense
-      rounded
-      :label='$t("MSG_SEND_FROM_MICROCHAIN_BALANCE")'
-      v-model='fromChainBalance'
-    />
-  </div>
-
-  <div class='vertical-sections-margin decorate-underline row'>
-    {{ $t('MSG_TO') }}
-  </div>
-  <div class='vertical-menus-margin'>
-    <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input address'>
-      <template #append>
-        <q-btn flat dense class='text-blue-8 cursor-pointer label-text-small' @click='onSelectToAccountClick'>
-          {{ $t('MSG_SELECT') }}
-        </q-btn>
-      </template>
-    </q-input>
+        </template>
+      </q-btn-dropdown>
+    </div>
     <q-btn-dropdown
-      v-else
-      flat filled class='btn-alt full-width btn-radius btn-grey-border'
+      flat filled class='btn-alt full-width btn-radius btn-grey-border material-field-stack'
       no-caps dense
       dropdown-icon='bi-chevron-down'
       menu-anchor='bottom left'
       menu-self='top left'
-      @click='onToAccountClick'
+      @click='onFromMicrochainClick'
+      v-if='fromMicrochains.length > 0'
     >
       <template #label>
-        <div class='row full-width'>
+        <div class='material-field-row full-width'>
           <q-avatar>
-            <q-img v-if='selectedToOwner' :src='dbModel.ownerAvatar(selectedToOwner)' width='36px' height='36px' />
+            <q-img v-if='selectedFromMicrochain' :src='dbModel.microchainAvatar(selectedFromMicrochain)' width='36px' height='36px' />
           </q-avatar>
-          <div class='header-items-margin-x-left text-left'>
-            <div>
-              {{ selectedToOwner?.name || 'Microchain' }}
+          <div v-if='selectedFromMicrochain' class='material-field-copy text-left'>
+            <div class='material-field-title'>
+              {{ selectedFromMicrochain.name || 'Microchain' }}
             </div>
-            <div class='text-grey-6 page-header-network'>
-              0x{{ shortid.shortId(selectedToOwner?.owner, 6) }}
+            <div class='material-field-subtitle'>
+              0x{{ shortid.shortId(selectedFromMicrochain.microchain, 6) }}
             </div>
-          </div>
-          <q-space />
-          <div class='flex justify-center items-center cursor-pointer' @click='onClearToAccountClick'>
-            <q-icon name='bi-x' size='20px' />
           </div>
         </div>
       </template>
     </q-btn-dropdown>
-  </div>
-  <div class='vertical-items-margin'>
-    <q-input
-      v-if='selectedToMicrochain === undefined' outlined v-model='toMicrochain' placeholder='Input microchain ID'
-      :disable='!selectedToOwner && !toAddress'
-    >
-      <template #append>
-        <q-btn
-          flat dense :disable='toMicrochainOwners.length === 0' class='text-blue-8 cursor-pointer label-text-small'
-          @click='onSelectToMicrochainClick'
+    <div v-else class='btn-alt full-width btn-radius btn-grey-border material-field-stack transfer-tip text-grey-6 cursor-pointer'>
+      {{ $t('MSG_NO_USABLE_MICROCHAIN') }} <span class='like-link'>{{ $t('MSG_CREATE') }}</span>
+    </div>
+    <div class='vertical-items-margin' v-if='fromMicrochains.length > 0 && selectedToken?.native'>
+      <q-toggle
+        dense
+        rounded
+        :label='$t("MSG_SEND_FROM_MICROCHAIN_BALANCE")'
+        v-model='fromChainBalance'
+      />
+    </div>
+
+    <div class='vertical-sections-margin'>
+      <div class='material-field-label'>
+        {{ $t('MSG_TO') }}
+      </div>
+      <div class='vertical-menus-margin'>
+        <q-input v-if='selectedToOwner === undefined' outlined v-model='toAddress' placeholder='Input address'>
+          <template #append>
+            <q-btn flat dense class='material-inline-action cursor-pointer' @click='onSelectToAccountClick'>
+              {{ $t('MSG_SELECT') }}
+            </q-btn>
+          </template>
+        </q-input>
+        <q-btn-dropdown
+          v-else
+          flat filled class='btn-alt full-width btn-radius btn-grey-border'
+          no-caps dense
+          dropdown-icon='bi-chevron-down'
+          menu-anchor='bottom left'
+          menu-self='top left'
+          @click='onToAccountClick'
         >
-          {{ $t('MSG_SELECT') }}
-        </q-btn>
-      </template>
-    </q-input>
-    <q-btn-dropdown
-      v-else
-      flat filled class='btn-alt full-width btn-radius btn-grey-border'
-      no-caps dense
-      dropdown-icon='bi-chevron-down'
-      menu-anchor='bottom left'
-      menu-self='top left'
-      @click='onToMicrochainClick'
-    >
-      <template #label>
-        <div class='row full-width'>
-          <q-avatar>
-            <q-img v-if='selectedToMicrochain' :src='dbModel.microchainAvatar(selectedToMicrochain)' width='36px' height='36px' />
-          </q-avatar>
-          <div class='header-items-margin-x-left text-left'>
-            <div>
-              {{ selectedToMicrochain?.name || 'Microchain' }}
+          <template #label>
+            <div class='material-field-row full-width'>
+              <q-avatar>
+                <q-img v-if='selectedToOwner' :src='dbModel.ownerAvatar(selectedToOwner)' width='36px' height='36px' />
+              </q-avatar>
+              <div class='material-field-copy text-left'>
+                <div class='material-field-title'>
+                  {{ selectedToOwner?.name || 'Microchain' }}
+                </div>
+                <div class='material-field-subtitle'>
+                  0x{{ shortid.shortId(selectedToOwner?.owner, 6) }}
+                </div>
+              </div>
+              <q-space />
+              <div class='flex justify-center items-center cursor-pointer' @click='onClearToAccountClick'>
+                <q-icon name='bi-x' size='20px' />
+              </div>
             </div>
-            <div class='text-grey-6 page-header-network'>
-              0x{{ shortid.shortId(selectedToMicrochain?.microchain, 6) }}
+          </template>
+        </q-btn-dropdown>
+      </div>
+      <div class='vertical-items-margin'>
+        <q-input
+          v-if='selectedToMicrochain === undefined' outlined v-model='toMicrochain' placeholder='Input microchain ID'
+          :disable='!selectedToOwner && !toAddress'
+        >
+          <template #append>
+            <q-btn
+              flat dense :disable='toMicrochainOwners.length === 0' class='material-inline-action cursor-pointer'
+              @click='onSelectToMicrochainClick'
+            >
+              {{ $t('MSG_SELECT') }}
+            </q-btn>
+          </template>
+        </q-input>
+        <q-btn-dropdown
+          v-else
+          flat filled class='btn-alt full-width btn-radius btn-grey-border'
+          no-caps dense
+          dropdown-icon='bi-chevron-down'
+          menu-anchor='bottom left'
+          menu-self='top left'
+          @click='onToMicrochainClick'
+        >
+          <template #label>
+            <div class='material-field-row full-width'>
+              <q-avatar>
+                <q-img v-if='selectedToMicrochain' :src='dbModel.microchainAvatar(selectedToMicrochain)' width='36px' height='36px' />
+              </q-avatar>
+              <div class='material-field-copy text-left'>
+                <div class='material-field-title'>
+                  {{ selectedToMicrochain?.name || 'Microchain' }}
+                </div>
+                <div class='material-field-subtitle'>
+                  0x{{ shortid.shortId(selectedToMicrochain?.microchain, 6) }}
+                </div>
+              </div>
+              <q-space />
+              <div class='flex justify-center items-center cursor-pointer' @click='onClearToMicrochainClick'>
+                <q-icon name='bi-x' size='20px' />
+              </div>
             </div>
-          </div>
-          <q-space />
-          <div class='flex justify-center items-center cursor-pointer' @click='onClearToMicrochainClick'>
-            <q-icon name='bi-x' size='20px' />
-          </div>
-        </div>
-      </template>
-    </q-btn-dropdown>
-  </div>
-  <div class='vertical-items-margin' v-if='toMicrochain && toMicrochain.length > 0 && selectedToken?.native'>
-    <q-toggle
-      dense
-      rounded
-      :label='$t("MSG_SEND_TO_MICROCHAIN_BALANCE")'
-      v-model='toChainBalance'
-    />
-  </div>
+          </template>
+        </q-btn-dropdown>
+      </div>
+      <div class='vertical-items-margin' v-if='toMicrochain && toMicrochain.length > 0 && selectedToken?.native'>
+        <q-toggle
+          dense
+          rounded
+          :label='$t("MSG_SEND_TO_MICROCHAIN_BALANCE")'
+          v-model='toChainBalance'
+        />
+      </div>
 
-  <div class='page-y-padding'>
-    <q-btn
-      flat
-      rounded
-      :label='$t("MSG_CONTINUE")'
-      class='btn full-width extra-margin-bottom'
-      @click='onTransferClick'
-      no-caps
-      :disable='!canGotoNext'
-    />
+      <div class='page-y-padding'>
+        <q-btn
+          flat
+          rounded
+          :label='$t("MSG_CONTINUE")'
+          class='btn full-width extra-margin-bottom'
+          @click='onTransferClick'
+          no-caps
+          :disable='!canGotoNext'
+        />
+      </div>
+    </div>
+    <q-dialog v-model='selectingFromOwner'>
+      <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='false' />
+    </q-dialog>
+    <q-dialog v-model='selectingFromMicrochain'>
+      <MicrochainSelector :owner='selectedFromOwner?.owner' v-model='selectedFromMicrochain' @selected='onFromMicrochainSelected' />
+    </q-dialog>
+    <q-dialog v-model='selectingToOwner'>
+      <OwnerSelector v-model='selectedToOwner' @selected='onToOwnerSelected' :creatable='false' :persistent='false' />
+    </q-dialog>
+    <q-dialog v-model='selectingToMicrochain'>
+      <MicrochainSelector :owner='selectedToOwner?.owner' v-model='selectedToMicrochain' @selected='onToMicrochainSelected' />
+    </q-dialog>
+    <q-dialog v-model='selectingToken'>
+      <TokenSelector v-model='selectedToken' @selected='onTokenSelected' />
+    </q-dialog>
   </div>
-  <q-dialog v-model='selectingFromOwner'>
-    <OwnerSelector v-model='selectedFromOwner' @selected='onFromOwnerSelected' :creatable='false' :persistent='false' />
-  </q-dialog>
-  <q-dialog v-model='selectingFromMicrochain'>
-    <MicrochainSelector :owner='selectedFromOwner?.owner' v-model='selectedFromMicrochain' @selected='onFromMicrochainSelected' />
-  </q-dialog>
-  <q-dialog v-model='selectingToOwner'>
-    <OwnerSelector v-model='selectedToOwner' @selected='onToOwnerSelected' :creatable='false' :persistent='false' />
-  </q-dialog>
-  <q-dialog v-model='selectingToMicrochain'>
-    <MicrochainSelector :owner='selectedToOwner?.owner' v-model='selectedToMicrochain' @selected='onToMicrochainSelected' />
-  </q-dialog>
-  <q-dialog v-model='selectingToken'>
-    <TokenSelector v-model='selectedToken' @selected='onTokenSelected' />
-  </q-dialog>
 </template>
 
 <script setup lang='ts'>

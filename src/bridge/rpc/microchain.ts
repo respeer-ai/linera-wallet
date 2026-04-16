@@ -39,10 +39,7 @@ export class Microchain {
     return (graphqlResult.rootData(res) as OpenChainMutation).claim as unknown
   }
 
-  static initMicrochainStore = async (
-    owner: string,
-    chainId: string
-  ) => {
+  static initMicrochainStore = async (owner: string, chainId: string) => {
     const options = await getClientOptionsWithEndpointType(EndpointType.Rpc)
     if (!options) return undefined
     const apolloClient = new ApolloClient(options)

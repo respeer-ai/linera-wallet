@@ -1,6 +1,6 @@
 <template>
-  <div class='row full-width page-header shadow-1'>
-    <div class='page-header-left-right page-header-network-btn'>
+  <div :class='[ "row full-width page-header", localStore.setting.extensionMode ? "extension-page-header" : "" ]'>
+    <div class='page-header-left-right page-header-network-btn row items-center'>
       <q-btn-dropdown
         rounded flat filled class='btn-alt'
         no-caps dense
@@ -10,7 +10,7 @@
         @click='onNetworkClick'
       >
         <template #label>
-          <div class='row'>
+          <div class='row items-center no-wrap'>
             <q-img :src='selectedNetwork?.icon' width='20px' height='20px' />
             <div v-if='!localStore.setting.extensionMode' class='header-items-margin-x-left page-header-network'>
               {{ selectedNetwork?.name }}
@@ -20,33 +20,27 @@
       </q-btn-dropdown>
     </div>
     <q-space />
-    <div class='header-account text-center'>
-      <div class='header-text text-center text-bold row cursor-pointer' @click='onAccountClick'>
-        <q-space />
-        <div class='account-icon'>
-          <q-img v-if='selectedOwner' :src='dbModel.ownerAvatar(selectedOwner)' height='14px' width='14px' />
-        </div>
-        <div class='header-items-margin-x-left'>
-          {{ selectedOwner?.name }}
-        </div>
-        <div class='header-items-margin-x-left'>
-          <q-icon name='bi-chevron-down' size='12px' />
-        </div>
-        <q-space />
+    <div class='header-account top-bar-title cursor-pointer' @click='onAccountClick'>
+      <div class='account-icon'>
+        <q-img v-if='selectedOwner' :src='dbModel.ownerAvatar(selectedOwner)' height='18px' width='18px' />
       </div>
-      <div class='header-text text-center row cursor-pointer'>
-        <q-space />
-        <div>
-          0x{{ shortid.shortId(selectedOwner?.address, 6) }}
+      <div class='top-bar-title-copy'>
+        <div class='top-bar-title-primary'>
+          {{ selectedOwner?.name || $t('MSG_SELECT_AN_ACCOUNT') }}
         </div>
-        <div class='header-items-margin-x-left cursor-pointer'>
-          <q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(selectedOwner?.address as string, evt)' />
+        <div v-if='!localStore.setting.extensionMode' class='top-bar-title-secondary row items-center no-wrap'>
+          <span>0x{{ shortid.shortId(selectedOwner?.address, 6) }}</span>
+          <span class='header-items-margin-x-left cursor-pointer'>
+            <q-icon name='bi-copy' size='12px' @click.stop='(evt) => _copyToClipboard(selectedOwner?.address as string, evt)' />
+          </span>
         </div>
-        <q-space />
+      </div>
+      <div class='header-items-margin-x-left'>
+        <q-icon name='bi-chevron-down' size='12px' />
       </div>
     </div>
     <q-space />
-    <div class='page-header-left-right row'>
+    <div class='page-header-left-right row items-center justify-end'>
       <q-space />
       <q-icon class='header-icon cursor-pointer' name='bi-three-dots-vertical' size='12x'>
         <q-menu anchor='bottom end' self='top end' :offset='[0, 8]'>

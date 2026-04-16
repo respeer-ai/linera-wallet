@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='transfer-step-inset'>
     <div class='text-grey-6 vertical-sections-margin'>
       {{ $t('MSG_TRANSFER') }}
     </div>

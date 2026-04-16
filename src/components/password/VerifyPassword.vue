@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class='text-center fill-parent card-soft verify-password-card'>
+  <q-card flat class='text-center fill-parent verify-password-card'>
     <h5 class='vertical-items-margin text-bold' v-if='showTitle'>
       {{ title }}
     </h5>
@@ -113,4 +113,8 @@ onMounted(async () => {
 <style scoped lang='sass'>
 .verify-password-card
   padding: 8px 0 0
+  background: transparent
+  border: 0
+  box-shadow: none
+  border-radius: 0
 </style>

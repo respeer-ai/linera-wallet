@@ -1,6 +1,6 @@
 <template>
   <div class='popup-shell full-height'>
-    <div class='full-width page-x-padding popup-header'>
+    <div class='full-width popup-header'>
       <PopupHeader />
     </div>
     <div class='popup-title-wrap'>
@@ -107,20 +107,16 @@ onUnmounted(() => {
 .popup-shell
   display: flex
   flex-direction: column
-  background: linear-gradient(180deg, #f7f9fc 0%, #f2f6fb 20%, #eef3f8 100%)
+  min-height: 100%
+  background: #ffffff
 
 .popup-header
-  margin: 12px 12px 0
-  padding-top: 14px
-  padding-bottom: 14px
-  background: rgba(255, 255, 255, 0.9)
-  border: 1px solid rgba(3, 118, 201, 0.12)
-  border-radius: 18px 18px 12px 12px
-  box-shadow: 0 12px 30px rgba(31, 59, 91, 0.08)
-  backdrop-filter: blur(10px)
+  padding: 14px 16px 12px
+  background: #ffffff
+  border-bottom: 1px solid rgba(214, 217, 220, 0.9)
 
 .popup-title-wrap
-  padding: 14px 20px 10px
+  padding: 14px 16px 10px
 
 .popup-queue
   width: fit-content
@@ -140,14 +136,13 @@ onUnmounted(() => {
 .popup-body
   flex: 1
   min-height: 0
-  padding: 0 12px 12px
+  padding: 0 16px 16px
 
 .popup-tip
-  margin: 0 12px 12px
-  padding: 12px 16px
+  margin: 0
+  padding: 12px 16px 16px
   color: #60758c
-  background: rgba(255, 255, 255, 0.78)
-  border: 1px solid rgba(3, 118, 201, 0.1)
-  border-radius: 14px
+  background: #ffffff
+  border-top: 1px solid rgba(214, 217, 220, 0.8)
   text-decoration: none
 </style>

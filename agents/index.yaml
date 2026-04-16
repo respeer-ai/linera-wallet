@@ -1,0 +1,148 @@
+version: 1
+entry:
+  readme: agents/README.md
+required_read_order:
+  - agents/index.yaml
+  - agents/context/project-rules.md
+  - agents/context/doc-standard.md
+  - agents/tasks/board.yaml
+task_source:
+  primary: agents/tasks/board.yaml
+rules_source:
+  primary: agents/context/project-rules.md
+assistant_doc_roots:
+  - agents/
+  - AGENTS.md
+local_scope_rule:
+  instruction: Before editing a directory, check for the nearest AGENTS.md in that directory or its parents.
+decision_map:
+  wallet_state_bug:
+    read_first:
+      - agents/primitives/data-sources-and-state.md
+      - agents/primitives/identity-and-wallet-ownership.md
+      - agents/runbooks/bug-investigation.md
+  rpc_or_extension_bug:
+    read_first:
+      - agents/primitives/rpc-and-approval-flow.md
+      - agents/primitives/identity-and-wallet-ownership.md
+      - agents/runbooks/bug-investigation.md
+  block_or_sync_bug:
+    read_first:
+      - agents/primitives/microchain-and-block-execution.md
+      - agents/primitives/data-sources-and-state.md
+      - agents/runbooks/bug-investigation.md
+  graphql_or_backend_integration_task:
+    read_first:
+      - agents/primitives/data-sources-and-state.md
+      - agents/context/system-map.md
+      - agents/runbooks/local-development.md
+  build_or_bex_task:
+    read_first:
+      - agents/context/system-map.md
+      - agents/context/current-capabilities.md
+      - agents/runbooks/local-development.md
+  testing_task:
+    read_first:
+      - agents/runbooks/testing.md
+      - agents/context/project-rules.md
+      - agents/tasks/board.yaml
+navigation:
+  context:
+    - path: agents/context/doc-standard.md
+      canonical_for:
+        - assistant_doc_format
+        - assistant_doc_update_rules
+      when_to_read:
+        - creating new assistant docs
+        - restructuring existing assistant docs
+    - path: agents/context/project-rules.md
+      canonical_for:
+        - repo_level_assistant_rules
+        - task_board_rules
+        - change_management_rules
+      when_to_read:
+        - starting any repository task
+        - deciding where assistant docs belong
+    - path: agents/context/system-map.md
+      canonical_for:
+        - module_map
+        - runtime_topology
+        - high_level_architecture
+      when_to_read:
+        - entering unfamiliar subsystem
+        - tracing cross-module behavior
+    - path: agents/context/current-capabilities.md
+      canonical_for:
+        - implemented_wallet_features
+        - known_gaps
+        - active_development_fronts
+      when_to_read:
+        - checking whether a feature already exists
+        - deciding whether a TODO is implemented already
+  primitives:
+    - path: agents/primitives/identity-and-wallet-ownership.md
+      canonical_for:
+        - owner_public_key_origin_binding
+        - rpc_auth_semantics
+        - account_identity_rules
+      when_to_read:
+        - changing account selection or auth
+        - debugging origin/account mismatches
+    - path: agents/primitives/rpc-and-approval-flow.md
+      canonical_for:
+        - extension_rpc_surface
+        - popup_confirmation_semantics
+        - request_routing
+      when_to_read:
+        - changing extension middleware
+        - adding rpc methods
+        - debugging dapp-to-wallet interactions
+    - path: agents/primitives/microchain-and-block-execution.md
+      canonical_for:
+        - operation_submission_flow
+        - incoming_bundle_processing
+        - sync_retry_semantics
+      when_to_read:
+        - changing block execution
+        - investigating stuck operations
+        - reviewing retry behavior
+    - path: agents/primitives/data-sources-and-state.md
+      canonical_for:
+        - truth_hierarchy
+        - graphql_and_local_db_boundaries
+        - ui_store_boundaries
+      when_to_read:
+        - debugging stale wallet state
+        - deciding whether to patch UI or persistence
+        - adding new fetched state
+  runbooks:
+    - path: agents/runbooks/bug-investigation.md
+      canonical_for:
+        - bug_investigation_flow
+      when_to_read:
+        - starting any bug fix
+    - path: agents/runbooks/local-development.md
+      canonical_for:
+        - local_dev_flow
+      when_to_read:
+        - running app locally
+        - building bex or wasm assets
+        - regenerating graphql files
+    - path: agents/runbooks/testing.md
+      canonical_for:
+        - testing_expectations
+      when_to_read:
+        - validating a change
+        - planning regression coverage
+  tasks:
+    - path: agents/tasks/board.yaml
+      canonical_for:
+        - live_task_status
+        - task_priority
+        - task_dependencies
+      when_to_read:
+        - selecting next task
+        - updating task status
+generated:
+  directory: agents/generated/
+  rule: Never store hand-maintained truth here.

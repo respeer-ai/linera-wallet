@@ -1,8 +1,7 @@
 <template>
-  <q-card flat class='full-width page-x-padding vertical-menus-margin row'>
-    <q-space />
-    <div class='transfer-card'>
-      <div class='row'>
+  <div class='full-width full-height page-x-padding'>
+    <div class='transfer-card vertical-menus-margin'>
+      <div class='row items-center'>
         <q-icon name='bi-arrow-left-short' size='24px' class='cursor-pointer' @click='onBackClick' />
         <q-space />
         <p class='text-center text-bold text-grey-9 selector-title'>
@@ -57,8 +56,7 @@
         />
       </div>
     </div>
-    <q-space />
-  </q-card>
+  </div>
 </template>
 
 <script setup lang='ts'>

@@ -6,18 +6,18 @@
     <q-list class='selector-list'>
       <q-item
         v-for='_network in networks' :key='_network.id' clickable
-        :class='[ "selector-item-padding-right tab-panel-item", _network.selected ? "selector-item-selected" : "" ]'
+        :class='[ "selector-item selector-item-padding-right tab-panel-item material-list-row", _network.selected ? "material-list-selected" : "" ]'
         @click='onNetworkSelected(_network)'
       >
-        <div :class='[ "selector-indicator", _network.selected ? "selector-indicator-selected" : "" ]' />
-        <q-avatar color='red-1 selector-margin-x-left'>
+        <div class='selector-indicator' />
+        <q-avatar color='red-1' class='selector-margin-x-left'>
           <q-img :src='_network.icon' width='48px' height='48px' />
         </q-avatar>
-        <div class='selector-margin-x-left'>
-          <div class='text-bold text-grey-9'>
+        <div class='selector-margin-x-left material-list-copy'>
+          <div class='material-list-title'>
             {{ _network.name }}
           </div>
-          <div class='selector-item-endpoint'>
+          <div class='material-list-subtitle'>
             {{ _network.faucetUrl }}
           </div>
         </div>

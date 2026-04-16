@@ -1,5 +1,5 @@
 <template>
-  <div class='full-width'>
+  <div class='full-width transfer-step-inset'>
     <div class='transfer-amount-space' />
     <div class='row text-center'>
       <q-space />
