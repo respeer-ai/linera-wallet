@@ -51,6 +51,25 @@ Authority: Medium
   - placeholder line
   - compare link in the form `https://github.com/<repo>/compare/<previous_tag>...<current_tag>` when a previous tag exists
 
+## Release Notes Requirements
+
+- Default to an engineer-facing tone
+- Summarize real shipped changes from the actual commit range, not from guesswork
+- Prefer concrete implementation areas such as RPC, GraphQL, popup flow, routing, runtime guards, versioning, and release automation
+- Keep the top section title as `## Change Notes`
+- Add a `## You must know` section when operators or users need migration or version-context information
+- If the repository has no public tag for an internal version jump, say that explicitly and anchor the compare link to the latest public tag
+- Include the release asset filename in `## You must know`
+- End with a full changelog link in the form:
+  `**Full Changelog**: https://github.com/<repo>/compare/<public_previous_tag>...<current_tag>`
+
+## Confirmed v0.0.22 Pattern
+
+- Use engineer-facing release notes
+- State that `v0.0.20` is not a public git tag when relevant
+- Use `v0.0.18...v0.0.22` as the changelog compare range for this release
+- Mention the asset name `Packaged.linera-checko-wallet.v0.0.22.zip`
+
 ## Do Not
 
 - Do not hardcode a version that disagrees with `package.json`

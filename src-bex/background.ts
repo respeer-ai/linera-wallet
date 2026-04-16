@@ -7,7 +7,11 @@ import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 import { sentinel, block } from './microchain'
 import InstallationManager from './manager/installationmanager'
 import browser from 'webextension-polyfill'
-import { installRuntimeGuards, runSafely, runSafelyAsync } from './runtime-guards'
+import {
+  installRuntimeGuards,
+  runSafely,
+  runSafelyAsync
+} from './runtime-guards'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process

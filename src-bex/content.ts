@@ -25,7 +25,11 @@ import type {
 import { RpcMethod, RpcRequest } from './middleware/types'
 import { subscription } from './content/subscription'
 import { subscription as bgSubscription } from './subscription'
-import { installRuntimeGuards, logRuntimeWarning, runSafely } from './runtime-guards'
+import {
+  installRuntimeGuards,
+  logRuntimeWarning,
+  runSafely
+} from './runtime-guards'
 
 window.Buffer = BufferPolyfill
 window.process = process
@@ -92,21 +96,29 @@ const normalizeMaybeUrl = (value: unknown): string | undefined => {
 
 const pageFavicon = () => {
   const headHtml = window.document.head?.innerHTML || ''
-  const iconPattern = /<link[^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*href=["']([^"']+)["'][^>]*>/i
-  const iconReversePattern = /<link[^>]*href=["']([^"']+)["'][^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*>/i
-  const ogImagePattern = /<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["'][^>]*>/i
-  const ogImageReversePattern = /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["'][^>]*>/i
+  const iconPattern =
+    /<link[^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*href=["']([^"']+)["'][^>]*>/i
+  const iconReversePattern =
+    /<link[^>]*href=["']([^"']+)["'][^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*>/i
+  const ogImagePattern =
+    /<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["'][^>]*>/i
+  const ogImageReversePattern =
+    /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["'][^>]*>/i
 
   const iconHref = normalizeMaybeUrl(headHtml.match(iconPattern)?.[1])
   if (iconHref) return iconHref
 
-  const iconReverseHref = normalizeMaybeUrl(headHtml.match(iconReversePattern)?.[1])
+  const iconReverseHref = normalizeMaybeUrl(
+    headHtml.match(iconReversePattern)?.[1]
+  )
   if (iconReverseHref) return iconReverseHref
 
   const ogImageHref = normalizeMaybeUrl(headHtml.match(ogImagePattern)?.[1])
   if (ogImageHref) return ogImageHref
 
-  const ogImageReverseHref = normalizeMaybeUrl(headHtml.match(ogImageReversePattern)?.[1])
+  const ogImageReverseHref = normalizeMaybeUrl(
+    headHtml.match(ogImageReversePattern)?.[1]
+  )
   if (ogImageReverseHref) return ogImageReverseHref
 
   return normalizeUrl('/favicon.ico') || ''

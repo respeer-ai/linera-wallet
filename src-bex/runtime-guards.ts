@@ -50,10 +50,13 @@ export const installRuntimeGuards = (scope: string) => {
       event.preventDefault?.()
     })
 
-    globalThis.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
-      logRuntimeWarning(scope, event.reason)
-      event.preventDefault?.()
-    })
+    globalThis.addEventListener(
+      'unhandledrejection',
+      (event: PromiseRejectionEvent) => {
+        logRuntimeWarning(scope, event.reason)
+        event.preventDefault?.()
+      }
+    )
   }
 }
 
@@ -66,7 +69,10 @@ export const runSafely = <T>(scope: string, action: () => T): T | undefined => {
   }
 }
 
-export const runSafelyAsync = (scope: string, action: () => Promise<unknown>) => {
+export const runSafelyAsync = (
+  scope: string,
+  action: () => Promise<unknown>
+) => {
   void Promise.resolve()
     .then(action)
     .catch((error) => {
