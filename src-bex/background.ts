@@ -7,9 +7,11 @@ import { setupLineraSubscription } from './middleware/rpcimpl/lineragraphqldo'
 import { sentinel, block } from './microchain'
 import InstallationManager from './manager/installationmanager'
 import browser from 'webextension-polyfill'
+import { installRuntimeGuards, runSafely, runSafelyAsync } from './runtime-guards'
 
 globalThis.Buffer = BufferPolyfill
 globalThis.process = process
+installRuntimeGuards('bex-background')
 
 const installationManager = new InstallationManager()
 let keepaliveInterval
@@ -62,26 +64,37 @@ export default bexBackground(
     }
   ) => {
     keepalive(bridge, allActiveConnections)
-
-    engine.DataHandler.run(bridge)
+    runSafely('bex-background:bridge-init', () => {
+      engine.DataHandler.run(bridge)
+    })
   }
 )
 
-installationManager.initializeOnInstalledListener()
+runSafely('bex-background:install-listener', () => {
+  installationManager.initializeOnInstalledListener()
+})
 
 browser.runtime.onMessage.addListener((message, sender) => {
-  if (!isTabMetadataMessage(message)) {
-    return undefined
-  }
+  return runSafely('bex-background:on-message', () => {
+    if (!isTabMetadataMessage(message)) {
+      return undefined
+    }
 
-  const tab = sender.tab
-  return Promise.resolve({
-    url: tab?.url || '',
-    title: tab?.title || '',
-    favicon: tab?.favIconUrl || ''
+    const tab = sender.tab
+    return Promise.resolve({
+      url: tab?.url || '',
+      title: tab?.title || '',
+      favicon: tab?.favIconUrl || ''
+    })
   })
 })
 
-void sentinel.Sentinel.run()
-void setupLineraSubscription()
-block.BlockSigner.run()
+runSafelyAsync('bex-background:sentinel', async () => {
+  await sentinel.Sentinel.run()
+})
+runSafelyAsync('bex-background:subscription', () => {
+  setupLineraSubscription()
+})
+runSafely('bex-background:block-signer', () => {
+  block.BlockSigner.run()
+})

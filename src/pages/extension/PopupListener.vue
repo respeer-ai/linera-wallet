@@ -13,19 +13,26 @@ import { commontypes } from 'src/types'
 const quasar = useQuasar()
 
 const handleNewRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
-  switch (payload.data.type) {
-    case middlewaretypes.PopupRequestType.CONFIRMATION:
-      localStore.popup.addConnection({
-        origin: payload.data.request.origin,
-        favicon: payload.data.request.favicon,
-        name: payload.data.request.name
-      })
-      return localStore.popup.insertRequest(payload)
-    default:
-      return void payload.respond({
-        code: -1,
-        message: 'Invalid request'
-      })
+  try {
+    switch (payload.data.type) {
+      case middlewaretypes.PopupRequestType.CONFIRMATION:
+        localStore.popup.addConnection({
+          origin: payload.data.request.origin,
+          favicon: payload.data.request.favicon,
+          name: payload.data.request.name
+        })
+        return localStore.popup.insertRequest(payload)
+      default:
+        return void payload.respond({
+          code: -1,
+          message: 'Invalid request'
+        })
+    }
+  } catch {
+    return void payload.respond({
+      code: -1,
+      message: 'Popup request handling failed'
+    })
   }
 }
 

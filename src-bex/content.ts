@@ -25,9 +25,11 @@ import type {
 import { RpcMethod, RpcRequest } from './middleware/types'
 import { subscription } from './content/subscription'
 import { subscription as bgSubscription } from './subscription'
+import { installRuntimeGuards, logRuntimeWarning, runSafely } from './runtime-guards'
 
 window.Buffer = BufferPolyfill
 window.process = process
+installRuntimeGuards('bex-content')
 
 interface PageMetadata {
   origin: string
@@ -47,8 +49,8 @@ const pageMetadata: PageMetadata = {
   favicon: ''
 }
 
-const normalizeUrl = (value?: string | null) => {
-  if (!value) return undefined
+const normalizeUrl = (value?: unknown): string | undefined => {
+  if (typeof value !== 'string' || !value) return undefined
   try {
     return new URL(value, window.location.href).href
   } catch {
@@ -69,42 +71,61 @@ const pageTitle = () => {
   return window.location.hostname || normalizedOrigin()
 }
 
-const pageFavicon = () => {
-  const iconSelectors = [
-    'link[rel="icon"]',
-    'link[rel="shortcut icon"]',
-    'link[rel="Shortcut Icon"]',
-    'link[rel="apple-touch-icon"]',
-    'link[rel="apple-touch-icon-precomposed"]',
-    'link[rel*="icon"]',
-    'meta[property="og:image"]'
-  ]
-
-  for (const selector of iconSelectors) {
-    const elements = Array.from(window.document.querySelectorAll(selector))
-    for (const element of elements) {
-      const href =
-        'href' in element
-          ? normalizeUrl(element.href)
-          : normalizeUrl(element.getAttribute('content'))
-      if (href) {
-        return href
-      }
-    }
+const readStringProperty = (value: unknown, key: string): string | null => {
+  if (typeof value !== 'object' || value === null) {
+    return null
   }
+
+  const candidate = value as Record<string, unknown>
+  const property = candidate[key]
+  return typeof property === 'string' ? property : null
+}
+
+const normalizeMaybeUrl = (value: unknown): string | undefined => {
+  if (typeof value !== 'string') {
+    return normalizeUrl(null)
+  }
+
+  const urlValue = `${value}`
+  return normalizeUrl(urlValue)
+}
+
+const pageFavicon = () => {
+  const headHtml = window.document.head?.innerHTML || ''
+  const iconPattern = /<link[^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*href=["']([^"']+)["'][^>]*>/i
+  const iconReversePattern = /<link[^>]*href=["']([^"']+)["'][^>]*rel=["'][^"']*\bicon\b[^"']*["'][^>]*>/i
+  const ogImagePattern = /<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["'][^>]*>/i
+  const ogImageReversePattern = /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["'][^>]*>/i
+
+  const iconHref = normalizeMaybeUrl(headHtml.match(iconPattern)?.[1])
+  if (iconHref) return iconHref
+
+  const iconReverseHref = normalizeMaybeUrl(headHtml.match(iconReversePattern)?.[1])
+  if (iconReverseHref) return iconReverseHref
+
+  const ogImageHref = normalizeMaybeUrl(headHtml.match(ogImagePattern)?.[1])
+  if (ogImageHref) return ogImageHref
+
+  const ogImageReverseHref = normalizeMaybeUrl(headHtml.match(ogImageReversePattern)?.[1])
+  if (ogImageReverseHref) return ogImageReverseHref
 
   return normalizeUrl('/favicon.ico') || ''
 }
 
 const requestTabMetadata = async () => {
   try {
-    const response: TabMetadataResponse = await chrome.runtime.sendMessage({
+    const response: unknown = await chrome.runtime.sendMessage({
       type: 'checko:get-tab-metadata'
     })
+    const tabMetadata = {
+      url: readStringProperty(response, 'url') || undefined,
+      title: readStringProperty(response, 'title') || undefined,
+      favicon: readStringProperty(response, 'favicon') || undefined
+    } as TabMetadataResponse
 
-    if (response?.url) {
+    if (tabMetadata.url) {
       try {
-        const url = new URL(response.url)
+        const url = new URL(tabMetadata.url)
         pageMetadata.origin =
           url.origin !== 'null' ? url.origin : `${url.protocol}//${url.host}`
       } catch {
@@ -112,11 +133,11 @@ const requestTabMetadata = async () => {
       }
     }
 
-    if (response?.title?.trim()) {
-      pageMetadata.name = response.title.trim()
+    if (tabMetadata.title?.trim()) {
+      pageMetadata.name = tabMetadata.title.trim()
     }
 
-    const favicon = normalizeUrl(response?.favicon)
+    const favicon = normalizeUrl(tabMetadata.favicon)
     if (favicon) {
       pageMetadata.favicon = favicon
     }
@@ -180,7 +201,7 @@ const setupPageStream = () => {
   pageMux.setMaxListeners(25)
 
   pump(pageMux, pageStream, pageMux, (err) =>
-    console.log('CheCko inpage multiplex', err)
+    logRuntimeWarning('bex-content:inpage-multiplex', err)
   )
 
   return pageMux.createStream(constant.PROVIDER)
@@ -333,11 +354,13 @@ const setupRpcEngine = (bridge: BexBridge, mux: Duplex) => {
   })
   const providerStream = createEngineStream({ engine })
   pump(mux, providerStream, mux, (err) =>
-    console.log('CheCko background multiplex provider', err)
+    logRuntimeWarning('bex-content:background-multiplex', err)
   )
 }
 
 export default bexContent((bridge: BexBridge) => {
-  setupMetadataTracking()
-  setupRpcEngine(bridge, setupPageStream())
+  runSafely('bex-content:init', () => {
+    setupMetadataTracking()
+    setupRpcEngine(bridge, setupPageStream())
+  })
 })

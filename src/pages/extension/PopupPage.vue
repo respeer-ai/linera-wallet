@@ -73,21 +73,28 @@ watch(popupCount, () => {
 })
 
 const handleUpdateRequest = (payload: BexPayload<commontypes.PopupRequest, unknown>) => {
-  switch (payload.data.type) {
-    case middlewaretypes.PopupRequestType.EXECUTION:
-      // It can only update a confirmed popup
-      if (!localStore.popup.updateRequest(payload)) {
+  try {
+    switch (payload.data.type) {
+      case middlewaretypes.PopupRequestType.EXECUTION:
+        // It can only update a confirmed popup
+        if (!localStore.popup.updateRequest(payload)) {
+          return void payload.respond({
+            code: -1,
+            message: 'Invalid request'
+          })
+        }
+        break
+      default:
         return void payload.respond({
           code: -1,
           message: 'Invalid request'
         })
-      }
-      break
-    default:
-      return void payload.respond({
-        code: -1,
-        message: 'Invalid request'
-      })
+    }
+  } catch {
+    return void payload.respond({
+      code: -1,
+      message: 'Popup update handling failed'
+    })
   }
 }
 

@@ -43,6 +43,7 @@ import wasmModuleUrl from '../../src-bex/wasm/linera_wasm_bg.wasm?url'
 import initWasm from '../../src-bex/wasm/linera_wasm'
 import { Berith } from '@hazae41/berith'
 import { localStore } from 'src/localstores'
+import { installRuntimeGuards, logRuntimeWarning } from '../../src-bex/runtime-guards'
 
 import MainHeaderView from 'src/components/header/MainHeaderView.vue'
 import FooterMenu from 'src/components/footer/FooterMenu.vue'
@@ -55,6 +56,7 @@ const showHeaderMenu = computed(() => localStore.setting.showHeaderMenu)
 const alignPageCenter = computed(() => localStore.setting.alignPageCenter)
 const extensionMode = computed(() => localStore.setting.extensionMode)
 const showSettingMenu = computed(() => localStore.setting.showSettingMenu)
+installRuntimeGuards('extension-ui')
 
 watch(showSettingMenu, () => {
   localStore.setting.ShowFooterMenu = showSettingMenu.value
@@ -90,9 +92,13 @@ const handlerNotification = () => {
 }
 
 onMounted(async () => {
-  await initWasm(await fetch(wasmModuleUrl))
-  await Berith.initBundledOnce()
-  handlerNotification()
+  try {
+    await initWasm(await fetch(wasmModuleUrl))
+    await Berith.initBundledOnce()
+    handlerNotification()
+  } catch (error) {
+    logRuntimeWarning('extension-ui:init', error)
+  }
 })
 
 interface Size {
