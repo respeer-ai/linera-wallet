@@ -14,6 +14,10 @@ const { configure } = require('quasar/wrappers')
 const path = require('path')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { stringify } = require('flatted')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pkg = require('./package.json')
+
+const appVersion = pkg.version
 
 module.exports = configure(function (ctx) {
   return {
@@ -62,7 +66,9 @@ module.exports = configure(function (ctx) {
       // publicPath: '/',
       // analyze: true,
 
-      // env: {},
+      env: {
+        APP_VERSION: appVersion
+      },
 
       rawDefine: {
         'process.version': stringify(process.version)
@@ -298,8 +304,11 @@ module.exports = configure(function (ctx) {
         }
         esbuildConf.loader = esbuildConf.loader || {}
         esbuildConf.loader['.wasm'] = 'file'
+      },
+
+      extendBexManifestJson(json) {
+        json.version = appVersion
       }
-      // extendBexManifestJson (json) {}
     }
   }
 })

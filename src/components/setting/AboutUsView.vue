@@ -14,7 +14,7 @@
             {{ $t('MSG_VERSION') }}
           </div>
           <q-space />
-          <div>{{ $t('MSG_VERSION_NUMBER') }}</div>
+          <div>v{{ appVersion }}</div>
         </div>
         <div class='row line'>
           <div class='label'>
@@ -39,6 +39,8 @@
 <script setup lang='ts'>
 
 import { cheCkoLogo } from 'src/assets'
+
+const appVersion = process.env.APP_VERSION || '0.0.0'
 
 </script>
 
