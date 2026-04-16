@@ -10,6 +10,10 @@ PUBLISH_RELEASE="${PUBLISH_RELEASE:-1}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 ALLOW_DIRTY="${ALLOW_DIRTY:-0}"
 RELEASE_NOTES_FILE="${RELEASE_NOTES_FILE:-}"
+TARGET_COMMITISH="${TARGET_COMMITISH:-master}"
+CREATE_TAG="${CREATE_TAG:-1}"
+ALLOW_EXISTING_TAG="${ALLOW_EXISTING_TAG:-0}"
+PREVIOUS_PUBLIC_TAG="${PREVIOUS_PUBLIC_TAG:-}"
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -29,8 +33,8 @@ if [[ -z "${GITHUB_TOKEN:-}" ]]; then
   exit 1
 fi
 
-VERSION="$(node -p "require('./package.json').version")"
-TAG="v${VERSION}"
+VERSION="${RELEASE_VERSION:-$(node -p "require('./package.json').version")}"
+TAG="${RELEASE_TAG:-v${VERSION}}"
 RELEASE_TITLE="Release ${TAG}"
 DEFAULT_ZIP="dist/bex/Packaged.linera-checko-wallet.zip"
 VERSIONED_ZIP="dist/bex/Packaged.linera-checko-wallet.${TAG}.zip"
@@ -41,14 +45,27 @@ if [[ "$ALLOW_DIRTY" != "1" ]] && [[ -n "$(git status --short)" ]]; then
   exit 1
 fi
 
+tag_exists_local=0
+tag_exists_remote=0
+
 if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null 2>&1; then
-  echo "Tag ${TAG} already exists locally" >&2
-  exit 1
+  tag_exists_local=1
 fi
 
 if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
-  echo "Tag ${TAG} already exists on origin" >&2
-  exit 1
+  tag_exists_remote=1
+fi
+
+if [[ "$ALLOW_EXISTING_TAG" != "1" ]] && [[ "$CREATE_TAG" = "1" ]]; then
+  if [[ "$tag_exists_local" = "1" ]]; then
+    echo "Tag ${TAG} already exists locally" >&2
+    exit 1
+  fi
+
+  if [[ "$tag_exists_remote" = "1" ]]; then
+    echo "Tag ${TAG} already exists on origin" >&2
+    exit 1
+  fi
 fi
 
 release_lookup="$(curl -fsSL \
@@ -56,10 +73,7 @@ release_lookup="$(curl -fsSL \
   -H "Authorization: Bearer ${GITHUB_TOKEN}" \
   "${API_BASE}/releases/tags/${TAG}" || true)"
 
-if [[ -n "$release_lookup" ]] && [[ "$(printf '%s' "$release_lookup" | jq -r '.id // empty')" != "" ]]; then
-  echo "Release ${TAG} already exists on GitHub" >&2
-  exit 1
-fi
+release_id="$(printf '%s' "$release_lookup" | jq -r '.id // empty')"
 
 if [[ "$SKIP_BUILD" != "1" ]]; then
   yarn build:bex
@@ -72,7 +86,10 @@ fi
 
 cp "$DEFAULT_ZIP" "$VERSIONED_ZIP"
 
-previous_tag="$(git tag --list 'v*' --sort=-version:refname | grep -Fxv "$TAG" | head -n 1 || true)"
+previous_tag="$PREVIOUS_PUBLIC_TAG"
+if [[ -z "$previous_tag" ]]; then
+  previous_tag="$(git tag --list 'v*' --sort=-version:refname | grep -Fxv "$TAG" | head -n 1 || true)"
+fi
 
 if [[ -n "$RELEASE_NOTES_FILE" ]]; then
   if [[ ! -f "$RELEASE_NOTES_FILE" ]]; then
@@ -87,23 +104,39 @@ else
   fi
 fi
 
-git tag "$TAG"
-git push origin "$TAG"
+if [[ "$CREATE_TAG" = "1" ]]; then
+  if [[ "$tag_exists_local" != "1" ]]; then
+    git tag "$TAG"
+  fi
+
+  if [[ "$tag_exists_remote" != "1" ]]; then
+    git push origin "$TAG"
+  fi
+fi
 
 release_payload="$(jq -n \
   --arg tag_name "$TAG" \
-  --arg target_commitish "master" \
+  --arg target_commitish "$TARGET_COMMITISH" \
   --arg name "$RELEASE_TITLE" \
   --arg body "$release_body" \
   --argjson draft "$( [[ "$PUBLISH_RELEASE" = "1" ]] && echo false || echo true )" \
   '{tag_name: $tag_name, target_commitish: $target_commitish, name: $name, body: $body, draft: $draft, prerelease: false}')"
 
-release_response="$(curl -fsSL \
-  -X POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-  "${API_BASE}/releases" \
-  -d "$release_payload")"
+if [[ -n "$release_id" ]]; then
+  release_response="$(curl -fsSL \
+    -X PATCH \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    "${API_BASE}/releases/${release_id}" \
+    -d "$release_payload")"
+else
+  release_response="$(curl -fsSL \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    "${API_BASE}/releases" \
+    -d "$release_payload")"
+fi
 
 release_id="$(printf '%s' "$release_response" | jq -r '.id')"
 
@@ -113,6 +146,16 @@ if [[ -z "$release_id" || "$release_id" == "null" ]]; then
 fi
 
 asset_name="$(basename "$VERSIONED_ZIP")"
+existing_asset_id="$(printf '%s' "$release_response" | jq -r --arg name "$asset_name" '.assets[]? | select(.name == $name) | .id' | head -n 1 || true)"
+
+if [[ -n "$existing_asset_id" ]]; then
+  curl -fsSL \
+    -X DELETE \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    "${API_BASE}/releases/assets/${existing_asset_id}" >/dev/null
+fi
+
 upload_url="https://uploads.github.com/repos/${RELEASE_REPO}/releases/${release_id}/assets?name=${asset_name}"
 
 curl -fsSL \
@@ -123,5 +166,5 @@ curl -fsSL \
   --data-binary @"$VERSIONED_ZIP" \
   "$upload_url" >/dev/null
 
-echo "Created release ${TAG}"
+echo "Published release ${TAG}"
 echo "Uploaded asset ${VERSIONED_ZIP}"
