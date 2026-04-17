@@ -31,6 +31,7 @@ jobs:
       - run: sudo apt install unzip
       - run: mkdir -p /tmp/protoc; cd /tmp/protoc; unzip /tmp/protoc-27.2-linux-x86_64.zip
       - run: yarn
+      - run: cargo fetch --manifest-path wasm/Cargo.toml --locked
       - run: PATH=$PATH:/tmp/protoc/bin yarn build:wasm
       - run: yarn build
       - run: yarn build:bex
